@@ -1,0 +1,84 @@
+---
+title: "Panel Wizard: Human-in-the-loop ML for proposal panel formation"
+slug: "panel-wizard"
+client: "National Science Foundation (sanitized)"
+timeframe: "Recent (sanitized)"
+role: "Solutions architect / applied data scientist (consulting)"
+stack:
+  - Python
+  - SciBERT/BERT embeddings
+  - HDBSCAN
+  - k-means
+  - Jupyter
+  - SQL
+  - Dashboards
+tags:
+  - Human-in-the-loop
+  - NLP
+  - Clustering
+  - Decision support
+  - Governance
+featured: true
+executiveSummary: "Reduced manual triage burden by generating auditable grouping suggestions while keeping program staff in control."
+builderSummary: "SciBERT embeddings + clustering to propose groups, surfaced with fit signals in a drag-and-drop UI."
+---
+
+## Context and why it mattered
+
+Federal research agencies review thousands of proposals each cycle. Grouping proposals into thematically coherent review panels is a labor-intensive, high-stakes task — get the groupings wrong and reviewers lack relevant expertise, slowing decisions and risking fairness.
+
+Program staff had been managing this process manually, relying on institutional knowledge and spreadsheets. As submission volumes grew, the approach didn't scale — and new staff couldn't replicate the reasoning of experienced colleagues.
+
+## Constraints
+
+- **Sensitive data**: proposal abstracts and metadata are pre-decisional and must be handled under strict access controls.
+- **Fairness and accountability**: any automated grouping must be explainable and auditable. Staff, not models, own the final decisions.
+- **Limited integration surface**: the solution needed to work alongside existing systems without requiring deep infrastructure changes.
+- **Human-in-the-loop requirement**: the tool must surface suggestions — never make assignments autonomously.
+
+## Approach
+
+### Embedding pipeline
+
+Proposal abstracts were encoded using **SciBERT** (a domain-adapted BERT model trained on scientific text) to produce dense vector representations. These embeddings capture semantic similarity between proposals far better than keyword matching.
+
+### Clustering
+
+Multiple clustering algorithms were evaluated:
+- **HDBSCAN** for discovering natural groupings without pre-specifying cluster count
+- **k-means** for generating fixed-size panels when operational constraints required it
+
+Clustering parameters were iteratively tuned with stakeholder feedback — not just optimized against a metric, but tested against program staff's qualitative judgment of "does this grouping make sense?"
+
+### Human-in-the-loop UI
+
+The core interface — internally called **Panel Wizard** — presented clustering suggestions alongside transparency signals:
+- **Fit scores** showing how strongly each proposal matched its assigned cluster
+- **"Why" signals** surfacing the most similar proposals and shared topical themes
+- **Drag-and-drop overrides** so staff could move proposals between panels, with the system updating fit metrics in real time
+
+### Monitoring and evaluation
+
+Telemetry dashboards tracked adoption patterns, override rates, and cluster quality metrics. This data informed iterative improvements and helped leadership understand how staff were actually using the tool.
+
+## What shipped (sanitized)
+
+- A working application enabling program staff to review ML-generated panel groupings, understand the rationale, and override as needed.
+- Dashboards providing operational visibility into clustering quality and staff interaction patterns.
+- Documentation and training materials supporting adoption by new team members.
+
+*What I can share is limited by the sensitivity of the work. The above describes the approach and design — specific data, metrics, and internal details are not included.*
+
+## Outcomes
+
+- Staff reported reduced time spent on manual grouping tasks.
+- The tool created a repeatable, auditable process where one had not existed before.
+- Override patterns provided valuable signal for improving future model iterations.
+- The human-in-the-loop design built trust with stakeholders who were initially cautious about ML-assisted workflows.
+
+## Lessons and what I'd improve next
+
+- **Start with the decision, not the model.** The most important design work was understanding how program officers actually think about panel composition — the ML was a means to that end.
+- **Override rates are signal, not failure.** High override rates early on helped calibrate the clustering. The goal was never zero overrides — it was informed overrides.
+- **Evaluation is ongoing.** There's no single accuracy metric for "good panels." Quality is contextual and requires continuous stakeholder dialogue.
+- If I were starting fresh, I'd invest earlier in **A/B-style evaluation** comparing manual vs. assisted groupings on downstream review outcomes.

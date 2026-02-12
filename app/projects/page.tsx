@@ -1,97 +1,90 @@
-"use client";
+import type { Metadata } from "next";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
-import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { FilterBar } from "@/components/projects/filter-bar";
-import { ProjectCard } from "@/components/projects/project-card";
-import { projects, getAllCategories } from "@/lib/projects";
+export const metadata: Metadata = {
+  title: "Projects",
+  description:
+    "Smaller projects and prototypes — RAG pipelines, embedding notebooks, governance toolkits, and more.",
+};
+
+const projects = [
+  {
+    title: "RAG Pipeline Prototype",
+    description:
+      "A retrieval-augmented generation pipeline using embedding-based search over a local document corpus. Built to explore how RAG can support curated Q&A experiences without exposing sensitive data.",
+    stack: ["Python", "LangChain (conceptual)", "FAISS", "Embeddings"],
+    availability: "Code available on request",
+  },
+  {
+    title: "Embedding + Clustering Notebook Template",
+    description:
+      "A reusable Jupyter notebook workflow for encoding text with transformer embeddings and exploring clustering approaches (HDBSCAN, k-means). Designed as a starting point for NLP exploration projects.",
+    stack: ["Python", "Jupyter", "scikit-learn", "sentence-transformers"],
+    availability: "Code available on request",
+  },
+  {
+    title: "Tableau Governance Checklist",
+    description:
+      "A starter kit for teams adopting Tableau in regulated environments. Covers naming conventions, data source management, accessibility standards, refresh monitoring, and publishing workflows.",
+    stack: ["Tableau", "Documentation", "Governance"],
+    availability: "Available on request",
+  },
+  {
+    title: "Portfolio Site (this site)",
+    description:
+      "A production-grade portfolio built with Next.js, TypeScript, and Tailwind CSS. Features MDX-driven content, global search, dark mode, print-ready resume, and accessibility-first design.",
+    stack: ["Next.js", "TypeScript", "Tailwind CSS", "MDX"],
+    availability: "Source available",
+  },
+];
 
 export default function ProjectsPage() {
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
-  const categories = getAllCategories();
-
-  const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
-      const matchesCategory =
-        activeCategory === "All" ||
-        project.category.includes(activeCategory);
-      const matchesSearch =
-        searchQuery === "" ||
-        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.technologies.some((t) =>
-          t.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      return matchesCategory && matchesSearch;
-    });
-  }, [activeCategory, searchQuery]);
-
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-5xl">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-4 mb-12"
-        >
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            All <span className="gradient-text">Projects</span>
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From AI-powered tools and federal government systems to open-source
-            contributions — explore the full portfolio.
+        <div className="space-y-4 mb-12">
+          <h1 className="text-4xl font-bold tracking-tight">Projects</h1>
+          <p className="text-lg text-muted-foreground max-w-2xl">
+            Smaller projects, prototypes, and toolkits. These complement the
+            larger case studies and reflect how I explore ideas outside of
+            client delivery.
           </p>
-        </motion.div>
-
-        {/* Search */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="max-w-md mx-auto mb-8"
-        >
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search projects, technologies..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </motion.div>
-
-        {/* Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-10"
-        >
-          <FilterBar
-            categories={categories}
-            activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
-          />
-        </motion.div>
-
-        {/* Projects Grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredProjects.map((project, index) => (
-            <ProjectCard key={project.slug} project={project} index={index} />
-          ))}
         </div>
 
-        {filteredProjects.length === 0 && (
-          <div className="text-center py-20 text-muted-foreground">
-            <p className="text-lg">No projects match your search.</p>
-            <p className="text-sm mt-2">Try adjusting your filters or search terms.</p>
-          </div>
-        )}
+        {/* Project cards */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {projects.map((project) => (
+            <Card
+              key={project.title}
+              className="h-full hover:border-primary/20 transition-colors"
+            >
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">{project.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {project.description}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {project.stack.map((tech) => (
+                    <Badge
+                      key={tech}
+                      variant="muted"
+                      className="text-[10px]"
+                    >
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground italic">
+                  {project.availability}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );

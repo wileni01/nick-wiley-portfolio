@@ -1,153 +1,230 @@
-"use client";
-
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Download, MessageSquare, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Download,
+  Brain,
+  Database,
+  Users,
+  Quote,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TypingEffect } from "@/components/home/typing-effect";
-import { StatsCounter } from "@/components/home/stats-counter";
-import { TechOrbit } from "@/components/home/tech-orbit";
-import { FeaturedProjects } from "@/components/home/featured-projects";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { getFeaturedCaseStudies } from "@/lib/mdx";
+import { HomeClient } from "@/components/home/home-client";
+
+const whatIDo = [
+  {
+    icon: Brain,
+    title: "Decision Support Apps",
+    description:
+      "Human-centered tools that let experts override models, audit decisions, and stay in control.",
+  },
+  {
+    icon: Database,
+    title: "Data Platforms & Analytics",
+    description:
+      "Warehouses, pipelines, and dashboards that turn messy systems into trustworthy reporting.",
+  },
+  {
+    icon: Users,
+    title: "Adoption & Governance",
+    description:
+      "I run the meetings, write the docs, build the training, and sweat the compliance details.",
+  },
+];
 
 export default function HomePage() {
+  const featured = getFeaturedCaseStudies();
+
   return (
     <div className="relative">
       {/* ── Hero Section ────────────────────────────────── */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-secondary/10 blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/5 blur-3xl" />
-        </div>
-
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
-            {/* Left: Text content */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7 }}
-              className="space-y-8"
-            >
-              <div className="space-y-4">
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm text-primary"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Available for opportunities
-                </motion.div>
-
-                <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-                  Hi, I&apos;m{" "}
-                  <span className="gradient-text">Nick Wiley</span>
-                </h1>
-
-                <div className="text-2xl font-medium text-muted-foreground sm:text-3xl h-10">
-                  <TypingEffect />
-                </div>
-
-                <p className="max-w-lg text-lg text-muted-foreground">
-                  I build production-grade web applications with AI integration,
-                  data engineering pipelines, and cybersecurity analysis tools.
-                  From federal government contracts to startup-speed innovation.
-                </p>
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap gap-4">
-                <Button asChild size="xl" className="group">
-                  <Link href="/chat">
-                    <MessageSquare className="h-5 w-5" />
-                    Chat with My AI
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="xl">
-                  <Link href="/projects">
-                    View Projects
-                  </Link>
-                </Button>
-                <Button asChild variant="ghost" size="xl">
-                  <Link href="/experience">
-                    <Download className="h-5 w-5" />
-                    Resume
-                  </Link>
-                </Button>
-              </div>
-
-              {/* Quick trust signals */}
-              <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-                <span className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-green-500" />
-                  Open to Work
+      <section
+        id="hero-section"
+        className="relative min-h-[80vh] flex items-center grid-bg"
+      >
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 w-full py-20 sm:py-28">
+          <div className="max-w-3xl space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] leading-[1.15]">
+                Human-in-the-loop AI
+                <br />
+                <span className="text-primary">
+                  for high-stakes decisions.
                 </span>
-                <span>IBM Federal Experience</span>
-                <span>9+ Production Apps</span>
-              </div>
-            </motion.div>
+              </h1>
 
-            {/* Right: Tech Orbit */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="hidden lg:flex lg:justify-center"
-            >
-              <TechOrbit />
-            </motion.div>
+              <p className="max-w-2xl text-lg text-muted-foreground leading-relaxed sm:text-xl">
+                I build decision-support tools that help experts move
+                faster{" "}
+                <strong className="text-foreground font-medium">
+                  without giving up accountability
+                </strong>
+                — from federal analytics platforms to ML-assisted workflow
+                apps.
+              </p>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap items-center gap-4">
+              <Button asChild size="lg" className="group">
+                <Link href="/work">
+                  View Case Studies
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <a href="/resume/nick-wiley-resume.pdf" download>
+                  <Download className="h-4 w-4" />
+                  Download Resume
+                </a>
+              </Button>
+              <Button asChild variant="ghost" size="lg">
+                <Link href="/contact">Contact</Link>
+              </Button>
+            </div>
+
+            {/* Tour + trust signals */}
+            <HomeClient />
           </div>
         </div>
       </section>
 
-      {/* ── Stats Section ───────────────────────────────── */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      {/* ── What I Do ───────────────────────────────────── */}
+      <section id="what-i-do" className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
-          <StatsCounter />
+          <h2 className="text-2xl font-bold tracking-tight mb-10">
+            What I do
+          </h2>
+          <div className="grid gap-6 sm:grid-cols-3">
+            {whatIDo.map((item) => (
+              <Card key={item.title} className="hover:border-primary/20 transition-colors">
+                <CardContent className="pt-6 space-y-3">
+                  <item.icon className="h-8 w-8 text-primary" />
+                  <h3 className="text-lg font-semibold">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {item.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── Featured Projects Section ───────────────────── */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
-        <div className="mx-auto max-w-7xl">
-          <FeaturedProjects />
+      {/* ── Selected Work ───────────────────────────────── */}
+      <section
+        id="selected-work"
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30"
+      >
+        <div className="mx-auto max-w-5xl">
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-2xl font-bold tracking-tight">
+              Selected work
+            </h2>
+            <Button asChild variant="ghost" size="sm" className="group">
+              <Link href="/work">
+                All case studies
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {featured.map((study) => (
+              <Link
+                key={study.slug}
+                href={`/work/${study.slug}`}
+                className="group block"
+              >
+                <Card className="h-full hover:border-primary/30 hover:shadow-md transition-all duration-200">
+                  <CardContent className="pt-6 space-y-3">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {study.client}
+                    </p>
+                    <h3 className="text-base font-semibold leading-snug group-hover:text-primary transition-colors">
+                      {study.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {study.executiveSummary}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {study.tags.slice(0, 3).map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="muted"
+                          className="text-[10px]"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How I Work ──────────────────────────────────── */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          <h2 className="text-2xl font-bold tracking-tight mb-6">
+            How I work
+          </h2>
+          <div className="space-y-4 text-muted-foreground leading-relaxed">
+            <p>
+              I start by clarifying the decision someone is trying to make.
+            </p>
+            <p>
+              Then I design a system that makes the decision{" "}
+              <strong className="text-foreground font-medium">
+                easier, safer, and repeatable
+              </strong>
+              — with governance and usability treated as first-class
+              engineering requirements.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonial ─────────────────────────────────── */}
+      <section
+        id="testimonial-section"
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30"
+      >
+        <div className="mx-auto max-w-3xl text-center space-y-6">
+          <Quote className="h-8 w-8 text-primary mx-auto" />
+          <blockquote className="text-xl font-medium leading-relaxed italic">
+            &ldquo;Professional and collaborative — uniquely suited for DAO
+            work.&rdquo;
+          </blockquote>
+          <cite className="block text-sm text-muted-foreground not-italic">
+            — Data Analytics Officer, NSF Engineering Directorate
+          </cite>
         </div>
       </section>
 
       {/* ── CTA Section ─────────────────────────────────── */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="space-y-6"
-          >
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Want to know more?{" "}
-              <span className="gradient-text">Ask my AI.</span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              I built a RAG-powered chatbot trained on my professional
-              experience. Ask it anything about my skills, projects, or
-              background — powered by GPT-4o and Claude.
-            </p>
-            <div className="flex justify-center gap-4">
-              <Button asChild size="lg" className="group">
-                <Link href="/chat">
-                  <MessageSquare className="h-5 w-5" />
-                  Start a Conversation
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/contact">Get in Touch</Link>
-              </Button>
-            </div>
-          </motion.div>
+        <div className="mx-auto max-w-3xl text-center space-y-6">
+          <h2 className="text-2xl font-bold tracking-tight">
+            Interested in working together?
+          </h2>
+          <p className="text-muted-foreground">
+            I&apos;m always open to conversations about decision-support
+            systems, analytics platforms, and responsible AI.
+          </p>
+          <div className="flex justify-center gap-4">
+            <Button asChild size="lg">
+              <Link href="/contact">Get in Touch</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/work">View My Work</Link>
+            </Button>
+          </div>
         </div>
       </section>
     </div>

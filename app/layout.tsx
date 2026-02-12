@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { PersonJsonLd, WebsiteJsonLd } from "@/components/seo/json-ld";
+import { SearchDialog } from "@/components/search/search-dialog";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,46 +24,49 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   ),
   title: {
-    default: "Nick Wiley | Full-Stack Engineer & AI Solutions Architect",
+    default:
+      "Nick Wiley | AI Solutions Architect — Human-in-the-Loop Decision Support",
     template: "%s | Nick Wiley",
   },
   description:
-    "Full-Stack Software Engineer and AI Solutions Architect. Building production-grade web applications with AI integration, data engineering, and cybersecurity expertise.",
+    "AI Solutions Architect / Applied AI & Analytics — Human-in-the-loop decision support for high-stakes public sector work.",
   keywords: [
     "Nick Wiley",
-    "Full-Stack Engineer",
     "AI Solutions Architect",
-    "Next.js",
-    "React",
+    "Human-in-the-loop",
+    "Decision support",
+    "Federal analytics",
     "Python",
-    "OpenAI",
-    "Cybersecurity",
-    "Portfolio",
+    "NLP",
+    "Tableau",
+    "Data engineering",
+    "Applied AI",
   ],
-  authors: [{ name: "Nick Wiley" }],
-  creator: "Nick Wiley",
+  authors: [{ name: "Nicholas A. Wiley" }],
+  creator: "Nicholas A. Wiley",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "/",
     siteName: "Nick Wiley Portfolio",
-    title: "Nick Wiley | Full-Stack Engineer & AI Solutions Architect",
+    title:
+      "Nick Wiley | AI Solutions Architect — Human-in-the-Loop Decision Support",
     description:
-      "Full-Stack Software Engineer and AI Solutions Architect. Building production-grade web applications with AI integration.",
+      "AI Solutions Architect — human-in-the-loop decision support for high-stakes public sector work.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Nick Wiley - Full-Stack Engineer & AI Solutions Architect",
+        alt: "Nick Wiley — AI Solutions Architect",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nick Wiley | Full-Stack Engineer & AI Solutions Architect",
+    title: "Nick Wiley | AI Solutions Architect",
     description:
-      "Full-Stack Software Engineer and AI Solutions Architect.",
+      "Human-in-the-loop decision support for high-stakes public sector work.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -93,11 +97,20 @@ export default function RootLayout({
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased bg-background text-foreground`}
       >
         <ThemeProvider>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none"
+          >
+            Skip to main content
+          </a>
           <div className="flex min-h-screen flex-col">
             <Navbar />
-            <main className="flex-1 pt-16">{children}</main>
+            <main id="main-content" className="flex-1 pt-16">
+              {children}
+            </main>
             <Footer />
           </div>
+          <SearchDialog />
         </ThemeProvider>
       </body>
     </html>

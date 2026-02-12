@@ -1,19 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import {
   Mail,
-  Github,
   Linkedin,
   Send,
   Loader2,
   CheckCircle2,
   AlertCircle,
-  MessageSquare,
-  ArrowRight,
 } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,7 +30,7 @@ export default function ContactPage() {
       email: formData.get("email") as string,
       subject: formData.get("subject") as string,
       message: formData.get("message") as string,
-      honeypot: formData.get("website") as string, // honeypot field
+      honeypot: formData.get("website") as string,
     };
 
     try {
@@ -62,34 +57,23 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-3xl">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-4 mb-12"
-        >
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Get in <span className="gradient-text">Touch</span>
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Interested in working together? Have a question? Drop me a message
-            or connect on social media.
+        <div className="space-y-4 mb-12">
+          <h1 className="text-4xl font-bold tracking-tight">Contact</h1>
+          <p className="text-lg text-muted-foreground">
+            Interested in working together or have a question? I&apos;d like to
+            hear from you.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid gap-12 lg:grid-cols-5">
           {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="lg:col-span-3"
-          >
+          <div className="lg:col-span-3">
             {formState === "success" ? (
-              <div className="rounded-2xl border border-green-500/50 bg-green-500/5 p-8 text-center space-y-4">
+              <div className="rounded-xl border border-green-500/50 bg-green-500/5 p-8 text-center space-y-4">
                 <CheckCircle2 className="mx-auto h-12 w-12 text-green-500" />
-                <h3 className="text-xl font-semibold">Message Sent!</h3>
+                <h3 className="text-xl font-semibold">Message sent.</h3>
                 <p className="text-muted-foreground">
                   Thank you for reaching out. I&apos;ll get back to you soon.
                 </p>
@@ -102,7 +86,7 @@ export default function ContactPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Honeypot (hidden from humans) */}
+                {/* Honeypot */}
                 <div className="absolute -left-[9999px]" aria-hidden="true">
                   <label htmlFor="website">Website</label>
                   <input
@@ -116,10 +100,7 @@ export default function ContactPage() {
 
                 <div className="grid gap-6 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <label
-                      htmlFor="name"
-                      className="text-sm font-medium"
-                    >
+                    <label htmlFor="name" className="text-sm font-medium">
                       Name *
                     </label>
                     <Input
@@ -132,10 +113,7 @@ export default function ContactPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label
-                      htmlFor="email"
-                      className="text-sm font-medium"
-                    >
+                    <label htmlFor="email" className="text-sm font-medium">
                       Email *
                     </label>
                     <Input
@@ -151,26 +129,20 @@ export default function ContactPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label
-                    htmlFor="subject"
-                    className="text-sm font-medium"
-                  >
+                  <label htmlFor="subject" className="text-sm font-medium">
                     Subject
                   </label>
                   <Input
                     id="subject"
                     name="subject"
-                    placeholder="What's this about?"
+                    placeholder="What is this about?"
                     maxLength={200}
                     disabled={formState === "submitting"}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label
-                    htmlFor="message"
-                    className="text-sm font-medium"
-                  >
+                  <label htmlFor="message" className="text-sm font-medium">
                     Message *
                   </label>
                   <Textarea
@@ -211,51 +183,27 @@ export default function ContactPage() {
                 </Button>
               </form>
             )}
-          </motion.div>
+          </div>
 
           {/* Sidebar */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="lg:col-span-2 space-y-8"
-          >
-            {/* AI CTA */}
-            <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6 space-y-3">
-              <div className="flex items-center gap-2 text-primary">
-                <MessageSquare className="h-5 w-5" />
-                <h3 className="font-semibold">Try My AI First</h3>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Want quick answers about my experience? Chat with my AI assistant
-                trained on my professional background.
-              </p>
-              <Button asChild variant="outline" size="sm" className="group">
-                <Link href="/chat">
-                  Chat with AI
-                  <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </Button>
-            </div>
-
-            {/* Connect */}
+          <div className="lg:col-span-2 space-y-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Connect</h3>
+              <h3 className="text-lg font-semibold">Connect directly</h3>
               <div className="space-y-3">
                 <a
-                  href="mailto:nick@example.com"
+                  href="mailto:wileni01@gmail.com"
                   className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/50 hover:shadow-md"
                 >
                   <Mail className="h-5 w-5 text-primary" />
                   <div>
                     <div className="text-sm font-medium">Email</div>
                     <div className="text-xs text-muted-foreground">
-                      nick@example.com
+                      wileni01@gmail.com
                     </div>
                   </div>
                 </a>
                 <a
-                  href="https://linkedin.com/in/nickwiley"
+                  href="https://linkedin.com/in/nicholas-a-wiley-975b3136"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/50 hover:shadow-md"
@@ -264,40 +212,21 @@ export default function ContactPage() {
                   <div>
                     <div className="text-sm font-medium">LinkedIn</div>
                     <div className="text-xs text-muted-foreground">
-                      in/nickwiley
-                    </div>
-                  </div>
-                </a>
-                <a
-                  href="https://github.com/nickwiley"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/50 hover:shadow-md"
-                >
-                  <Github className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="text-sm font-medium">GitHub</div>
-                    <div className="text-xs text-muted-foreground">
-                      @nickwiley
+                      nicholas-a-wiley
                     </div>
                   </div>
                 </a>
               </div>
             </div>
 
-            {/* Status */}
-            <div className="rounded-2xl border border-border bg-card p-6 space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-sm font-medium">Open to Opportunities</span>
-              </div>
+            <div className="rounded-xl border border-border bg-card p-6 space-y-2">
+              <p className="text-sm font-medium">Based in Alexandria, VA</p>
               <p className="text-xs text-muted-foreground">
-                Currently looking for full-time roles in Full-Stack Engineering,
-                AI/ML Engineering, or Solutions Architecture. Open to remote and
-                hybrid positions.
+                Open to conversations about decision-support systems, analytics
+                platforms, and applied AI in regulated environments.
               </p>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

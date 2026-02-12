@@ -1,0 +1,68 @@
+# Work Case Studies — Outlines
+# Use these as input for /content/work/*.mdx pages.
+
+- slug: "panel-wizard"
+  title: "Panel Wizard: Human-in-the-loop ML for proposal panel formation"
+  client: "National Science Foundation (sanitized)"
+  timeframe: "Recent (sanitized)"
+  role: "Solutions architect / applied data scientist (consulting)"
+  featured: true
+  tags: ["Human-in-the-loop", "NLP", "Clustering", "Decision support", "Governance"]
+  stack: ["Python", "SciBERT/BERT embeddings", "HDBSCAN", "k-means", "Jupyter", "SQL", "Dashboards"]
+  executiveSummary: "Auditable grouping suggestions that keep program staff in control."
+  builderSummary: "Embeddings + clustering pipeline surfaced in a drag-and-drop override UI."
+
+- slug: "usda-organic-analytics"
+  title: "USDA Organic Analytics: Warehouse + Tableau suite for 50,000+ operations"
+  client: "USDA (organic program)"
+  timeframe: "Recent (sanitized)"
+  role: "Technical PM / analytics lead"
+  featured: true
+  tags: ["Data platform", "Tableau", "ETL", "Reporting", "508"]
+  stack: ["SQL", "Python", "Tableau", "ETL", "Data warehouse"]
+  executiveSummary: "Trustworthy reporting and visibility across a complex operational program."
+  builderSummary: "Warehouse + ETL feeding Tableau dashboards; governance and accessibility baked in."
+
+- slug: "researcher-lineage-dashboard"
+  title: "Researcher Lineage Dashboard: Making funding histories visible"
+  client: "NSF (sanitized)"
+  timeframe: "Recent (sanitized)"
+  role: "Analytics lead"
+  featured: false
+  tags: ["Dashboards", "Data integration", "Stakeholder alignment"]
+  stack: ["BigQuery", "Tableau", "SQL", "Python"]
+  executiveSummary: "A shared view of funding histories and collaboration networks."
+  builderSummary: "Integrated data sources into a lineage-oriented dashboard experience."
+
+- slug: "enablement-study-halls"
+  title: "Building adoption: Study halls that made analytics usable"
+  client: "NSF (ENG, sanitized)"
+  timeframe: "Ongoing"
+  role: "Facilitator / analytics lead"
+  featured: false
+  tags: ["Adoption", "Enablement", "Governance"]
+  stack: ["Tableau", "Google BigQuery", "Docs", "Workshops"]
+  executiveSummary: "Reduced dependency by teaching stakeholders how to use the tools."
+  builderSummary: "Lightweight enablement programs that shipped alongside delivery."
+
+- slug: "visitime-ar"
+  title: "VisiTime: Turning geospatial data into an AR visitor experience"
+  client: "VisiTime, LLC"
+  timeframe: "2012–~2020"
+  role: "Founder / product + delivery lead"
+  featured: true
+  tags: ["Product", "AR", "GIS", "Operations"]
+  stack: ["Geospatial data", "Mobile apps (high level)", "Product ops"]
+  executiveSummary: "A data-rich visitor experience built end-to-end—from fundraising to delivery."
+  builderSummary: "Geospatial storytelling translated into an interactive guided tour system."
+
+- slug: "ratb-gis-oversight"
+  title: "Recovery oversight with GIS: targeting risk and misrepresentation"
+  client: "U.S. Government (RATB)"
+  timeframe: "2011–2012"
+  role: "Data analyst (GIS lead)"
+  featured: false
+  tags: ["GIS", "Accountability", "Public sector"]
+  stack: ["ESRI", "Palantir", "MS Office"]
+  executiveSummary: "Geospatial analysis to focus investigative attention where it mattered most."
+  builderSummary: "Built datasets and workflows that made investigation spatial and visible."

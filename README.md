@@ -1,118 +1,155 @@
-# Nick Wiley Portfolio
+# Nick Wiley — Human-in-the-Loop AI Portfolio
 
-AI-powered professional portfolio website built with Next.js 15, TypeScript, and Tailwind CSS. Features a RAG-powered chatbot trained on professional experience, 18 project showcases, interactive resume timeline, and recruiter-ready features.
+Production-grade portfolio website for Nicholas A. Wiley, built with Next.js 15, TypeScript, and Tailwind CSS.
 
-## Features
+## Local Development
 
-- **Chat with Nick's AI** — RAG-powered chatbot (GPT-4o + Claude 3.5) that answers questions about professional experience
-- **18 Project Showcases** — 9 real projects with demo data + 9 government project templates with fill-in placeholders
-- **Interactive Resume** — Animated timeline with expandable entries, PDF download, print-friendly styles
-- **Skills Matrix** — Visual proficiency grid across 6 technical domains, linked to relevant projects
-- **Dark/Light Mode** — Automatic theme detection with manual toggle
-- **SEO Optimized** — Open Graph, Twitter cards, JSON-LD structured data, sitemap, robots.txt
-- **Security** — Rate limiting, input sanitization, CSP headers, honeypot spam prevention, server-only API keys
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Lint
+npm run lint
+```
+
+The dev server runs at [http://localhost:3000](http://localhost:3000).
+
+## Deployment
+
+This project is **Vercel-ready**. Push to your repository and connect it to Vercel — the build will work out of the box.
+
+Environment variables (optional):
+- `NEXT_PUBLIC_SITE_URL` — Your production URL (defaults to `https://nickwiley.dev`)
+- `OPENAI_API_KEY` — Enables the AI chat API route
+- `ANTHROPIC_API_KEY` — Alternative AI provider for the chat route
+
+## Where to Edit Content
+
+### Case Studies
+Edit or add MDX files in `content/work/*.mdx`. Each file requires frontmatter:
+
+```yaml
+---
+title: "..."
+slug: "..."
+client: "..."
+timeframe: "..."
+role: "..."
+stack: [...]
+tags: [...]
+featured: true/false
+executiveSummary: "..."
+builderSummary: "..."
+---
+```
+
+### Writing / Blog Posts
+Edit or add MDX files in `content/writing/*.mdx`. Frontmatter:
+
+```yaml
+---
+title: "..."
+slug: "..."
+date: "YYYY-MM-DD"
+description: "..."
+tags: [...]
+---
+```
+
+### Resume
+The resume content is in `app/resume/page.tsx` as structured HTML. Edit directly.
+
+Place a PDF resume at `public/resume/nick-wiley-resume.pdf` for the download button.
+
+### Projects
+Edit the projects list in `app/projects/page.tsx`.
+
+### About Page
+Edit `app/about/page.tsx`.
+
+## Site Structure
+
+```
+app/
+  page.tsx              # Home
+  work/page.tsx         # Case study index
+  work/[slug]/page.tsx  # Case study detail
+  projects/page.tsx     # Projects
+  writing/page.tsx      # Writing index
+  writing/[slug]/page.tsx # Writing detail
+  resume/page.tsx       # Resume (HTML + print styles)
+  about/page.tsx        # About
+  contact/page.tsx      # Contact form
+  api/chat/route.ts     # AI chat API
+  api/contact/route.ts  # Contact form API
+
+components/
+  layout/               # Navbar, footer, theme
+  ui/                   # Button, card, badge, input, textarea
+  work/                 # Case study cards, mode toggle
+  home/                 # Guided tour, home client wrapper
+  search/               # Global search dialog
+  resume/               # Print action button
+  seo/                  # JSON-LD structured data
+
+content/
+  work/*.mdx            # Case study content
+  writing/*.mdx         # Blog post content
+
+lib/
+  mdx.ts                # MDX content loader with zod validation
+  types.ts              # TypeScript types and zod schemas
+  utils.ts              # Shared utilities
+```
+
+## Key Features
+
+- **Executive / Builder toggle** — Each case study has two summary modes: one focused on outcomes and governance, the other on architecture and stack.
+- **Global search** — Press `/` or `Cmd+K` to search across case studies, writing, and pages.
+- **Guided tour** — A 60-second tour on the home page highlighting key sections.
+- **Dark mode** — System preference + manual toggle.
+- **Skip links** — Keyboard-accessible skip-to-content link.
+- **Print-ready resume** — The resume page has print styles for PDF export.
+- **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.
 
 ## Tech Stack
 
-| Category | Technologies |
-|----------|-------------|
-| Framework | Next.js 15 (App Router), React 19, TypeScript |
-| Styling | Tailwind CSS 4, shadcn/ui, Framer Motion |
-| AI | OpenAI GPT-4o, Anthropic Claude 3.5, Vercel AI SDK |
-| AI Pipeline | text-embedding-3-small, in-memory vector store, cosine similarity |
-| Deployment | Vercel (serverless, edge runtime) |
+- **Next.js 15** (App Router) + **TypeScript**
+- **Tailwind CSS 4**
+- **MDX** content with **zod** frontmatter validation
+- **Framer Motion** for subtle animations
+- **Radix UI** primitives
+- **Vercel** deployment
 
-## Quick Start
+---
 
-```bash
-# Clone and install
-cd nick-wiley-portfolio
-npm install
+## Content Integrity Notes
 
-# Set up environment variables
-cp .env.example .env.local
-# Edit .env.local with your API keys
+The following notes document where content uses sanitized, approximated, or placeholder language. All factual claims are sourced from verified resume materials and the canonical resource files.
 
-# Run development server
-npm run dev
-```
+### Sanitized language used
+- NSF case studies use "sanitized" to indicate that agency-specific details, internal data, and metrics are not disclosed due to the sensitivity of the work.
+- Timeframes for recent NSF/USDA work use "Recent (sanitized)" rather than specific years.
+- RATB case study keeps tool details at a high level ("ESRI", "Palantir") without disclosing specific datasets or investigation targets.
 
-Open [http://localhost:3000](http://localhost:3000).
+### Reported / approximate language
+- VisiTime's "400% annual growth" is noted as a "reported" figure in one resume version. It is used with the qualifier "reported" in the case study.
+- "$200K+" for VisiTime fundraising uses the conservative lower bound across resume versions.
+- "5B+ records" for the USDA warehouse is presented as "described as 5+ billion records" to match the original resume language.
+- "12+ years" experience is calculated from the 2011 start date at RATB.
 
-## Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `OPENAI_API_KEY` | For AI chat | OpenAI API key (GPT-4o + embeddings) |
-| `ANTHROPIC_API_KEY` | For AI chat | Anthropic API key (Claude 3.5) |
-| `CONTACT_EMAIL` | Optional | Email address for contact form delivery |
-| `NEXT_PUBLIC_SITE_URL` | Optional | Production domain (defaults to localhost) |
-
-> **Note:** The site works without API keys — the chat feature will show an error message prompting configuration, but all other pages function normally.
-
-## Customizing Your Data
-
-### Projects
-Edit `lib/projects.ts` — all 18 projects are defined here. Government templates have `[FILL IN]` markers.
-
-### Experience / Resume
-Edit `lib/experience.ts` — work history, education, certifications with `[FILL IN]` placeholders.
-
-### Skills
-Edit `lib/skills.ts` — skill categories, proficiency levels, and project links.
-
-### AI Knowledge Base
-Edit `content/knowledge-base.ts` — the RAG chatbot uses this as its knowledge source.
-
-### Social Links
-Edit `components/layout/footer.tsx` and `app/contact/page.tsx` with your real URLs.
-
-## Deployment on Vercel
-
-1. Push to GitHub
-2. Import in [Vercel](https://vercel.com/new)
-3. Add environment variables in Vercel dashboard
-4. Deploy — that's it
-
-### Custom Domain
-1. Buy a domain
-2. In Vercel → Settings → Domains → Add your domain
-3. Update DNS records as instructed
-4. Update `NEXT_PUBLIC_SITE_URL` environment variable
-
-## Project Structure
-
-```
-nick-wiley-portfolio/
-├── app/                        # Next.js App Router pages
-│   ├── page.tsx                # Landing page
-│   ├── layout.tsx              # Root layout + nav + footer
-│   ├── projects/               # Projects gallery + detail
-│   ├── chat/                   # AI chatbot page
-│   ├── experience/             # Interactive resume
-│   ├── skills/                 # Skills matrix
-│   ├── contact/                # Contact form
-│   └── api/                    # API routes (chat, contact)
-├── components/                 # React components
-│   ├── ui/                     # Base UI (button, card, badge, input)
-│   ├── layout/                 # Navbar, Footer, ThemeToggle
-│   ├── home/                   # Hero, Stats, TechOrbit, FeaturedProjects
-│   ├── projects/               # ProjectCard, FilterBar
-│   ├── chat/                   # ChatInterface, ModelToggle
-│   ├── experience/             # Timeline
-│   └── seo/                    # JSON-LD structured data
-├── content/                    # Knowledge base for AI
-├── lib/                        # Utilities + data
-│   ├── ai.ts                   # AI model configuration
-│   ├── embeddings.ts           # RAG vector store
-│   ├── projects.ts             # All 18 project definitions
-│   ├── experience.ts           # Work history data
-│   ├── skills.ts               # Skills matrix data
-│   ├── rate-limit.ts           # Rate limiting
-│   └── utils.ts                # Shared utilities
-└── public/                     # Static assets
-```
-
-## License
-
-MIT
+### Placeholders requiring Nick to fill
+- `public/resume/nick-wiley-resume.pdf` — Place an actual PDF resume here for the download button.
+- `public/og-image.png` — Open Graph image for social sharing (1200x630 recommended).
+- Projects page items marked "Code available on request" or "Available on request" — Add links if/when repos are shared.
+- The testimonial quote on the home page uses a short excerpt. Nick should verify this is the preferred quote from the recommendation letter.
+- The chat API route (`/api/chat`) requires `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` environment variables to function.

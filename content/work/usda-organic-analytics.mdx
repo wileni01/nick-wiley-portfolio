@@ -1,0 +1,80 @@
+---
+title: "USDA Organic Analytics: Warehouse + Tableau suite for 50,000+ operations"
+slug: "usda-organic-analytics"
+client: "USDA (organic program)"
+timeframe: "Recent (sanitized)"
+role: "Technical PM / analytics lead"
+stack:
+  - SQL
+  - Python
+  - Tableau
+  - ETL
+  - Data warehouse
+tags:
+  - Data platform
+  - Tableau
+  - ETL
+  - Reporting
+  - "508"
+featured: true
+executiveSummary: "Trustworthy reporting and visibility across a complex operational program supporting 50,000+ certified organic operations."
+builderSummary: "Warehouse + ETL feeding 48+ Tableau dashboards; governance and accessibility baked in from day one."
+---
+
+## Scope and stakeholders
+
+The USDA's organic program oversees more than **50,000 certified organic operations** across the United States. Program leadership needed reliable, timely reporting to support operational decisions, congressional inquiries, and public transparency — but existing reporting was fragmented across multiple systems and manual processes.
+
+Stakeholders ranged from program analysts running daily reports to senior leadership preparing briefings. The platform needed to serve both audiences without requiring each to build their own queries.
+
+## Warehouse and reporting architecture
+
+### Data warehouse
+
+The analytics platform was built on a structured data warehouse containing data described as **5+ billion records**, with ETL pipelines processing **millions of records daily**. The warehouse consolidated data from multiple operational systems into a single, governed source of truth.
+
+Key design decisions:
+- **Incremental ETL** to keep processing times manageable at scale
+- **Slowly changing dimensions** to preserve historical context for trend analysis
+- **Clear data lineage** so analysts could trace any number back to its source system
+
+### Tableau reporting suite
+
+The reporting layer comprised **more than four dozen Tableau reports** (approx. 48+), organized by program area and audience:
+- Operational dashboards for day-to-day monitoring
+- Executive summaries for leadership briefings
+- Ad-hoc exploration views for analysts
+- Public-facing reports supporting transparency requirements
+
+## Governance and accessibility
+
+### Section 508 compliance
+
+All reports were built with **Section 508 / WCAG accessibility** as a first-class requirement — not an afterthought. This included:
+- Meaningful alt text and data table alternatives
+- Color palettes tested for contrast compliance
+- Keyboard-navigable interfaces
+- Screen-reader-compatible layouts where Tableau's platform allowed
+
+### Data governance
+
+- Defined data dictionaries and metric definitions so stakeholders shared a common vocabulary
+- Established review and approval workflows for new reports
+- Documented known data quality issues transparently rather than hiding them
+
+## Operational adoption
+
+Building reports is straightforward. Getting people to use them — and trust them — is harder. Adoption work included:
+- **Training sessions** tailored to different skill levels
+- **Office hours** for analysts encountering edge cases
+- **Change communications** so stakeholders understood what was new and why
+- Gradual retirement of legacy reports to reduce confusion
+
+## Outcomes
+
+- **Improved visibility**: leadership gained consistent, timely access to program performance data.
+- **Streamlined reporting**: consolidated dozens of ad-hoc processes into a governed, repeatable reporting suite.
+- **Auditable**: every number could be traced back to source systems and transformation logic.
+- **Reduced analyst burden**: self-service dashboards allowed analysts to answer routine questions without custom queries.
+
+*Specific performance metrics and internal details are not shared due to the sensitivity of the work.*

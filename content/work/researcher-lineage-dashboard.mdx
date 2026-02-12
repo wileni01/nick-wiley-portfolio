@@ -1,0 +1,62 @@
+---
+title: "Researcher Lineage Dashboard: Making funding histories visible"
+slug: "researcher-lineage-dashboard"
+client: "NSF (sanitized)"
+timeframe: "Recent (sanitized)"
+role: "Analytics lead"
+stack:
+  - BigQuery
+  - Tableau
+  - SQL
+  - Python
+tags:
+  - Dashboards
+  - Data integration
+  - Stakeholder alignment
+featured: false
+executiveSummary: "A shared view of funding histories and collaboration networks that improved portfolio review and executive reporting."
+builderSummary: "Integrated data sources into a lineage-oriented dashboard experience using BigQuery and Tableau."
+---
+
+## The decision it supported
+
+Program leadership needed to understand the full arc of researcher engagement: who had been funded before, how researchers collaborated across awards, and what patterns emerged across funding portfolios.
+
+Without this visibility, portfolio reviews relied on institutional memory and manual lookups — limiting the depth of analysis and making it difficult to spot trends or gaps.
+
+## What "lineage" meant
+
+In this context, "lineage" referred to the connected history of a researcher's relationship with the agency:
+- **Funding history**: prior awards, renewal patterns, and funding trajectories
+- **Collaboration networks**: co-PI relationships and cross-disciplinary connections
+- **Impact indicators**: publications, outcomes, and downstream effects tied to funded work
+
+The challenge was integrating these signals from multiple data sources — each with different schemas, update frequencies, and quality characteristics — into a coherent view.
+
+## Balancing stakeholder needs and data quality
+
+Different stakeholders wanted different things:
+- **Executives** wanted high-level summaries: portfolio composition, trends over time, notable clusters of activity.
+- **Program officers** wanted drill-down capability: individual researcher histories, specific award details, collaboration maps.
+- **Data quality teams** needed transparency about gaps, caveats, and known issues.
+
+Balancing these needs required:
+- Layered dashboard design (summary → detail → source)
+- Clear labeling of data freshness and known limitations
+- Regular stakeholder check-ins to validate that the tool matched how people actually worked
+
+## Technical approach
+
+- **BigQuery** served as the analytical layer, joining data from multiple operational systems
+- **SQL-based transformations** standardized naming conventions, resolved entity matching challenges, and built derived metrics
+- **Tableau dashboards** presented the lineage view with interactive filtering and drill-down
+- **Python scripts** handled data quality checks and automated refresh monitoring
+
+## Outcomes
+
+- **Better executive reporting**: leadership could review portfolio-level trends without requesting custom analyses.
+- **Shared understanding**: a common data layer reduced disagreements about "what the numbers mean."
+- **Faster portfolio reviews**: pre-built views replaced manual data gathering, shortening preparation time.
+- **Foundation for future work**: the lineage data model proved useful for subsequent analytical projects.
+
+*Details are sanitized to protect agency-specific information.*

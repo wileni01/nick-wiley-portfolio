@@ -1,0 +1,102 @@
+# Portfolio Facts (source-of-truth)
+# Use this file to keep the site honest. If something isn't here, don't claim it.
+
+person:
+  full_name: "Nicholas A. Wiley"
+  preferred_name: "Nick Wiley"
+  location: "Alexandria, VA"
+  email: "wileni01@gmail.com"
+  phone: "(717) 451-7015"
+  linkedin: "linkedin.com/in/nicholas-a-wiley-975b3136"
+
+positioning:
+  headline: "AI Solutions Architect / Applied AI & Analytics — Human-in-the-loop decision support for high-stakes public sector work"
+  keywords:
+    - "Human-in-the-loop"
+    - "Decision support"
+    - "Responsible AI"
+    - "Federal civilian"
+    - "Analytics platforms"
+    - "Governance & adoption"
+
+experience:
+  - company: "IBM Global Business Services (AI & Analytics)"
+    role: "Managing Consultant"
+    start: "2019"
+    end: "Present"
+    highlights:
+      - "Led proposal writing supporting a 5-year, $5M contract win."
+      - "Managed Agile delivery (example: 9-person team)."
+      - "Built/led analytics solutions for NSF and USDA."
+      - "Built Tableau-based warehouse + reporting suite supporting 50,000+ USDA organic operations."
+      - "Contributed to warehouse described as 5+ billion records; ETL processing millions of records daily."
+      - "Built NLP embedding + clustering workflows (SciBERT/BERT; HDBSCAN/k-means)."
+      - "Designed and delivered human-in-the-loop decision support tooling (e.g., Panel Wizard)."
+      - "Facilitated adoption via Tableau Study Hall, Google BigQuery Study Hall, and an ENG Data Working Group."
+
+  - company: "VisiTime, LLC"
+    role: "Founder"
+    start: "2012"
+    end: "~2020"
+    highlights:
+      - "Founded AR-driven tours using geospatial datasets."
+      - "Raised $200K+ to produce a tour book and multiple mobile applications."
+      - "Led distributed delivery to create a six-hour interactive iPad tour experience."
+      - "Reported scalable rental model; one resume cites 400% annual growth (treat as 'reported' if used)."
+      - "U.S. patent holder: 9,417,668; 9,900,042."
+
+  - company: "Transform, Inc."
+    role: "Solution Engineer"
+    start: "2014"
+    end: "2015"
+    highlights:
+      - "Integrated analytics tooling into client-facing visualization products."
+      - "Collaborated with Fortune 500 executives to translate goals into analytics solutions."
+
+  - company: "U.S. Government — Recovery Accountability & Transparency Board (RATB)"
+    role: "Data Analyst"
+    start: "2011"
+    end: "2012"
+    highlights:
+      - "Applied geospatial analytics for Recovery Act oversight using ESRI and Palantir."
+      - "Built GIS datasets and presented findings to diverse stakeholders."
+
+education:
+  - school: "University of Maryland, Smith School of Business"
+    degrees:
+      - "MBA — Consulting & Management Track (2019)"
+      - "MS — Information Systems (2019)"
+  - school: "Gettysburg College"
+    degrees:
+      - "BA — Environmental Studies (2010)"
+  - school: "Pennsylvania State University"
+    certificates:
+      - "Master’s Certificate — Project Management (2017)"
+      - "Post-baccalaureate Certificate — Geographic Information Systems (2012)"
+
+certifications:
+  - "SAFe Scrum Master (2022)"
+  - "Tableau Certified Associate (2022)"
+  - "MIT Professional Education — Applied Data Science: Leveraging AI for Effective Decision-Making (2024)"
+
+patents:
+  - "US Patent 9,417,668"
+  - "US Patent 9,900,042"
+
+tools:
+  languages:
+    - "Python"
+    - "SQL"
+  analytics_bi:
+    - "Tableau"
+    - "Google BigQuery"
+    - "DBeaver"
+    - "Dimensions"
+  ml_ai:
+    - "SciBERT/BERT embeddings"
+    - "HDBSCAN"
+    - "k-means"
+    - "RAG (concepts referenced: LangChain, FAISS)"
+  platforms:
+    - "ESRI"
+    - "Palantir"

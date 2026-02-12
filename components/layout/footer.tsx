@@ -1,30 +1,13 @@
 import Link from "next/link";
-import { Code2, Github, Linkedin, Mail } from "lucide-react";
+import { Linkedin, Mail } from "lucide-react";
 
 const footerLinks = [
+  { href: "/work", label: "Work" },
   { href: "/projects", label: "Projects" },
-  { href: "/chat", label: "Chat with AI" },
-  { href: "/experience", label: "Experience" },
-  { href: "/skills", label: "Skills" },
+  { href: "/writing", label: "Writing" },
+  { href: "/resume", label: "Resume" },
+  { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
-];
-
-const socialLinks = [
-  {
-    href: "https://github.com/nickwiley",
-    label: "GitHub",
-    icon: Github,
-  },
-  {
-    href: "https://linkedin.com/in/nickwiley",
-    label: "LinkedIn",
-    icon: Linkedin,
-  },
-  {
-    href: "mailto:nick@example.com",
-    label: "Email",
-    icon: Mail,
-  },
 ];
 
 export function Footer() {
@@ -34,13 +17,15 @@ export function Footer() {
         <div className="grid gap-8 py-12 md:grid-cols-3">
           {/* Brand */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2 text-lg font-bold">
-              <Code2 className="h-6 w-6 text-primary" />
-              <span className="gradient-text">Nick Wiley</span>
+            <Link
+              href="/"
+              className="text-lg font-bold text-foreground"
+            >
+              Nick Wiley
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Full-Stack Engineer & AI Solutions Architect. Building
-              production-grade web applications with AI integration.
+              AI Solutions Architect — human-in-the-loop decision support for
+              high-stakes public sector work.
             </p>
           </div>
 
@@ -63,31 +48,41 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Social */}
+          {/* Connect */}
           <div>
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               Connect
             </h3>
             <div className="flex gap-3">
-              {socialLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={link.label}
-                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-all hover:border-primary hover:text-primary hover:shadow-md"
-                >
-                  <link.icon className="h-5 w-5" />
-                </a>
-              ))}
+              <a
+                href="https://linkedin.com/in/nicholas-a-wiley-975b3136"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-all hover:border-primary hover:text-primary hover:shadow-md"
+              >
+                <Linkedin className="h-5 w-5" />
+              </a>
+              <a
+                href="mailto:wileni01@gmail.com"
+                aria-label="Email"
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-all hover:border-primary hover:text-primary hover:shadow-md"
+              >
+                <Mail className="h-5 w-5" />
+              </a>
             </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Alexandria, VA
+            </p>
           </div>
         </div>
 
         {/* Bottom */}
         <div className="border-t border-border py-6 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Nick Wiley. Built with Next.js, Tailwind CSS, and AI.</p>
+          <p>
+            &copy; {new Date().getFullYear()} Nicholas A. Wiley. Built with
+            Next.js and Tailwind CSS.
+          </p>
         </div>
       </div>
     </footer>
