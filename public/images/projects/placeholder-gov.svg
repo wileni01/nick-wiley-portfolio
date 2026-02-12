@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="govbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0c1222;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a2744;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#govbg)"/>
+  <!-- Shield icon -->
+  <path d="M600 120 L660 150 L660 220 C660 280 600 320 600 320 C600 320 540 280 540 220 L540 150 Z" fill="none" stroke="#3b82f6" stroke-width="3" opacity="0.6"/>
+  <text x="600" y="240" text-anchor="middle" font-family="system-ui,sans-serif" font-size="40" fill="#3b82f6" opacity="0.6"></text>
+  <!-- Title -->
+  <text x="600" y="380" text-anchor="middle" font-family="system-ui,sans-serif" font-size="32" font-weight="bold" fill="#e2e8f0">Government Project</text>
+  <text x="600" y="415" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#64748b">Classified  Details Coming Soon</text>
+  <!-- Decorative lines -->
+  <line x1="400" y1="440" x2="800" y2="440" stroke="#334155" stroke-width="1"/>
+  <text x="600" y="480" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" fill="#475569">IBM Federal | USPS · Census · USDA · NSF</text>
+  <text x="600" y="560" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" fill="#334155">Replace with project screenshot or diagram</text>
+</svg>
