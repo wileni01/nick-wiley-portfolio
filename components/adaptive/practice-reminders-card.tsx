@@ -1,0 +1,159 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { AlarmClock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useInterviewMode } from "./interview-mode-provider";
+import {
+  getReadinessChecklist,
+  getReadinessCompletion,
+  getReadinessStorageKey,
+  parseReadinessState,
+} from "@/lib/adaptive/readiness-checklist";
+import {
+  getPrepHistoryStorageKey,
+  parsePrepHistory,
+} from "@/lib/adaptive/prep-history";
+import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
+import { buildPracticeReminders } from "@/lib/adaptive/practice-reminders";
+
+function getPriorityBadge(priority: "high" | "medium" | "low") {
+  if (priority === "high") {
+    return (
+      <Badge variant="outline" className="text-[10px] border-primary/50">
+        High
+      </Badge>
+    );
+  }
+  if (priority === "medium") {
+    return (
+      <Badge variant="outline" className="text-[10px]">
+        Medium
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="muted" className="text-[10px]">
+      Low
+    </Badge>
+  );
+}
+
+export function PracticeRemindersCard() {
+  const { companyId, personaId } = useInterviewMode();
+  const [readinessPct, setReadinessPct] = useState(0);
+  const [latestScore, setLatestScore] = useState<number | null>(null);
+  const [launchpadPct, setLaunchpadPct] = useState(0);
+
+  useEffect(() => {
+    if (!companyId || !personaId) return;
+
+    const keys = {
+      readiness: getReadinessStorageKey(companyId, personaId),
+      history: getPrepHistoryStorageKey(companyId, personaId),
+      launchpad: getLaunchpadStorageKey(companyId, personaId),
+    };
+
+    function refresh() {
+      const checklistItems = getReadinessChecklist(companyId, personaId);
+      const readinessState = parseReadinessState(
+        localStorage.getItem(keys.readiness)
+      );
+      const readiness = getReadinessCompletion(checklistItems, readinessState);
+      setReadinessPct(readiness.completionPct);
+
+      const history = parsePrepHistory(localStorage.getItem(keys.history));
+      setLatestScore(history[0]?.averageScore ?? null);
+
+      const rawLaunchpad = localStorage.getItem(keys.launchpad);
+      if (!rawLaunchpad) {
+        setLaunchpadPct(0);
+        return;
+      }
+      try {
+        const parsed = JSON.parse(rawLaunchpad) as Record<string, boolean>;
+        const values = Object.values(parsed);
+        const opened = values.filter(Boolean).length;
+        setLaunchpadPct(values.length ? Math.round((opened / values.length) * 100) : 0);
+      } catch {
+        setLaunchpadPct(0);
+      }
+    }
+
+    refresh();
+
+    function onStorage(event: StorageEvent) {
+      if (Object.values(keys).includes(event.key ?? "")) refresh();
+    }
+
+    function onReadinessUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === keys.readiness) refresh();
+    }
+
+    function onPrepHistoryUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === keys.history) refresh();
+    }
+
+    function onLaunchpadUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === keys.launchpad) refresh();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
+    window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
+    window.addEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("adaptive-readiness-updated", onReadinessUpdate);
+      window.removeEventListener(
+        "adaptive-prep-history-updated",
+        onPrepHistoryUpdate
+      );
+      window.removeEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
+    };
+  }, [companyId, personaId]);
+
+  const reminders = useMemo(
+    () =>
+      buildPracticeReminders({
+        now: new Date(),
+        latestScore,
+        readinessPct,
+        launchpadPct,
+      }),
+    [latestScore, launchpadPct, readinessPct]
+  );
+
+  if (!companyId || !personaId) return null;
+
+  return (
+    <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-sm font-semibold inline-flex items-center gap-2">
+          <AlarmClock className="h-4 w-4 text-primary" />
+          Practice reminders
+        </h3>
+        <Badge variant="outline">{reminders.length} reminder(s)</Badge>
+      </div>
+
+      <ul className="space-y-2">
+        {reminders.map((reminder) => (
+          <li key={reminder.id} className="rounded-md border border-border bg-background p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-medium">{reminder.title}</p>
+              {getPriorityBadge(reminder.priority)}
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">{reminder.detail}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Due by: {reminder.dueBy}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}

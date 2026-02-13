@@ -23,6 +23,7 @@ import { MockInterviewerScript } from "./mock-interviewer-script";
 import { NextBestActions } from "./next-best-actions";
 import { PreflightReadinessCard } from "./preflight-readiness-card";
 import { PrepNotes } from "./prep-notes";
+import { PracticeRemindersCard } from "./practice-reminders-card";
 import { PrepInsights } from "./prep-insights";
 import { ResourceLaunchpad } from "./resource-launchpad";
 import { TargetedDrills } from "./targeted-drills";
@@ -261,6 +262,7 @@ export function AdaptiveBriefing() {
       <PrepCockpitSummary />
       <ResourceLaunchpad />
       <PrepNotes />
+      <PracticeRemindersCard />
       <PrepDataTools />
       <NextBestActions />
       <TargetedDrills />
