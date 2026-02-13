@@ -26,6 +26,7 @@ import { PreflightReadinessCard } from "./preflight-readiness-card";
 import { PrepNotes } from "./prep-notes";
 import { PracticeRemindersCard } from "./practice-reminders-card";
 import { PrepInsights } from "./prep-insights";
+import { TimelineStatusBanner } from "./timeline-status-banner";
 import { ReadinessGapPanel } from "./readiness-gap-panel";
 import { ResourceLaunchpad } from "./resource-launchpad";
 import { TargetedDrills } from "./targeted-drills";
@@ -186,6 +187,8 @@ export function AdaptiveBriefing() {
           <p className="mt-1 text-xs text-muted-foreground">{focusNote}</p>
         </div>
       )}
+
+      <TimelineStatusBanner />
 
       <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
         <h3 className="text-sm font-semibold">Company priorities in this mode</h3>
