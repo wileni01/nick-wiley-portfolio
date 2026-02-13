@@ -18,6 +18,7 @@ import { InterviewReadinessChecklist } from "./interview-readiness-checklist";
 import { ModeComparisonPanel } from "./mode-comparison-panel";
 import { MockInterviewSession } from "./mock-interview-session";
 import { MockInterviewerScript } from "./mock-interviewer-script";
+import { NextBestActions } from "./next-best-actions";
 import { PrepInsights } from "./prep-insights";
 import {
   buildDeterministicNarrative,
@@ -235,6 +236,7 @@ export function AdaptiveBriefing() {
 
       <ModeComparisonPanel />
       <PrepCockpitSummary />
+      <NextBestActions />
       <InterviewReadinessChecklist />
       <PrepInsights />
       <MockInterviewerScript />
