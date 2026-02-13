@@ -148,7 +148,7 @@ lib/
 - **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, top resources, and inline timeline quick-fix actions when date context is missing/stale.
 - **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode, including pacing guidance and calendar shortcuts.
 - **Mode comparison panel** — Side-by-side view of current vs alternate company mode with top resources and one-click switching.
-- **Resource launchpad** — Track and open top recommended artifacts with per-mode completion progress and bulk open/mark actions.
+- **Resource launchpad** — Track and open top recommended artifacts with per-mode completion progress, bulk open/mark actions, and pop-up blocker feedback when opening multiple tabs.
 - **Next best actions** — Dynamic, priority-ranked guidance based on readiness, latest mock outcomes, and confidence calibration.
 - **Timeline-aware action guidance** — Next-best-actions escalates countdown priorities when the interview date is within 48 hours and includes one-click date setup/reset actions when timeline context is missing or stale.
 - **Targeted drills** — Theme-driven micro-exercises generated from your latest coaching gaps, with local completion tracking.
@@ -156,7 +156,7 @@ lib/
 - **Prep data tools** — Export/import/paste/reset local prep state (JSON), including notes, focus history, and interview date, per company/persona mode, with two-step reset confirmation, payload size guards, sanitization caps, and explicit time-bound confirmation before cross-mode imports.
 - **Prep notes pad** — Persist mode-specific interviewer notes and include them in exported briefs/packets.
 - **Interview day plan** — Time-phased execution plan (prep window + T-45 to close) tuned to selected company/persona priorities and interview-date timeline.
-- **Interview date tracker** — Set a per-mode interview date (with quick-set controls and strict date validation) to anchor urgency, include date context in exported briefs, launch upcoming Google Calendar interview/prep checkpoint events, and download an `.ics` prep plan.
+- **Interview date tracker** — Set a per-mode interview date (with quick-set controls and strict date validation) to anchor urgency, include date context in exported briefs, launch upcoming Google Calendar interview/prep checkpoint events (with pop-up blocker feedback), and download an `.ics` prep plan.
 - **Full prep packet export** — Download a consolidated Markdown packet with brief, preflight status, pacing guidance, reminders, next actions, drills, and day plan.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.

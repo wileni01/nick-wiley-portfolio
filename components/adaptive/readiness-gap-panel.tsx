@@ -5,6 +5,7 @@ import { AlertTriangle, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { useTransientState } from "./use-transient-state";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import {
   getIncompleteReadinessItems,
@@ -14,6 +15,7 @@ import {
   type ReadinessChecklistItem,
 } from "@/lib/adaptive/readiness-checklist";
 import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
+import { openExternalUrl } from "@/lib/external-link";
 
 interface ResourceGap {
   id: string;
@@ -26,6 +28,10 @@ export function ReadinessGapPanel() {
   const { companyId, personaId } = useInterviewMode();
   const [incompleteItems, setIncompleteItems] = useState<ReadinessChecklistItem[]>([]);
   const [resourceGaps, setResourceGaps] = useState<ResourceGap[]>([]);
+  const [openState, setOpenState] = useTransientState<"idle" | "opened" | "error">(
+    "idle",
+    1800
+  );
 
   const bundle = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -178,8 +184,13 @@ export function ReadinessGapPanel() {
                     size="sm"
                     variant="ghost"
                     onClick={() => {
-                      window.open(resource.url, "_blank", "noopener,noreferrer");
-                      markResourceOpened(resource.id);
+                      const opened = openExternalUrl(resource.url);
+                      if (opened) {
+                        markResourceOpened(resource.id);
+                        setOpenState("opened");
+                        return;
+                      }
+                      setOpenState("error");
                     }}
                   >
                     Open
@@ -190,6 +201,18 @@ export function ReadinessGapPanel() {
             ))}
           </ul>
         </div>
+      )}
+      <span className="sr-only" role="status" aria-live="polite">
+        {openState === "opened"
+          ? "Resource opened."
+          : openState === "error"
+            ? "Resource popup blocked."
+            : ""}
+      </span>
+      {openState === "error" && (
+        <p className="text-xs text-muted-foreground">
+          Resource tab was blocked. Allow pop-ups for this site and try again.
+        </p>
       )}
     </div>
   );

@@ -17,6 +17,7 @@ import {
 } from "@/lib/adaptive/interview-calendar";
 import { buildInterviewDateOffsetValue } from "@/lib/adaptive/interview-date-actions";
 import { sanitizeFileToken, triggerDownload } from "@/lib/download";
+import { openExternalUrl } from "@/lib/external-link";
 
 export function InterviewDateTracker() {
   const { companyId, personaId, company, persona } = useInterviewMode();
@@ -26,6 +27,9 @@ export function InterviewDateTracker() {
   });
   const [downloadState, setDownloadState] = useTransientState<
     "idle" | "done" | "error"
+  >("idle", 1800);
+  const [calendarOpenState, setCalendarOpenState] = useTransientState<
+    "idle" | "opened" | "partial" | "error"
   >("idle", 1800);
 
   const summary = useMemo(
@@ -83,7 +87,7 @@ export function InterviewDateTracker() {
           })
         : "");
     if (!url) return;
-    window.open(url, "_blank", "noopener,noreferrer");
+    setCalendarOpenState(openExternalUrl(url) ? "opened" : "error");
   }
 
   function setDateOffset(daysFromNow: number) {
@@ -92,14 +96,24 @@ export function InterviewDateTracker() {
 
   function openGoogleCalendarCheckpoint(url: string) {
     if (!url) return;
-    window.open(url, "_blank", "noopener,noreferrer");
+    setCalendarOpenState(openExternalUrl(url) ? "opened" : "error");
   }
 
   function openAllGoogleCalendarCheckpoints() {
     if (!googleCalendarEvents.length) return;
+    let openedCount = 0;
     googleCalendarEvents.forEach((event) => {
-      window.open(event.url, "_blank", "noopener,noreferrer");
+      if (openExternalUrl(event.url)) openedCount += 1;
     });
+    if (openedCount === googleCalendarEvents.length) {
+      setCalendarOpenState("opened");
+      return;
+    }
+    if (openedCount > 0) {
+      setCalendarOpenState("partial");
+      return;
+    }
+    setCalendarOpenState("error");
   }
 
   return (
@@ -162,6 +176,15 @@ export function InterviewDateTracker() {
           : downloadState === "error"
             ? "Calendar plan download failed."
             : ""}
+      </span>
+      <span className="sr-only" role="status" aria-live="polite">
+        {calendarOpenState === "opened"
+          ? "Calendar event opened."
+          : calendarOpenState === "partial"
+            ? "Some calendar events were blocked."
+            : calendarOpenState === "error"
+              ? "Calendar event popup was blocked."
+              : ""}
       </span>
 
       {googleCalendarEvents.length > 0 && (
@@ -230,6 +253,11 @@ export function InterviewDateTracker() {
         <p className="text-xs text-muted-foreground">
           Could not start calendar download automatically. Try again after
           interacting with the page.
+        </p>
+      )}
+      {(calendarOpenState === "error" || calendarOpenState === "partial") && (
+        <p className="text-xs text-muted-foreground">
+          Calendar pop-up was blocked. Allow pop-ups for this site and try again.
         </p>
       )}
     </div>

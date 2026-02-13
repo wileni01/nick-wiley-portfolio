@@ -6,12 +6,17 @@ import { ExternalLink, Rocket, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { useTransientState } from "./use-transient-state";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
+import { openExternalUrl } from "@/lib/external-link";
 
 export function ResourceLaunchpad() {
   const { companyId, personaId } = useInterviewMode();
   const [opened, setOpened] = useState<Record<string, boolean>>({});
+  const [openState, setOpenState] = useTransientState<
+    "idle" | "opened" | "partial" | "error"
+  >("idle", 1800);
 
   const bundle = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -91,10 +96,30 @@ export function ResourceLaunchpad() {
 
   function openRemaining() {
     if (!remainingResources.length) return;
+    const openedIds: string[] = [];
     remainingResources.forEach((resource) => {
-      window.open(resource.asset.url, "_blank", "noopener,noreferrer");
+      if (openExternalUrl(resource.asset.url)) {
+        openedIds.push(resource.asset.id);
+      }
     });
-    markAllOpened();
+    if (openedIds.length) {
+      setOpened((prev) => {
+        const merged = { ...prev };
+        openedIds.forEach((resourceId) => {
+          merged[resourceId] = true;
+        });
+        return merged;
+      });
+    }
+    if (openedIds.length === remainingResources.length) {
+      setOpenState("opened");
+      return;
+    }
+    if (openedIds.length > 0) {
+      setOpenState("partial");
+      return;
+    }
+    setOpenState("error");
   }
 
   function resetLaunchpad() {
@@ -136,6 +161,21 @@ export function ResourceLaunchpad() {
           Mark all opened
         </Button>
       </div>
+      <span className="sr-only" role="status" aria-live="polite">
+        {openState === "opened"
+          ? "Remaining resources opened."
+          : openState === "partial"
+            ? "Some resource pop-ups were blocked."
+            : openState === "error"
+              ? "Resource pop-up blocked."
+              : ""}
+      </span>
+      {(openState === "partial" || openState === "error") && (
+        <p className="text-xs text-muted-foreground">
+          Some resource tabs were blocked. Allow pop-ups for this site to open all
+          launchpad links automatically.
+        </p>
+      )}
 
       <ul className="space-y-2">
         {resources.map((resource) => (
