@@ -7,7 +7,7 @@ export interface ModeHealthInput {
 }
 
 export interface ModeHealthOutput {
-  status: "strong" | "building" | "attention" | "urgent";
+  status: "strong" | "building" | "attention" | "urgent" | "timeline";
   shortLabel: string;
   detail: string;
   className: string;
@@ -19,6 +19,28 @@ export function evaluateModeHealth(input: ModeHealthInput): ModeHealthOutput {
   const confidence = input.latestConfidence;
   const daysUntilInterview = getDaysUntilInterview(input.interviewDate);
   const recencyDays = getSessionRecencyDays(input.latestSessionTimestamp);
+
+  if (daysUntilInterview === null) {
+    return {
+      status: "timeline",
+      shortLabel: "Set date",
+      detail:
+        input.latestScore === null
+          ? "Set your interview date and run a baseline mock session to unlock countdown-aware prep guidance."
+          : "Set your interview date to unlock countdown-aware pacing and urgency guidance.",
+      className: "border-amber-400/50 text-amber-700 dark:text-amber-300",
+    };
+  }
+
+  if (daysUntilInterview < 0) {
+    return {
+      status: "timeline",
+      shortLabel: "Date passed",
+      detail:
+        "Your tracked interview date has passed. Set your next interview target date to keep prep guidance aligned.",
+      className: "border-rose-400/60 text-rose-700 dark:text-rose-300",
+    };
+  }
 
   if (daysUntilInterview !== null && daysUntilInterview >= 0 && daysUntilInterview <= 2) {
     const needsUrgentAttention =
