@@ -1,55 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useInterviewMode } from "./interview-mode-provider";
-import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
-import {
-  getInterviewDateSummary,
-  parseInterviewDate,
-} from "@/lib/adaptive/interview-date";
+import { useModeInterviewDate } from "./use-mode-interview-date";
+import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
 
 export function InterviewCountdownPill() {
   const { companyId, personaId } = useInterviewMode();
-  const [interviewDate, setInterviewDate] = useState<string | null>(null);
-
-  const storageKey = useMemo(() => {
-    if (!companyId || !personaId) return null;
-    return getInterviewDateStorageKey(companyId, personaId);
-  }, [companyId, personaId]);
-
-  useEffect(() => {
-    if (!storageKey) {
-      setInterviewDate(null);
-      return;
-    }
-    const activeStorageKey = storageKey;
-
-    function refresh() {
-      setInterviewDate(parseInterviewDate(localStorage.getItem(activeStorageKey)));
-    }
-
-    refresh();
-
-    function onStorage(event: StorageEvent) {
-      if (event.key === activeStorageKey) refresh();
-    }
-
-    function onInterviewDateUpdate(event: Event) {
-      const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === activeStorageKey) refresh();
-    }
-
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener(
-        "adaptive-interview-date-updated",
-        onInterviewDateUpdate
-      );
-    };
-  }, [storageKey]);
+  const { interviewDate } = useModeInterviewDate({ companyId, personaId });
 
   if (!companyId || !personaId) return null;
   const summary = getInterviewDateSummary(interviewDate);

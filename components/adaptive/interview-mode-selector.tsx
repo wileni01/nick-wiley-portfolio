@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Check, Copy, Save, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { useModeInterviewDate } from "./use-mode-interview-date";
 import { ModeHealthPill } from "./mode-health-pill";
 import { InterviewCountdownPill } from "./interview-countdown-pill";
 import {
@@ -13,10 +14,8 @@ import {
 } from "@/lib/adaptive/focus-history";
 import {
   getInterviewDateSummary,
-  parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
 import { setInterviewDateOffsetForMode } from "@/lib/adaptive/interview-date-actions";
-import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
 
 function formatFocusChipLabel(text: string): string {
   return text.length > 48 ? `${text.slice(0, 47)}…` : text;
@@ -41,9 +40,9 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
     setFocusNote,
     resetMode,
   } = useInterviewMode();
+  const { interviewDate } = useModeInterviewDate({ companyId, personaId });
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [focusHistory, setFocusHistory] = useState<string[]>([]);
-  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   useEffect(() => {
     if (!companyId || !personaId) {
@@ -77,39 +76,6 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
     };
   }, [companyId, personaId]);
 
-  useEffect(() => {
-    if (!companyId || !personaId) {
-      setInterviewDate(null);
-      return;
-    }
-    const key = getInterviewDateStorageKey(companyId, personaId);
-
-    function refresh() {
-      setInterviewDate(parseInterviewDate(localStorage.getItem(key)));
-    }
-
-    refresh();
-
-    function onStorage(event: StorageEvent) {
-      if (event.key === key) refresh();
-    }
-
-    function onInterviewDateUpdate(event: Event) {
-      const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === key) refresh();
-    }
-
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener(
-        "adaptive-interview-date-updated",
-        onInterviewDateUpdate
-      );
-    };
-  }, [companyId, personaId]);
-
   const interviewTimeline = getInterviewDateSummary(interviewDate);
   const shouldPromptDateSetup =
     interviewTimeline.daysUntil === null || interviewTimeline.daysUntil < 0;
@@ -130,9 +96,6 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
       if (focusNote.trim()) {
         params.set("focus", focusNote.trim());
       }
-      const interviewDate = parseInterviewDate(
-        localStorage.getItem(getInterviewDateStorageKey(companyId, personaId))
-      );
       if (interviewDate) {
         params.set("date", interviewDate);
       } else {

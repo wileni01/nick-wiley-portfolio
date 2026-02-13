@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { CalendarClock, Check, Download, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { useModeInterviewDate } from "./use-mode-interview-date";
 import {
   getInterviewDateSummary,
-  parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
 import {
   buildInterviewGoogleCalendarEvents,
@@ -15,59 +15,17 @@ import {
   buildInterviewPrepCalendarIcs,
 } from "@/lib/adaptive/interview-calendar";
 import { buildInterviewDateOffsetValue } from "@/lib/adaptive/interview-date-actions";
-import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
 
 export function InterviewDateTracker() {
   const { companyId, personaId, company, persona } = useInterviewMode();
-  const [interviewDate, setInterviewDate] = useState<string>("");
+  const { interviewDate, setInterviewDate } = useModeInterviewDate({
+    companyId,
+    personaId,
+  });
   const [downloadState, setDownloadState] = useState<"idle" | "done">("idle");
 
-  useEffect(() => {
-    if (!companyId || !personaId) return;
-    const key = getInterviewDateStorageKey(companyId, personaId);
-
-    function refresh() {
-      const parsed = parseInterviewDate(localStorage.getItem(key));
-      setInterviewDate(parsed ?? "");
-    }
-
-    refresh();
-
-    function onStorage(event: StorageEvent) {
-      if (event.key === key) refresh();
-    }
-
-    function onInterviewDateUpdate(event: Event) {
-      const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === key) refresh();
-    }
-
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener(
-        "adaptive-interview-date-updated",
-        onInterviewDateUpdate
-      );
-    };
-  }, [companyId, personaId]);
-
-  useEffect(() => {
-    if (!companyId || !personaId) return;
-    const key = getInterviewDateStorageKey(companyId, personaId);
-    if (interviewDate) {
-      localStorage.setItem(key, interviewDate);
-    } else {
-      localStorage.removeItem(key);
-    }
-    window.dispatchEvent(
-      new CustomEvent("adaptive-interview-date-updated", { detail: { key } })
-    );
-  }, [companyId, interviewDate, personaId]);
-
   const summary = useMemo(
-    () => getInterviewDateSummary(interviewDate || null),
+    () => getInterviewDateSummary(interviewDate),
     [interviewDate]
   );
   const companyName = company?.name ?? companyId ?? "Target Company";
@@ -155,12 +113,12 @@ export function InterviewDateTracker() {
       <div className="flex flex-wrap items-center gap-2">
         <input
           type="date"
-          value={interviewDate}
+          value={interviewDate ?? ""}
           onChange={(event) => setInterviewDate(event.target.value)}
           className="h-8 rounded-md border border-border bg-background px-2 text-xs"
           aria-label="Set interview date"
         />
-        <Button size="sm" variant="ghost" onClick={() => setInterviewDate("")}>
+        <Button size="sm" variant="ghost" onClick={() => setInterviewDate(null)}>
           Clear date
         </Button>
         <Button

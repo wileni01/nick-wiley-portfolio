@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useInterviewMode } from "./interview-mode-provider";
+import { useModeInterviewDate } from "./use-mode-interview-date";
 import { evaluateModeHealth } from "@/lib/adaptive/mode-health";
 import {
   getReadinessChecklist,
@@ -14,25 +15,22 @@ import {
   getPrepHistoryStorageKey,
   parsePrepHistory,
 } from "@/lib/adaptive/prep-history";
-import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
-import { parseInterviewDate } from "@/lib/adaptive/interview-date";
 
 export function ModeHealthPill() {
   const { companyId, personaId } = useInterviewMode();
+  const { interviewDate } = useModeInterviewDate({ companyId, personaId });
   const [readinessPct, setReadinessPct] = useState<number | null>(null);
   const [latestScore, setLatestScore] = useState<number | null>(null);
   const [latestConfidence, setLatestConfidence] = useState<number | null>(null);
   const [latestSessionTimestamp, setLatestSessionTimestamp] = useState<string | null>(
     null
   );
-  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   const keys = useMemo(() => {
     if (!companyId || !personaId) return null;
     return {
       readiness: getReadinessStorageKey(companyId, personaId),
       history: getPrepHistoryStorageKey(companyId, personaId),
-      interviewDate: getInterviewDateStorageKey(companyId, personaId),
     };
   }, [companyId, personaId]);
 
@@ -42,7 +40,6 @@ export function ModeHealthPill() {
       setLatestScore(null);
       setLatestConfidence(null);
       setLatestSessionTimestamp(null);
-      setInterviewDate(null);
       return;
     }
     const activeCompanyId = companyId;
@@ -60,7 +57,6 @@ export function ModeHealthPill() {
       setLatestScore(history[0]?.averageScore ?? null);
       setLatestConfidence(history[0]?.averageConfidence ?? null);
       setLatestSessionTimestamp(history[0]?.timestamp ?? null);
-      setInterviewDate(parseInterviewDate(localStorage.getItem(activeKeys.interviewDate)));
     }
 
     refresh();
@@ -68,8 +64,7 @@ export function ModeHealthPill() {
     function onStorage(event: StorageEvent) {
       if (
         event.key === activeKeys.readiness ||
-        event.key === activeKeys.history ||
-        event.key === activeKeys.interviewDate
+        event.key === activeKeys.history
       ) {
         refresh();
       }
@@ -85,25 +80,15 @@ export function ModeHealthPill() {
       if (detail?.key === activeKeys.history) refresh();
     }
 
-    function onInterviewDateUpdate(event: Event) {
-      const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === activeKeys.interviewDate) refresh();
-    }
-
     window.addEventListener("storage", onStorage);
     window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
     window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
-    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("adaptive-readiness-updated", onReadinessUpdate);
       window.removeEventListener(
         "adaptive-prep-history-updated",
         onPrepHistoryUpdate
-      );
-      window.removeEventListener(
-        "adaptive-interview-date-updated",
-        onInterviewDateUpdate
       );
     };
   }, [companyId, keys, personaId]);

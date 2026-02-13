@@ -1,4 +1,5 @@
 import { getInterviewDateStorageKey } from "./storage-keys";
+import { parseInterviewDate } from "./interview-date";
 
 export function buildInterviewDateOffsetValue(
   daysFromNow: number,
@@ -30,9 +31,24 @@ export function setInterviewDateForMode(
   personaId: string,
   interviewDate: string
 ): string | null {
+  const normalized = parseInterviewDate(interviewDate);
+  if (!normalized) return null;
   if (typeof window === "undefined") return null;
   const key = getInterviewDateStorageKey(companyId, personaId);
-  window.localStorage.setItem(key, interviewDate);
+  window.localStorage.setItem(key, normalized);
+  window.dispatchEvent(
+    new CustomEvent("adaptive-interview-date-updated", { detail: { key } })
+  );
+  return key;
+}
+
+export function clearInterviewDateForMode(
+  companyId: string,
+  personaId: string
+): string | null {
+  if (typeof window === "undefined") return null;
+  const key = getInterviewDateStorageKey(companyId, personaId);
+  window.localStorage.removeItem(key);
   window.dispatchEvent(
     new CustomEvent("adaptive-interview-date-updated", { detail: { key } })
   );
