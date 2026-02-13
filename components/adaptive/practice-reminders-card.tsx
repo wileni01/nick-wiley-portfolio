@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { AlarmClock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { TimelineQuickFixActions } from "./timeline-quick-fix-actions";
 import {
   getReadinessChecklist,
   getReadinessCompletion,
@@ -24,7 +24,6 @@ import {
   getInterviewDateSummary,
   parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
-import { setInterviewDateOffsetForMode } from "@/lib/adaptive/interview-date-actions";
 
 function getPriorityBadge(priority: "high" | "medium" | "low") {
   if (priority === "high") {
@@ -162,10 +161,6 @@ export function PracticeRemindersCard() {
   const activeCompanyId = companyId;
   const activePersonaId = personaId;
 
-  function setInterviewDateOffset(daysFromNow: number) {
-    setInterviewDateOffsetForMode(activeCompanyId, activePersonaId, daysFromNow);
-  }
-
   return (
     <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -194,23 +189,12 @@ export function PracticeRemindersCard() {
             </p>
             {(reminder.id === "set-interview-date" ||
               reminder.id === "reset-interview-date") && (
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-7 px-2 text-[11px]"
-                  onClick={() => setInterviewDateOffset(7)}
-                >
-                  {reminder.id === "set-interview-date" ? "Set +7d" : "Reset +7d"}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-7 px-2 text-[11px]"
-                  onClick={() => setInterviewDateOffset(14)}
-                >
-                  {reminder.id === "set-interview-date" ? "Set +14d" : "Reset +14d"}
-                </Button>
+              <div className="mt-2">
+                <TimelineQuickFixActions
+                  companyId={activeCompanyId}
+                  personaId={activePersonaId}
+                  mode={reminder.id === "set-interview-date" ? "set" : "reset"}
+                />
               </div>
             )}
           </li>

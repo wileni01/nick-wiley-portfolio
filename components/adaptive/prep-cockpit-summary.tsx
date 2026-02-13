@@ -5,6 +5,7 @@ import { Check, ClipboardCopy, Crosshair, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { TimelineQuickFixActions } from "./timeline-quick-fix-actions";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import {
   buildPrepBriefMarkdown,
@@ -27,7 +28,6 @@ import { buildInterviewDayPlan } from "@/lib/adaptive/interview-day-plan";
 import { calculatePreflightScore } from "@/lib/adaptive/preflight";
 import { buildPracticeReminders } from "@/lib/adaptive/practice-reminders";
 import { evaluatePrepCadence } from "@/lib/adaptive/prep-cadence";
-import { setInterviewDateOffsetForMode } from "@/lib/adaptive/interview-date-actions";
 import {
   getPrepHistoryStorageKey,
   parsePrepHistory,
@@ -182,10 +182,6 @@ export function PrepCockpitSummary() {
     latestSessionTimestamp,
   });
   const shouldShowTimelineQuickFix = cadence.status === "none";
-
-  function setInterviewDateOffset(daysFromNow: number) {
-    setInterviewDateOffsetForMode(activeCompanyId, activePersonaId, daysFromNow);
-  }
   const calendarLinks = interviewDate
     ? buildInterviewGoogleCalendarEvents({
         companyName: company.name,
@@ -389,23 +385,12 @@ export function PrepCockpitSummary() {
           {interviewTimeline.label} · reps remaining: {cadence.sessionsNeeded}
         </p>
         {shouldShowTimelineQuickFix && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-[11px]"
-              onClick={() => setInterviewDateOffset(7)}
-            >
-              {interviewTimeline.daysUntil === null ? "Set +7d" : "Reset +7d"}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-[11px]"
-              onClick={() => setInterviewDateOffset(14)}
-            >
-              {interviewTimeline.daysUntil === null ? "Set +14d" : "Reset +14d"}
-            </Button>
+          <div className="mt-2">
+            <TimelineQuickFixActions
+              companyId={activeCompanyId}
+              personaId={activePersonaId}
+              mode={interviewTimeline.daysUntil === null ? "set" : "reset"}
+            />
           </div>
         )}
       </div>

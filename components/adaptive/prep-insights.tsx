@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { BarChart3, TrendingDown, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { TimelineQuickFixActions } from "./timeline-quick-fix-actions";
 import {
   getPrepHistoryStorageKey,
   parsePrepHistory,
@@ -27,7 +27,6 @@ import {
   parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
 import { evaluatePrepCadence } from "@/lib/adaptive/prep-cadence";
-import { setInterviewDateOffsetForMode } from "@/lib/adaptive/interview-date-actions";
 
 function formatDateLabel(timestamp: string): string {
   try {
@@ -252,29 +251,12 @@ export function PrepInsights() {
   const isTimelineMissing = interviewTimeline.daysUntil === null;
   const shouldShowTimelineQuickActions = cadence.status === "none";
 
-  function setInterviewDateOffset(daysFromNow: number) {
-    setInterviewDateOffsetForMode(activeCompanyId, activePersonaId, daysFromNow);
-  }
-
   const timelineQuickActions = shouldShowTimelineQuickActions ? (
-    <div className="flex flex-wrap gap-1.5">
-      <Button
-        size="sm"
-        variant="outline"
-        className="h-7 px-2 text-[11px]"
-        onClick={() => setInterviewDateOffset(7)}
-      >
-        {isTimelineMissing ? "Set +7d" : "Reset +7d"}
-      </Button>
-      <Button
-        size="sm"
-        variant="outline"
-        className="h-7 px-2 text-[11px]"
-        onClick={() => setInterviewDateOffset(14)}
-      >
-        {isTimelineMissing ? "Set +14d" : "Reset +14d"}
-      </Button>
-    </div>
+    <TimelineQuickFixActions
+      companyId={activeCompanyId}
+      personaId={activePersonaId}
+      mode={isTimelineMissing ? "set" : "reset"}
+    />
   ) : null;
 
   return (

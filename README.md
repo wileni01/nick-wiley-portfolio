@@ -127,6 +127,7 @@ lib/
 - **Mode health indicator** — Navbar status pill shows current readiness completion and latest mock score for selected mode.
 - **Interview countdown pill** — Navbar displays D-day countdown (or passed state) for the active company/persona interview date.
 - **Navbar date quick-fix** — When date context is missing/stale, Interview Mode surfaces a one-click “Set/Reset date +7d” action.
+- **Shared timeline quick-fix controls** — Consistent Set/Reset +7d/+14d actions appear across cockpit, insights, reminders, and next-actions panels when date context is missing/stale.
 - **Mode health status** — Indicator is risk-coded ("On track", "Building", "Needs reps", "Urgent", "Set date", "Date passed") based on readiness, performance, and interview-date timeline context.
 - **Preflight readiness score** — Weighted 0–100 score combining checklist progress, mock results, launchpad coverage, prep context, session recency, and interview-date urgency (with stale/missing-date timeline flags and quick date reset actions).
 - **Practice reminders** — Auto-generated next-step reminders (with due-by guidance) based on readiness, score, launchpad coverage, and interview-date proximity (including one-click prompts to set/reset date context).
