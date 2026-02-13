@@ -143,7 +143,7 @@ lib/
 - **Exportable prep report** — Copy or download a plain-text mock-session report with scores, strengths, gaps, and coaching prompts, with inline feedback when downloads fail.
 - **Session autosave** — Mock interview drafts persist locally per company/persona with sanitized restore handling, so you can continue prep later.
 - **Pacing + coaching themes** — Mock mode estimates speaking time per answer and surfaces recurring improvement themes at session completion.
-- **Readiness checklist** — Persona-aware prep checklist with local progress tracking and completion percentage.
+- **Readiness checklist** — Persona-aware prep checklist with local progress tracking, completion percentage, and loop-safe cross-panel synchronization.
 - **Prep insights dashboard** — Tracks the latest 20 session results, latest/best scores, trend, recurring coaching themes, interview pacing status, and one-click timeline quick-fix actions per company/persona.
 - **Confidence calibration** — Mock sessions capture self-rated confidence and compare it with performance trends.
 - **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, top resources, and inline timeline quick-fix actions when date context is missing/stale.

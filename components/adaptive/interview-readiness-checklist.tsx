@@ -11,6 +11,7 @@ import {
   getReadinessStorageKey,
   parseReadinessState,
 } from "@/lib/adaptive/readiness-checklist";
+import { areBooleanStateRecordsEqual } from "@/lib/adaptive/boolean-state";
 
 export function InterviewReadinessChecklist() {
   const { companyId, personaId } = useInterviewMode();
@@ -23,31 +24,60 @@ export function InterviewReadinessChecklist() {
 
   useEffect(() => {
     if (!companyId || !personaId || !checklistItems.length) return;
+    const storageKey = getReadinessStorageKey(companyId, personaId);
 
-    const storedRaw = localStorage.getItem(
-      getReadinessStorageKey(companyId, personaId)
-    );
-    if (!storedRaw) {
-      setChecked({});
-      return;
+    function refresh() {
+      const storedRaw = localStorage.getItem(storageKey);
+      if (!storedRaw) {
+        setChecked((prev) => (Object.keys(prev).length ? {} : prev));
+        return;
+      }
+
+      const parsed = parseReadinessState(storedRaw);
+      if (!Object.keys(parsed).length && storedRaw) {
+        localStorage.removeItem(storageKey);
+        setChecked((prev) => (Object.keys(prev).length ? {} : prev));
+        return;
+      }
+      setChecked((prev) =>
+        areBooleanStateRecordsEqual(prev, parsed) ? prev : parsed
+      );
     }
 
-    const parsed = parseReadinessState(storedRaw);
-    if (!Object.keys(parsed).length && storedRaw) {
-      localStorage.removeItem(getReadinessStorageKey(companyId, personaId));
-      setChecked({});
-      return;
+    refresh();
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === storageKey) refresh();
     }
-    setChecked(parsed);
+
+    function onReadinessUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === storageKey) refresh();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("adaptive-readiness-updated", onReadinessUpdate);
+    };
   }, [checklistItems.length, companyId, personaId]);
 
   useEffect(() => {
     if (!companyId || !personaId || !checklistItems.length) return;
     const storageKey = getReadinessStorageKey(companyId, personaId);
-    localStorage.setItem(
-      storageKey,
-      JSON.stringify(checked)
-    );
+    if (!Object.keys(checked).length) {
+      if (localStorage.getItem(storageKey) === null) return;
+      localStorage.removeItem(storageKey);
+      window.dispatchEvent(
+        new CustomEvent("adaptive-readiness-updated", { detail: { key: storageKey } })
+      );
+      return;
+    }
+
+    const serialized = JSON.stringify(checked);
+    if (localStorage.getItem(storageKey) === serialized) return;
+    localStorage.setItem(storageKey, serialized);
     window.dispatchEvent(
       new CustomEvent("adaptive-readiness-updated", { detail: { key: storageKey } })
     );
@@ -65,16 +95,7 @@ export function InterviewReadinessChecklist() {
   }
 
   function resetChecklist() {
-    setChecked({});
-    if (companyId && personaId) {
-      const storageKey = getReadinessStorageKey(companyId, personaId);
-      localStorage.removeItem(storageKey);
-      window.dispatchEvent(
-        new CustomEvent("adaptive-readiness-updated", {
-          detail: { key: storageKey },
-        })
-      );
-    }
+    setChecked((prev) => (Object.keys(prev).length ? {} : prev));
   }
 
   return (
