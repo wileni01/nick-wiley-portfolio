@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useInterviewMode } from "./interview-mode-provider";
+import { useModeInterviewDate } from "./use-mode-interview-date";
 import {
   buildMockInterviewerScript,
   deriveCoachingThemes,
@@ -30,14 +31,8 @@ import {
   parsePrepHistory,
   type PrepSessionSnapshot,
 } from "@/lib/adaptive/prep-history";
-import {
-  getInterviewDateStorageKey,
-  getMockSessionStorageKey,
-} from "@/lib/adaptive/storage-keys";
-import {
-  getInterviewDateSummary,
-  parseInterviewDate,
-} from "@/lib/adaptive/interview-date";
+import { getMockSessionStorageKey } from "@/lib/adaptive/storage-keys";
+import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
 
 interface SessionQuestion {
   question: string;
@@ -115,6 +110,7 @@ function isValidQuestionOrder(order: number[], questionCount: number): boolean {
 
 export function MockInterviewSession() {
   const { companyId, personaId } = useInterviewMode();
+  const { interviewDate } = useModeInterviewDate({ companyId, personaId });
   const [started, setStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
@@ -127,7 +123,6 @@ export function MockInterviewSession() {
   const [timerDuration, setTimerDuration] = useState(90);
   const [timerRemaining, setTimerRemaining] = useState(90);
   const [timerRunning, setTimerRunning] = useState(false);
-  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   const script = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -311,40 +306,6 @@ export function MockInterviewSession() {
       );
     };
   }, [companyId, loadPersistedSession, personaId]);
-
-  useEffect(() => {
-    if (!companyId || !personaId) {
-      setInterviewDate(null);
-      return;
-    }
-
-    const key = getInterviewDateStorageKey(companyId, personaId);
-
-    function refresh() {
-      setInterviewDate(parseInterviewDate(localStorage.getItem(key)));
-    }
-
-    refresh();
-
-    function onStorage(event: StorageEvent) {
-      if (event.key === key) refresh();
-    }
-
-    function onInterviewDateUpdate(event: Event) {
-      const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === key) refresh();
-    }
-
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener(
-        "adaptive-interview-date-updated",
-        onInterviewDateUpdate
-      );
-    };
-  }, [companyId, personaId]);
 
   useEffect(() => {
     if (!timerRunning) return;
