@@ -24,6 +24,7 @@ export interface PrepDataBundle {
   prepGoal: PrepGoalState;
   prepNotes: string;
   focusHistory: string[];
+  launchpadState: Record<string, boolean>;
   mockSession: StoredMockSessionState | null;
   drillState: Record<string, boolean>;
 }
@@ -36,6 +37,7 @@ export function buildPrepDataBundle(input: {
   prepGoalRaw: string | null;
   prepNotesRaw: string | null;
   focusHistoryRaw: string | null;
+  launchpadStateRaw: string | null;
   mockSessionRaw: string | null;
   drillStateRaw: string | null;
 }): PrepDataBundle {
@@ -51,6 +53,7 @@ export function buildPrepDataBundle(input: {
     prepGoal: parsePrepGoalState(input.prepGoalRaw),
     prepNotes: parsePrepNotes(input.prepNotesRaw),
     focusHistory: parseFocusHistory(input.focusHistoryRaw),
+    launchpadState: parseDrillState(input.launchpadStateRaw),
     mockSession: parseMockSessionState(input.mockSessionRaw),
     drillState: parseDrillState(input.drillStateRaw),
   };
@@ -87,6 +90,9 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
       ),
       focusHistory: parseFocusHistory(
         JSON.stringify(parsed.focusHistory ?? [])
+      ),
+      launchpadState: parseDrillState(
+        JSON.stringify(parsed.launchpadState ?? {})
       ),
       mockSession: parseMockSessionState(
         parsed.mockSession ? JSON.stringify(parsed.mockSession) : null

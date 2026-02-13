@@ -21,6 +21,7 @@ import { ModeComparisonPanel } from "./mode-comparison-panel";
 import { MockInterviewSession } from "./mock-interview-session";
 import { MockInterviewerScript } from "./mock-interviewer-script";
 import { NextBestActions } from "./next-best-actions";
+import { PreflightReadinessCard } from "./preflight-readiness-card";
 import { PrepNotes } from "./prep-notes";
 import { PrepInsights } from "./prep-insights";
 import { ResourceLaunchpad } from "./resource-launchpad";
@@ -256,6 +257,7 @@ export function AdaptiveBriefing() {
 
       <ModeComparisonPanel />
       <InterviewDayPlanPanel />
+      <PreflightReadinessCard />
       <PrepCockpitSummary />
       <ResourceLaunchpad />
       <PrepNotes />

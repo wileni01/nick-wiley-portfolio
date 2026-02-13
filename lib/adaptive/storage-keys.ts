@@ -18,3 +18,10 @@ export function getPrepNotesStorageKey(
 ): string {
   return `adaptive.prep-notes.${companyId}.${personaId}`;
 }
+
+export function getLaunchpadStorageKey(
+  companyId: string,
+  personaId: string
+): string {
+  return `adaptive.launchpad.${companyId}.${personaId}`;
+}

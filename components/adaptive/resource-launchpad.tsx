@@ -7,10 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
-
-function getLaunchpadStorageKey(companyId: string, personaId: string) {
-  return `adaptive.launchpad.${companyId}.${personaId}`;
-}
+import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
 
 export function ResourceLaunchpad() {
   const { companyId, personaId } = useInterviewMode();
@@ -24,24 +21,49 @@ export function ResourceLaunchpad() {
   useEffect(() => {
     if (!companyId || !personaId) return;
     const key = getLaunchpadStorageKey(companyId, personaId);
-    const raw = localStorage.getItem(key);
-    if (!raw) {
-      setOpened({});
-      return;
+
+    function refresh() {
+      const raw = localStorage.getItem(key);
+      if (!raw) {
+        setOpened({});
+        return;
+      }
+      try {
+        setOpened(JSON.parse(raw) as Record<string, boolean>);
+      } catch {
+        setOpened({});
+        localStorage.removeItem(key);
+      }
     }
-    try {
-      setOpened(JSON.parse(raw) as Record<string, boolean>);
-    } catch {
-      setOpened({});
-      localStorage.removeItem(key);
+
+    refresh();
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === key) refresh();
     }
+
+    function onLaunchpadUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === key) refresh();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(
+        "adaptive-launchpad-updated",
+        onLaunchpadUpdate
+      );
+    };
   }, [companyId, personaId]);
 
   useEffect(() => {
     if (!companyId || !personaId) return;
-    localStorage.setItem(
-      getLaunchpadStorageKey(companyId, personaId),
-      JSON.stringify(opened)
+    const key = getLaunchpadStorageKey(companyId, personaId);
+    localStorage.setItem(key, JSON.stringify(opened));
+    window.dispatchEvent(
+      new CustomEvent("adaptive-launchpad-updated", { detail: { key } })
     );
   }, [companyId, opened, personaId]);
 
@@ -56,7 +78,11 @@ export function ResourceLaunchpad() {
 
   function resetLaunchpad() {
     setOpened({});
-    localStorage.removeItem(getLaunchpadStorageKey(companyId, personaId));
+    const key = getLaunchpadStorageKey(companyId, personaId);
+    localStorage.removeItem(key);
+    window.dispatchEvent(
+      new CustomEvent("adaptive-launchpad-updated", { detail: { key } })
+    );
   }
 
   return (

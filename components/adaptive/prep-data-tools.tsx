@@ -14,6 +14,7 @@ import {
 } from "@/lib/adaptive/prep-data-bundle";
 import {
   getDrillStateStorageKey,
+  getLaunchpadStorageKey,
   getMockSessionStorageKey,
   getPrepNotesStorageKey,
 } from "@/lib/adaptive/storage-keys";
@@ -37,6 +38,7 @@ export function PrepDataTools() {
     drills: getDrillStateStorageKey(companyId, personaId),
     notes: getPrepNotesStorageKey(companyId, personaId),
     focusHistory: getFocusHistoryStorageKey(companyId, personaId),
+    launchpad: getLaunchpadStorageKey(companyId, personaId),
   };
 
   function emitRefreshEvents() {
@@ -75,6 +77,11 @@ export function PrepDataTools() {
         detail: { key: keys.focusHistory },
       })
     );
+    window.dispatchEvent(
+      new CustomEvent("adaptive-launchpad-updated", {
+        detail: { key: keys.launchpad },
+      })
+    );
   }
 
   function getBundleJson() {
@@ -86,6 +93,7 @@ export function PrepDataTools() {
       prepGoalRaw: localStorage.getItem(keys.goals),
       prepNotesRaw: localStorage.getItem(keys.notes),
       focusHistoryRaw: localStorage.getItem(keys.focusHistory),
+      launchpadStateRaw: localStorage.getItem(keys.launchpad),
       mockSessionRaw: localStorage.getItem(keys.mock),
       drillStateRaw: localStorage.getItem(keys.drills),
     });
@@ -146,6 +154,7 @@ export function PrepDataTools() {
       localStorage.setItem(keys.drills, JSON.stringify(parsed.drillState));
       localStorage.setItem(keys.notes, parsed.prepNotes);
       localStorage.setItem(keys.focusHistory, JSON.stringify(parsed.focusHistory));
+      localStorage.setItem(keys.launchpad, JSON.stringify(parsed.launchpadState));
       if (parsed.mockSession) {
         localStorage.setItem(keys.mock, JSON.stringify(parsed.mockSession));
       } else {
