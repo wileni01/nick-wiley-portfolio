@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Download, FileUp, RotateCcw } from "lucide-react";
+import { ClipboardPaste, Download, FileUp, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
@@ -11,6 +11,7 @@ import { getPrepGoalStorageKey } from "@/lib/adaptive/prep-goals";
 import {
   buildPrepDataBundle,
   parsePrepDataBundle,
+  type PrepDataBundle,
 } from "@/lib/adaptive/prep-data-bundle";
 import {
   getDrillStateStorageKey,
@@ -164,6 +165,64 @@ export function PrepDataTools() {
     fileInputRef.current?.click();
   }
 
+  function applyImportedBundle(parsed: PrepDataBundle) {
+    localStorage.setItem(keys.readiness, JSON.stringify(parsed.readinessState));
+    localStorage.setItem(keys.history, JSON.stringify(parsed.prepHistory));
+    localStorage.setItem(keys.goals, JSON.stringify(parsed.prepGoal));
+    localStorage.setItem(keys.drills, JSON.stringify(parsed.drillState));
+    localStorage.setItem(keys.notes, parsed.prepNotes);
+    localStorage.setItem(keys.focusHistory, JSON.stringify(parsed.focusHistory));
+    if (parsed.interviewDate) {
+      localStorage.setItem(keys.interviewDate, parsed.interviewDate);
+    } else {
+      localStorage.removeItem(keys.interviewDate);
+    }
+    localStorage.setItem(keys.launchpad, JSON.stringify(parsed.launchpadState));
+    if (parsed.mockSession) {
+      localStorage.setItem(keys.mock, JSON.stringify(parsed.mockSession));
+    } else {
+      localStorage.removeItem(keys.mock);
+    }
+    emitRefreshEvents();
+
+    if (
+      parsed.mode.companyId !== activeCompanyId ||
+      parsed.mode.personaId !== activePersonaId
+    ) {
+      setTone("neutral");
+      setStatus(
+        `Imported bundle from ${parsed.mode.companyId}/${parsed.mode.personaId} into current mode.`
+      );
+    } else {
+      setTone("success");
+      setStatus("Prep data imported successfully.");
+    }
+  }
+
+  async function pasteJsonFromClipboard() {
+    setConfirmReset(false);
+    try {
+      const raw = await navigator.clipboard.readText();
+      if (!raw.trim()) {
+        setTone("error");
+        setStatus("Clipboard is empty.");
+        return;
+      }
+
+      const parsed = parsePrepDataBundle(raw);
+      if (!parsed) {
+        setTone("error");
+        setStatus("Clipboard does not contain a valid prep data bundle.");
+        return;
+      }
+
+      applyImportedBundle(parsed);
+    } catch {
+      setTone("error");
+      setStatus("Could not read clipboard data.");
+    }
+  }
+
   async function onImportFile(event: React.ChangeEvent<HTMLInputElement>) {
     setConfirmReset(false);
     const file = event.target.files?.[0];
@@ -177,38 +236,7 @@ export function PrepDataTools() {
         setStatus("Invalid prep data bundle.");
         return;
       }
-
-      localStorage.setItem(keys.readiness, JSON.stringify(parsed.readinessState));
-      localStorage.setItem(keys.history, JSON.stringify(parsed.prepHistory));
-      localStorage.setItem(keys.goals, JSON.stringify(parsed.prepGoal));
-      localStorage.setItem(keys.drills, JSON.stringify(parsed.drillState));
-      localStorage.setItem(keys.notes, parsed.prepNotes);
-      localStorage.setItem(keys.focusHistory, JSON.stringify(parsed.focusHistory));
-      if (parsed.interviewDate) {
-        localStorage.setItem(keys.interviewDate, parsed.interviewDate);
-      } else {
-        localStorage.removeItem(keys.interviewDate);
-      }
-      localStorage.setItem(keys.launchpad, JSON.stringify(parsed.launchpadState));
-      if (parsed.mockSession) {
-        localStorage.setItem(keys.mock, JSON.stringify(parsed.mockSession));
-      } else {
-        localStorage.removeItem(keys.mock);
-      }
-      emitRefreshEvents();
-
-      if (
-        parsed.mode.companyId !== activeCompanyId ||
-        parsed.mode.personaId !== activePersonaId
-      ) {
-        setTone("neutral");
-        setStatus(
-          `Imported bundle from ${parsed.mode.companyId}/${parsed.mode.personaId} into current mode.`
-        );
-      } else {
-        setTone("success");
-        setStatus("Prep data imported successfully.");
-      }
+      applyImportedBundle(parsed);
     } catch {
       setTone("error");
       setStatus("Could not read selected file.");
@@ -237,6 +265,10 @@ export function PrepDataTools() {
         <Button size="sm" variant="ghost" onClick={triggerImport}>
           <FileUp className="h-3.5 w-3.5" />
           Import JSON
+        </Button>
+        <Button size="sm" variant="ghost" onClick={pasteJsonFromClipboard}>
+          <ClipboardPaste className="h-3.5 w-3.5" />
+          Paste JSON
         </Button>
         <Button
           size="sm"
