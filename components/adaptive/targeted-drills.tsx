@@ -7,10 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { parsePrepHistory, getPrepHistoryStorageKey } from "@/lib/adaptive/prep-history";
 import { buildTargetedDrills } from "@/lib/adaptive/drills";
-
-function getDrillStateKey(companyId: string, personaId: string) {
-  return `adaptive.drills.${companyId}.${personaId}`;
-}
+import { getDrillStateStorageKey } from "@/lib/adaptive/storage-keys";
 
 export function TargetedDrills() {
   const { companyId, personaId } = useInterviewMode();
@@ -52,26 +49,48 @@ export function TargetedDrills() {
 
   useEffect(() => {
     if (!companyId || !personaId) return;
-    const key = getDrillStateKey(companyId, personaId);
-    const raw = localStorage.getItem(key);
-    if (!raw) {
-      setChecked({});
-      return;
+    const key = getDrillStateStorageKey(companyId, personaId);
+
+    function refreshChecked() {
+      const raw = localStorage.getItem(key);
+      if (!raw) {
+        setChecked({});
+        return;
+      }
+      try {
+        setChecked(JSON.parse(raw) as Record<string, boolean>);
+      } catch {
+        setChecked({});
+        localStorage.removeItem(key);
+      }
     }
-    try {
-      setChecked(JSON.parse(raw) as Record<string, boolean>);
-    } catch {
-      setChecked({});
-      localStorage.removeItem(key);
+
+    refreshChecked();
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === key) refreshChecked();
     }
+
+    function onDrillStateUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === key) refreshChecked();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-drill-state-updated", onDrillStateUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(
+        "adaptive-drill-state-updated",
+        onDrillStateUpdate
+      );
+    };
   }, [companyId, personaId]);
 
   useEffect(() => {
     if (!companyId || !personaId) return;
-    localStorage.setItem(
-      getDrillStateKey(companyId, personaId),
-      JSON.stringify(checked)
-    );
+    const key = getDrillStateStorageKey(companyId, personaId);
+    localStorage.setItem(key, JSON.stringify(checked));
   }, [checked, companyId, personaId]);
 
   if (!companyId || !personaId) return null;
@@ -84,7 +103,11 @@ export function TargetedDrills() {
 
   function resetDrills() {
     setChecked({});
-    localStorage.removeItem(getDrillStateKey(companyId, personaId));
+    const key = getDrillStateStorageKey(companyId, personaId);
+    localStorage.removeItem(key);
+    window.dispatchEvent(
+      new CustomEvent("adaptive-drill-state-updated", { detail: { key } })
+    );
   }
 
   return (

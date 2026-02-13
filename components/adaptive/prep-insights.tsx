@@ -78,14 +78,38 @@ export function PrepInsights() {
   useEffect(() => {
     if (!companyId || !personaId) return;
     const goalKey = getPrepGoalStorageKey(companyId, personaId);
-    const parsed = parsePrepGoalState(localStorage.getItem(goalKey));
-    setWeeklyTarget(parsed.weeklyTarget);
+
+    function refreshGoal() {
+      const parsed = parsePrepGoalState(localStorage.getItem(goalKey));
+      setWeeklyTarget(parsed.weeklyTarget);
+    }
+
+    refreshGoal();
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === goalKey) refreshGoal();
+    }
+
+    function onGoalUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === goalKey) refreshGoal();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-prep-goal-updated", onGoalUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("adaptive-prep-goal-updated", onGoalUpdate);
+    };
   }, [companyId, personaId]);
 
   useEffect(() => {
     if (!companyId || !personaId) return;
     const goalKey = getPrepGoalStorageKey(companyId, personaId);
     localStorage.setItem(goalKey, JSON.stringify({ weeklyTarget }));
+    window.dispatchEvent(
+      new CustomEvent("adaptive-prep-goal-updated", { detail: { key: goalKey } })
+    );
   }, [companyId, personaId, weeklyTarget]);
 
   const prepCalendar = useMemo(() => {

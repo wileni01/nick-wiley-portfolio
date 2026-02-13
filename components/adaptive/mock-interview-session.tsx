@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Check,
@@ -28,6 +28,7 @@ import {
   parsePrepHistory,
   type PrepSessionSnapshot,
 } from "@/lib/adaptive/prep-history";
+import { getMockSessionStorageKey } from "@/lib/adaptive/storage-keys";
 
 interface SessionQuestion {
   question: string;
@@ -49,17 +50,13 @@ const warmupQuestion: SessionQuestion = {
     "Use a compact arc: role fit, one credible example, and what value you can create in the first 90 days.",
 };
 
-interface PersistedMockSession {
+export interface PersistedMockSession {
   answers: string[];
   confidences: number[];
   currentIndex: number;
   completed: boolean;
   started: boolean;
   updatedAt: string;
-}
-
-function getSessionStorageKey(companyId: string, personaId: string) {
-  return `adaptive.mock-session.${companyId}.${personaId}`;
 }
 
 function countWords(text: string): number {
@@ -159,11 +156,15 @@ export function MockInterviewSession() {
     sessionQuestions,
   ]);
 
-  useEffect(() => {
+  const loadPersistedSession = useCallback(() => {
     if (!companyId || !personaId || !sessionQuestions.length) return;
 
-    const storedRaw = localStorage.getItem(getSessionStorageKey(companyId, personaId));
-    if (!storedRaw) return;
+    const key = getMockSessionStorageKey(companyId, personaId);
+    const storedRaw = localStorage.getItem(key);
+    if (!storedRaw) {
+      setLoadedFromDraft(false);
+      return;
+    }
 
     try {
       const stored = JSON.parse(storedRaw) as PersistedMockSession;
@@ -195,9 +196,42 @@ export function MockInterviewSession() {
         )
       );
     } catch {
-      localStorage.removeItem(getSessionStorageKey(companyId, personaId));
+      localStorage.removeItem(key);
+      setLoadedFromDraft(false);
     }
   }, [companyId, personaId, sessionQuestions.length]);
+
+  useEffect(() => {
+    loadPersistedSession();
+  }, [loadPersistedSession]);
+
+  useEffect(() => {
+    if (!companyId || !personaId) return;
+    const key = getMockSessionStorageKey(companyId, personaId);
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === key) {
+        loadPersistedSession();
+      }
+    }
+
+    function onMockSessionUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === key) {
+        loadPersistedSession();
+      }
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-mock-session-updated", onMockSessionUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(
+        "adaptive-mock-session-updated",
+        onMockSessionUpdate
+      );
+    };
+  }, [companyId, loadPersistedSession, personaId]);
 
   useEffect(() => {
     if (!companyId || !personaId) return;
@@ -207,7 +241,7 @@ export function MockInterviewSession() {
       answers.every((answer) => !answer.trim()) &&
       confidences.every((confidence) => confidence === 3)
     ) {
-      localStorage.removeItem(getSessionStorageKey(companyId, personaId));
+      localStorage.removeItem(getMockSessionStorageKey(companyId, personaId));
       return;
     }
 
@@ -221,7 +255,7 @@ export function MockInterviewSession() {
     };
 
     localStorage.setItem(
-      getSessionStorageKey(companyId, personaId),
+      getMockSessionStorageKey(companyId, personaId),
       JSON.stringify(payload)
     );
   }, [
@@ -308,7 +342,11 @@ export function MockInterviewSession() {
 
   function resetSession() {
     if (companyId && personaId) {
-      localStorage.removeItem(getSessionStorageKey(companyId, personaId));
+      const key = getMockSessionStorageKey(companyId, personaId);
+      localStorage.removeItem(key);
+      window.dispatchEvent(
+        new CustomEvent("adaptive-mock-session-updated", { detail: { key } })
+      );
     }
     setStarted(false);
     setCompleted(false);

@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { PrepCockpitSummary } from "./prep-cockpit-summary";
+import { PrepDataTools } from "./prep-data-tools";
 import { InterviewReadinessChecklist } from "./interview-readiness-checklist";
 import { ModeComparisonPanel } from "./mode-comparison-panel";
 import { MockInterviewSession } from "./mock-interview-session";
@@ -237,6 +238,7 @@ export function AdaptiveBriefing() {
 
       <ModeComparisonPanel />
       <PrepCockpitSummary />
+      <PrepDataTools />
       <NextBestActions />
       <TargetedDrills />
       <InterviewReadinessChecklist />

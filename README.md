@@ -134,6 +134,7 @@ lib/
 - **Next best actions** — Dynamic, priority-ranked guidance based on readiness, latest mock outcomes, and confidence calibration.
 - **Targeted drills** — Theme-driven micro-exercises generated from your latest coaching gaps, with local completion tracking.
 - **Prep cadence tracking** — Weekly session target + streak tracking to keep interview practice consistent.
+- **Prep data tools** — Export/import/reset local prep state (JSON) per company/persona mode for backup and portability.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.
