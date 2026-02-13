@@ -41,6 +41,8 @@ export function buildNextActions(input: BuildNextActionsInput): NextAction[] {
   const actions: NextAction[] = [];
   const daysUntilInterview = getDaysUntilInterview(input.interviewDate);
   const recencyDays = getSessionRecencyDays(input.latestSessionTimestamp);
+  const hasPassedInterviewDate =
+    daysUntilInterview !== null && daysUntilInterview < 0;
 
   if (daysUntilInterview === null) {
     actions.push({
@@ -49,6 +51,16 @@ export function buildNextActions(input: BuildNextActionsInput): NextAction[] {
       title: "Set interview date for timeline planning",
       detail:
         "Add your interview date to unlock countdown-aware pacing, urgency scoring, and prep checkpoint scheduling.",
+    });
+  }
+
+  if (hasPassedInterviewDate) {
+    actions.push({
+      id: "reset-interview-date",
+      priority: "high",
+      title: "Interview date passed — set your next target date",
+      detail:
+        "Update to your next interview date so countdown guidance and timeline actions can re-prioritize your prep plan.",
     });
   }
 

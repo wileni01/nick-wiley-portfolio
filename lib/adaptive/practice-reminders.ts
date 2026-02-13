@@ -57,6 +57,8 @@ export function buildPracticeReminders(
   const reminders: PracticeReminder[] = [];
   const interviewDate = parseInterviewDate(input.interviewDate);
   const daysUntilInterview = getDaysUntilInterview(input.now, interviewDate);
+  const hasPassedInterviewDate =
+    daysUntilInterview !== null && daysUntilInterview < 0;
   const todayIso = toIsoDate(capDueDate(startOfDay(input.now), interviewDate, input.now));
   const tomorrowIso = toIsoDate(
     capDueDate(addDays(input.now, 1), interviewDate, input.now)
@@ -70,6 +72,17 @@ export function buildPracticeReminders(
         "Add your interview date so reminders, pacing guidance, and countdown status can prioritize the right prep window.",
       dueBy: todayIso,
       priority: "medium",
+    });
+  }
+
+  if (hasPassedInterviewDate) {
+    reminders.push({
+      id: "reset-interview-date",
+      title: "Update to your next interview date",
+      detail:
+        "Your saved interview date has passed. Set the next interview date to restore countdown-aware pacing and reminder priority.",
+      dueBy: todayIso,
+      priority: "high",
     });
   }
 
@@ -105,9 +118,13 @@ export function buildPracticeReminders(
   } else {
     reminders.push({
       id: "maintain",
-      title: "Keep rhythm with one rehearsal",
+      title: hasPassedInterviewDate
+        ? "Restart rhythm for your next loop"
+        : "Keep rhythm with one rehearsal",
       detail:
-        "Run one focused rehearsal and review your top 2 recommendation artifacts.",
+        hasPassedInterviewDate
+          ? "Run one focused rehearsal to keep momentum while scheduling your next interview target."
+          : "Run one focused rehearsal and review your top 2 recommendation artifacts.",
       dueBy: tomorrowIso,
       priority: "medium",
     });
@@ -118,7 +135,9 @@ export function buildPracticeReminders(
       id: "readiness-gap",
       title: "Close checklist gaps",
       detail:
-        "Complete at least two outstanding readiness checklist items before interview day.",
+        hasPassedInterviewDate
+          ? "Complete at least two outstanding readiness checklist items before your next interview cycle."
+          : "Complete at least two outstanding readiness checklist items before interview day.",
       dueBy: tomorrowIso,
       priority: "medium",
     });
