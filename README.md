@@ -137,6 +137,7 @@ lib/
 - **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, and top resources.
 - **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode.
 - **Mode comparison panel** — Side-by-side view of current vs alternate company mode with top resources and one-click switching.
+- **Resource launchpad** — Track and open top recommended artifacts with per-mode completion progress.
 - **Next best actions** — Dynamic, priority-ranked guidance based on readiness, latest mock outcomes, and confidence calibration.
 - **Targeted drills** — Theme-driven micro-exercises generated from your latest coaching gaps, with local completion tracking.
 - **Prep cadence tracking** — Weekly session target + streak tracking to keep interview practice consistent.
