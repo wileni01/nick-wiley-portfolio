@@ -139,7 +139,7 @@ lib/
 - **Prep insights dashboard** — Tracks session history, latest/best scores, trend, recurring coaching themes, and interview pacing status per company/persona.
 - **Confidence calibration** — Mock sessions capture self-rated confidence and compare it with performance trends.
 - **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, and top resources.
-- **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode.
+- **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode, including interview pacing guidance.
 - **Mode comparison panel** — Side-by-side view of current vs alternate company mode with top resources and one-click switching.
 - **Resource launchpad** — Track and open top recommended artifacts with per-mode completion progress and bulk open/mark actions.
 - **Next best actions** — Dynamic, priority-ranked guidance based on readiness, latest mock outcomes, and confidence calibration.
@@ -150,7 +150,7 @@ lib/
 - **Prep notes pad** — Persist mode-specific interviewer notes and include them in exported briefs/packets.
 - **Interview day plan** — Time-phased execution plan (prep window + T-45 to close) tuned to selected company/persona priorities and interview-date timeline.
 - **Interview date tracker** — Set a per-mode interview date (with quick-set controls) to anchor urgency, include date context in exported briefs, open a Google Calendar event, and download an `.ics` prep plan.
-- **Full prep packet export** — Download a consolidated Markdown packet with brief, preflight status, reminders, next actions, drills, and day plan.
+- **Full prep packet export** — Download a consolidated Markdown packet with brief, preflight status, pacing guidance, reminders, next actions, drills, and day plan.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.

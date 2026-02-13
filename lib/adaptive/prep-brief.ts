@@ -19,6 +19,12 @@ export interface PrepBriefInput {
     label: string;
     detail: string;
   };
+  cadence?: {
+    label: string;
+    detail: string;
+    sessionsNeeded: number;
+    recencyDays: number | null;
+  };
   topResources: Array<{
     title: string;
     url: string;
@@ -95,6 +101,20 @@ ${input.prepNotes?.trim() ? input.prepNotes : "No prep notes captured."}
     input.latestConfidence !== null ? `${input.latestConfidence}/5` : "N/A"
   }
 ${input.preflight ? `- Preflight: ${input.preflight.score}/100 (${input.preflight.label})` : ""}
+
+## Interview Pacing
+${
+  input.cadence
+    ? `- Status: ${input.cadence.label}
+- Suggested reps remaining: ${input.cadence.sessionsNeeded}
+- Latest session recency: ${
+        input.cadence.recencyDays !== null
+          ? `${input.cadence.recencyDays} day${input.cadence.recencyDays === 1 ? "" : "s"} ago`
+          : "No recent session logged"
+      }
+- Guidance: ${input.cadence.detail}`
+    : "- No pacing guidance available."
+}
 
 ## Recommended Resources (open first)
 ${resourceLines}

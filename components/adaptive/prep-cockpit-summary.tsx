@@ -18,10 +18,14 @@ import {
 } from "@/lib/adaptive/readiness-checklist";
 import { buildNextActions } from "@/lib/adaptive/next-actions";
 import { buildTargetedDrills } from "@/lib/adaptive/drills";
-import { parseInterviewDate } from "@/lib/adaptive/interview-date";
+import {
+  getInterviewDateSummary,
+  parseInterviewDate,
+} from "@/lib/adaptive/interview-date";
 import { buildInterviewDayPlan } from "@/lib/adaptive/interview-day-plan";
 import { calculatePreflightScore } from "@/lib/adaptive/preflight";
 import { buildPracticeReminders } from "@/lib/adaptive/practice-reminders";
+import { evaluatePrepCadence } from "@/lib/adaptive/prep-cadence";
 import {
   getPrepHistoryStorageKey,
   parsePrepHistory,
@@ -166,6 +170,13 @@ export function PrepCockpitSummary() {
   if (!companyId || !personaId || !company || !persona || !recommendationBundle) {
     return null;
   }
+  const interviewTimeline = getInterviewDateSummary(interviewDate);
+  const cadence = evaluatePrepCadence({
+    daysUntilInterview: interviewTimeline.daysUntil,
+    readinessPct: checklistCompletion.completionPct,
+    latestScore,
+    latestSessionTimestamp,
+  });
 
   const prepBriefMarkdown = buildPrepBriefMarkdown({
     generatedAt: new Date().toISOString(),
@@ -192,6 +203,7 @@ export function PrepCockpitSummary() {
       hasFocusNote: Boolean(focusNote.trim()),
       interviewDate,
     }),
+    cadence,
     topResources: recommendationBundle.topRecommendations.slice(0, 3).map(
       (recommendation) => ({
         title: recommendation.asset.title,
@@ -234,6 +246,7 @@ export function PrepCockpitSummary() {
       hasFocusNote: Boolean(focusNote.trim()),
       interviewDate,
     }),
+    cadence,
     topResources: recommendationBundle.topRecommendations.slice(0, 3).map(
       (recommendation) => ({
         title: recommendation.asset.title,
@@ -348,6 +361,13 @@ export function PrepCockpitSummary() {
       <p className="text-xs text-muted-foreground">
         {recommendationBundle.persona.recommendationGoal}
       </p>
+      <div className="rounded-md border border-border bg-background p-2">
+        <p className="text-[11px] text-muted-foreground">Pacing status</p>
+        <p className="text-xs font-medium">{cadence.label}</p>
+        <p className="text-[11px] text-muted-foreground">
+          {interviewTimeline.label} · reps remaining: {cadence.sessionsNeeded}
+        </p>
+      </div>
 
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="ghost" onClick={copyPrepSnapshot}>
