@@ -7,6 +7,8 @@ export interface ReadinessChecklistItem {
 }
 
 export type ReadinessState = Record<string, boolean>;
+const READINESS_STATE_MAX_KEYS = 300;
+const READINESS_STATE_KEY_MAX_CHARS = 120;
 
 const commonChecklist: ReadinessChecklistItem[] = [
   {
@@ -140,8 +142,10 @@ export function parseReadinessState(raw: string | null): ReadinessState {
   try {
     const parsed = JSON.parse(raw) as Record<string, unknown>;
     const normalized: ReadinessState = {};
-    for (const [key, value] of Object.entries(parsed)) {
-      normalized[key] = Boolean(value);
+    for (const [key, value] of Object.entries(parsed).slice(0, READINESS_STATE_MAX_KEYS)) {
+      const normalizedKey = String(key).trim().slice(0, READINESS_STATE_KEY_MAX_CHARS);
+      if (!normalizedKey) continue;
+      normalized[normalizedKey] = Boolean(value);
     }
     return normalized;
   } catch {

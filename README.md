@@ -124,7 +124,7 @@ lib/
 - **Clipboard copy resilience** — Copy actions for prep links, mock scripts/reports, and prep briefs use primary clipboard APIs with a legacy fallback path for wider browser compatibility.
 - **Focus-note tuning** — Add an optional session focus note to steer recommendations, AI narrative, and exported prep packets.
 - **Focus presets** — One-click persona-specific focus-note presets to quickly retarget the narrative for each interviewer type.
-- **Focus-note memory** — Save and reuse recent focus notes per company/persona for faster iterative prep sessions.
+- **Focus-note memory** — Save and reuse up to 6 recent focus notes (length-capped) per company/persona for faster iterative prep sessions.
 - **Mode health indicator** — Navbar status pill shows current readiness completion and latest mock score for selected mode.
 - **Interview countdown pill** — Navbar displays D-day countdown (or passed state) for the active company/persona interview date.
 - **Navbar date quick-fix** — When date context is missing/stale, Interview Mode surfaces a one-click “Set/Reset date +7d” action.
