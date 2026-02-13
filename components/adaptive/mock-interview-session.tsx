@@ -9,6 +9,8 @@ import {
   ChevronRight,
   Copy,
   Download,
+  Pause,
+  Play,
   Timer,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -70,6 +72,15 @@ function estimateSpeechSeconds(wordCount: number, wordsPerMinute = 140): number 
   return Math.round((wordCount / wordsPerMinute) * 60);
 }
 
+function formatSeconds(seconds: number): string {
+  const safeSeconds = Math.max(0, seconds);
+  const minutes = Math.floor(safeSeconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const remainingSeconds = (safeSeconds % 60).toString().padStart(2, "0");
+  return `${minutes}:${remainingSeconds}`;
+}
+
 export function MockInterviewSession() {
   const { companyId, personaId } = useInterviewMode();
   const [started, setStarted] = useState(false);
@@ -79,6 +90,9 @@ export function MockInterviewSession() {
   const [completed, setCompleted] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [loadedFromDraft, setLoadedFromDraft] = useState(false);
+  const [timerDuration, setTimerDuration] = useState(90);
+  const [timerRemaining, setTimerRemaining] = useState(90);
+  const [timerRunning, setTimerRunning] = useState(false);
 
   const script = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -234,6 +248,36 @@ export function MockInterviewSession() {
   }, [companyId, loadPersistedSession, personaId]);
 
   useEffect(() => {
+    if (!timerRunning) return;
+    if (timerRemaining <= 0) {
+      setTimerRunning(false);
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setTimerRemaining((prev) => {
+        if (prev <= 1) {
+          window.clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [timerRemaining, timerRunning]);
+
+  useEffect(() => {
+    if (!started || completed) {
+      setTimerRunning(false);
+      setTimerRemaining(timerDuration);
+      return;
+    }
+    setTimerRunning(false);
+    setTimerRemaining(timerDuration);
+  }, [completed, currentIndex, started, timerDuration]);
+
+  useEffect(() => {
     if (!companyId || !personaId) return;
 
     if (
@@ -275,6 +319,8 @@ export function MockInterviewSession() {
     setCompleted(false);
     setStarted(true);
     setLoadedFromDraft(false);
+    setTimerRunning(false);
+    setTimerRemaining(timerDuration);
   }
 
   function updateCurrentAnswer(nextValue: string) {
@@ -355,6 +401,22 @@ export function MockInterviewSession() {
     setConfidences([]);
     setCopyState("idle");
     setLoadedFromDraft(false);
+    setTimerRunning(false);
+    setTimerRemaining(timerDuration);
+  }
+
+  function toggleTimer() {
+    if (timerRemaining === 0) {
+      setTimerRemaining(timerDuration);
+      setTimerRunning(true);
+      return;
+    }
+    setTimerRunning((prev) => !prev);
+  }
+
+  function resetTimer() {
+    setTimerRunning(false);
+    setTimerRemaining(timerDuration);
   }
 
   async function copyReport() {
@@ -603,6 +665,52 @@ export function MockInterviewSession() {
         </div>
         <p className="text-xs text-muted-foreground">
           Rate how confident you would feel giving this answer live (1–5).
+        </p>
+      </div>
+
+      <div className="rounded-md border border-border bg-background p-3 space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs font-medium">Live answer timer</p>
+          <select
+            value={timerDuration}
+            onChange={(event) => setTimerDuration(Number(event.target.value) || 90)}
+            className="h-7 rounded border border-border bg-background px-2 text-xs"
+            aria-label="Select answer timer duration"
+          >
+            <option value={60}>60s</option>
+            <option value={90}>90s</option>
+            <option value={120}>120s</option>
+          </select>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge
+            variant={timerRemaining === 0 ? "default" : "outline"}
+            className="font-mono"
+          >
+            {formatSeconds(timerRemaining)}
+          </Badge>
+          <Button size="sm" variant="ghost" onClick={toggleTimer}>
+            {timerRunning ? (
+              <>
+                <Pause className="h-3.5 w-3.5" />
+                Pause
+              </>
+            ) : (
+              <>
+                <Play className="h-3.5 w-3.5" />
+                {timerRemaining === 0 ? "Restart" : "Start"}
+              </>
+            )}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={resetTimer}>
+            Reset timer
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Use this to simulate concise live responses.{" "}
+          {timerRemaining === 0
+            ? "Time is up — wrap with your impact statement."
+            : "Aim to close with impact before the timer ends."}
         </p>
       </div>
 
