@@ -55,7 +55,7 @@ export default function ResumePage() {
           </header>
 
           {/* Summary */}
-          <section className="mb-8 print:mb-5">
+          <section id="summary" className="mb-8 scroll-mt-24 print:mb-5">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 print:text-xs print:mb-2">
               Summary
             </h3>
@@ -71,7 +71,7 @@ export default function ResumePage() {
           </section>
 
           {/* Core Skills */}
-          <section className="mb-8 print:mb-5">
+          <section id="skills" className="mb-8 scroll-mt-24 print:mb-5">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 print:text-xs print:mb-2">
               Core Skills
             </h3>
@@ -100,7 +100,7 @@ export default function ResumePage() {
           </section>
 
           {/* Experience */}
-          <section className="mb-8 print:mb-5">
+          <section id="experience" className="mb-8 scroll-mt-24 print:mb-5">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4 print:text-xs print:mb-2">
               Experience
             </h3>
@@ -267,7 +267,7 @@ export default function ResumePage() {
           </section>
 
           {/* Education */}
-          <section className="mb-8 print:mb-5">
+          <section id="education" className="mb-8 scroll-mt-24 print:mb-5">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 print:text-xs print:mb-2">
               Education
             </h3>
@@ -305,7 +305,7 @@ export default function ResumePage() {
           </section>
 
           {/* Certifications */}
-          <section className="mb-8 print:mb-5">
+          <section id="certifications" className="mb-8 scroll-mt-24 print:mb-5">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 print:text-xs print:mb-2">
               Certifications / Programs
             </h3>
@@ -320,7 +320,7 @@ export default function ResumePage() {
           </section>
 
           {/* Patents */}
-          <section>
+          <section id="patents" className="scroll-mt-24">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 print:text-xs print:mb-2">
               Patents
             </h3>

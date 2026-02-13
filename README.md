@@ -90,6 +90,7 @@ app/
   about/page.tsx        # About
   contact/page.tsx      # Contact form
   api/chat/route.ts     # AI chat API
+  api/interview-mode/route.ts # Adaptive interviewer briefing API
   api/contact/route.ts  # Contact form API
 
 components/
@@ -108,6 +109,7 @@ content/
 lib/
   mdx.ts                # MDX content loader with zod validation
   types.ts              # TypeScript types and zod schemas
+  adaptive/             # Company/persona profiles + recommendation engine
   utils.ts              # Shared utilities
 ```
 
@@ -117,9 +119,22 @@ lib/
 - **Global search** — Press `/` or `Cmd+K` to search across case studies, writing, and pages.
 - **Guided tour** — A 60-second tour on the home page highlighting key sections.
 - **Dark mode** — System preference + manual toggle.
+- **Adaptive Interview Mode** — Company/persona-tailored recommendations and talking points (KUNGFU.AI + Anthropic CEO comparison), with adaptive theming and optional AI-enhanced interviewer briefings.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.
+
+## Adaptive Interview Mode
+
+Use the Interview Mode controls in the navbar to set:
+- target company
+- interviewer persona/role
+- preferred AI provider for optional briefing generation
+
+Behavior:
+- deterministic recommendations are always available
+- AI-enhanced narrative is used when API keys are present
+- secure fallback returns deterministic narrative when keys are missing or provider calls fail
 
 ## Tech Stack
 

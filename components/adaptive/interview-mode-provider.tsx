@@ -1,0 +1,203 @@
+"use client";
+
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import type { AIProvider } from "@/lib/ai";
+import {
+  companyProfiles,
+  getCompanyProfileById,
+  getDefaultPersonaForCompany,
+  getPersonaById,
+} from "@/lib/adaptive/profiles";
+import type { CompanyId, CompanyProfile, PersonaProfile } from "@/lib/adaptive/types";
+
+interface InterviewModeContextValue {
+  companyId: CompanyId | null;
+  personaId: string | null;
+  provider: AIProvider;
+  company: CompanyProfile | null;
+  persona: PersonaProfile | null;
+  companies: CompanyProfile[];
+  setCompanyId: (companyId: CompanyId | null) => void;
+  setPersonaId: (personaId: string | null) => void;
+  setProvider: (provider: AIProvider) => void;
+  resetMode: () => void;
+}
+
+const InterviewModeContext = createContext<InterviewModeContextValue | null>(
+  null
+);
+
+function isCompanyId(value: string | null): value is CompanyId {
+  if (!value) return false;
+  return companyProfiles.some((company) => company.id === value);
+}
+
+const STORAGE_KEYS = {
+  companyId: "adaptive.companyId",
+  personaId: "adaptive.personaId",
+  provider: "adaptive.provider",
+} as const;
+
+export function InterviewModeProvider({ children }: { children: ReactNode }) {
+  const [companyId, setCompanyIdState] = useState<CompanyId | null>(null);
+  const [personaId, setPersonaIdState] = useState<string | null>(null);
+  const [provider, setProvider] = useState<AIProvider>("openai");
+  const [hydrated, setHydrated] = useState(false);
+
+  const company = companyId ? getCompanyProfileById(companyId) ?? null : null;
+  const persona =
+    companyId && personaId ? getPersonaById(companyId, personaId) ?? null : null;
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const urlCompany = params.get("company");
+    const urlPersona = params.get("persona");
+    const urlProvider = params.get("provider");
+
+    const storedCompany = localStorage.getItem(STORAGE_KEYS.companyId);
+    const storedPersona = localStorage.getItem(STORAGE_KEYS.personaId);
+    const storedProvider = localStorage.getItem(STORAGE_KEYS.provider);
+
+    const nextCompany = isCompanyId(urlCompany)
+      ? urlCompany
+      : isCompanyId(storedCompany)
+        ? storedCompany
+        : null;
+
+    let nextPersona: string | null = null;
+    if (nextCompany) {
+      if (urlPersona && getPersonaById(nextCompany, urlPersona)) {
+        nextPersona = urlPersona;
+      } else if (storedPersona && getPersonaById(nextCompany, storedPersona)) {
+        nextPersona = storedPersona;
+      } else {
+        nextPersona = getDefaultPersonaForCompany(nextCompany)?.id ?? null;
+      }
+    }
+
+    const nextProvider =
+      urlProvider === "anthropic" || urlProvider === "openai"
+        ? urlProvider
+        : storedProvider === "anthropic" || storedProvider === "openai"
+          ? storedProvider
+          : "openai";
+
+    setCompanyIdState(nextCompany);
+    setPersonaIdState(nextPersona);
+    setProvider(nextProvider);
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    if (companyId) {
+      localStorage.setItem(STORAGE_KEYS.companyId, companyId);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.companyId);
+    }
+
+    if (personaId) {
+      localStorage.setItem(STORAGE_KEYS.personaId, personaId);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.personaId);
+    }
+    localStorage.setItem(STORAGE_KEYS.provider, provider);
+
+    const params = new URLSearchParams(window.location.search);
+    if (companyId) {
+      params.set("company", companyId);
+    } else {
+      params.delete("company");
+    }
+    if (personaId) {
+      params.set("persona", personaId);
+    } else {
+      params.delete("persona");
+    }
+    params.set("provider", provider);
+
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery
+      ? `${window.location.pathname}?${nextQuery}`
+      : window.location.pathname;
+    const currentUrl = `${window.location.pathname}${window.location.search}`;
+    if (nextUrl !== currentUrl) {
+      window.history.replaceState({}, "", nextUrl);
+    }
+
+    if (companyId) {
+      document.documentElement.setAttribute("data-company-theme", companyId);
+    } else {
+      document.documentElement.removeAttribute("data-company-theme");
+    }
+  }, [companyId, hydrated, personaId, provider]);
+
+  function setCompanyId(company: CompanyId | null) {
+    if (!company) {
+      setCompanyIdState(null);
+      setPersonaIdState(null);
+      return;
+    }
+
+    const defaultPersona = getDefaultPersonaForCompany(company);
+    setCompanyIdState(company);
+    setPersonaIdState(defaultPersona?.id ?? null);
+  }
+
+  function setPersonaId(persona: string | null) {
+    if (!companyId || !persona) {
+      setPersonaIdState(null);
+      return;
+    }
+
+    if (!getPersonaById(companyId, persona)) {
+      setPersonaIdState(getDefaultPersonaForCompany(companyId)?.id ?? null);
+      return;
+    }
+
+    setPersonaIdState(persona);
+  }
+
+  function resetMode() {
+    setCompanyIdState(null);
+    setPersonaIdState(null);
+    setProvider("openai");
+  }
+
+  const value: InterviewModeContextValue = {
+    companyId,
+    personaId,
+    provider,
+    company,
+    persona,
+    companies: companyProfiles,
+    setCompanyId,
+    setPersonaId,
+    setProvider,
+    resetMode,
+  };
+
+  return (
+    <InterviewModeContext.Provider value={value}>
+      {children}
+    </InterviewModeContext.Provider>
+  );
+}
+
+export function useInterviewMode() {
+  const context = useContext(InterviewModeContext);
+  if (!context) {
+    throw new Error(
+      "useInterviewMode must be used inside InterviewModeProvider."
+    );
+  }
+  return context;
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getAllCaseStudies } from "@/lib/mdx";
 import { WorkIndexClient } from "@/components/work/work-index-client";
+import { AdaptiveBriefing } from "@/components/adaptive/adaptive-briefing";
 
 export const metadata: Metadata = {
   title: "Work",
@@ -22,6 +23,10 @@ export default function WorkPage() {
             data platforms, and startup product delivery. Toggle between
             Executive and Builder views to see different angles.
           </p>
+        </div>
+
+        <div className="mb-10">
+          <AdaptiveBriefing />
         </div>
 
         <WorkIndexClient

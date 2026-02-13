@@ -61,6 +61,49 @@
   --color-ring: #3b82f6;
 }
 
+/* Company-adaptive interview mode themes */
+html[data-company-theme="kungfu-ai"] {
+  --color-primary: #e41159;
+  --color-accent: #4421d2;
+  --color-ring: #c91266;
+  --color-background: #fff8fb;
+  --color-foreground: #110a29;
+  --color-muted: #fde7f0;
+  --color-border: #f6b3cb;
+}
+
+html.dark[data-company-theme="kungfu-ai"] {
+  --color-primary: #f0598d;
+  --color-accent: #8d7bff;
+  --color-ring: #f0598d;
+  --color-background: #130a22;
+  --color-foreground: #f8ecf5;
+  --color-muted: #28143d;
+  --color-border: #4b285f;
+  --color-card: #1a0f2e;
+}
+
+html[data-company-theme="anthropic"] {
+  --color-primary: #da7756;
+  --color-accent: #6a9bcc;
+  --color-ring: #da7756;
+  --color-background: #faf9f5;
+  --color-foreground: #141413;
+  --color-muted: #eeece2;
+  --color-border: #e1ddd1;
+}
+
+html.dark[data-company-theme="anthropic"] {
+  --color-primary: #e28b6e;
+  --color-accent: #9ab9da;
+  --color-ring: #e28b6e;
+  --color-background: #1b1916;
+  --color-foreground: #f8f3ea;
+  --color-muted: #2a2620;
+  --color-border: #403a31;
+  --color-card: #211d18;
+}
+
 /* Smooth scrolling — respect user preferences */
 @media (prefers-reduced-motion: no-preference) {
   html {

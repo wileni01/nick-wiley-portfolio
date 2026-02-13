@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getFeaturedCaseStudies } from "@/lib/mdx";
 import { HomeClient } from "@/components/home/home-client";
+import { AdaptiveBriefing } from "@/components/adaptive/adaptive-briefing";
 
 const whatIDo = [
   {
@@ -88,6 +89,13 @@ export default function HomePage() {
             {/* Tour + trust signals */}
             <HomeClient />
           </div>
+        </div>
+      </section>
+
+      {/* ── What I Do ───────────────────────────────────── */}
+      <section className="py-10 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl">
+          <AdaptiveBriefing />
         </div>
       </section>
 

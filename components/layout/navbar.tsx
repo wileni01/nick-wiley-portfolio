@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
+import { InterviewModeSelector } from "@/components/adaptive/interview-mode-selector";
 
 const navLinks = [
   { href: "/work", label: "Work", icon: Briefcase },
@@ -51,6 +52,8 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:gap-1">
+            <InterviewModeSelector />
+
             {navLinks.map((link) => {
               const isActive =
                 pathname === link.href ||
@@ -143,6 +146,7 @@ export function Navbar() {
             className="overflow-hidden border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden"
           >
             <div className="space-y-1 px-4 py-3">
+              <InterviewModeSelector mobile />
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
