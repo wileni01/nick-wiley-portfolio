@@ -22,6 +22,7 @@ import {
 } from "@/lib/adaptive/storage-keys";
 import { calculatePreflightScore } from "@/lib/adaptive/preflight";
 import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
+import { parseBooleanStateRecord } from "@/lib/adaptive/boolean-state";
 
 export function PreflightReadinessCard() {
   const { companyId, personaId, focusNote } = useInterviewMode();
@@ -62,15 +63,11 @@ export function PreflightReadinessCard() {
       if (!launchpad) {
         setLaunchpadPct(0);
       } else {
-        try {
-          const parsed = JSON.parse(launchpad) as Record<string, boolean>;
-          const values = Object.values(parsed);
-          const opened = values.filter(Boolean).length;
-          const pct = values.length ? Math.round((opened / values.length) * 100) : 0;
-          setLaunchpadPct(pct);
-        } catch {
-          setLaunchpadPct(0);
-        }
+        const parsed = parseBooleanStateRecord(launchpad);
+        const values = Object.values(parsed);
+        const opened = values.filter(Boolean).length;
+        const pct = values.length ? Math.round((opened / values.length) * 100) : 0;
+        setLaunchpadPct(pct);
       }
 
       const notes = localStorage.getItem(keys.notes) ?? "";

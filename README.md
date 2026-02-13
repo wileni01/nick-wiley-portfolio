@@ -133,7 +133,7 @@ lib/
 - **Shared timeline quick-fix controls** — Consistent Set/Reset +7d/+14d actions (plus a direct “Open tracker” shortcut) appear across cockpit, insights, reminders, and next-actions panels when date context is missing/stale.
 - **Timeline status banner** — Adaptive briefing surfaces a prominent timeline risk banner for missing/stale/imminent interview windows, with quick remediation and jump-to-section actions.
 - **Mode health status** — Indicator is risk-coded ("On track", "Building", "Needs reps", "Urgent", "Set date", "Date passed") based on readiness, performance, and interview-date timeline context.
-- **Preflight readiness score** — Weighted 0–100 score combining checklist progress, mock results, launchpad coverage, prep context, session recency, and interview-date urgency (with stale/missing-date timeline flags and quick date reset actions).
+- **Preflight readiness score** — Weighted 0–100 score combining checklist progress, mock results, launchpad coverage, prep context, session recency, and interview-date urgency (with stale/missing-date timeline flags, resilient launchpad-state parsing, and quick date reset actions).
 - **Practice reminders** — Auto-generated next-step reminders (with due-by guidance) based on readiness, score, launchpad coverage, and interview-date proximity (including one-click prompts to set/reset date context).
 - **Readiness gap panel** — Surfaces outstanding checklist and unopened resource gaps with direct remediation actions.
 - **Mock interviewer script** — Role-specific practice questions with answer strategies and direct links to recommended portfolio artifacts.
