@@ -6,13 +6,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
-import { buildPrepBriefMarkdown } from "@/lib/adaptive/prep-brief";
+import {
+  buildPrepBriefMarkdown,
+  buildPrepPacketMarkdown,
+} from "@/lib/adaptive/prep-brief";
 import {
   getReadinessChecklist,
   getReadinessCompletion,
   getReadinessStorageKey,
   parseReadinessState,
 } from "@/lib/adaptive/readiness-checklist";
+import { buildNextActions } from "@/lib/adaptive/next-actions";
+import { buildTargetedDrills } from "@/lib/adaptive/drills";
+import { buildInterviewDayPlan } from "@/lib/adaptive/interview-day-plan";
 import {
   getPrepHistoryStorageKey,
   parsePrepHistory,
@@ -22,6 +28,7 @@ export function PrepCockpitSummary() {
   const { companyId, personaId, company, persona } = useInterviewMode();
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [downloadState, setDownloadState] = useState<"idle" | "done">("idle");
+  const [packetState, setPacketState] = useState<"idle" | "done">("idle");
   const [checklistCompletion, setChecklistCompletion] = useState({
     completedCount: 0,
     completionPct: 0,
@@ -29,6 +36,7 @@ export function PrepCockpitSummary() {
   });
   const [latestScore, setLatestScore] = useState<number | null>(null);
   const [latestConfidence, setLatestConfidence] = useState<number | null>(null);
+  const [latestThemes, setLatestThemes] = useState<string[]>([]);
 
   const recommendationBundle = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -54,6 +62,7 @@ export function PrepCockpitSummary() {
       const history = parsePrepHistory(localStorage.getItem(historyKey));
       setLatestScore(history[0]?.averageScore ?? null);
       setLatestConfidence(history[0]?.averageConfidence ?? null);
+      setLatestThemes(history[0]?.topThemes ?? []);
     }
 
     refresh();
@@ -115,6 +124,40 @@ export function PrepCockpitSummary() {
     talkingPoints: recommendationBundle.talkingPoints,
   });
 
+  const prepPacketMarkdown = buildPrepPacketMarkdown({
+    generatedAt: new Date().toISOString(),
+    companyName: company.name,
+    personaName: persona.name,
+    personaRole: persona.role,
+    personaGoal: recommendationBundle.persona.recommendationGoal,
+    readiness: {
+      completed: checklistCompletion.completedCount,
+      total: checklistCompletion.total,
+      percentage: checklistCompletion.completionPct,
+    },
+    latestScore,
+    latestConfidence,
+    topResources: recommendationBundle.topRecommendations.slice(0, 3).map(
+      (recommendation) => ({
+        title: recommendation.asset.title,
+        url: recommendation.asset.url,
+        reason: recommendation.reason,
+      })
+    ),
+    talkingPoints: recommendationBundle.talkingPoints,
+    nextActions: buildNextActions({
+      readinessPct: checklistCompletion.completionPct,
+      readinessCompleted: checklistCompletion.completedCount,
+      readinessTotal: checklistCompletion.total,
+      latestScore,
+      latestConfidence,
+      latestThemes,
+      topResourceTitle: recommendationBundle.topRecommendations[0]?.asset.title,
+    }),
+    drills: buildTargetedDrills({ themes: latestThemes }),
+    dayPlan: buildInterviewDayPlan(companyId, personaId),
+  });
+
   async function copyPrepSnapshot() {
     try {
       await navigator.clipboard.writeText(prepBriefMarkdown);
@@ -140,6 +183,22 @@ export function PrepCockpitSummary() {
     URL.revokeObjectURL(url);
     setDownloadState("done");
     setTimeout(() => setDownloadState("idle"), 1800);
+  }
+
+  function downloadFullPacket() {
+    const safeCompany = companyId.replace(/[^a-z0-9-]/gi, "-");
+    const safePersona = personaId.replace(/[^a-z0-9-]/gi, "-");
+    const blob = new Blob([prepPacketMarkdown], {
+      type: "text/markdown;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `interview-prep-packet-${safeCompany}-${safePersona}.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setPacketState("done");
+    setTimeout(() => setPacketState("idle"), 1800);
   }
 
   return (
@@ -206,6 +265,19 @@ export function PrepCockpitSummary() {
             <>
               <Download className="h-3.5 w-3.5" />
               Download .md brief
+            </>
+          )}
+        </Button>
+        <Button size="sm" variant="ghost" onClick={downloadFullPacket}>
+          {packetState === "done" ? (
+            <>
+              <Check className="h-3.5 w-3.5" />
+              Downloaded packet
+            </>
+          ) : (
+            <>
+              <Download className="h-3.5 w-3.5" />
+              Download full packet
             </>
           )}
         </Button>
