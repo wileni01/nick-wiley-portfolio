@@ -55,11 +55,14 @@ const warmupQuestion: SessionQuestion = {
 export interface PersistedMockSession {
   answers: string[];
   confidences: number[];
+  sessionMode?: SessionMode;
   currentIndex: number;
   completed: boolean;
   started: boolean;
   updatedAt: string;
 }
+
+type SessionMode = "standard" | "pressure";
 
 function countWords(text: string): number {
   const trimmed = text.trim();
@@ -87,6 +90,7 @@ export function MockInterviewSession() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [confidences, setConfidences] = useState<number[]>([]);
+  const [sessionMode, setSessionMode] = useState<SessionMode>("standard");
   const [completed, setCompleted] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [loadedFromDraft, setLoadedFromDraft] = useState(false);
@@ -182,6 +186,8 @@ export function MockInterviewSession() {
 
     try {
       const stored = JSON.parse(storedRaw) as PersistedMockSession;
+      const restoredMode: SessionMode =
+        stored.sessionMode === "pressure" ? "pressure" : "standard";
       const normalizedAnswers = Array.from(
         { length: sessionQuestions.length },
         (_, index) => stored.answers[index] ?? ""
@@ -195,6 +201,7 @@ export function MockInterviewSession() {
         }
       );
 
+      setSessionMode(restoredMode);
       setAnswers(normalizedAnswers);
       setConfidences(normalizedConfidences);
       setCurrentIndex(
@@ -278,6 +285,12 @@ export function MockInterviewSession() {
   }, [completed, currentIndex, started, timerDuration]);
 
   useEffect(() => {
+    if (sessionMode === "pressure" && timerDuration !== 60) {
+      setTimerDuration(60);
+    }
+  }, [sessionMode, timerDuration]);
+
+  useEffect(() => {
     if (!companyId || !personaId) return;
 
     if (
@@ -292,6 +305,7 @@ export function MockInterviewSession() {
     const payload: PersistedMockSession = {
       answers,
       confidences,
+      sessionMode,
       currentIndex,
       completed,
       started,
@@ -309,6 +323,7 @@ export function MockInterviewSession() {
     confidences,
     currentIndex,
     personaId,
+    sessionMode,
     started,
   ]);
 
@@ -319,8 +334,10 @@ export function MockInterviewSession() {
     setCompleted(false);
     setStarted(true);
     setLoadedFromDraft(false);
+    const nextDuration = sessionMode === "pressure" ? 60 : timerDuration;
+    setTimerDuration(nextDuration);
     setTimerRunning(false);
-    setTimerRemaining(timerDuration);
+    setTimerRemaining(nextDuration);
   }
 
   function updateCurrentAnswer(nextValue: string) {
@@ -455,6 +472,36 @@ export function MockInterviewSession() {
           Practice live answers for this persona. You will get local feedback on
           structure, metrics, impact framing, and governance signals.
         </p>
+        <div className="space-y-1">
+          <p className="text-xs font-medium">Session mode</p>
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onClick={() => setSessionMode("standard")}
+              className={`rounded-md border px-2 py-1 text-[11px] transition-colors ${
+                sessionMode === "standard"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Standard (90s default)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSessionMode("pressure")}
+              className={`rounded-md border px-2 py-1 text-[11px] transition-colors ${
+                sessionMode === "pressure"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Pressure (60s forced)
+            </button>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Pressure mode uses a fixed 60-second timer to simulate high-tempo interview rounds.
+          </p>
+        </div>
         {loadedFromDraft && (
           <p className="text-xs text-muted-foreground">
             Saved draft found for this interviewer mode.
@@ -502,6 +549,9 @@ export function MockInterviewSession() {
             : "N/A"}
           /5
         </p>
+        <Badge variant="muted" className="text-[10px] uppercase w-fit">
+          Mode: {sessionMode}
+        </Badge>
 
         <div className="space-y-3">
           {sessionQuestions.map((question, index) => {
@@ -591,9 +641,14 @@ export function MockInterviewSession() {
     <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold">Mock session in progress</h3>
-        <Badge variant="muted">
-          Question {currentIndex + 1} / {sessionQuestions.length}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="muted">
+            Question {currentIndex + 1} / {sessionQuestions.length}
+          </Badge>
+          <Badge variant="outline" className="text-[10px] uppercase">
+            {sessionMode}
+          </Badge>
+        </div>
       </div>
 
       <div className="rounded-md border border-border bg-background p-3 space-y-2">
@@ -676,6 +731,7 @@ export function MockInterviewSession() {
             onChange={(event) => setTimerDuration(Number(event.target.value) || 90)}
             className="h-7 rounded border border-border bg-background px-2 text-xs"
             aria-label="Select answer timer duration"
+            disabled={sessionMode === "pressure"}
           >
             <option value={60}>60s</option>
             <option value={90}>90s</option>
@@ -710,7 +766,9 @@ export function MockInterviewSession() {
           Use this to simulate concise live responses.{" "}
           {timerRemaining === 0
             ? "Time is up — wrap with your impact statement."
-            : "Aim to close with impact before the timer ends."}
+            : sessionMode === "pressure"
+              ? "Pressure mode locks timer to 60 seconds. Aim for clarity and impact."
+              : "Aim to close with impact before the timer ends."}
         </p>
       </div>
 

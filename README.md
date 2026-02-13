@@ -128,7 +128,7 @@ lib/
 - **Mock interviewer script** — Role-specific practice questions with answer strategies and direct links to recommended portfolio artifacts.
 - **Mock script export** — Copy/download persona-specific interviewer scripts as Markdown for offline rehearsal.
 - **5-question mock session** — Interactive persona-specific practice flow with live local feedback on metrics, ownership, impact framing, and governance language.
-- **Live answer timer** — Built-in 60/90/120-second response timer to rehearse concise, interview-realistic delivery.
+- **Live answer timer + pressure mode** — Built-in 60/90/120-second timer with optional pressure mode that locks 60-second responses.
 - **Exportable prep report** — Copy or download a plain-text mock-session report with scores, strengths, gaps, and coaching prompts.
 - **Session autosave** — Mock interview drafts persist locally per company/persona, so you can continue prep later.
 - **Pacing + coaching themes** — Mock mode estimates speaking time per answer and surfaces recurring improvement themes at session completion.
