@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CalendarClock, Check, Download } from "lucide-react";
+import { CalendarClock, Check, Download, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
@@ -9,7 +9,10 @@ import {
   getInterviewDateSummary,
   parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
-import { buildInterviewPrepCalendarIcs } from "@/lib/adaptive/interview-calendar";
+import {
+  buildInterviewGoogleCalendarUrl,
+  buildInterviewPrepCalendarIcs,
+} from "@/lib/adaptive/interview-calendar";
 import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
 
 export function InterviewDateTracker() {
@@ -94,6 +97,29 @@ export function InterviewDateTracker() {
     setTimeout(() => setDownloadState("idle"), 1800);
   }
 
+  function openGoogleCalendar() {
+    if (!interviewDate) return;
+    const companyName = company?.name ?? activeCompanyId;
+    const personaName = persona?.name ?? activePersonaId;
+    const url = buildInterviewGoogleCalendarUrl({
+      companyName,
+      personaName,
+      interviewDate,
+    });
+    if (!url) return;
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  function setDateOffset(daysFromNow: number) {
+    const base = new Date();
+    base.setHours(0, 0, 0, 0);
+    base.setDate(base.getDate() + daysFromNow);
+    const year = base.getFullYear();
+    const month = String(base.getMonth() + 1).padStart(2, "0");
+    const day = String(base.getDate()).padStart(2, "0");
+    setInterviewDate(`${year}-${month}-${day}`);
+  }
+
   return (
     <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -118,6 +144,15 @@ export function InterviewDateTracker() {
         <Button
           size="sm"
           variant="ghost"
+          onClick={openGoogleCalendar}
+          disabled={!interviewDate}
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          Google Calendar
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
           onClick={downloadCalendarPlan}
           disabled={!interviewDate}
         >
@@ -135,9 +170,38 @@ export function InterviewDateTracker() {
         </Button>
       </div>
 
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="text-[11px] text-muted-foreground">Quick set:</p>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 px-2 text-[11px]"
+          onClick={() => setDateOffset(3)}
+        >
+          In 3 days
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 px-2 text-[11px]"
+          onClick={() => setDateOffset(7)}
+        >
+          In 1 week
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 px-2 text-[11px]"
+          onClick={() => setDateOffset(14)}
+        >
+          In 2 weeks
+        </Button>
+      </div>
+
       <p className="text-xs text-muted-foreground">
         Set your interview date to contextualize readiness and prep urgency, then
-        export a calendar plan with prep checkpoints.
+        export a calendar plan with prep checkpoints or open the interview event
+        in Google Calendar.
       </p>
     </div>
   );

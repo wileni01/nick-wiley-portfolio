@@ -4,6 +4,15 @@ interface BuildInterviewPrepCalendarInput {
   interviewDate: string;
 }
 
+function normalizeTarget(input: {
+  companyName: string;
+  personaName: string;
+}) {
+  const normalizedCompany = input.companyName.trim() || "Target Company";
+  const normalizedPersona = input.personaName.trim() || "Interviewer";
+  return { normalizedCompany, normalizedPersona };
+}
+
 function toIcsDate(date: Date): string {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");
@@ -64,8 +73,7 @@ export function buildInterviewPrepCalendarIcs(
 
   interviewDate.setUTCHours(0, 0, 0, 0);
   const stamp = toIcsTimestamp(new Date());
-  const normalizedCompany = input.companyName.trim() || "Target Company";
-  const normalizedPersona = input.personaName.trim() || "Interviewer";
+  const { normalizedCompany, normalizedPersona } = normalizeTarget(input);
   const baseUid = `${normalizedCompany}-${normalizedPersona}`
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -110,4 +118,23 @@ export function buildInterviewPrepCalendarIcs(
     "END:VCALENDAR",
     "",
   ].join("\n");
+}
+
+export function buildInterviewGoogleCalendarUrl(
+  input: BuildInterviewPrepCalendarInput
+): string {
+  const interviewDate = new Date(input.interviewDate);
+  if (Number.isNaN(interviewDate.getTime())) return "";
+
+  interviewDate.setUTCHours(0, 0, 0, 0);
+  const endDate = addDays(interviewDate, 1);
+  const { normalizedCompany, normalizedPersona } = normalizeTarget(input);
+  const title = `Interview — ${normalizedCompany} (${normalizedPersona})`;
+  const details =
+    "Final interview slot. Bring concise stories with metrics, ownership, and governance framing.";
+  const dates = `${toIcsDate(interviewDate)}/${toIcsDate(endDate)}`;
+
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+    title
+  )}&dates=${encodeURIComponent(dates)}&details=${encodeURIComponent(details)}`;
 }
