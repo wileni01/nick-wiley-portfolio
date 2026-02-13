@@ -23,6 +23,7 @@ import {
   getPrepHistoryStorageKey,
   parsePrepHistory,
 } from "@/lib/adaptive/prep-history";
+import { getPrepNotesStorageKey } from "@/lib/adaptive/storage-keys";
 
 export function PrepCockpitSummary() {
   const { companyId, personaId, focusNote, company, persona } = useInterviewMode();
@@ -37,6 +38,7 @@ export function PrepCockpitSummary() {
   const [latestScore, setLatestScore] = useState<number | null>(null);
   const [latestConfidence, setLatestConfidence] = useState<number | null>(null);
   const [latestThemes, setLatestThemes] = useState<string[]>([]);
+  const [prepNotes, setPrepNotes] = useState("");
 
   const recommendationBundle = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -48,6 +50,7 @@ export function PrepCockpitSummary() {
 
     const readinessKey = getReadinessStorageKey(companyId, personaId);
     const historyKey = getPrepHistoryStorageKey(companyId, personaId);
+    const notesKey = getPrepNotesStorageKey(companyId, personaId);
 
     function refresh() {
       const checklistItems = getReadinessChecklist(companyId, personaId);
@@ -63,12 +66,17 @@ export function PrepCockpitSummary() {
       setLatestScore(history[0]?.averageScore ?? null);
       setLatestConfidence(history[0]?.averageConfidence ?? null);
       setLatestThemes(history[0]?.topThemes ?? []);
+      setPrepNotes((localStorage.getItem(notesKey) ?? "").slice(0, 1200));
     }
 
     refresh();
 
     function onStorage(event: StorageEvent) {
-      if (event.key === readinessKey || event.key === historyKey) {
+      if (
+        event.key === readinessKey ||
+        event.key === historyKey ||
+        event.key === notesKey
+      ) {
         refresh();
       }
     }
@@ -83,9 +91,15 @@ export function PrepCockpitSummary() {
       if (detail?.key === historyKey) refresh();
     }
 
+    function onPrepNotesUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === notesKey) refresh();
+    }
+
     window.addEventListener("storage", onStorage);
     window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
     window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
+    window.addEventListener("adaptive-prep-notes-updated", onPrepNotesUpdate);
 
     return () => {
       window.removeEventListener("storage", onStorage);
@@ -94,6 +108,7 @@ export function PrepCockpitSummary() {
         "adaptive-prep-history-updated",
         onPrepHistoryUpdate
       );
+      window.removeEventListener("adaptive-prep-notes-updated", onPrepNotesUpdate);
     };
   }, [companyId, personaId]);
 
@@ -108,6 +123,7 @@ export function PrepCockpitSummary() {
     personaRole: persona.role,
     personaGoal: recommendationBundle.persona.recommendationGoal,
     focusNote,
+    prepNotes,
     readiness: {
       completed: checklistCompletion.completedCount,
       total: checklistCompletion.total,
@@ -132,6 +148,7 @@ export function PrepCockpitSummary() {
     personaRole: persona.role,
     personaGoal: recommendationBundle.persona.recommendationGoal,
     focusNote,
+    prepNotes,
     readiness: {
       completed: checklistCompletion.completedCount,
       total: checklistCompletion.total,

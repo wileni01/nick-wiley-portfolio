@@ -21,6 +21,7 @@ export interface PrepDataBundle {
   readinessState: ReadinessState;
   prepHistory: PrepSessionSnapshot[];
   prepGoal: PrepGoalState;
+  prepNotes: string;
   mockSession: StoredMockSessionState | null;
   drillState: Record<string, boolean>;
 }
@@ -31,6 +32,7 @@ export function buildPrepDataBundle(input: {
   readinessRaw: string | null;
   prepHistoryRaw: string | null;
   prepGoalRaw: string | null;
+  prepNotesRaw: string | null;
   mockSessionRaw: string | null;
   drillStateRaw: string | null;
 }): PrepDataBundle {
@@ -44,6 +46,7 @@ export function buildPrepDataBundle(input: {
     readinessState: parseReadinessState(input.readinessRaw),
     prepHistory: parsePrepHistory(input.prepHistoryRaw),
     prepGoal: parsePrepGoalState(input.prepGoalRaw),
+    prepNotes: parsePrepNotes(input.prepNotesRaw),
     mockSession: parseMockSessionState(input.mockSessionRaw),
     drillState: parseDrillState(input.drillStateRaw),
   };
@@ -75,6 +78,9 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
       ),
       prepHistory: parsePrepHistory(JSON.stringify(parsed.prepHistory ?? [])),
       prepGoal: parsePrepGoalState(JSON.stringify(parsed.prepGoal ?? {})),
+      prepNotes: parsePrepNotes(
+        typeof parsed.prepNotes === "string" ? parsed.prepNotes : null
+      ),
       mockSession: parseMockSessionState(
         parsed.mockSession ? JSON.stringify(parsed.mockSession) : null
       ),
@@ -83,6 +89,11 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
   } catch {
     return null;
   }
+}
+
+function parsePrepNotes(raw: string | null): string {
+  if (!raw) return "";
+  return String(raw).slice(0, 1200);
 }
 
 function parseMockSessionState(raw: string | null): StoredMockSessionState | null {

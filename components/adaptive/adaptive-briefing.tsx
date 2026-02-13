@@ -21,6 +21,7 @@ import { ModeComparisonPanel } from "./mode-comparison-panel";
 import { MockInterviewSession } from "./mock-interview-session";
 import { MockInterviewerScript } from "./mock-interviewer-script";
 import { NextBestActions } from "./next-best-actions";
+import { PrepNotes } from "./prep-notes";
 import { PrepInsights } from "./prep-insights";
 import { ResourceLaunchpad } from "./resource-launchpad";
 import { TargetedDrills } from "./targeted-drills";
@@ -257,6 +258,7 @@ export function AdaptiveBriefing() {
       <InterviewDayPlanPanel />
       <PrepCockpitSummary />
       <ResourceLaunchpad />
+      <PrepNotes />
       <PrepDataTools />
       <NextBestActions />
       <TargetedDrills />

@@ -142,6 +142,7 @@ lib/
 - **Targeted drills** — Theme-driven micro-exercises generated from your latest coaching gaps, with local completion tracking.
 - **Prep cadence tracking** — Weekly session target + streak tracking to keep interview practice consistent.
 - **Prep data tools** — Export/import/reset local prep state (JSON) per company/persona mode for backup and portability.
+- **Prep notes pad** — Persist mode-specific interviewer notes and include them in exported briefs/packets.
 - **Interview day plan** — Time-phased execution plan (T-45 to close) tuned to selected company/persona priorities.
 - **Full prep packet export** — Download a consolidated Markdown packet with brief, next actions, drills, and day plan.
 - **Skip links** — Keyboard-accessible skip-to-content link.
