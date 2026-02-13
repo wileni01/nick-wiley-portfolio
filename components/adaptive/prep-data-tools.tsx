@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Download, FileUp, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,15 @@ export function PrepDataTools() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<string>("");
   const [tone, setTone] = useState<StatusTone>("neutral");
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  useEffect(() => {
+    if (!confirmReset) return;
+    const timeout = window.setTimeout(() => {
+      setConfirmReset(false);
+    }, 5000);
+    return () => window.clearTimeout(timeout);
+  }, [confirmReset]);
 
   if (!companyId || !personaId || !company || !persona) return null;
   const activeCompanyId = companyId;
@@ -111,6 +120,7 @@ export function PrepDataTools() {
   }
 
   async function copyJson() {
+    setConfirmReset(false);
     try {
       await navigator.clipboard.writeText(getBundleJson());
       setTone("success");
@@ -122,6 +132,7 @@ export function PrepDataTools() {
   }
 
   function downloadJson() {
+    setConfirmReset(false);
     const json = getBundleJson();
     const blob = new Blob([json], { type: "application/json;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -135,10 +146,18 @@ export function PrepDataTools() {
   }
 
   function resetData() {
+    if (!confirmReset) {
+      setTone("neutral");
+      setStatus("Click reset again within 5 seconds to confirm.");
+      setConfirmReset(true);
+      return;
+    }
+
     Object.values(keys).forEach((key) => localStorage.removeItem(key));
     emitRefreshEvents();
     setTone("success");
     setStatus("Cleared prep data for this company/persona mode.");
+    setConfirmReset(false);
   }
 
   function triggerImport() {
@@ -146,6 +165,7 @@ export function PrepDataTools() {
   }
 
   async function onImportFile(event: React.ChangeEvent<HTMLInputElement>) {
+    setConfirmReset(false);
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -218,9 +238,13 @@ export function PrepDataTools() {
           <FileUp className="h-3.5 w-3.5" />
           Import JSON
         </Button>
-        <Button size="sm" variant="ghost" onClick={resetData}>
+        <Button
+          size="sm"
+          variant={confirmReset ? "destructive" : "ghost"}
+          onClick={resetData}
+        >
           <RotateCcw className="h-3.5 w-3.5" />
-          Reset mode data
+          {confirmReset ? "Confirm reset" : "Reset mode data"}
         </Button>
       </div>
 
