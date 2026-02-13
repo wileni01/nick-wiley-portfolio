@@ -10,6 +10,7 @@ import {
   parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
 import {
+  buildInterviewGoogleCalendarEvents,
   buildInterviewGoogleCalendarUrl,
   buildInterviewPrepCalendarIcs,
 } from "@/lib/adaptive/interview-calendar";
@@ -68,6 +69,19 @@ export function InterviewDateTracker() {
     () => getInterviewDateSummary(interviewDate || null),
     [interviewDate]
   );
+  const companyName = company?.name ?? companyId ?? "Target Company";
+  const personaName = persona?.name ?? personaId ?? "Interviewer";
+  const googleCalendarEvents = useMemo(
+    () =>
+      companyId && personaId && interviewDate
+        ? buildInterviewGoogleCalendarEvents({
+            companyName,
+            personaName,
+            interviewDate,
+          })
+        : [],
+    [companyId, companyName, interviewDate, personaId, personaName]
+  );
 
   if (!companyId || !personaId) return null;
   const activeCompanyId = companyId;
@@ -75,8 +89,6 @@ export function InterviewDateTracker() {
 
   function downloadCalendarPlan() {
     if (!interviewDate) return;
-    const companyName = company?.name ?? activeCompanyId;
-    const personaName = persona?.name ?? activePersonaId;
     const icsContent = buildInterviewPrepCalendarIcs({
       companyName,
       personaName,
@@ -99,8 +111,6 @@ export function InterviewDateTracker() {
 
   function openGoogleCalendar() {
     if (!interviewDate) return;
-    const companyName = company?.name ?? activeCompanyId;
-    const personaName = persona?.name ?? activePersonaId;
     const url = buildInterviewGoogleCalendarUrl({
       companyName,
       personaName,
@@ -118,6 +128,19 @@ export function InterviewDateTracker() {
     const month = String(base.getMonth() + 1).padStart(2, "0");
     const day = String(base.getDate()).padStart(2, "0");
     setInterviewDate(`${year}-${month}-${day}`);
+  }
+
+  function openGoogleCalendarCheckpoint(id: "prep-2d" | "prep-1d" | "interview") {
+    const url = googleCalendarEvents.find((event) => event.id === id)?.url;
+    if (!url) return;
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  function openAllGoogleCalendarCheckpoints() {
+    if (!googleCalendarEvents.length) return;
+    googleCalendarEvents.forEach((event) => {
+      window.open(event.url, "_blank", "noopener,noreferrer");
+    });
   }
 
   return (
@@ -170,6 +193,44 @@ export function InterviewDateTracker() {
         </Button>
       </div>
 
+      {googleCalendarEvents.length > 0 && (
+        <div className="rounded-md border border-border bg-background p-3 space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-medium">Google Calendar checkpoints</p>
+            <Button size="sm" variant="ghost" onClick={openAllGoogleCalendarCheckpoints}>
+              <ExternalLink className="h-3.5 w-3.5" />
+              Open all
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-[11px]"
+              onClick={() => openGoogleCalendarCheckpoint("prep-2d")}
+            >
+              T-2 anchor review
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-[11px]"
+              onClick={() => openGoogleCalendarCheckpoint("prep-1d")}
+            >
+              T-1 pressure mock
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-[11px]"
+              onClick={() => openGoogleCalendarCheckpoint("interview")}
+            >
+              Interview day
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-[11px] text-muted-foreground">Quick set:</p>
         <Button
@@ -200,8 +261,8 @@ export function InterviewDateTracker() {
 
       <p className="text-xs text-muted-foreground">
         Set your interview date to contextualize readiness and prep urgency, then
-        export a calendar plan with prep checkpoints or open the interview event
-        in Google Calendar.
+        export a calendar plan with prep checkpoints or launch interview + prep
+        checkpoint events in Google Calendar.
       </p>
     </div>
   );

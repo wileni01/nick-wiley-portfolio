@@ -4,6 +4,13 @@ interface BuildInterviewPrepCalendarInput {
   interviewDate: string;
 }
 
+export interface InterviewCalendarLink {
+  id: "prep-2d" | "prep-1d" | "interview";
+  label: string;
+  offsetDays: number;
+  url: string;
+}
+
 function normalizeTarget(input: {
   companyName: string;
   personaName: string;
@@ -123,18 +130,69 @@ export function buildInterviewPrepCalendarIcs(
 export function buildInterviewGoogleCalendarUrl(
   input: BuildInterviewPrepCalendarInput
 ): string {
+  return buildInterviewGoogleCalendarEvents(input).find((event) => event.id === "interview")
+    ?.url ?? "";
+}
+
+export function buildInterviewGoogleCalendarEvents(
+  input: BuildInterviewPrepCalendarInput
+): InterviewCalendarLink[] {
   const interviewDate = new Date(input.interviewDate);
-  if (Number.isNaN(interviewDate.getTime())) return "";
+  if (Number.isNaN(interviewDate.getTime())) return [];
 
   interviewDate.setUTCHours(0, 0, 0, 0);
-  const endDate = addDays(interviewDate, 1);
   const { normalizedCompany, normalizedPersona } = normalizeTarget(input);
-  const title = `Interview — ${normalizedCompany} (${normalizedPersona})`;
-  const details =
-    "Final interview slot. Bring concise stories with metrics, ownership, and governance framing.";
-  const dates = `${toIcsDate(interviewDate)}/${toIcsDate(endDate)}`;
+  const interviewLabel = `Interview — ${normalizedCompany} (${normalizedPersona})`;
 
+  const checkpoints: Array<Omit<InterviewCalendarLink, "url"> & { details: string }> = [
+    {
+      id: "prep-2d",
+      label: "Prep checkpoint (T-2): anchor artifacts",
+      offsetDays: -2,
+      details:
+        "Re-open your top two recommended artifacts and extract one metric + one governance detail from each.",
+    },
+    {
+      id: "prep-1d",
+      label: "Prep checkpoint (T-1): pressure simulation",
+      offsetDays: -1,
+      details:
+        "Run one full pressure-mode mock and tighten your weakest answer plus opening statement.",
+    },
+    {
+      id: "interview",
+      label: interviewLabel,
+      offsetDays: 0,
+      details:
+        "Final interview slot. Bring concise stories with metrics, ownership, and governance framing.",
+    },
+  ];
+
+  return checkpoints.map((checkpoint) => {
+    const startDate = addDays(interviewDate, checkpoint.offsetDays);
+    const endDate = addDays(startDate, 1);
+    return {
+      id: checkpoint.id,
+      label: checkpoint.label,
+      offsetDays: checkpoint.offsetDays,
+      url: buildGoogleCalendarUrl({
+        title: checkpoint.label,
+        details: checkpoint.details,
+        startDate,
+        endDate,
+      }),
+    };
+  });
+}
+
+function buildGoogleCalendarUrl(input: {
+  title: string;
+  details: string;
+  startDate: Date;
+  endDate: Date;
+}): string {
+  const dates = `${toIcsDate(input.startDate)}/${toIcsDate(input.endDate)}`;
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-    title
-  )}&dates=${encodeURIComponent(dates)}&details=${encodeURIComponent(details)}`;
+    input.title
+  )}&dates=${encodeURIComponent(dates)}&details=${encodeURIComponent(input.details)}`;
 }
