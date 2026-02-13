@@ -82,6 +82,11 @@ export function MockInterviewerScript() {
                   <Check className="h-3.5 w-3.5" />
                   Copied script
                 </>
+              ) : copyState === "error" ? (
+                <>
+                  <ClipboardCopy className="h-3.5 w-3.5" />
+                  Copy failed
+                </>
               ) : (
                 <>
                   <ClipboardCopy className="h-3.5 w-3.5" />

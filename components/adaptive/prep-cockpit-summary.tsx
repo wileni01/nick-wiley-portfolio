@@ -387,6 +387,11 @@ export function PrepCockpitSummary() {
               <Check className="h-3.5 w-3.5" />
               Copied prep brief
             </>
+          ) : copyState === "error" ? (
+            <>
+              <ClipboardCopy className="h-3.5 w-3.5" />
+              Copy failed
+            </>
           ) : (
             <>
               <ClipboardCopy className="h-3.5 w-3.5" />

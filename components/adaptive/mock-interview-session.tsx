@@ -697,6 +697,11 @@ export function MockInterviewSession() {
                 <Check className="h-3.5 w-3.5" />
                 Copied report
               </>
+            ) : copyState === "error" ? (
+              <>
+                <Copy className="h-3.5 w-3.5" />
+                Copy failed
+              </>
             ) : (
               <>
                 <Copy className="h-3.5 w-3.5" />
