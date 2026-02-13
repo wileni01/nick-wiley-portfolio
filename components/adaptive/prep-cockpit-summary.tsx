@@ -22,6 +22,7 @@ import {
   getInterviewDateSummary,
   parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
+import { buildInterviewGoogleCalendarEvents } from "@/lib/adaptive/interview-calendar";
 import { buildInterviewDayPlan } from "@/lib/adaptive/interview-day-plan";
 import { calculatePreflightScore } from "@/lib/adaptive/preflight";
 import { buildPracticeReminders } from "@/lib/adaptive/practice-reminders";
@@ -177,6 +178,16 @@ export function PrepCockpitSummary() {
     latestScore,
     latestSessionTimestamp,
   });
+  const calendarLinks = interviewDate
+    ? buildInterviewGoogleCalendarEvents({
+        companyName: company.name,
+        personaName: persona.name,
+        interviewDate,
+      }).map((event) => ({
+        label: `Google Calendar: ${event.label}`,
+        url: event.url,
+      }))
+    : [];
 
   const prepBriefMarkdown = buildPrepBriefMarkdown({
     generatedAt: new Date().toISOString(),
@@ -219,6 +230,7 @@ export function PrepCockpitSummary() {
       launchpadPct,
       interviewDate,
     }),
+    calendarLinks,
   });
 
   const prepPacketMarkdown = buildPrepPacketMarkdown({
@@ -262,6 +274,7 @@ export function PrepCockpitSummary() {
       launchpadPct,
       interviewDate,
     }),
+    calendarLinks,
     nextActions: buildNextActions({
       readinessPct: checklistCompletion.completionPct,
       readinessCompleted: checklistCompletion.completedCount,

@@ -37,6 +37,10 @@ export interface PrepBriefInput {
     dueBy: string;
     priority: "high" | "medium" | "low";
   }>;
+  calendarLinks?: Array<{
+    label: string;
+    url: string;
+  }>;
 }
 
 export interface PrepPacketInput extends PrepBriefInput {
@@ -132,6 +136,15 @@ ${
         )
         .join("\n")
     : "- No reminders generated."
+}
+
+## Calendar Shortcuts
+${
+  input.calendarLinks?.length
+    ? input.calendarLinks
+        .map((link, index) => `${index + 1}. [${link.label}](${link.url})`)
+        .join("\n")
+    : "- No calendar links generated."
 }
 `;
 }

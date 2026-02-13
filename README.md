@@ -141,7 +141,7 @@ lib/
 - **Prep insights dashboard** — Tracks session history, latest/best scores, trend, recurring coaching themes, and interview pacing status per company/persona.
 - **Confidence calibration** — Mock sessions capture self-rated confidence and compare it with performance trends.
 - **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, and top resources.
-- **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode, including interview pacing guidance.
+- **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode, including pacing guidance and calendar shortcuts.
 - **Mode comparison panel** — Side-by-side view of current vs alternate company mode with top resources and one-click switching.
 - **Resource launchpad** — Track and open top recommended artifacts with per-mode completion progress and bulk open/mark actions.
 - **Next best actions** — Dynamic, priority-ranked guidance based on readiness, latest mock outcomes, and confidence calibration.
