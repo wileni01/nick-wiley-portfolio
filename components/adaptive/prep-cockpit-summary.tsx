@@ -261,7 +261,7 @@ export function PrepCockpitSummary() {
       interviewDate,
     }),
     drills: buildTargetedDrills({ themes: latestThemes }),
-    dayPlan: buildInterviewDayPlan(companyId, personaId),
+    dayPlan: buildInterviewDayPlan(companyId, personaId, { interviewDate }),
   });
 
   async function copyPrepSnapshot() {
