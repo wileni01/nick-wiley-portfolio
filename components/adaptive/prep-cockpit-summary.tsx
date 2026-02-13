@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, ClipboardCopy, Crosshair } from "lucide-react";
+import { Check, ClipboardCopy, Crosshair, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
+import { buildPrepBriefMarkdown } from "@/lib/adaptive/prep-brief";
 import {
   getReadinessChecklist,
   getReadinessCompletion,
@@ -20,6 +21,7 @@ import {
 export function PrepCockpitSummary() {
   const { companyId, personaId, company, persona } = useInterviewMode();
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [downloadState, setDownloadState] = useState<"idle" | "done">("idle");
   const [checklistCompletion, setChecklistCompletion] = useState({
     completedCount: 0,
     completionPct: 0,
@@ -90,38 +92,54 @@ export function PrepCockpitSummary() {
     return null;
   }
 
-  async function copyPrepSnapshot() {
-    const topAssets = recommendationBundle.topRecommendations
-      .slice(0, 3)
-      .map((recommendation, index) => {
-        return `${index + 1}. ${recommendation.asset.title} (${recommendation.asset.url})`;
+  const prepBriefMarkdown = buildPrepBriefMarkdown({
+    generatedAt: new Date().toISOString(),
+    companyName: company.name,
+    personaName: persona.name,
+    personaRole: persona.role,
+    personaGoal: recommendationBundle.persona.recommendationGoal,
+    readiness: {
+      completed: checklistCompletion.completedCount,
+      total: checklistCompletion.total,
+      percentage: checklistCompletion.completionPct,
+    },
+    latestScore,
+    latestConfidence,
+    topResources: recommendationBundle.topRecommendations.slice(0, 3).map(
+      (recommendation) => ({
+        title: recommendation.asset.title,
+        url: recommendation.asset.url,
+        reason: recommendation.reason,
       })
-      .join("\n");
+    ),
+    talkingPoints: recommendationBundle.talkingPoints,
+  });
 
-    const snapshot = [
-      `Interview prep snapshot — ${company.name}`,
-      `Persona: ${persona.name} (${persona.role})`,
-      `Readiness: ${checklistCompletion.completedCount}/${checklistCompletion.total} items (${checklistCompletion.completionPct}%)`,
-      `Latest mock-session score: ${latestScore ?? "N/A"}`,
-      `Latest confidence rating: ${
-        latestConfidence !== null ? `${latestConfidence}/5` : "N/A"
-      }`,
-      "",
-      "Top resources to open first:",
-      topAssets,
-      "",
-      "Focus prompt:",
-      recommendationBundle.persona.recommendationGoal,
-    ].join("\n");
-
+  async function copyPrepSnapshot() {
     try {
-      await navigator.clipboard.writeText(snapshot);
+      await navigator.clipboard.writeText(prepBriefMarkdown);
       setCopyState("copied");
     } catch {
       setCopyState("error");
     } finally {
       setTimeout(() => setCopyState("idle"), 1800);
     }
+  }
+
+  function downloadPrepBrief() {
+    const safeCompany = companyId.replace(/[^a-z0-9-]/gi, "-");
+    const safePersona = personaId.replace(/[^a-z0-9-]/gi, "-");
+    const blob = new Blob([prepBriefMarkdown], {
+      type: "text/markdown;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `interview-prep-brief-${safeCompany}-${safePersona}.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setDownloadState("done");
+    setTimeout(() => setDownloadState("idle"), 1800);
   }
 
   return (
@@ -164,19 +182,34 @@ export function PrepCockpitSummary() {
         {recommendationBundle.persona.recommendationGoal}
       </p>
 
-      <Button size="sm" variant="ghost" onClick={copyPrepSnapshot}>
-        {copyState === "copied" ? (
-          <>
-            <Check className="h-3.5 w-3.5" />
-            Copied prep snapshot
-          </>
-        ) : (
-          <>
-            <ClipboardCopy className="h-3.5 w-3.5" />
-            Copy prep snapshot
-          </>
-        )}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" variant="ghost" onClick={copyPrepSnapshot}>
+          {copyState === "copied" ? (
+            <>
+              <Check className="h-3.5 w-3.5" />
+              Copied prep brief
+            </>
+          ) : (
+            <>
+              <ClipboardCopy className="h-3.5 w-3.5" />
+              Copy prep brief
+            </>
+          )}
+        </Button>
+        <Button size="sm" variant="ghost" onClick={downloadPrepBrief}>
+          {downloadState === "done" ? (
+            <>
+              <Check className="h-3.5 w-3.5" />
+              Downloaded brief
+            </>
+          ) : (
+            <>
+              <Download className="h-3.5 w-3.5" />
+              Download .md brief
+            </>
+          )}
+        </Button>
+      </div>
       {copyState === "error" && (
         <p className="text-xs text-muted-foreground">
           Could not copy automatically. Try again after interacting with the page.

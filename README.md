@@ -129,6 +129,7 @@ lib/
 - **Prep insights dashboard** — Tracks session history, latest/best scores, trend, and recurring coaching themes per company/persona.
 - **Confidence calibration** — Mock sessions capture self-rated confidence and compare it with performance trends.
 - **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, and top resources.
+- **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.
