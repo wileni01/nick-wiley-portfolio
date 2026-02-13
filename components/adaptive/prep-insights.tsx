@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { BarChart3, TrendingDown, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useInterviewMode } from "./interview-mode-provider";
+import { useModeInterviewDate } from "./use-mode-interview-date";
 import { TimelineQuickFixActions } from "./timeline-quick-fix-actions";
 import {
   getPrepHistoryStorageKey,
@@ -21,11 +22,7 @@ import {
   getReadinessStorageKey,
   parseReadinessState,
 } from "@/lib/adaptive/readiness-checklist";
-import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
-import {
-  getInterviewDateSummary,
-  parseInterviewDate,
-} from "@/lib/adaptive/interview-date";
+import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
 import { evaluatePrepCadence } from "@/lib/adaptive/prep-cadence";
 
 function formatDateLabel(timestamp: string): string {
@@ -43,10 +40,10 @@ function formatDateLabel(timestamp: string): string {
 
 export function PrepInsights() {
   const { companyId, personaId } = useInterviewMode();
+  const { interviewDate } = useModeInterviewDate({ companyId, personaId });
   const [history, setHistory] = useState<PrepSessionSnapshot[]>([]);
   const [weeklyTarget, setWeeklyTarget] = useState(defaultPrepGoal.weeklyTarget);
   const [readinessPct, setReadinessPct] = useState(0);
-  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   const storageKey = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -131,30 +128,24 @@ export function PrepInsights() {
   useEffect(() => {
     if (!companyId || !personaId) {
       setReadinessPct(0);
-      setInterviewDate(null);
       return;
     }
     const activeCompanyId = companyId;
     const activePersonaId = personaId;
 
     const readinessKey = getReadinessStorageKey(activeCompanyId, activePersonaId);
-    const interviewDateKey = getInterviewDateStorageKey(
-      activeCompanyId,
-      activePersonaId
-    );
 
     function refresh() {
       const checklistItems = getReadinessChecklist(activeCompanyId, activePersonaId);
       const readinessState = parseReadinessState(localStorage.getItem(readinessKey));
       const completion = getReadinessCompletion(checklistItems, readinessState);
       setReadinessPct(completion.completionPct);
-      setInterviewDate(parseInterviewDate(localStorage.getItem(interviewDateKey)));
     }
 
     refresh();
 
     function onStorage(event: StorageEvent) {
-      if (event.key === readinessKey || event.key === interviewDateKey) {
+      if (event.key === readinessKey) {
         refresh();
       }
     }
@@ -164,21 +155,11 @@ export function PrepInsights() {
       if (detail?.key === readinessKey) refresh();
     }
 
-    function onInterviewDateUpdate(event: Event) {
-      const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === interviewDateKey) refresh();
-    }
-
     window.addEventListener("storage", onStorage);
     window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
-    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("adaptive-readiness-updated", onReadinessUpdate);
-      window.removeEventListener(
-        "adaptive-interview-date-updated",
-        onInterviewDateUpdate
-      );
     };
   }, [companyId, personaId]);
 
