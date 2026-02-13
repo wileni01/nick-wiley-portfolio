@@ -35,6 +35,7 @@ import {
 import { getMockSessionStorageKey } from "@/lib/adaptive/storage-keys";
 import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
 import { copyTextToClipboard } from "@/lib/clipboard";
+import { sanitizeFileToken, triggerDownload } from "@/lib/download";
 import {
   parseStoredMockSessionState,
   type StoredMockSessionState,
@@ -506,15 +507,14 @@ export function MockInterviewSession() {
   }
 
   function downloadReport() {
-    const blob = new Blob([reportText], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    const safeCompany = (companyId ?? "general").replace(/[^a-z0-9-]/gi, "-");
-    const safePersona = (personaId ?? "persona").replace(/[^a-z0-9-]/gi, "-");
-    link.href = url;
-    link.download = `interview-prep-${safeCompany}-${safePersona}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
+    triggerDownload({
+      content: reportText,
+      mimeType: "text/plain;charset=utf-8",
+      filename: `interview-prep-${sanitizeFileToken(
+        companyId,
+        "general"
+      )}-${sanitizeFileToken(personaId, "persona")}.txt`,
+    });
   }
 
   if (!script || !sessionQuestions.length) return null;

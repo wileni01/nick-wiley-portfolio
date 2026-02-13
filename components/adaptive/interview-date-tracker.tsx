@@ -16,6 +16,7 @@ import {
   buildInterviewPrepCalendarIcs,
 } from "@/lib/adaptive/interview-calendar";
 import { buildInterviewDateOffsetValue } from "@/lib/adaptive/interview-date-actions";
+import { sanitizeFileToken, triggerDownload } from "@/lib/download";
 
 export function InterviewDateTracker() {
   const { companyId, personaId, company, persona } = useInterviewMode();
@@ -61,15 +62,15 @@ export function InterviewDateTracker() {
     });
     if (!icsContent) return;
 
-    const safeCompany = activeCompanyId.replace(/[^a-z0-9-]/gi, "-");
-    const safePersona = activePersonaId.replace(/[^a-z0-9-]/gi, "-");
-    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `interview-prep-calendar-${safeCompany}-${safePersona}.ics`;
-    link.click();
-    URL.revokeObjectURL(url);
+    const downloaded = triggerDownload({
+      content: icsContent,
+      mimeType: "text/calendar;charset=utf-8",
+      filename: `interview-prep-calendar-${sanitizeFileToken(
+        activeCompanyId,
+        "company"
+      )}-${sanitizeFileToken(activePersonaId, "persona")}.ics`,
+    });
+    if (!downloaded) return;
     setDownloadState("done");
   }
 

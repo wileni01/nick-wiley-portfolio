@@ -9,6 +9,7 @@ import { useTransientState } from "./use-transient-state";
 import { buildMockInterviewerScript } from "@/lib/adaptive/mock-interviewer";
 import { buildMockScriptMarkdown } from "@/lib/adaptive/mock-script-export";
 import { copyTextToClipboard } from "@/lib/clipboard";
+import { sanitizeFileToken, triggerDownload } from "@/lib/download";
 
 export function MockInterviewerScript() {
   const { companyId, personaId, company, persona } = useInterviewMode();
@@ -46,15 +47,15 @@ export function MockInterviewerScript() {
   }
 
   function downloadScript() {
-    const blob = new Blob([scriptMarkdown], {
-      type: "text/markdown;charset=utf-8",
+    const downloaded = triggerDownload({
+      content: scriptMarkdown,
+      mimeType: "text/markdown;charset=utf-8",
+      filename: `mock-script-${sanitizeFileToken(
+        companyId,
+        "company"
+      )}-${sanitizeFileToken(personaId, "persona")}.md`,
     });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `mock-script-${companyId}-${personaId}.md`;
-    link.click();
-    URL.revokeObjectURL(url);
+    if (!downloaded) return;
     setDownloadState("done");
   }
 

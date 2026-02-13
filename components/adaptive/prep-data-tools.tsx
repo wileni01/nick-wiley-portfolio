@@ -23,6 +23,7 @@ import {
 } from "@/lib/adaptive/storage-keys";
 import { getFocusHistoryStorageKey } from "@/lib/adaptive/focus-history";
 import { copyTextToClipboard } from "@/lib/clipboard";
+import { sanitizeFileToken, triggerDownload } from "@/lib/download";
 
 type StatusTone = "neutral" | "error" | "success";
 const CROSS_MODE_IMPORT_CONFIRM_MS = 10000;
@@ -173,13 +174,19 @@ export function PrepDataTools() {
     setPendingImport(null);
     setPendingImportTargetKey(null);
     const json = getBundleJson();
-    const blob = new Blob([json], { type: "application/json;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `prep-data-${activeCompanyId}-${activePersonaId}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+    const downloaded = triggerDownload({
+      content: json,
+      mimeType: "application/json;charset=utf-8",
+      filename: `prep-data-${sanitizeFileToken(
+        activeCompanyId,
+        "company"
+      )}-${sanitizeFileToken(activePersonaId, "persona")}.json`,
+    });
+    if (!downloaded) {
+      setTone("error");
+      setStatus("Could not start download.");
+      return;
+    }
     setTone("success");
     setStatus("Prep data exported as JSON.");
   }

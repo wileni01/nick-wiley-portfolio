@@ -38,6 +38,7 @@ import {
   getPrepNotesStorageKey,
 } from "@/lib/adaptive/storage-keys";
 import { copyTextToClipboard } from "@/lib/clipboard";
+import { sanitizeFileToken, triggerDownload } from "@/lib/download";
 
 export function PrepCockpitSummary() {
   const { companyId, personaId, focusNote, company, persona } = useInterviewMode();
@@ -301,33 +302,29 @@ export function PrepCockpitSummary() {
 
   function downloadPrepBrief() {
     if (!companyId || !personaId) return;
-    const safeCompany = companyId.replace(/[^a-z0-9-]/gi, "-");
-    const safePersona = personaId.replace(/[^a-z0-9-]/gi, "-");
-    const blob = new Blob([prepBriefMarkdown], {
-      type: "text/markdown;charset=utf-8",
+    const downloaded = triggerDownload({
+      content: prepBriefMarkdown,
+      mimeType: "text/markdown;charset=utf-8",
+      filename: `interview-prep-brief-${sanitizeFileToken(
+        companyId,
+        "company"
+      )}-${sanitizeFileToken(personaId, "persona")}.md`,
     });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `interview-prep-brief-${safeCompany}-${safePersona}.md`;
-    link.click();
-    URL.revokeObjectURL(url);
+    if (!downloaded) return;
     setDownloadState("done");
   }
 
   function downloadFullPacket() {
     if (!companyId || !personaId) return;
-    const safeCompany = companyId.replace(/[^a-z0-9-]/gi, "-");
-    const safePersona = personaId.replace(/[^a-z0-9-]/gi, "-");
-    const blob = new Blob([prepPacketMarkdown], {
-      type: "text/markdown;charset=utf-8",
+    const downloaded = triggerDownload({
+      content: prepPacketMarkdown,
+      mimeType: "text/markdown;charset=utf-8",
+      filename: `interview-prep-packet-${sanitizeFileToken(
+        companyId,
+        "company"
+      )}-${sanitizeFileToken(personaId, "persona")}.md`,
     });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `interview-prep-packet-${safeCompany}-${safePersona}.md`;
-    link.click();
-    URL.revokeObjectURL(url);
+    if (!downloaded) return;
     setPacketState("done");
   }
 
