@@ -30,7 +30,14 @@ import {
   parsePrepHistory,
   type PrepSessionSnapshot,
 } from "@/lib/adaptive/prep-history";
-import { getMockSessionStorageKey } from "@/lib/adaptive/storage-keys";
+import {
+  getInterviewDateStorageKey,
+  getMockSessionStorageKey,
+} from "@/lib/adaptive/storage-keys";
+import {
+  getInterviewDateSummary,
+  parseInterviewDate,
+} from "@/lib/adaptive/interview-date";
 
 interface SessionQuestion {
   question: string;
@@ -120,6 +127,7 @@ export function MockInterviewSession() {
   const [timerDuration, setTimerDuration] = useState(90);
   const [timerRemaining, setTimerRemaining] = useState(90);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   const script = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -145,6 +153,12 @@ export function MockInterviewSession() {
   const currentFeedback = evaluateMockAnswer(currentAnswer);
   const currentWordCount = countWords(currentAnswer);
   const currentSpeechSeconds = estimateSpeechSeconds(currentWordCount);
+  const interviewTimeline = getInterviewDateSummary(interviewDate);
+  const isInterviewSoon =
+    interviewTimeline.daysUntil !== null &&
+    interviewTimeline.daysUntil >= 0 &&
+    interviewTimeline.daysUntil <= 2;
+  const recommendedMode: SessionMode = isInterviewSoon ? "pressure" : "standard";
   const report = evaluateMockSession(answers.slice(0, sessionQuestions.length));
   const scriptHeading = script?.heading ?? "Mock interview session";
   const coachingThemes = useMemo(() => {
@@ -157,6 +171,7 @@ export function MockInterviewSession() {
       `Generated: ${timestamp}`,
       `Mode: ${companyId ?? "general"} / ${personaId ?? "persona-not-set"}`,
       `Session: ${scriptHeading}`,
+      `Interview timeline: ${interviewTimeline.label}`,
       `Average score: ${report.averageScore}/100`,
       `Average confidence: ${
         confidences.length
@@ -204,6 +219,7 @@ export function MockInterviewSession() {
     report,
     scriptHeading,
     sessionQuestions,
+    interviewTimeline.label,
   ]);
 
   const loadPersistedSession = useCallback(() => {
@@ -295,6 +311,40 @@ export function MockInterviewSession() {
       );
     };
   }, [companyId, loadPersistedSession, personaId]);
+
+  useEffect(() => {
+    if (!companyId || !personaId) {
+      setInterviewDate(null);
+      return;
+    }
+
+    const key = getInterviewDateStorageKey(companyId, personaId);
+
+    function refresh() {
+      setInterviewDate(parseInterviewDate(localStorage.getItem(key)));
+    }
+
+    refresh();
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === key) refresh();
+    }
+
+    function onInterviewDateUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === key) refresh();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(
+        "adaptive-interview-date-updated",
+        onInterviewDateUpdate
+      );
+    };
+  }, [companyId, personaId]);
 
   useEffect(() => {
     if (!timerRunning) return;
@@ -511,14 +561,35 @@ export function MockInterviewSession() {
   if (!started) {
     return (
       <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <Timer className="h-4 w-4 text-primary" />
-          <h3 className="text-sm font-semibold">5-question mock session</h3>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="inline-flex items-center gap-2">
+            <Timer className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-semibold">5-question mock session</h3>
+          </div>
+          <Badge variant="muted" className="text-[10px]">
+            {interviewTimeline.label}
+          </Badge>
         </div>
         <p className="text-xs text-muted-foreground">
           Practice live answers for this persona. You will get local feedback on
           structure, metrics, impact framing, and governance signals.
         </p>
+        <div className="rounded-md border border-border bg-background p-3 space-y-1">
+          <p className="text-xs font-medium">Recommended rehearsal mode</p>
+          <p className="text-xs text-muted-foreground">
+            {isInterviewSoon
+              ? "Interview is close. Run pressure mode first, then replay your weakest answer once."
+              : "Use standard mode to build answer structure, then switch to pressure for final reps."}
+          </p>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="text-xs"
+            onClick={() => setSessionMode(recommendedMode)}
+          >
+            Use recommended mode ({recommendedMode})
+          </Button>
+        </div>
         <div className="space-y-1">
           <p className="text-xs font-medium">Session mode</p>
           <div className="flex flex-wrap gap-1.5">
@@ -813,6 +884,8 @@ export function MockInterviewSession() {
           Use this to simulate concise live responses.{" "}
           {timerRemaining === 0
             ? "Time is up — wrap with your impact statement."
+            : isInterviewSoon
+              ? "Interview is near. Prioritize concise impact closes and clear ownership language."
             : sessionMode === "pressure"
               ? "Pressure mode locks timer to 60 seconds. Aim for clarity and impact."
               : "Aim to close with impact before the timer ends."}

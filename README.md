@@ -130,7 +130,7 @@ lib/
 - **Readiness gap panel** — Surfaces outstanding checklist and unopened resource gaps with direct remediation actions.
 - **Mock interviewer script** — Role-specific practice questions with answer strategies and direct links to recommended portfolio artifacts.
 - **Mock script export** — Copy/download persona-specific interviewer scripts as Markdown for offline rehearsal.
-- **5-question mock session** — Interactive persona-specific practice flow with live local feedback on metrics, ownership, impact framing, and governance language.
+- **5-question mock session** — Interactive persona-specific practice flow with live local feedback on metrics, ownership, impact framing, governance language, and interview-date timeline guidance.
 - **Live answer timer + pressure mode** — Built-in 60/90/120-second timer with optional pressure mode that locks 60-second responses and randomizes non-warmup prompt order.
 - **Exportable prep report** — Copy or download a plain-text mock-session report with scores, strengths, gaps, and coaching prompts.
 - **Session autosave** — Mock interview drafts persist locally per company/persona, so you can continue prep later.
