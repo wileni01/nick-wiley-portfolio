@@ -1,26 +1,117 @@
 "use client";
 
 import Link from "next/link";
-import { MessageSquareQuote } from "lucide-react";
+import { useState } from "react";
+import { Check, ClipboardCopy, Download, MessageSquareQuote } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { buildMockInterviewerScript } from "@/lib/adaptive/mock-interviewer";
+import { buildMockScriptMarkdown } from "@/lib/adaptive/mock-script-export";
 
 export function MockInterviewerScript() {
-  const { companyId, personaId } = useInterviewMode();
+  const { companyId, personaId, company, persona } = useInterviewMode();
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [downloadState, setDownloadState] = useState<"idle" | "done">("idle");
 
-  if (!companyId || !personaId) return null;
+  const script =
+    companyId && personaId ? buildMockInterviewerScript(companyId, personaId) : null;
+  const scriptMarkdown =
+    company && persona && script
+      ? buildMockScriptMarkdown({
+          generatedAt: new Date().toISOString(),
+          companyName: company.name,
+          personaName: persona.name,
+          personaRole: persona.role,
+          script,
+        })
+      : "";
 
-  const script = buildMockInterviewerScript(companyId, personaId);
+  if (!companyId || !personaId || !company || !persona) return null;
   if (!script) return null;
+
+  async function copyScript() {
+    try {
+      await navigator.clipboard.writeText(scriptMarkdown);
+      setCopyState("copied");
+    } catch {
+      setCopyState("error");
+    } finally {
+      setTimeout(() => setCopyState("idle"), 1800);
+    }
+  }
+
+  function downloadScript() {
+    const blob = new Blob([scriptMarkdown], {
+      type: "text/markdown;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `mock-script-${companyId}-${personaId}.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setDownloadState("done");
+    setTimeout(() => setDownloadState("idle"), 1800);
+  }
 
   return (
     <details className="rounded-lg border border-border bg-muted/20 p-4">
       <summary className="cursor-pointer list-none">
-        <span className="inline-flex items-center gap-2 text-sm font-semibold">
-          <MessageSquareQuote className="h-4 w-4 text-primary" />
-          {script.heading}
-        </span>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="inline-flex items-center gap-2 text-sm font-semibold">
+            <MessageSquareQuote className="h-4 w-4 text-primary" />
+            {script.heading}
+          </span>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                void copyScript();
+              }}
+              className="text-xs"
+            >
+              {copyState === "copied" ? (
+                <>
+                  <Check className="h-3.5 w-3.5" />
+                  Copied script
+                </>
+              ) : (
+                <>
+                  <ClipboardCopy className="h-3.5 w-3.5" />
+                  Copy script
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                downloadScript();
+              }}
+              className="text-xs"
+            >
+              {downloadState === "done" ? (
+                <>
+                  <Check className="h-3.5 w-3.5" />
+                  Downloaded
+                </>
+              ) : (
+                <>
+                  <Download className="h-3.5 w-3.5" />
+                  Download script
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
       </summary>
 
       <div className="mt-4 space-y-3">
@@ -49,6 +140,11 @@ export function MockInterviewerScript() {
           </div>
         ))}
       </div>
+      {copyState === "error" && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Could not copy automatically. Use download instead.
+        </p>
+      )}
     </details>
   );
 }
