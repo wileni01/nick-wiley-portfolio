@@ -58,6 +58,7 @@ export function TimelineStatusBanner() {
           companyId={companyId}
           personaId={personaId}
           mode={mode}
+          showOpenTrackerButton={false}
         />
       )}
       <div className="flex flex-wrap gap-1.5">

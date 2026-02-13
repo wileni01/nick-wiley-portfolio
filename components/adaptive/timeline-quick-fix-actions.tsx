@@ -7,15 +7,24 @@ interface TimelineQuickFixActionsProps {
   companyId: string;
   personaId: string;
   mode: "set" | "reset";
+  showOpenTrackerButton?: boolean;
 }
 
 export function TimelineQuickFixActions({
   companyId,
   personaId,
   mode,
+  showOpenTrackerButton = true,
 }: TimelineQuickFixActionsProps) {
   function applyOffset(daysFromNow: number) {
     setInterviewDateOffsetForMode(companyId, personaId, daysFromNow);
+  }
+
+  function scrollToDateTracker() {
+    if (typeof document === "undefined") return;
+    const target = document.getElementById("adaptive-interview-date-tracker");
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   return (
@@ -36,6 +45,16 @@ export function TimelineQuickFixActions({
       >
         {mode === "set" ? "Set +14d" : "Reset +14d"}
       </Button>
+      {showOpenTrackerButton ? (
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 px-2 text-[11px]"
+          onClick={scrollToDateTracker}
+        >
+          Open tracker
+        </Button>
+      ) : null}
     </div>
   );
 }
