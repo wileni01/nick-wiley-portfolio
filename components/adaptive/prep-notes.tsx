@@ -19,7 +19,8 @@ export function PrepNotes() {
 
     function refresh() {
       const raw = localStorage.getItem(key);
-      setNotes((raw ?? "").slice(0, MAX_NOTES_LENGTH));
+      const nextValue = (raw ?? "").slice(0, MAX_NOTES_LENGTH);
+      setNotes((prev) => (prev === nextValue ? prev : nextValue));
     }
 
     refresh();
@@ -44,23 +45,28 @@ export function PrepNotes() {
   useEffect(() => {
     if (!companyId || !personaId) return;
     const key = getPrepNotesStorageKey(companyId, personaId);
-    localStorage.setItem(key, notes.slice(0, MAX_NOTES_LENGTH));
+    const normalized = notes.slice(0, MAX_NOTES_LENGTH);
+    const existing = localStorage.getItem(key) ?? "";
+    if (!normalized.trim()) {
+      if (existing === "") return;
+      localStorage.removeItem(key);
+      window.dispatchEvent(
+        new CustomEvent("adaptive-prep-notes-updated", { detail: { key } })
+      );
+      return;
+    }
+
+    if (existing === normalized) return;
+    localStorage.setItem(key, normalized);
     window.dispatchEvent(
       new CustomEvent("adaptive-prep-notes-updated", { detail: { key } })
     );
   }, [companyId, notes, personaId]);
 
   if (!companyId || !personaId) return null;
-  const activeCompanyId = companyId;
-  const activePersonaId = personaId;
 
   function clearNotes() {
-    const key = getPrepNotesStorageKey(activeCompanyId, activePersonaId);
-    localStorage.removeItem(key);
     setNotes("");
-    window.dispatchEvent(
-      new CustomEvent("adaptive-prep-notes-updated", { detail: { key } })
-    );
   }
 
   return (

@@ -8,7 +8,10 @@ import { useInterviewMode } from "./interview-mode-provider";
 import { parsePrepHistory, getPrepHistoryStorageKey } from "@/lib/adaptive/prep-history";
 import { buildTargetedDrills } from "@/lib/adaptive/drills";
 import { getDrillStateStorageKey } from "@/lib/adaptive/storage-keys";
-import { parseBooleanStateRecord } from "@/lib/adaptive/boolean-state";
+import {
+  areBooleanStateRecordsEqual,
+  parseBooleanStateRecord,
+} from "@/lib/adaptive/boolean-state";
 
 export function TargetedDrills() {
   const { companyId, personaId } = useInterviewMode();
@@ -59,11 +62,13 @@ export function TargetedDrills() {
     function refreshChecked() {
       const raw = localStorage.getItem(key);
       if (!raw) {
-        setChecked({});
+        setChecked((prev) => (Object.keys(prev).length ? {} : prev));
         return;
       }
       const parsed = parseBooleanStateRecord(raw);
-      setChecked(parsed);
+      setChecked((prev) =>
+        areBooleanStateRecordsEqual(prev, parsed) ? prev : parsed
+      );
       if (!Object.keys(parsed).length) {
         localStorage.removeItem(key);
       }
@@ -96,12 +101,23 @@ export function TargetedDrills() {
     const activeCompanyId = companyId;
     const activePersonaId = personaId;
     const key = getDrillStateStorageKey(activeCompanyId, activePersonaId);
-    localStorage.setItem(key, JSON.stringify(checked));
+    if (!Object.keys(checked).length) {
+      if (localStorage.getItem(key) === null) return;
+      localStorage.removeItem(key);
+      window.dispatchEvent(
+        new CustomEvent("adaptive-drill-state-updated", { detail: { key } })
+      );
+      return;
+    }
+    const serialized = JSON.stringify(checked);
+    if (localStorage.getItem(key) === serialized) return;
+    localStorage.setItem(key, serialized);
+    window.dispatchEvent(
+      new CustomEvent("adaptive-drill-state-updated", { detail: { key } })
+    );
   }, [checked, companyId, personaId]);
 
   if (!companyId || !personaId) return null;
-  const activeCompanyId = companyId;
-  const activePersonaId = personaId;
 
   const completed = drills.filter((drill) => checked[drill.id]).length;
 
@@ -110,12 +126,7 @@ export function TargetedDrills() {
   }
 
   function resetDrills() {
-    setChecked({});
-    const key = getDrillStateStorageKey(activeCompanyId, activePersonaId);
-    localStorage.removeItem(key);
-    window.dispatchEvent(
-      new CustomEvent("adaptive-drill-state-updated", { detail: { key } })
-    );
+    setChecked((prev) => (Object.keys(prev).length ? {} : prev));
   }
 
   return (

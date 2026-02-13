@@ -152,10 +152,10 @@ lib/
 - **Resource launchpad** — Track and open top recommended artifacts with per-mode completion progress, validated single/bulk open actions, pop-up blocker feedback, resilient local-state parsing, accurate progress updates after bulk opens, and loop-safe cross-panel sync events.
 - **Next best actions** — Dynamic, priority-ranked guidance based on readiness, latest mock outcomes, and confidence calibration.
 - **Timeline-aware action guidance** — Next-best-actions escalates countdown priorities when the interview date is within 48 hours and includes one-click date setup/reset actions when timeline context is missing or stale.
-- **Targeted drills** — Theme-driven micro-exercises generated from your latest coaching gaps, with local completion tracking.
+- **Targeted drills** — Theme-driven micro-exercises generated from your latest coaching gaps, with loop-safe local completion tracking and cross-panel drill-state sync.
 - **Prep cadence tracking** — Weekly session target + streak tracking to keep interview practice consistent, with normalized loop-safe goal synchronization.
 - **Prep data tools** — Export/import/paste/reset local prep state (JSON), including notes, focus history, and interview date, per company/persona mode, with two-step reset confirmation, payload size guards, sanitization caps, clipboard + in-panel manual paste import fallback, and explicit time-bound confirmation before cross-mode imports.
-- **Prep notes pad** — Persist mode-specific interviewer notes and include them in exported briefs/packets.
+- **Prep notes pad** — Persist mode-specific interviewer notes with loop-safe sync semantics and include them in exported briefs/packets.
 - **Interview day plan** — Time-phased execution plan (prep window + T-45 to close) tuned to selected company/persona priorities and interview-date timeline.
 - **Interview date tracker** — Set a per-mode interview date (with quick-set controls and strict date validation) to anchor urgency, include date context in exported briefs, launch upcoming Google Calendar interview/prep checkpoint events (with pop-up blocker feedback), and download an `.ics` prep plan.
 - **Full prep packet export** — Download a consolidated Markdown packet with brief, preflight status, pacing guidance, reminders, next actions, drills, and day plan.
