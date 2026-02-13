@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import {
   getReadinessChecklist,
@@ -161,6 +162,22 @@ export function PreflightReadinessCard() {
   );
 
   if (!companyId || !personaId) return null;
+  const interviewDateKey = getInterviewDateStorageKey(companyId, personaId);
+
+  function setInterviewDateOffset(daysFromNow: number) {
+    const base = new Date();
+    base.setHours(0, 0, 0, 0);
+    base.setDate(base.getDate() + daysFromNow);
+    const year = base.getFullYear();
+    const month = String(base.getMonth() + 1).padStart(2, "0");
+    const day = String(base.getDate()).padStart(2, "0");
+    localStorage.setItem(interviewDateKey, `${year}-${month}-${day}`);
+    window.dispatchEvent(
+      new CustomEvent("adaptive-interview-date-updated", {
+        detail: { key: interviewDateKey },
+      })
+    );
+  }
 
   return (
     <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
@@ -212,6 +229,26 @@ export function PreflightReadinessCard() {
       <p className="text-[11px] text-muted-foreground">
         Interview timeline: {interviewDateSummary.label}
       </p>
+      {preflight.timelineStatus !== "upcoming" && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 px-2 text-[11px]"
+            onClick={() => setInterviewDateOffset(7)}
+          >
+            {preflight.timelineStatus === "missing" ? "Set +7d" : "Reset +7d"}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 px-2 text-[11px]"
+            onClick={() => setInterviewDateOffset(14)}
+          >
+            {preflight.timelineStatus === "missing" ? "Set +14d" : "Reset +14d"}
+          </Button>
+        </div>
+      )}
       <p className="text-[11px] text-muted-foreground">
         Context signals: {hasNotes ? "notes" : "no-notes"} +{" "}
         {focusNote.trim() ? "focus" : "no-focus"}
