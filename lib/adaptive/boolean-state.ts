@@ -3,6 +3,12 @@ export interface ParseBooleanStateOptions {
   maxKeyLength?: number;
 }
 
+export interface BooleanStateSummary {
+  total: number;
+  truthy: number;
+  percentage: number;
+}
+
 const DEFAULT_MAX_KEYS = 400;
 const DEFAULT_MAX_KEY_LENGTH = 120;
 
@@ -28,5 +34,15 @@ export function parseBooleanStateRecord(
   } catch {
     return {};
   }
+}
+
+export function summarizeBooleanStateRecord(
+  state: Record<string, boolean>
+): BooleanStateSummary {
+  const values = Object.values(state);
+  const total = values.length;
+  const truthy = values.filter(Boolean).length;
+  const percentage = total ? Math.round((truthy / total) * 100) : 0;
+  return { total, truthy, percentage };
 }
 
