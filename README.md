@@ -123,7 +123,7 @@ lib/
 - **Shareable prep links** — Copy mode links that preserve company, persona, provider, focus note, and interview date context, with live URL sync as mode/date changes and inline copy-failure feedback.
 - **Clipboard copy resilience** — Copy actions for prep links, mock scripts/reports, and prep briefs use primary clipboard APIs with a legacy fallback path for wider browser compatibility, plus inline failure feedback states.
 - **Export download resilience** — Download actions use shared blob export handling with sanitized filenames, deferred object-URL cleanup for browser compatibility, and inline failure feedback.
-- **External-link safety** — Adaptive popup-launch actions now use a shared opener that validates HTTP(S) URLs and reports blocked pop-up outcomes.
+- **External-link safety** — Adaptive popup-launch actions now use a shared opener that validates HTTP(S) URLs and a shared outcome classifier for blocked/partial/full-open results.
 - **Focus-note tuning** — Add an optional session focus note to steer recommendations, AI narrative, and exported prep packets.
 - **Focus presets** — One-click persona-specific focus-note presets to quickly retarget the narrative for each interviewer type.
 - **Focus-note memory** — Save and reuse up to 6 recent focus notes (length-capped) per company/persona for faster iterative prep sessions.

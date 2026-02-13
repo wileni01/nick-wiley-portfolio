@@ -8,7 +8,11 @@ import { useInterviewMode } from "./interview-mode-provider";
 import { useTransientState } from "./use-transient-state";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
-import { openExternalUrl, openExternalUrls } from "@/lib/external-link";
+import {
+  classifyExternalOpenResult,
+  openExternalUrl,
+  openExternalUrls,
+} from "@/lib/external-link";
 import { parseBooleanStateRecord } from "@/lib/adaptive/boolean-state";
 
 export function ResourceLaunchpad() {
@@ -121,15 +125,7 @@ export function ResourceLaunchpad() {
         return merged;
       });
     }
-    if (result.opened === remainingResources.length) {
-      setOpenState("opened");
-      return;
-    }
-    if (result.opened > 0) {
-      setOpenState("partial");
-      return;
-    }
-    setOpenState("error");
+    setOpenState(classifyExternalOpenResult(result));
   }
 
   function resetLaunchpad() {

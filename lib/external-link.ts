@@ -1,3 +1,11 @@
+export type ExternalOpenState = "opened" | "partial" | "error";
+
+export interface ExternalOpenResult {
+  attempted: number;
+  opened: number;
+  openedIndexes: number[];
+}
+
 export function openExternalUrl(url: string): boolean {
   if (typeof window === "undefined") return false;
   const normalized = normalizeExternalUrl(url);
@@ -6,11 +14,7 @@ export function openExternalUrl(url: string): boolean {
   return Boolean(opened);
 }
 
-export function openExternalUrls(urls: string[]): {
-  attempted: number;
-  opened: number;
-  openedIndexes: number[];
-} {
+export function openExternalUrls(urls: string[]): ExternalOpenResult {
   let opened = 0;
   const openedIndexes: number[] = [];
   let attempted = 0;
@@ -25,6 +29,14 @@ export function openExternalUrls(urls: string[]): {
   });
 
   return { attempted, opened, openedIndexes };
+}
+
+export function classifyExternalOpenResult(
+  result: Pick<ExternalOpenResult, "attempted" | "opened">
+): ExternalOpenState {
+  if (result.attempted > 0 && result.opened >= result.attempted) return "opened";
+  if (result.opened > 0) return "partial";
+  return "error";
 }
 
 function normalizeExternalUrl(url: string): string | null {
