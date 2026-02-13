@@ -71,9 +71,28 @@ export function ResourceLaunchpad() {
 
   const resources = bundle.topRecommendations.slice(0, 5);
   const openedCount = resources.filter((resource) => opened[resource.asset.id]).length;
+  const remainingResources = resources.filter(
+    (resource) => !opened[resource.asset.id]
+  );
 
   function markOpened(resourceId: string) {
     setOpened((prev) => ({ ...prev, [resourceId]: true }));
+  }
+
+  function markAllOpened() {
+    const merged = resources.reduce<Record<string, boolean>>((acc, resource) => {
+      acc[resource.asset.id] = true;
+      return acc;
+    }, { ...opened });
+    setOpened(merged);
+  }
+
+  function openRemaining() {
+    if (!remainingResources.length) return;
+    remainingResources.forEach((resource) => {
+      window.open(resource.asset.url, "_blank", "noopener,noreferrer");
+    });
+    markAllOpened();
   }
 
   function resetLaunchpad() {
@@ -95,6 +114,25 @@ export function ResourceLaunchpad() {
         <Badge variant="outline">
           {openedCount}/{resources.length} opened
         </Badge>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={openRemaining}
+          disabled={!remainingResources.length}
+        >
+          Open remaining
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={markAllOpened}
+          disabled={openedCount === resources.length}
+        >
+          Mark all opened
+        </Button>
       </div>
 
       <ul className="space-y-2">
