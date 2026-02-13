@@ -130,6 +130,7 @@ lib/
 - **Confidence calibration** — Mock sessions capture self-rated confidence and compare it with performance trends.
 - **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, and top resources.
 - **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode.
+- **Mode comparison panel** — Side-by-side view of current vs alternate company mode with top resources and one-click switching.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.

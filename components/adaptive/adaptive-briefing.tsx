@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { PrepCockpitSummary } from "./prep-cockpit-summary";
 import { InterviewReadinessChecklist } from "./interview-readiness-checklist";
+import { ModeComparisonPanel } from "./mode-comparison-panel";
 import { MockInterviewSession } from "./mock-interview-session";
 import { MockInterviewerScript } from "./mock-interviewer-script";
 import { PrepInsights } from "./prep-insights";
@@ -232,6 +233,7 @@ export function AdaptiveBriefing() {
         </ul>
       </div>
 
+      <ModeComparisonPanel />
       <PrepCockpitSummary />
       <InterviewReadinessChecklist />
       <PrepInsights />
