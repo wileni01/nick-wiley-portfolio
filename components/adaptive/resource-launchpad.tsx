@@ -108,10 +108,9 @@ export function ResourceLaunchpad() {
     const result = openExternalUrls(
       remainingResources.map((resource) => resource.asset.url)
     );
-    const openedUrlSet = new Set(result.openedUrls);
-    const openedIds = remainingResources
-      .filter((resource) => openedUrlSet.has(resource.asset.url))
-      .map((resource) => resource.asset.id);
+    const openedIds = result.openedIndexes
+      .map((index) => remainingResources[index]?.asset.id)
+      .filter((resourceId): resourceId is string => Boolean(resourceId));
 
     if (openedIds.length) {
       setOpened((prev) => {

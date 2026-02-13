@@ -9,22 +9,22 @@ export function openExternalUrl(url: string): boolean {
 export function openExternalUrls(urls: string[]): {
   attempted: number;
   opened: number;
-  openedUrls: string[];
+  openedIndexes: number[];
 } {
   let opened = 0;
-  const openedUrls: string[] = [];
+  const openedIndexes: number[] = [];
   let attempted = 0;
 
-  urls.forEach((url) => {
+  urls.forEach((url, index) => {
     const didOpen = openExternalUrl(url);
     attempted += 1;
     if (didOpen) {
       opened += 1;
-      openedUrls.push(url);
+      openedIndexes.push(index);
     }
   });
 
-  return { attempted, opened, openedUrls };
+  return { attempted, opened, openedIndexes };
 }
 
 function normalizeExternalUrl(url: string): string | null {

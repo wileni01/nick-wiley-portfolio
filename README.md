@@ -149,7 +149,7 @@ lib/
 - **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, top resources, and inline timeline quick-fix actions when date context is missing/stale.
 - **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode, including pacing guidance and calendar shortcuts.
 - **Mode comparison panel** — Side-by-side view of current vs alternate company mode with top resources and one-click switching.
-- **Resource launchpad** — Track and open top recommended artifacts with per-mode completion progress, validated single/bulk open actions, pop-up blocker feedback, and resilient local-state parsing.
+- **Resource launchpad** — Track and open top recommended artifacts with per-mode completion progress, validated single/bulk open actions, pop-up blocker feedback, resilient local-state parsing, and accurate progress updates after bulk opens.
 - **Next best actions** — Dynamic, priority-ranked guidance based on readiness, latest mock outcomes, and confidence calibration.
 - **Timeline-aware action guidance** — Next-best-actions escalates countdown priorities when the interview date is within 48 hours and includes one-click date setup/reset actions when timeline context is missing or stale.
 - **Targeted drills** — Theme-driven micro-exercises generated from your latest coaching gaps, with local completion tracking.
