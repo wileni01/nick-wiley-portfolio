@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { CalendarClock, Check, Download, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { useModeInterviewDate } from "./use-mode-interview-date";
+import { useTransientState } from "./use-transient-state";
 import {
   getInterviewDateSummary,
 } from "@/lib/adaptive/interview-date";
@@ -22,7 +23,10 @@ export function InterviewDateTracker() {
     companyId,
     personaId,
   });
-  const [downloadState, setDownloadState] = useState<"idle" | "done">("idle");
+  const [downloadState, setDownloadState] = useTransientState<"idle" | "done">(
+    "idle",
+    1800
+  );
 
   const summary = useMemo(
     () => getInterviewDateSummary(interviewDate),
@@ -67,7 +71,6 @@ export function InterviewDateTracker() {
     link.click();
     URL.revokeObjectURL(url);
     setDownloadState("done");
-    setTimeout(() => setDownloadState("idle"), 1800);
   }
 
   function openGoogleCalendar() {

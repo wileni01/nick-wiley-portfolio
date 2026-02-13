@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useInterviewMode } from "./interview-mode-provider";
 import { useModeInterviewDate } from "./use-mode-interview-date";
+import { useTransientState } from "./use-transient-state";
 import {
   buildMockInterviewerScript,
   deriveCoachingThemes,
@@ -112,7 +113,9 @@ export function MockInterviewSession() {
   const [sessionMode, setSessionMode] = useState<SessionMode>("standard");
   const [questionOrder, setQuestionOrder] = useState<number[]>([]);
   const [completed, setCompleted] = useState(false);
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [copyState, setCopyState] = useTransientState<
+    "idle" | "copied" | "error"
+  >("idle", 1800);
   const [loadedFromDraft, setLoadedFromDraft] = useState(false);
   const [timerDuration, setTimerDuration] = useState(90);
   const [timerRemaining, setTimerRemaining] = useState(90);
@@ -499,8 +502,6 @@ export function MockInterviewSession() {
       setCopyState(copied ? "copied" : "error");
     } catch {
       setCopyState("error");
-    } finally {
-      setTimeout(() => setCopyState("idle"), 1800);
     }
   }
 

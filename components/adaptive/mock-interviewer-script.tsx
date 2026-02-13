@@ -1,19 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { Check, ClipboardCopy, Download, MessageSquareQuote } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { useTransientState } from "./use-transient-state";
 import { buildMockInterviewerScript } from "@/lib/adaptive/mock-interviewer";
 import { buildMockScriptMarkdown } from "@/lib/adaptive/mock-script-export";
 import { copyTextToClipboard } from "@/lib/clipboard";
 
 export function MockInterviewerScript() {
   const { companyId, personaId, company, persona } = useInterviewMode();
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
-  const [downloadState, setDownloadState] = useState<"idle" | "done">("idle");
+  const [copyState, setCopyState] = useTransientState<
+    "idle" | "copied" | "error"
+  >("idle", 1800);
+  const [downloadState, setDownloadState] = useTransientState<"idle" | "done">(
+    "idle",
+    1800
+  );
 
   const script =
     companyId && personaId ? buildMockInterviewerScript(companyId, personaId) : null;
@@ -37,8 +42,6 @@ export function MockInterviewerScript() {
       setCopyState(copied ? "copied" : "error");
     } catch {
       setCopyState("error");
-    } finally {
-      setTimeout(() => setCopyState("idle"), 1800);
     }
   }
 
@@ -53,7 +56,6 @@ export function MockInterviewerScript() {
     link.click();
     URL.revokeObjectURL(url);
     setDownloadState("done");
-    setTimeout(() => setDownloadState("idle"), 1800);
   }
 
   return (

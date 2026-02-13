@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { useModeInterviewDate } from "./use-mode-interview-date";
+import { useTransientState } from "./use-transient-state";
 import { TimelineQuickFixActions } from "./timeline-quick-fix-actions";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import {
@@ -41,9 +42,17 @@ import { copyTextToClipboard } from "@/lib/clipboard";
 export function PrepCockpitSummary() {
   const { companyId, personaId, focusNote, company, persona } = useInterviewMode();
   const { interviewDate } = useModeInterviewDate({ companyId, personaId });
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
-  const [downloadState, setDownloadState] = useState<"idle" | "done">("idle");
-  const [packetState, setPacketState] = useState<"idle" | "done">("idle");
+  const [copyState, setCopyState] = useTransientState<
+    "idle" | "copied" | "error"
+  >("idle", 1800);
+  const [downloadState, setDownloadState] = useTransientState<"idle" | "done">(
+    "idle",
+    1800
+  );
+  const [packetState, setPacketState] = useTransientState<"idle" | "done">(
+    "idle",
+    1800
+  );
   const [checklistCompletion, setChecklistCompletion] = useState({
     completedCount: 0,
     completionPct: 0,
@@ -287,8 +296,6 @@ export function PrepCockpitSummary() {
       setCopyState(copied ? "copied" : "error");
     } catch {
       setCopyState("error");
-    } finally {
-      setTimeout(() => setCopyState("idle"), 1800);
     }
   }
 
@@ -306,7 +313,6 @@ export function PrepCockpitSummary() {
     link.click();
     URL.revokeObjectURL(url);
     setDownloadState("done");
-    setTimeout(() => setDownloadState("idle"), 1800);
   }
 
   function downloadFullPacket() {
@@ -323,7 +329,6 @@ export function PrepCockpitSummary() {
     link.click();
     URL.revokeObjectURL(url);
     setPacketState("done");
-    setTimeout(() => setPacketState("idle"), 1800);
   }
 
   return (

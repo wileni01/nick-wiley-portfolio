@@ -5,6 +5,7 @@ import { Check, Copy, Save, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { useModeInterviewDate } from "./use-mode-interview-date";
+import { useTransientState } from "./use-transient-state";
 import { ModeHealthPill } from "./mode-health-pill";
 import { InterviewCountdownPill } from "./interview-countdown-pill";
 import {
@@ -42,7 +43,9 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
     resetMode,
   } = useInterviewMode();
   const { interviewDate } = useModeInterviewDate({ companyId, personaId });
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [copyState, setCopyState] = useTransientState<
+    "idle" | "copied" | "error"
+  >("idle", 1500);
   const [focusHistory, setFocusHistory] = useState<string[]>([]);
 
   useEffect(() => {
@@ -108,8 +111,6 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
       setCopyState(copied ? "copied" : "error");
     } catch {
       setCopyState("error");
-    } finally {
-      setTimeout(() => setCopyState("idle"), 1500);
     }
   }
 
