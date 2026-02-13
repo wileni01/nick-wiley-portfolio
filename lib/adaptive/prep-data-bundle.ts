@@ -69,7 +69,7 @@ export function buildPrepDataBundle(input: {
     focusHistory: parseFocusHistory(input.focusHistoryRaw),
     interviewDate: parseInterviewDate(input.interviewDateRaw),
     launchpadState: parseDrillState(input.launchpadStateRaw),
-    mockSession: parseMockSessionState(input.mockSessionRaw),
+    mockSession: parseStoredMockSessionState(input.mockSessionRaw),
     drillState: parseDrillState(input.drillStateRaw),
   };
 }
@@ -118,7 +118,7 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
       launchpadState: parseDrillState(
         JSON.stringify(parsed.launchpadState ?? {})
       ),
-      mockSession: parseMockSessionState(
+      mockSession: parseStoredMockSessionState(
         parsed.mockSession ? JSON.stringify(parsed.mockSession) : null
       ),
       drillState: parseDrillState(JSON.stringify(parsed.drillState ?? {})),
@@ -133,7 +133,9 @@ function parsePrepNotes(raw: string | null): string {
   return String(raw).slice(0, PREP_DATA_NOTES_MAX_CHARS);
 }
 
-function parseMockSessionState(raw: string | null): StoredMockSessionState | null {
+export function parseStoredMockSessionState(
+  raw: string | null
+): StoredMockSessionState | null {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as Partial<StoredMockSessionState>;

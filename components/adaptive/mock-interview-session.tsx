@@ -34,6 +34,10 @@ import {
 import { getMockSessionStorageKey } from "@/lib/adaptive/storage-keys";
 import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
 import { copyTextToClipboard } from "@/lib/clipboard";
+import {
+  parseStoredMockSessionState,
+  type StoredMockSessionState,
+} from "@/lib/adaptive/prep-data-bundle";
 
 interface SessionQuestion {
   question: string;
@@ -54,17 +58,6 @@ const warmupQuestion: SessionQuestion = {
   answerStrategy:
     "Use a compact arc: role fit, one credible example, and what value you can create in the first 90 days.",
 };
-
-export interface PersistedMockSession {
-  answers: string[];
-  confidences: number[];
-  sessionMode?: SessionMode;
-  questionOrder?: number[];
-  currentIndex: number;
-  completed: boolean;
-  started: boolean;
-  updatedAt: string;
-}
 
 type SessionMode = "standard" | "pressure";
 
@@ -229,7 +222,12 @@ export function MockInterviewSession() {
     }
 
     try {
-      const stored = JSON.parse(storedRaw) as PersistedMockSession;
+      const stored = parseStoredMockSessionState(storedRaw);
+      if (!stored) {
+        localStorage.removeItem(key);
+        setLoadedFromDraft(false);
+        return;
+      }
       const restoredMode: SessionMode =
         stored.sessionMode === "pressure" ? "pressure" : "standard";
       const restoredOrderRaw = Array.isArray(stored.questionOrder)
@@ -356,7 +354,7 @@ export function MockInterviewSession() {
       return;
     }
 
-    const payload: PersistedMockSession = {
+    const payload: StoredMockSessionState = {
       answers,
       confidences,
       sessionMode,
