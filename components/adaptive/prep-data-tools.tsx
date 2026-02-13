@@ -31,6 +31,7 @@ export function PrepDataTools() {
   const [status, setStatus] = useState<string>("");
   const [tone, setTone] = useState<StatusTone>("neutral");
   const [confirmReset, setConfirmReset] = useState(false);
+  const [pendingImport, setPendingImport] = useState<PrepDataBundle | null>(null);
 
   useEffect(() => {
     if (!confirmReset) return;
@@ -124,6 +125,7 @@ export function PrepDataTools() {
 
   async function copyJson() {
     setConfirmReset(false);
+    setPendingImport(null);
     try {
       await navigator.clipboard.writeText(getBundleJson());
       setTone("success");
@@ -136,6 +138,7 @@ export function PrepDataTools() {
 
   function downloadJson() {
     setConfirmReset(false);
+    setPendingImport(null);
     const json = getBundleJson();
     const blob = new Blob([json], { type: "application/json;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -149,6 +152,7 @@ export function PrepDataTools() {
   }
 
   function resetData() {
+    setPendingImport(null);
     if (!confirmReset) {
       setTone("neutral");
       setStatus("Click reset again within 5 seconds to confirm.");
@@ -164,10 +168,12 @@ export function PrepDataTools() {
   }
 
   function triggerImport() {
+    setPendingImport(null);
     fileInputRef.current?.click();
   }
 
   function applyImportedBundle(parsed: PrepDataBundle) {
+    setPendingImport(null);
     localStorage.setItem(keys.readiness, JSON.stringify(parsed.readinessState));
     localStorage.setItem(keys.history, JSON.stringify(parsed.prepHistory));
     localStorage.setItem(keys.goals, JSON.stringify(parsed.prepGoal));
@@ -201,8 +207,36 @@ export function PrepDataTools() {
     }
   }
 
+  function isCrossModeBundle(parsed: PrepDataBundle): boolean {
+    return (
+      parsed.mode.companyId !== activeCompanyId ||
+      parsed.mode.personaId !== activePersonaId
+    );
+  }
+
+  function queueCrossModeImport(parsed: PrepDataBundle) {
+    setPendingImport(parsed);
+    setTone("neutral");
+    setStatus(
+      `Bundle is from ${parsed.mode.companyId}/${parsed.mode.personaId}. Confirm to import into current mode.`
+    );
+  }
+
+  function cancelPendingImport() {
+    if (!pendingImport) return;
+    setPendingImport(null);
+    setTone("neutral");
+    setStatus("Cross-mode import canceled.");
+  }
+
+  function confirmPendingImport() {
+    if (!pendingImport) return;
+    applyImportedBundle(pendingImport);
+  }
+
   async function pasteJsonFromClipboard() {
     setConfirmReset(false);
+    setPendingImport(null);
     try {
       const raw = await navigator.clipboard.readText();
       if (!raw.trim()) {
@@ -222,7 +256,10 @@ export function PrepDataTools() {
         setStatus("Clipboard does not contain a valid prep data bundle.");
         return;
       }
-
+      if (isCrossModeBundle(parsed)) {
+        queueCrossModeImport(parsed);
+        return;
+      }
       applyImportedBundle(parsed);
     } catch {
       setTone("error");
@@ -232,6 +269,7 @@ export function PrepDataTools() {
 
   async function onImportFile(event: React.ChangeEvent<HTMLInputElement>) {
     setConfirmReset(false);
+    setPendingImport(null);
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -246,6 +284,10 @@ export function PrepDataTools() {
       if (!parsed) {
         setTone("error");
         setStatus("Invalid prep data bundle.");
+        return;
+      }
+      if (isCrossModeBundle(parsed)) {
+        queueCrossModeImport(parsed);
         return;
       }
       applyImportedBundle(parsed);
@@ -299,6 +341,35 @@ export function PrepDataTools() {
         onChange={onImportFile}
         className="hidden"
       />
+
+      {pendingImport ? (
+        <div className="rounded-md border border-amber-400/50 bg-amber-50/40 dark:bg-amber-950/20 p-2 space-y-2">
+          <p className="text-[11px] text-muted-foreground">
+            Pending cross-mode import:{" "}
+            <span className="font-medium text-foreground">
+              {pendingImport.mode.companyId}/{pendingImport.mode.personaId}
+            </span>
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-[11px]"
+              onClick={confirmPendingImport}
+            >
+              Confirm import
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 px-2 text-[11px]"
+              onClick={cancelPendingImport}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       {status ? (
         <p
