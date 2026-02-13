@@ -25,3 +25,10 @@ export function getLaunchpadStorageKey(
 ): string {
   return `adaptive.launchpad.${companyId}.${personaId}`;
 }
+
+export function getInterviewDateStorageKey(
+  companyId: string,
+  personaId: string
+): string {
+  return `adaptive.interview-date.${companyId}.${personaId}`;
+}

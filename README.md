@@ -145,9 +145,10 @@ lib/
 - **Next best actions** — Dynamic, priority-ranked guidance based on readiness, latest mock outcomes, and confidence calibration.
 - **Targeted drills** — Theme-driven micro-exercises generated from your latest coaching gaps, with local completion tracking.
 - **Prep cadence tracking** — Weekly session target + streak tracking to keep interview practice consistent.
-- **Prep data tools** — Export/import/reset local prep state (JSON), including notes and focus history, per company/persona mode.
+- **Prep data tools** — Export/import/reset local prep state (JSON), including notes, focus history, and interview date, per company/persona mode.
 - **Prep notes pad** — Persist mode-specific interviewer notes and include them in exported briefs/packets.
 - **Interview day plan** — Time-phased execution plan (T-45 to close) tuned to selected company/persona priorities.
+- **Interview date tracker** — Set a per-mode interview date to anchor urgency and include date context in exported briefs.
 - **Full prep packet export** — Download a consolidated Markdown packet with brief, preflight status, reminders, next actions, drills, and day plan.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.

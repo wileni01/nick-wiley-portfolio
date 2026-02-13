@@ -4,6 +4,7 @@ export interface PrepBriefInput {
   personaName: string;
   personaRole: string;
   personaGoal: string;
+  interviewDate?: string | null;
   focusNote?: string;
   prepNotes?: string;
   readiness: {
@@ -76,6 +77,7 @@ Generated: ${input.generatedAt}
 ## Target
 - Company: ${input.companyName}
 - Interviewer: ${input.personaName} (${input.personaRole})
+- Interview date: ${input.interviewDate || "Not set"}
 
 ## Role Focus
 ${input.personaGoal}

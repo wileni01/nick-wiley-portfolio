@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { InterviewDayPlanPanel } from "./interview-day-plan";
+import { InterviewDateTracker } from "./interview-date-tracker";
 import { PrepCockpitSummary } from "./prep-cockpit-summary";
 import { PrepDataTools } from "./prep-data-tools";
 import { InterviewReadinessChecklist } from "./interview-readiness-checklist";
@@ -258,6 +259,7 @@ export function AdaptiveBriefing() {
       </div>
 
       <ModeComparisonPanel />
+      <InterviewDateTracker />
       <InterviewDayPlanPanel />
       <PreflightReadinessCard />
       <ReadinessGapPanel />

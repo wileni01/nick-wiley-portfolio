@@ -18,6 +18,7 @@ import {
 } from "@/lib/adaptive/readiness-checklist";
 import { buildNextActions } from "@/lib/adaptive/next-actions";
 import { buildTargetedDrills } from "@/lib/adaptive/drills";
+import { parseInterviewDate } from "@/lib/adaptive/interview-date";
 import { buildInterviewDayPlan } from "@/lib/adaptive/interview-day-plan";
 import { calculatePreflightScore } from "@/lib/adaptive/preflight";
 import { buildPracticeReminders } from "@/lib/adaptive/practice-reminders";
@@ -26,6 +27,7 @@ import {
   parsePrepHistory,
 } from "@/lib/adaptive/prep-history";
 import {
+  getInterviewDateStorageKey,
   getLaunchpadStorageKey,
   getPrepNotesStorageKey,
 } from "@/lib/adaptive/storage-keys";
@@ -47,6 +49,7 @@ export function PrepCockpitSummary() {
   );
   const [launchpadPct, setLaunchpadPct] = useState(0);
   const [latestThemes, setLatestThemes] = useState<string[]>([]);
+  const [interviewDate, setInterviewDate] = useState<string | null>(null);
   const [prepNotes, setPrepNotes] = useState("");
 
   const recommendationBundle = useMemo(() => {
@@ -61,6 +64,7 @@ export function PrepCockpitSummary() {
     const historyKey = getPrepHistoryStorageKey(companyId, personaId);
     const notesKey = getPrepNotesStorageKey(companyId, personaId);
     const launchpadKey = getLaunchpadStorageKey(companyId, personaId);
+    const interviewDateKey = getInterviewDateStorageKey(companyId, personaId);
 
     function refresh() {
       const checklistItems = getReadinessChecklist(companyId, personaId);
@@ -78,6 +82,7 @@ export function PrepCockpitSummary() {
       setLatestSessionTimestamp(history[0]?.timestamp ?? null);
       setLatestThemes(history[0]?.topThemes ?? []);
       setPrepNotes((localStorage.getItem(notesKey) ?? "").slice(0, 1200));
+      setInterviewDate(parseInterviewDate(localStorage.getItem(interviewDateKey)));
 
       const rawLaunchpad = localStorage.getItem(launchpadKey);
       if (!rawLaunchpad) {
@@ -101,7 +106,8 @@ export function PrepCockpitSummary() {
         event.key === readinessKey ||
         event.key === historyKey ||
         event.key === notesKey ||
-        event.key === launchpadKey
+        event.key === launchpadKey ||
+        event.key === interviewDateKey
       ) {
         refresh();
       }
@@ -127,11 +133,17 @@ export function PrepCockpitSummary() {
       if (detail?.key === launchpadKey) refresh();
     }
 
+    function onInterviewDateUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === interviewDateKey) refresh();
+    }
+
     window.addEventListener("storage", onStorage);
     window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
     window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
     window.addEventListener("adaptive-prep-notes-updated", onPrepNotesUpdate);
     window.addEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
+    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
 
     return () => {
       window.removeEventListener("storage", onStorage);
@@ -142,6 +154,10 @@ export function PrepCockpitSummary() {
       );
       window.removeEventListener("adaptive-prep-notes-updated", onPrepNotesUpdate);
       window.removeEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
+      window.removeEventListener(
+        "adaptive-interview-date-updated",
+        onInterviewDateUpdate
+      );
     };
   }, [companyId, personaId]);
 
@@ -155,6 +171,7 @@ export function PrepCockpitSummary() {
     personaName: persona.name,
     personaRole: persona.role,
     personaGoal: recommendationBundle.persona.recommendationGoal,
+    interviewDate,
     focusNote,
     prepNotes,
     readiness: {
@@ -194,6 +211,7 @@ export function PrepCockpitSummary() {
     personaName: persona.name,
     personaRole: persona.role,
     personaGoal: recommendationBundle.persona.recommendationGoal,
+    interviewDate,
     focusNote,
     prepNotes,
     readiness: {

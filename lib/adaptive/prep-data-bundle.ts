@@ -26,6 +26,7 @@ export interface PrepDataBundle {
   prepGoal: PrepGoalState;
   prepNotes: string;
   focusHistory: string[];
+  interviewDate: string | null;
   launchpadState: Record<string, boolean>;
   mockSession: StoredMockSessionState | null;
   drillState: Record<string, boolean>;
@@ -39,6 +40,7 @@ export function buildPrepDataBundle(input: {
   prepGoalRaw: string | null;
   prepNotesRaw: string | null;
   focusHistoryRaw: string | null;
+  interviewDateRaw: string | null;
   launchpadStateRaw: string | null;
   mockSessionRaw: string | null;
   drillStateRaw: string | null;
@@ -55,6 +57,7 @@ export function buildPrepDataBundle(input: {
     prepGoal: parsePrepGoalState(input.prepGoalRaw),
     prepNotes: parsePrepNotes(input.prepNotesRaw),
     focusHistory: parseFocusHistory(input.focusHistoryRaw),
+    interviewDate: parseInterviewDateRaw(input.interviewDateRaw),
     launchpadState: parseDrillState(input.launchpadStateRaw),
     mockSession: parseMockSessionState(input.mockSessionRaw),
     drillState: parseDrillState(input.drillStateRaw),
@@ -93,6 +96,9 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
       focusHistory: parseFocusHistory(
         JSON.stringify(parsed.focusHistory ?? [])
       ),
+      interviewDate: parseInterviewDateRaw(
+        typeof parsed.interviewDate === "string" ? parsed.interviewDate : null
+      ),
       launchpadState: parseDrillState(
         JSON.stringify(parsed.launchpadState ?? {})
       ),
@@ -104,6 +110,14 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
   } catch {
     return null;
   }
+}
+
+function parseInterviewDateRaw(raw: string | null): string | null {
+  if (!raw) return null;
+  const value = String(raw).slice(0, 10);
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return value;
 }
 
 function parsePrepNotes(raw: string | null): string {

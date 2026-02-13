@@ -14,6 +14,7 @@ import {
 } from "@/lib/adaptive/prep-data-bundle";
 import {
   getDrillStateStorageKey,
+  getInterviewDateStorageKey,
   getLaunchpadStorageKey,
   getMockSessionStorageKey,
   getPrepNotesStorageKey,
@@ -39,6 +40,7 @@ export function PrepDataTools() {
     notes: getPrepNotesStorageKey(companyId, personaId),
     focusHistory: getFocusHistoryStorageKey(companyId, personaId),
     launchpad: getLaunchpadStorageKey(companyId, personaId),
+    interviewDate: getInterviewDateStorageKey(companyId, personaId),
   };
 
   function emitRefreshEvents() {
@@ -82,6 +84,11 @@ export function PrepDataTools() {
         detail: { key: keys.launchpad },
       })
     );
+    window.dispatchEvent(
+      new CustomEvent("adaptive-interview-date-updated", {
+        detail: { key: keys.interviewDate },
+      })
+    );
   }
 
   function getBundleJson() {
@@ -93,6 +100,7 @@ export function PrepDataTools() {
       prepGoalRaw: localStorage.getItem(keys.goals),
       prepNotesRaw: localStorage.getItem(keys.notes),
       focusHistoryRaw: localStorage.getItem(keys.focusHistory),
+      interviewDateRaw: localStorage.getItem(keys.interviewDate),
       launchpadStateRaw: localStorage.getItem(keys.launchpad),
       mockSessionRaw: localStorage.getItem(keys.mock),
       drillStateRaw: localStorage.getItem(keys.drills),
@@ -154,6 +162,11 @@ export function PrepDataTools() {
       localStorage.setItem(keys.drills, JSON.stringify(parsed.drillState));
       localStorage.setItem(keys.notes, parsed.prepNotes);
       localStorage.setItem(keys.focusHistory, JSON.stringify(parsed.focusHistory));
+      if (parsed.interviewDate) {
+        localStorage.setItem(keys.interviewDate, parsed.interviewDate);
+      } else {
+        localStorage.removeItem(keys.interviewDate);
+      }
       localStorage.setItem(keys.launchpad, JSON.stringify(parsed.launchpadState));
       if (parsed.mockSession) {
         localStorage.setItem(keys.mock, JSON.stringify(parsed.mockSession));
