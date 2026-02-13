@@ -124,6 +124,7 @@ lib/
 - **Focus presets** — One-click persona-specific focus-note presets to quickly retarget the narrative for each interviewer type.
 - **Focus-note memory** — Save and reuse recent focus notes per company/persona for faster iterative prep sessions.
 - **Mode health indicator** — Navbar status pill shows current readiness completion and latest mock score for selected mode.
+- **Interview countdown pill** — Navbar displays D-day countdown (or passed state) for the active company/persona interview date.
 - **Mode health status** — Indicator is risk-coded ("On track", "Building", "Needs reps", "Urgent") based on readiness, performance, and interview-date urgency.
 - **Preflight readiness score** — Weighted 0–100 score combining checklist progress, mock results, launchpad coverage, prep context, session recency, and interview-date urgency.
 - **Practice reminders** — Auto-generated next-step reminders (with due-by guidance) based on readiness, score, launchpad coverage, and interview-date proximity.

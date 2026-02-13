@@ -5,6 +5,7 @@ import { Check, Copy, Save, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { ModeHealthPill } from "./mode-health-pill";
+import { InterviewCountdownPill } from "./interview-countdown-pill";
 import {
   addFocusHistoryEntry,
   getFocusHistoryStorageKey,
@@ -127,6 +128,7 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
           Interview Mode
         </span>
         <ModeHealthPill />
+        <InterviewCountdownPill />
       </div>
 
       <select
