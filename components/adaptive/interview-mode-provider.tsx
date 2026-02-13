@@ -54,6 +54,7 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
   const [personaId, setPersonaIdState] = useState<string | null>(null);
   const [provider, setProvider] = useState<AIProvider>("openai");
   const [focusNote, setFocusNote] = useState("");
+  const [interviewDate, setInterviewDate] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
   const company = companyId ? getCompanyProfileById(companyId) ?? null : null;
@@ -114,8 +115,41 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
     setPersonaIdState(nextPersona);
     setProvider(nextProvider);
     setFocusNote(nextFocus);
+    setInterviewDate(urlInterviewDate);
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!hydrated || !companyId || !personaId) {
+      setInterviewDate(null);
+      return;
+    }
+    const key = getInterviewDateStorageKey(companyId, personaId);
+    function refreshDate() {
+      setInterviewDate(parseInterviewDate(localStorage.getItem(key)));
+    }
+
+    refreshDate();
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === key) refreshDate();
+    }
+
+    function onInterviewDateUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === key) refreshDate();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(
+        "adaptive-interview-date-updated",
+        onInterviewDateUpdate
+      );
+    };
+  }, [companyId, hydrated, personaId]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -150,11 +184,12 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
       params.delete("persona");
     }
     if (companyId && personaId) {
-      const interviewDate = parseInterviewDate(
+      const modeInterviewDate = parseInterviewDate(
         localStorage.getItem(getInterviewDateStorageKey(companyId, personaId))
       );
-      if (interviewDate) {
-        params.set("date", interviewDate);
+      const nextInterviewDate = interviewDate ?? modeInterviewDate;
+      if (nextInterviewDate) {
+        params.set("date", nextInterviewDate);
       } else {
         params.delete("date");
       }
@@ -182,7 +217,7 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
     } else {
       document.documentElement.removeAttribute("data-company-theme");
     }
-  }, [companyId, focusNote, hydrated, personaId, provider]);
+  }, [companyId, focusNote, hydrated, interviewDate, personaId, provider]);
 
   function setCompanyId(company: CompanyId | null) {
     if (!company) {
