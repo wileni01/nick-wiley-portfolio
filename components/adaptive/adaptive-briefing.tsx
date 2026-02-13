@@ -30,8 +30,15 @@ import {
 import type { InterviewModeResponse } from "@/lib/adaptive/types";
 
 export function AdaptiveBriefing() {
-  const { companyId, personaId, provider, company, persona, setCompanyId } =
-    useInterviewMode();
+  const {
+    companyId,
+    personaId,
+    provider,
+    focusNote,
+    company,
+    persona,
+    setCompanyId,
+  } = useInterviewMode();
   const [aiNarrative, setAiNarrative] = useState<string>("");
   const [narrativeSource, setNarrativeSource] = useState<"deterministic" | "ai">(
     "deterministic"
@@ -71,6 +78,7 @@ export function AdaptiveBriefing() {
             companyId,
             personaId,
             provider,
+            contextNote: focusNote || undefined,
           }),
           signal: controller.signal,
         });
@@ -103,7 +111,7 @@ export function AdaptiveBriefing() {
 
     void fetchNarrative();
     return () => controller.abort();
-  }, [companyId, deterministicNarrative, personaId, provider]);
+  }, [companyId, deterministicNarrative, focusNote, personaId, provider]);
 
   if (!bundle || !company || !persona) {
     return (
@@ -164,6 +172,13 @@ export function AdaptiveBriefing() {
         <p className="text-xs text-muted-foreground">
           Fallback used: {apiError}
         </p>
+      )}
+
+      {focusNote.trim() && (
+        <div className="rounded-lg border border-border bg-background p-3">
+          <p className="text-xs font-medium">Session focus note</p>
+          <p className="mt-1 text-xs text-muted-foreground">{focusNote}</p>
+        </div>
       )}
 
       <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">

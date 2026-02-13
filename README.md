@@ -120,6 +120,7 @@ lib/
 - **Guided tour** — A 60-second tour on the home page highlighting key sections.
 - **Dark mode** — System preference + manual toggle.
 - **Adaptive Interview Mode** — Company/persona-tailored recommendations and talking points (KUNGFU.AI + Anthropic CEO comparison), with adaptive theming and optional AI-enhanced interviewer briefings.
+- **Focus-note tuning** — Add an optional session focus note to steer recommendations, AI narrative, and exported prep packets.
 - **Mock interviewer script** — Role-specific practice questions with answer strategies and direct links to recommended portfolio artifacts.
 - **5-question mock session** — Interactive persona-specific practice flow with live local feedback on metrics, ownership, impact framing, and governance language.
 - **Exportable prep report** — Copy or download a plain-text mock-session report with scores, strengths, gaps, and coaching prompts.

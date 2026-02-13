@@ -25,7 +25,7 @@ import {
 } from "@/lib/adaptive/prep-history";
 
 export function PrepCockpitSummary() {
-  const { companyId, personaId, company, persona } = useInterviewMode();
+  const { companyId, personaId, focusNote, company, persona } = useInterviewMode();
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [downloadState, setDownloadState] = useState<"idle" | "done">("idle");
   const [packetState, setPacketState] = useState<"idle" | "done">("idle");
@@ -107,6 +107,7 @@ export function PrepCockpitSummary() {
     personaName: persona.name,
     personaRole: persona.role,
     personaGoal: recommendationBundle.persona.recommendationGoal,
+    focusNote,
     readiness: {
       completed: checklistCompletion.completedCount,
       total: checklistCompletion.total,
@@ -130,6 +131,7 @@ export function PrepCockpitSummary() {
     personaName: persona.name,
     personaRole: persona.role,
     personaGoal: recommendationBundle.persona.recommendationGoal,
+    focusNote,
     readiness: {
       completed: checklistCompletion.completedCount,
       total: checklistCompletion.total,

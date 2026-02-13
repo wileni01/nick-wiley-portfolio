@@ -20,12 +20,14 @@ interface InterviewModeContextValue {
   companyId: CompanyId | null;
   personaId: string | null;
   provider: AIProvider;
+  focusNote: string;
   company: CompanyProfile | null;
   persona: PersonaProfile | null;
   companies: CompanyProfile[];
   setCompanyId: (companyId: CompanyId | null) => void;
   setPersonaId: (personaId: string | null) => void;
   setProvider: (provider: AIProvider) => void;
+  setFocusNote: (focusNote: string) => void;
   resetMode: () => void;
 }
 
@@ -42,12 +44,14 @@ const STORAGE_KEYS = {
   companyId: "adaptive.companyId",
   personaId: "adaptive.personaId",
   provider: "adaptive.provider",
+  focusNote: "adaptive.focusNote",
 } as const;
 
 export function InterviewModeProvider({ children }: { children: ReactNode }) {
   const [companyId, setCompanyIdState] = useState<CompanyId | null>(null);
   const [personaId, setPersonaIdState] = useState<string | null>(null);
   const [provider, setProvider] = useState<AIProvider>("openai");
+  const [focusNote, setFocusNote] = useState("");
   const [hydrated, setHydrated] = useState(false);
 
   const company = companyId ? getCompanyProfileById(companyId) ?? null : null;
@@ -60,10 +64,12 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
     const urlCompany = params.get("company");
     const urlPersona = params.get("persona");
     const urlProvider = params.get("provider");
+    const urlFocus = params.get("focus");
 
     const storedCompany = localStorage.getItem(STORAGE_KEYS.companyId);
     const storedPersona = localStorage.getItem(STORAGE_KEYS.personaId);
     const storedProvider = localStorage.getItem(STORAGE_KEYS.provider);
+    const storedFocus = localStorage.getItem(STORAGE_KEYS.focusNote);
 
     const nextCompany = isCompanyId(urlCompany)
       ? urlCompany
@@ -89,9 +95,12 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
           ? storedProvider
           : "openai";
 
+    const nextFocus = (urlFocus ?? storedFocus ?? "").slice(0, 200);
+
     setCompanyIdState(nextCompany);
     setPersonaIdState(nextPersona);
     setProvider(nextProvider);
+    setFocusNote(nextFocus);
     setHydrated(true);
   }, []);
 
@@ -110,6 +119,11 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem(STORAGE_KEYS.personaId);
     }
     localStorage.setItem(STORAGE_KEYS.provider, provider);
+    if (focusNote.trim()) {
+      localStorage.setItem(STORAGE_KEYS.focusNote, focusNote.trim());
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.focusNote);
+    }
 
     const params = new URLSearchParams(window.location.search);
     if (companyId) {
@@ -123,6 +137,11 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
       params.delete("persona");
     }
     params.set("provider", provider);
+    if (focusNote.trim()) {
+      params.set("focus", focusNote.trim());
+    } else {
+      params.delete("focus");
+    }
 
     const nextQuery = params.toString();
     const nextUrl = nextQuery
@@ -138,7 +157,7 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
     } else {
       document.documentElement.removeAttribute("data-company-theme");
     }
-  }, [companyId, hydrated, personaId, provider]);
+  }, [companyId, focusNote, hydrated, personaId, provider]);
 
   function setCompanyId(company: CompanyId | null) {
     if (!company) {
@@ -170,18 +189,21 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
     setCompanyIdState(null);
     setPersonaIdState(null);
     setProvider("openai");
+    setFocusNote("");
   }
 
   const value: InterviewModeContextValue = {
     companyId,
     personaId,
     provider,
+    focusNote,
     company,
     persona,
     companies: companyProfiles,
     setCompanyId,
     setPersonaId,
     setProvider,
+    setFocusNote,
     resetMode,
   };
 

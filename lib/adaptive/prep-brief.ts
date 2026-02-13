@@ -4,6 +4,7 @@ export interface PrepBriefInput {
   personaName: string;
   personaRole: string;
   personaGoal: string;
+  focusNote?: string;
   readiness: {
     completed: number;
     total: number;
@@ -66,6 +67,9 @@ Generated: ${input.generatedAt}
 
 ## Role Focus
 ${input.personaGoal}
+
+## Session Focus Note
+${input.focusNote?.trim() ? input.focusNote : "No additional focus note set."}
 
 ## Readiness Snapshot
 - Checklist: ${input.readiness.completed}/${input.readiness.total} (${input.readiness.percentage}%)

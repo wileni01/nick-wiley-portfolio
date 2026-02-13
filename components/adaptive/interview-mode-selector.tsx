@@ -14,12 +14,14 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
     companyId,
     personaId,
     provider,
+    focusNote,
     company,
     persona,
     companies,
     setCompanyId,
     setPersonaId,
     setProvider,
+    setFocusNote,
     resetMode,
   } = useInterviewMode();
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
@@ -32,6 +34,9 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
       params.set("company", companyId);
       params.set("persona", personaId);
       params.set("provider", provider);
+      if (focusNote.trim()) {
+        params.set("focus", focusNote.trim());
+      }
 
       const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
       await navigator.clipboard.writeText(url);
@@ -105,6 +110,14 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
         <option value="openai">OpenAI brief</option>
         <option value="anthropic">Anthropic brief</option>
       </select>
+
+      <input
+        value={focusNote}
+        onChange={(event) => setFocusNote(event.target.value.slice(0, 200))}
+        placeholder="Optional focus note (e.g., emphasize platform scaling)"
+        className="h-8 min-w-56 rounded-md border border-border bg-background px-2 text-xs"
+        aria-label="Optional focus note"
+      />
 
       <Button
         size="sm"
