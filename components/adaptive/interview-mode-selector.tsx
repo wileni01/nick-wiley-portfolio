@@ -16,6 +16,7 @@ import {
   getInterviewDateSummary,
 } from "@/lib/adaptive/interview-date";
 import { setInterviewDateOffsetForMode } from "@/lib/adaptive/interview-date-actions";
+import { copyTextToClipboard } from "@/lib/clipboard";
 
 function formatFocusChipLabel(text: string): string {
   return text.length > 48 ? `${text.slice(0, 47)}…` : text;
@@ -103,8 +104,8 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
       }
 
       const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
-      await navigator.clipboard.writeText(url);
-      setCopyState("copied");
+      const copied = await copyTextToClipboard(url);
+      setCopyState(copied ? "copied" : "error");
     } catch {
       setCopyState("error");
     } finally {

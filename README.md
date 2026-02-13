@@ -121,6 +121,7 @@ lib/
 - **Dark mode** — System preference + manual toggle.
 - **Adaptive Interview Mode** — Company/persona-tailored recommendations and talking points (KUNGFU.AI + Anthropic CEO comparison), with adaptive theming and optional AI-enhanced interviewer briefings.
 - **Shareable prep links** — Copy mode links that preserve company, persona, provider, focus note, and interview date context, with live URL sync as mode/date changes and inline copy-failure feedback.
+- **Clipboard copy resilience** — Copy actions for prep links, mock scripts/reports, and prep briefs use primary clipboard APIs with a legacy fallback path for wider browser compatibility.
 - **Focus-note tuning** — Add an optional session focus note to steer recommendations, AI narrative, and exported prep packets.
 - **Focus presets** — One-click persona-specific focus-note presets to quickly retarget the narrative for each interviewer type.
 - **Focus-note memory** — Save and reuse recent focus notes per company/persona for faster iterative prep sessions.

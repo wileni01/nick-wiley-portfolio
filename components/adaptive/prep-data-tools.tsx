@@ -22,6 +22,7 @@ import {
   getPrepNotesStorageKey,
 } from "@/lib/adaptive/storage-keys";
 import { getFocusHistoryStorageKey } from "@/lib/adaptive/focus-history";
+import { copyTextToClipboard } from "@/lib/clipboard";
 
 type StatusTone = "neutral" | "error" | "success";
 const CROSS_MODE_IMPORT_CONFIRM_MS = 10000;
@@ -153,7 +154,12 @@ export function PrepDataTools() {
     setPendingImport(null);
     setPendingImportTargetKey(null);
     try {
-      await navigator.clipboard.writeText(getBundleJson());
+      const copied = await copyTextToClipboard(getBundleJson());
+      if (!copied) {
+        setTone("error");
+        setStatus("Could not copy to clipboard.");
+        return;
+      }
       setTone("success");
       setStatus("Prep data copied to clipboard.");
     } catch {

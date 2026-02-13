@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { buildMockInterviewerScript } from "@/lib/adaptive/mock-interviewer";
 import { buildMockScriptMarkdown } from "@/lib/adaptive/mock-script-export";
+import { copyTextToClipboard } from "@/lib/clipboard";
 
 export function MockInterviewerScript() {
   const { companyId, personaId, company, persona } = useInterviewMode();
@@ -32,8 +33,8 @@ export function MockInterviewerScript() {
 
   async function copyScript() {
     try {
-      await navigator.clipboard.writeText(scriptMarkdown);
-      setCopyState("copied");
+      const copied = await copyTextToClipboard(scriptMarkdown);
+      setCopyState(copied ? "copied" : "error");
     } catch {
       setCopyState("error");
     } finally {

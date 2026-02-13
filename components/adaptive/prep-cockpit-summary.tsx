@@ -36,6 +36,7 @@ import {
   getLaunchpadStorageKey,
   getPrepNotesStorageKey,
 } from "@/lib/adaptive/storage-keys";
+import { copyTextToClipboard } from "@/lib/clipboard";
 
 export function PrepCockpitSummary() {
   const { companyId, personaId, focusNote, company, persona } = useInterviewMode();
@@ -282,8 +283,8 @@ export function PrepCockpitSummary() {
 
   async function copyPrepSnapshot() {
     try {
-      await navigator.clipboard.writeText(prepBriefMarkdown);
-      setCopyState("copied");
+      const copied = await copyTextToClipboard(prepBriefMarkdown);
+      setCopyState(copied ? "copied" : "error");
     } catch {
       setCopyState("error");
     } finally {

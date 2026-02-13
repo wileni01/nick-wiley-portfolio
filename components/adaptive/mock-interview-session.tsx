@@ -33,6 +33,7 @@ import {
 } from "@/lib/adaptive/prep-history";
 import { getMockSessionStorageKey } from "@/lib/adaptive/storage-keys";
 import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
+import { copyTextToClipboard } from "@/lib/clipboard";
 
 interface SessionQuestion {
   question: string;
@@ -496,8 +497,8 @@ export function MockInterviewSession() {
 
   async function copyReport() {
     try {
-      await navigator.clipboard.writeText(reportText);
-      setCopyState("copied");
+      const copied = await copyTextToClipboard(reportText);
+      setCopyState(copied ? "copied" : "error");
     } catch {
       setCopyState("error");
     } finally {
