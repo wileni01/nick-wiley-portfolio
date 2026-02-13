@@ -2,7 +2,15 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, ChevronLeft, ChevronRight, Timer } from "lucide-react";
+import {
+  Check,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Download,
+  Timer,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,6 +48,7 @@ export function MockInterviewSession() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [completed, setCompleted] = useState(false);
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
 
   const script = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -55,6 +64,44 @@ export function MockInterviewSession() {
   const currentAnswer = answers[currentIndex] ?? "";
   const currentFeedback = evaluateMockAnswer(currentAnswer);
   const report = evaluateMockSession(answers.slice(0, sessionQuestions.length));
+  const reportText = useMemo(() => {
+    const timestamp = new Date().toISOString();
+    const header = [
+      "Nick Wiley Interview Prep Report",
+      `Generated: ${timestamp}`,
+      `Mode: ${companyId ?? "general"} / ${personaId ?? "persona-not-set"}`,
+      `Session: ${script.heading}`,
+      `Average score: ${report.averageScore}/100`,
+      "",
+    ];
+
+    const questionSections = sessionQuestions.map((question, index) => {
+      const answer = answers[index]?.trim() || "(no answer recorded)";
+      const feedback = report.feedbackByQuestion[index];
+      const strengths = feedback?.strengths.length
+        ? feedback.strengths.map((strength) => `  - ${strength}`).join("\n")
+        : "  - None captured";
+      const gaps = feedback?.gaps.length
+        ? feedback.gaps.map((gap) => `  - ${gap}`).join("\n")
+        : "  - None captured";
+
+      return [
+        `Q${index + 1}: ${question.question}`,
+        `Testing: ${question.whatTheyAreTesting}`,
+        `Score: ${feedback?.score ?? 0}/100`,
+        "Answer:",
+        answer,
+        "Strengths:",
+        strengths,
+        "Gaps:",
+        gaps,
+        `Coaching: ${feedback?.coachingPrompt ?? "N/A"}`,
+        "",
+      ].join("\n");
+    });
+
+    return [...header, ...questionSections].join("\n");
+  }, [answers, companyId, personaId, report, script.heading, sessionQuestions]);
 
   function startSession() {
     setAnswers(Array.from({ length: sessionQuestions.length }, () => ""));
@@ -89,6 +136,30 @@ export function MockInterviewSession() {
     setCompleted(false);
     setCurrentIndex(0);
     setAnswers([]);
+    setCopyState("idle");
+  }
+
+  async function copyReport() {
+    try {
+      await navigator.clipboard.writeText(reportText);
+      setCopyState("copied");
+    } catch {
+      setCopyState("error");
+    } finally {
+      setTimeout(() => setCopyState("idle"), 1800);
+    }
+  }
+
+  function downloadReport() {
+    const blob = new Blob([reportText], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const safeCompany = (companyId ?? "general").replace(/[^a-z0-9-]/gi, "-");
+    const safePersona = (personaId ?? "persona").replace(/[^a-z0-9-]/gi, "-");
+    link.href = url;
+    link.download = `interview-prep-${safeCompany}-${safePersona}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   if (!script || !sessionQuestions.length) return null;
@@ -152,9 +223,33 @@ export function MockInterviewSession() {
           </p>
         </div>
 
-        <Button size="sm" variant="outline" onClick={resetSession}>
-          Run again
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={resetSession}>
+            Run again
+          </Button>
+          <Button size="sm" variant="ghost" onClick={copyReport}>
+            {copyState === "copied" ? (
+              <>
+                <Check className="h-3.5 w-3.5" />
+                Copied report
+              </>
+            ) : (
+              <>
+                <Copy className="h-3.5 w-3.5" />
+                Copy report
+              </>
+            )}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={downloadReport}>
+            <Download className="h-3.5 w-3.5" />
+            Download report
+          </Button>
+        </div>
+        {copyState === "error" && (
+          <p className="text-xs text-muted-foreground">
+            Could not copy automatically. Use the download option instead.
+          </p>
+        )}
       </div>
     );
   }
