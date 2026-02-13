@@ -117,6 +117,9 @@ export function MockInterviewSession() {
   const [copyState, setCopyState] = useTransientState<
     "idle" | "copied" | "error"
   >("idle", 1800);
+  const [downloadState, setDownloadState] = useTransientState<
+    "idle" | "done" | "error"
+  >("idle", 1800);
   const [loadedFromDraft, setLoadedFromDraft] = useState(false);
   const [timerDuration, setTimerDuration] = useState(90);
   const [timerRemaining, setTimerRemaining] = useState(90);
@@ -478,6 +481,7 @@ export function MockInterviewSession() {
     setConfidences([]);
     setQuestionOrder([]);
     setCopyState("idle");
+    setDownloadState("idle");
     setLoadedFromDraft(false);
     setTimerRunning(false);
     setTimerRemaining(timerDuration);
@@ -507,7 +511,7 @@ export function MockInterviewSession() {
   }
 
   function downloadReport() {
-    triggerDownload({
+    const downloaded = triggerDownload({
       content: reportText,
       mimeType: "text/plain;charset=utf-8",
       filename: `interview-prep-${sanitizeFileToken(
@@ -515,6 +519,7 @@ export function MockInterviewSession() {
         "general"
       )}-${sanitizeFileToken(personaId, "persona")}.txt`,
     });
+    setDownloadState(downloaded ? "done" : "error");
   }
 
   if (!script || !sessionQuestions.length) return null;
@@ -700,13 +705,33 @@ export function MockInterviewSession() {
             )}
           </Button>
           <Button size="sm" variant="ghost" onClick={downloadReport}>
-            <Download className="h-3.5 w-3.5" />
-            Download report
+            {downloadState === "done" ? (
+              <>
+                <Check className="h-3.5 w-3.5" />
+                Downloaded report
+              </>
+            ) : downloadState === "error" ? (
+              <>
+                <Download className="h-3.5 w-3.5" />
+                Download failed
+              </>
+            ) : (
+              <>
+                <Download className="h-3.5 w-3.5" />
+                Download report
+              </>
+            )}
           </Button>
         </div>
         {copyState === "error" && (
           <p className="text-xs text-muted-foreground">
             Could not copy automatically. Use the download option instead.
+          </p>
+        )}
+        {downloadState === "error" && (
+          <p className="text-xs text-muted-foreground">
+            Could not start download automatically. Try again after interacting with
+            the page.
           </p>
         )}
         <p className="text-xs text-muted-foreground">

@@ -139,7 +139,7 @@ lib/
 - **Mock script export** — Copy/download persona-specific interviewer scripts as Markdown for offline rehearsal.
 - **5-question mock session** — Interactive persona-specific practice flow with live local feedback on metrics, ownership, impact framing, governance language, and interview-date timeline guidance.
 - **Live answer timer + pressure mode** — Built-in 60/90/120-second timer with optional pressure mode that locks 60-second responses and randomizes non-warmup prompt order.
-- **Exportable prep report** — Copy or download a plain-text mock-session report with scores, strengths, gaps, and coaching prompts.
+- **Exportable prep report** — Copy or download a plain-text mock-session report with scores, strengths, gaps, and coaching prompts, with inline feedback when downloads fail.
 - **Session autosave** — Mock interview drafts persist locally per company/persona with sanitized restore handling, so you can continue prep later.
 - **Pacing + coaching themes** — Mock mode estimates speaking time per answer and surfaces recurring improvement themes at session completion.
 - **Readiness checklist** — Persona-aware prep checklist with local progress tracking and completion percentage.
