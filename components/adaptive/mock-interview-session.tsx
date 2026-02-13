@@ -54,6 +54,32 @@ function getSessionStorageKey(companyId: string, personaId: string) {
   return `adaptive.mock-session.${companyId}.${personaId}`;
 }
 
+function countWords(text: string): number {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).length;
+}
+
+function estimateSpeechSeconds(wordCount: number, wordsPerMinute = 140): number {
+  if (!wordCount) return 0;
+  return Math.round((wordCount / wordsPerMinute) * 60);
+}
+
+function mapGapToTheme(gap: string): string {
+  const normalized = gap.toLowerCase();
+  if (normalized.includes("metric")) return "Add concrete metrics";
+  if (normalized.includes("ownership") || normalized.includes("verbs")) {
+    return "Use stronger ownership language";
+  }
+  if (normalized.includes("impact") || normalized.includes("outcome")) {
+    return "Close with clearer impact";
+  }
+  if (normalized.includes("governance") || normalized.includes("safety")) {
+    return "Include governance and safety framing";
+  }
+  return "Add structured detail";
+}
+
 export function MockInterviewSession() {
   const { companyId, personaId } = useInterviewMode();
   const [started, setStarted] = useState(false);
@@ -76,7 +102,22 @@ export function MockInterviewSession() {
   const currentQuestion = sessionQuestions[currentIndex];
   const currentAnswer = answers[currentIndex] ?? "";
   const currentFeedback = evaluateMockAnswer(currentAnswer);
+  const currentWordCount = countWords(currentAnswer);
+  const currentSpeechSeconds = estimateSpeechSeconds(currentWordCount);
   const report = evaluateMockSession(answers.slice(0, sessionQuestions.length));
+  const coachingThemes = useMemo(() => {
+    const counts = new Map<string, number>();
+    report.feedbackByQuestion.forEach((feedback) => {
+      feedback.gaps.forEach((gap) => {
+        const theme = mapGapToTheme(gap);
+        counts.set(theme, (counts.get(theme) ?? 0) + 1);
+      });
+    });
+
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+  }, [report.feedbackByQuestion]);
   const reportText = useMemo(() => {
     const timestamp = new Date().toISOString();
     const header = [
@@ -306,6 +347,23 @@ export function MockInterviewSession() {
           </p>
         </div>
 
+        <div className="rounded-md border border-border bg-background p-3 space-y-2">
+          <p className="text-xs font-medium">Priority coaching themes</p>
+          {coachingThemes.length ? (
+            <ul className="space-y-1">
+              {coachingThemes.map(([theme, count]) => (
+                <li key={theme} className="text-xs text-muted-foreground">
+                  • {theme} ({count} prompt{count > 1 ? "s" : ""})
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Great baseline. Keep polishing concise impact statements.
+            </p>
+          )}
+        </div>
+
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="outline" onClick={resetSession}>
             Run again
@@ -384,6 +442,17 @@ export function MockInterviewSession() {
           placeholder="Write your spoken answer draft here..."
           maxLength={3000}
         />
+      </div>
+
+      <div className="rounded-md border border-border bg-background p-3 space-y-1">
+        <p className="text-xs font-medium">Answer pacing</p>
+        <p className="text-xs text-muted-foreground">
+          Word count: {currentWordCount} · Estimated speaking time:{" "}
+          {currentSpeechSeconds}s at ~140 wpm
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Target: ~45–90 seconds for most answers.
+        </p>
       </div>
 
       <div className="rounded-md border border-border bg-background p-3 space-y-2">
