@@ -13,10 +13,51 @@ interface BuildNextActionsInput {
   latestConfidence: number | null;
   latestThemes: string[];
   topResourceTitle?: string;
+  latestSessionTimestamp?: string | null;
+  interviewDate?: string | null;
+}
+
+function getDaysUntilInterview(interviewDate: string | null | undefined): number | null {
+  if (!interviewDate) return null;
+  const date = new Date(interviewDate);
+  if (Number.isNaN(date.getTime())) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  date.setHours(0, 0, 0, 0);
+  const diffMs = date.getTime() - today.getTime();
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+function getSessionRecencyDays(timestamp: string | null | undefined): number | null {
+  if (!timestamp) return null;
+  const parsed = new Date(timestamp);
+  if (Number.isNaN(parsed.getTime())) return null;
+  const diffMs = Date.now() - parsed.getTime();
+  if (diffMs < 0) return 0;
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24));
 }
 
 export function buildNextActions(input: BuildNextActionsInput): NextAction[] {
   const actions: NextAction[] = [];
+  const daysUntilInterview = getDaysUntilInterview(input.interviewDate);
+  const recencyDays = getSessionRecencyDays(input.latestSessionTimestamp);
+
+  if (daysUntilInterview !== null && daysUntilInterview >= 0 && daysUntilInterview <= 2) {
+    actions.push({
+      id: "interview-countdown",
+      priority: "high",
+      title:
+        daysUntilInterview === 0
+          ? "Interview day: run final confidence loop"
+          : `Interview in ${daysUntilInterview} day${
+              daysUntilInterview === 1 ? "" : "s"
+            }: run final simulation`,
+      detail:
+        recencyDays === null || recencyDays > 2
+          ? "Complete one full pressure-mode session now, then tighten your opening and closing statements."
+          : "Run one focused rehearsal on your weakest answer and refresh your top two artifacts.",
+    });
+  }
 
   if (input.readinessPct < 60) {
     actions.push({

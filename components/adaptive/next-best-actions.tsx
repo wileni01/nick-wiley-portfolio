@@ -16,6 +16,11 @@ import {
   parsePrepHistory,
 } from "@/lib/adaptive/prep-history";
 import { buildNextActions } from "@/lib/adaptive/next-actions";
+import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
+import {
+  getInterviewDateSummary,
+  parseInterviewDate,
+} from "@/lib/adaptive/interview-date";
 
 function getPriorityStyle(priority: "high" | "medium" | "low") {
   if (priority === "high") {
@@ -46,6 +51,10 @@ export function NextBestActions() {
   const [historyScore, setHistoryScore] = useState<number | null>(null);
   const [historyConfidence, setHistoryConfidence] = useState<number | null>(null);
   const [historyThemes, setHistoryThemes] = useState<string[]>([]);
+  const [latestSessionTimestamp, setLatestSessionTimestamp] = useState<string | null>(
+    null
+  );
+  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   const bundle = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -58,6 +67,10 @@ export function NextBestActions() {
     const activePersonaId = personaId;
     const readinessKey = getReadinessStorageKey(activeCompanyId, activePersonaId);
     const historyKey = getPrepHistoryStorageKey(activeCompanyId, activePersonaId);
+    const interviewDateKey = getInterviewDateStorageKey(
+      activeCompanyId,
+      activePersonaId
+    );
 
     function refresh() {
       const checklistItems = getReadinessChecklist(activeCompanyId, activePersonaId);
@@ -73,12 +86,18 @@ export function NextBestActions() {
       setHistoryScore(history[0]?.averageScore ?? null);
       setHistoryConfidence(history[0]?.averageConfidence ?? null);
       setHistoryThemes(history[0]?.topThemes ?? []);
+      setLatestSessionTimestamp(history[0]?.timestamp ?? null);
+      setInterviewDate(parseInterviewDate(localStorage.getItem(interviewDateKey)));
     }
 
     refresh();
 
     function onStorage(event: StorageEvent) {
-      if (event.key === readinessKey || event.key === historyKey) {
+      if (
+        event.key === readinessKey ||
+        event.key === historyKey ||
+        event.key === interviewDateKey
+      ) {
         refresh();
       }
     }
@@ -93,15 +112,25 @@ export function NextBestActions() {
       if (detail?.key === historyKey) refresh();
     }
 
+    function onInterviewDateUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === interviewDateKey) refresh();
+    }
+
     window.addEventListener("storage", onStorage);
     window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
     window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
+    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("adaptive-readiness-updated", onReadinessUpdate);
       window.removeEventListener(
         "adaptive-prep-history-updated",
         onPrepHistoryUpdate
+      );
+      window.removeEventListener(
+        "adaptive-interview-date-updated",
+        onInterviewDateUpdate
       );
     };
   }, [companyId, personaId]);
@@ -116,13 +145,21 @@ export function NextBestActions() {
     latestConfidence: historyConfidence,
     latestThemes: historyThemes,
     topResourceTitle: bundle.topRecommendations[0]?.asset.title,
+    latestSessionTimestamp,
+    interviewDate,
   });
+  const interviewDateSummary = getInterviewDateSummary(interviewDate);
 
   return (
     <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold">Next best actions</h3>
-        <Badge variant="outline">{actions.length} action(s)</Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline">{actions.length} action(s)</Badge>
+          <Badge variant="muted" className="text-[10px]">
+            {interviewDateSummary.label}
+          </Badge>
+        </div>
       </div>
 
       <ul className="space-y-2">

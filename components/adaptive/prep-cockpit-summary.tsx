@@ -257,6 +257,8 @@ export function PrepCockpitSummary() {
       latestConfidence,
       latestThemes,
       topResourceTitle: recommendationBundle.topRecommendations[0]?.asset.title,
+      latestSessionTimestamp,
+      interviewDate,
     }),
     drills: buildTargetedDrills({ themes: latestThemes }),
     dayPlan: buildInterviewDayPlan(companyId, personaId),

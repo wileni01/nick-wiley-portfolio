@@ -124,7 +124,7 @@ lib/
 - **Focus presets** — One-click persona-specific focus-note presets to quickly retarget the narrative for each interviewer type.
 - **Focus-note memory** — Save and reuse recent focus notes per company/persona for faster iterative prep sessions.
 - **Mode health indicator** — Navbar status pill shows current readiness completion and latest mock score for selected mode.
-- **Mode health status** — Indicator is risk-coded ("On track", "Building", "Needs reps") based on readiness + latest score.
+- **Mode health status** — Indicator is risk-coded ("On track", "Building", "Needs reps", "Urgent") based on readiness, performance, and interview-date urgency.
 - **Preflight readiness score** — Weighted 0–100 score combining checklist progress, mock results, launchpad coverage, prep context, session recency, and interview-date urgency.
 - **Practice reminders** — Auto-generated next-step reminders (with due-by guidance) based on readiness, score, launchpad coverage, and interview-date proximity.
 - **Readiness gap panel** — Surfaces outstanding checklist and unopened resource gaps with direct remediation actions.
@@ -143,6 +143,7 @@ lib/
 - **Mode comparison panel** — Side-by-side view of current vs alternate company mode with top resources and one-click switching.
 - **Resource launchpad** — Track and open top recommended artifacts with per-mode completion progress and bulk open/mark actions.
 - **Next best actions** — Dynamic, priority-ranked guidance based on readiness, latest mock outcomes, and confidence calibration.
+- **Timeline-aware action guidance** — Next-best-actions now escalates countdown priorities when the interview date is within 48 hours.
 - **Targeted drills** — Theme-driven micro-exercises generated from your latest coaching gaps, with local completion tracking.
 - **Prep cadence tracking** — Weekly session target + streak tracking to keep interview practice consistent.
 - **Prep data tools** — Export/import/reset local prep state (JSON), including notes, focus history, and interview date, per company/persona mode.
