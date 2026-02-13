@@ -26,6 +26,7 @@ export function PrepCockpitSummary() {
     total: 0,
   });
   const [latestScore, setLatestScore] = useState<number | null>(null);
+  const [latestConfidence, setLatestConfidence] = useState<number | null>(null);
 
   const recommendationBundle = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -50,6 +51,7 @@ export function PrepCockpitSummary() {
 
       const history = parsePrepHistory(localStorage.getItem(historyKey));
       setLatestScore(history[0]?.averageScore ?? null);
+      setLatestConfidence(history[0]?.averageConfidence ?? null);
     }
 
     refresh();
@@ -101,6 +103,9 @@ export function PrepCockpitSummary() {
       `Persona: ${persona.name} (${persona.role})`,
       `Readiness: ${checklistCompletion.completedCount}/${checklistCompletion.total} items (${checklistCompletion.completionPct}%)`,
       `Latest mock-session score: ${latestScore ?? "N/A"}`,
+      `Latest confidence rating: ${
+        latestConfidence !== null ? `${latestConfidence}/5` : "N/A"
+      }`,
       "",
       "Top resources to open first:",
       topAssets,
@@ -129,7 +134,7 @@ export function PrepCockpitSummary() {
         <Badge variant="outline">{company.name}</Badge>
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-md border border-border bg-background p-2">
           <p className="text-[11px] text-muted-foreground">Persona</p>
           <p className="text-xs font-medium">{persona.role}</p>
@@ -145,6 +150,12 @@ export function PrepCockpitSummary() {
           <p className="text-[11px] text-muted-foreground">Latest session</p>
           <p className="text-xs font-medium">
             {latestScore !== null ? `${latestScore}/100` : "Not started"}
+          </p>
+        </div>
+        <div className="rounded-md border border-border bg-background p-2">
+          <p className="text-[11px] text-muted-foreground">Confidence</p>
+          <p className="text-xs font-medium">
+            {latestConfidence !== null ? `${latestConfidence}/5` : "N/A"}
           </p>
         </div>
       </div>

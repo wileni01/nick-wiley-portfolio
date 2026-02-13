@@ -2,6 +2,7 @@ export interface PrepSessionSnapshot {
   id: string;
   timestamp: string;
   averageScore: number;
+  averageConfidence?: number | null;
   answerCount: number;
   topThemes: string[];
 }
@@ -18,14 +19,22 @@ export function parsePrepHistory(raw: string | null): PrepSessionSnapshot[] {
   try {
     const parsed = JSON.parse(raw) as PrepSessionSnapshot[];
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (entry) =>
+    return parsed
+      .filter(
+        (entry) =>
         typeof entry?.id === "string" &&
         typeof entry?.timestamp === "string" &&
         typeof entry?.averageScore === "number" &&
         typeof entry?.answerCount === "number" &&
         Array.isArray(entry?.topThemes)
-    );
+      )
+      .map((entry) => ({
+        ...entry,
+        averageConfidence:
+          typeof entry.averageConfidence === "number"
+            ? entry.averageConfidence
+            : null,
+      }));
   } catch {
     return [];
   }

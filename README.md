@@ -127,6 +127,7 @@ lib/
 - **Pacing + coaching themes** — Mock mode estimates speaking time per answer and surfaces recurring improvement themes at session completion.
 - **Readiness checklist** — Persona-aware prep checklist with local progress tracking and completion percentage.
 - **Prep insights dashboard** — Tracks session history, latest/best scores, trend, and recurring coaching themes per company/persona.
+- **Confidence calibration** — Mock sessions capture self-rated confidence and compare it with performance trends.
 - **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, and top resources.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.

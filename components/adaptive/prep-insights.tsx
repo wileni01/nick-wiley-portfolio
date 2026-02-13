@@ -80,6 +80,11 @@ export function PrepInsights() {
 
   const trendValue =
     latest && previous ? latest.averageScore - previous.averageScore : 0;
+  const latestConfidence = latest?.averageConfidence ?? null;
+  const confidenceCalibration =
+    latestConfidence !== null && latest
+      ? Number((latest.averageScore / 20 - latestConfidence).toFixed(1))
+      : null;
 
   const recurringThemes = (() => {
     const counts = new Map<string, number>();
@@ -107,7 +112,7 @@ export function PrepInsights() {
         </p>
       ) : (
         <>
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-md border border-border bg-background p-2">
               <p className="text-[11px] text-muted-foreground">Latest score</p>
               <p className="text-sm font-semibold">{latest?.averageScore ?? 0}/100</p>
@@ -127,6 +132,18 @@ export function PrepInsights() {
                 {previous ? `${trendValue >= 0 ? "+" : ""}${trendValue}` : "N/A"}
               </p>
             </div>
+            <div className="rounded-md border border-border bg-background p-2">
+              <p className="text-[11px] text-muted-foreground">Confidence</p>
+              <p className="text-sm font-semibold">
+                {latestConfidence !== null ? `${latestConfidence}/5` : "N/A"}
+              </p>
+              {confidenceCalibration !== null && (
+                <p className="text-[11px] text-muted-foreground">
+                  Calibration: {confidenceCalibration >= 0 ? "+" : ""}
+                  {confidenceCalibration}
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -140,7 +157,13 @@ export function PrepInsights() {
                   <span className="text-muted-foreground">
                     {formatDateLabel(entry.timestamp)}
                   </span>
-                  <span className="font-medium">{entry.averageScore}/100</span>
+                  <span className="font-medium">
+                    {entry.averageScore}/100
+                    {entry.averageConfidence !== null &&
+                    entry.averageConfidence !== undefined
+                      ? ` · C${entry.averageConfidence}`
+                      : ""}
+                  </span>
                 </li>
               ))}
             </ul>

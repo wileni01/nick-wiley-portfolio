@@ -51,6 +51,7 @@ const warmupQuestion: SessionQuestion = {
 
 interface PersistedMockSession {
   answers: string[];
+  confidences: number[];
   currentIndex: number;
   completed: boolean;
   started: boolean;
@@ -77,6 +78,7 @@ export function MockInterviewSession() {
   const [started, setStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
+  const [confidences, setConfidences] = useState<number[]>([]);
   const [completed, setCompleted] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [loadedFromDraft, setLoadedFromDraft] = useState(false);
@@ -93,6 +95,7 @@ export function MockInterviewSession() {
 
   const currentQuestion = sessionQuestions[currentIndex];
   const currentAnswer = answers[currentIndex] ?? "";
+  const currentConfidence = confidences[currentIndex] ?? 3;
   const currentFeedback = evaluateMockAnswer(currentAnswer);
   const currentWordCount = countWords(currentAnswer);
   const currentSpeechSeconds = estimateSpeechSeconds(currentWordCount);
@@ -108,6 +111,14 @@ export function MockInterviewSession() {
       `Mode: ${companyId ?? "general"} / ${personaId ?? "persona-not-set"}`,
       `Session: ${script.heading}`,
       `Average score: ${report.averageScore}/100`,
+      `Average confidence: ${
+        confidences.length
+          ? (
+              confidences.reduce((sum, confidence) => sum + confidence, 0) /
+              confidences.length
+            ).toFixed(1)
+          : "N/A"
+      }/5`,
       "",
     ];
 
@@ -125,6 +136,7 @@ export function MockInterviewSession() {
         `Q${index + 1}: ${question.question}`,
         `Testing: ${question.whatTheyAreTesting}`,
         `Score: ${feedback?.score ?? 0}/100`,
+        `Confidence: ${confidences[index] ?? 3}/5`,
         "Answer:",
         answer,
         "Strengths:",
@@ -137,7 +149,15 @@ export function MockInterviewSession() {
     });
 
     return [...header, ...questionSections].join("\n");
-  }, [answers, companyId, personaId, report, script.heading, sessionQuestions]);
+  }, [
+    answers,
+    companyId,
+    confidences,
+    personaId,
+    report,
+    script.heading,
+    sessionQuestions,
+  ]);
 
   useEffect(() => {
     if (!companyId || !personaId || !sessionQuestions.length) return;
@@ -151,14 +171,29 @@ export function MockInterviewSession() {
         { length: sessionQuestions.length },
         (_, index) => stored.answers[index] ?? ""
       );
+      const normalizedConfidences = Array.from(
+        { length: sessionQuestions.length },
+        (_, index) => {
+          const confidence = stored.confidences?.[index];
+          if (typeof confidence !== "number") return 3;
+          return Math.min(5, Math.max(1, Math.round(confidence)));
+        }
+      );
 
       setAnswers(normalizedAnswers);
+      setConfidences(normalizedConfidences);
       setCurrentIndex(
         Math.max(0, Math.min(stored.currentIndex ?? 0, sessionQuestions.length - 1))
       );
       setCompleted(Boolean(stored.completed));
       setStarted(Boolean(stored.started));
-      setLoadedFromDraft(Boolean(stored.started || stored.answers.some(Boolean)));
+      setLoadedFromDraft(
+        Boolean(
+          stored.started ||
+            stored.answers.some(Boolean) ||
+            stored.confidences?.some((confidence) => confidence !== 3)
+        )
+      );
     } catch {
       localStorage.removeItem(getSessionStorageKey(companyId, personaId));
     }
@@ -167,13 +202,18 @@ export function MockInterviewSession() {
   useEffect(() => {
     if (!companyId || !personaId) return;
 
-    if (!started && answers.every((answer) => !answer.trim())) {
+    if (
+      !started &&
+      answers.every((answer) => !answer.trim()) &&
+      confidences.every((confidence) => confidence === 3)
+    ) {
       localStorage.removeItem(getSessionStorageKey(companyId, personaId));
       return;
     }
 
     const payload: PersistedMockSession = {
       answers,
+      confidences,
       currentIndex,
       completed,
       started,
@@ -184,10 +224,19 @@ export function MockInterviewSession() {
       getSessionStorageKey(companyId, personaId),
       JSON.stringify(payload)
     );
-  }, [answers, companyId, completed, currentIndex, personaId, started]);
+  }, [
+    answers,
+    companyId,
+    completed,
+    confidences,
+    currentIndex,
+    personaId,
+    started,
+  ]);
 
   function startSession() {
     setAnswers(Array.from({ length: sessionQuestions.length }, () => ""));
+    setConfidences(Array.from({ length: sessionQuestions.length }, () => 3));
     setCurrentIndex(0);
     setCompleted(false);
     setStarted(true);
@@ -198,6 +247,14 @@ export function MockInterviewSession() {
     setAnswers((prev) => {
       const next = [...prev];
       next[currentIndex] = nextValue;
+      return next;
+    });
+  }
+
+  function updateCurrentConfidence(nextConfidence: number) {
+    setConfidences((prev) => {
+      const next = [...prev];
+      next[currentIndex] = nextConfidence;
       return next;
     });
   }
@@ -221,6 +278,14 @@ export function MockInterviewSession() {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         timestamp: new Date().toISOString(),
         averageScore: report.averageScore,
+        averageConfidence: confidences.length
+          ? Number(
+              (
+                confidences.reduce((sum, confidence) => sum + confidence, 0) /
+                confidences.length
+              ).toFixed(1)
+            )
+          : null,
         answerCount: report.answerCount,
         topThemes,
       };
@@ -249,6 +314,7 @@ export function MockInterviewSession() {
     setCompleted(false);
     setCurrentIndex(0);
     setAnswers([]);
+    setConfidences([]);
     setCopyState("idle");
     setLoadedFromDraft(false);
   }
@@ -322,8 +388,20 @@ export function MockInterviewSession() {
             <CheckCircle2 className="h-4 w-4 text-primary" />
             Session complete
           </h3>
-          <Badge variant="outline">Average score: {report.averageScore}/100</Badge>
+          <Badge variant="outline">
+            Average score: {report.averageScore}/100
+          </Badge>
         </div>
+        <p className="text-xs text-muted-foreground">
+          Average confidence:{" "}
+          {confidences.length
+            ? (
+                confidences.reduce((sum, confidence) => sum + confidence, 0) /
+                confidences.length
+              ).toFixed(1)
+            : "N/A"}
+          /5
+        </p>
 
         <div className="space-y-3">
           {sessionQuestions.map((question, index) => {
@@ -335,6 +413,9 @@ export function MockInterviewSession() {
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Score: {feedback?.score ?? 0}/100
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Confidence: {confidences[index] ?? 3}/5
                 </p>
                 {feedback?.gaps.length ? (
                   <p className="mt-1 text-xs text-muted-foreground">
@@ -460,6 +541,30 @@ export function MockInterviewSession() {
         </p>
         <p className="text-xs text-muted-foreground">
           Target: ~45–90 seconds for most answers.
+        </p>
+      </div>
+
+      <div className="rounded-md border border-border bg-background p-3 space-y-2">
+        <p className="text-xs font-medium">Confidence rating</p>
+        <div className="flex flex-wrap gap-1.5">
+          {[1, 2, 3, 4, 5].map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => updateCurrentConfidence(value)}
+              aria-pressed={currentConfidence === value}
+              className={`rounded-md border px-2 py-1 text-xs transition-colors ${
+                currentConfidence === value
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Rate how confident you would feel giving this answer live (1–5).
         </p>
       </div>
 
