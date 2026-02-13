@@ -82,6 +82,8 @@ export function InterviewDateTracker() {
         : [],
     [companyId, companyName, interviewDate, personaId, personaName]
   );
+  const interviewEventUrl =
+    googleCalendarEvents.find((event) => event.id === "interview")?.url ?? "";
 
   if (!companyId || !personaId) return null;
   const activeCompanyId = companyId;
@@ -110,12 +112,15 @@ export function InterviewDateTracker() {
   }
 
   function openGoogleCalendar() {
-    if (!interviewDate) return;
-    const url = buildInterviewGoogleCalendarUrl({
-      companyName,
-      personaName,
-      interviewDate,
-    });
+    const url =
+      interviewEventUrl ||
+      (interviewDate
+        ? buildInterviewGoogleCalendarUrl({
+            companyName,
+            personaName,
+            interviewDate,
+          })
+        : "");
     if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
   }
@@ -130,8 +135,7 @@ export function InterviewDateTracker() {
     setInterviewDate(`${year}-${month}-${day}`);
   }
 
-  function openGoogleCalendarCheckpoint(id: "prep-2d" | "prep-1d" | "interview") {
-    const url = googleCalendarEvents.find((event) => event.id === id)?.url;
+  function openGoogleCalendarCheckpoint(url: string) {
     if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
   }
@@ -168,7 +172,7 @@ export function InterviewDateTracker() {
           size="sm"
           variant="ghost"
           onClick={openGoogleCalendar}
-          disabled={!interviewDate}
+          disabled={!interviewEventUrl}
         >
           <ExternalLink className="h-3.5 w-3.5" />
           Google Calendar
@@ -203,30 +207,21 @@ export function InterviewDateTracker() {
             </Button>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-[11px]"
-              onClick={() => openGoogleCalendarCheckpoint("prep-2d")}
-            >
-              T-2 anchor review
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-[11px]"
-              onClick={() => openGoogleCalendarCheckpoint("prep-1d")}
-            >
-              T-1 pressure mock
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-[11px]"
-              onClick={() => openGoogleCalendarCheckpoint("interview")}
-            >
-              Interview day
-            </Button>
+            {googleCalendarEvents.map((event) => (
+              <Button
+                key={event.id}
+                size="sm"
+                variant="outline"
+                className="h-7 px-2 text-[11px]"
+                onClick={() => openGoogleCalendarCheckpoint(event.url)}
+              >
+                {event.id === "prep-2d"
+                  ? "T-2 anchor review"
+                  : event.id === "prep-1d"
+                    ? "T-1 pressure mock"
+                    : "Interview day"}
+              </Button>
+            ))}
           </div>
         </div>
       )}
