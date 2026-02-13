@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useInterviewMode } from "./interview-mode-provider";
+import { evaluateModeHealth } from "@/lib/adaptive/mode-health";
 import {
   getReadinessChecklist,
   getReadinessCompletion,
@@ -18,6 +19,7 @@ export function ModeHealthPill() {
   const { companyId, personaId } = useInterviewMode();
   const [readinessPct, setReadinessPct] = useState<number | null>(null);
   const [latestScore, setLatestScore] = useState<number | null>(null);
+  const [latestConfidence, setLatestConfidence] = useState<number | null>(null);
 
   const keys = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -43,6 +45,7 @@ export function ModeHealthPill() {
       const history = parsePrepHistory(localStorage.getItem(keys.history));
       setReadinessPct(readiness.completionPct);
       setLatestScore(history[0]?.averageScore ?? null);
+      setLatestConfidence(history[0]?.averageConfidence ?? null);
     }
 
     refresh();
@@ -76,9 +79,19 @@ export function ModeHealthPill() {
 
   if (!companyId || !personaId) return null;
 
+  const health = evaluateModeHealth({
+    readinessPct,
+    latestScore,
+    latestConfidence,
+  });
+
   return (
-    <Badge variant="outline" className="text-[10px] whitespace-nowrap">
-      Ready {readinessPct ?? 0}% · Score {latestScore ?? "N/A"}
+    <Badge
+      variant="outline"
+      className={`text-[10px] whitespace-nowrap ${health.className}`}
+      title={health.detail}
+    >
+      {health.shortLabel} · {readinessPct ?? 0}% · {latestScore ?? "N/A"}
     </Badge>
   );
 }
