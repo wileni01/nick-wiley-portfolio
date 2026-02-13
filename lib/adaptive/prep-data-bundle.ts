@@ -5,6 +5,13 @@ import { parseFocusHistory } from "./focus-history";
 import { parseInterviewDate } from "./interview-date";
 
 export const PREP_DATA_BUNDLE_MAX_CHARS = 250_000;
+const PREP_DATA_MODE_ID_MAX_CHARS = 80;
+const PREP_DATA_NOTES_MAX_CHARS = 1200;
+const PREP_DATA_STATE_MAX_KEYS = 400;
+const PREP_DATA_STATE_KEY_MAX_CHARS = 120;
+const PREP_DATA_MOCK_MAX_ANSWERS = 12;
+const PREP_DATA_MOCK_ANSWER_MAX_CHARS = 2000;
+const PREP_DATA_MOCK_MAX_QUESTION_ORDER = 24;
 
 export interface StoredMockSessionState {
   answers: string[];
@@ -74,10 +81,12 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
 
   try {
     const parsed = JSON.parse(raw) as PrepDataBundle;
+    const companyId = parseModeId(parsed?.mode?.companyId);
+    const personaId = parseModeId(parsed?.mode?.personaId);
     if (
       parsed?.version !== 1 ||
-      typeof parsed?.mode?.companyId !== "string" ||
-      typeof parsed?.mode?.personaId !== "string"
+      !companyId ||
+      !personaId
     ) {
       return null;
     }
@@ -89,8 +98,8 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
           ? parsed.exportedAt
           : new Date().toISOString(),
       mode: {
-        companyId: parsed.mode.companyId,
-        personaId: parsed.mode.personaId,
+        companyId,
+        personaId,
       },
       readinessState: parseReadinessState(
         JSON.stringify(parsed.readinessState ?? {})
@@ -121,7 +130,7 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
 
 function parsePrepNotes(raw: string | null): string {
   if (!raw) return "";
-  return String(raw).slice(0, 1200);
+  return String(raw).slice(0, PREP_DATA_NOTES_MAX_CHARS);
 }
 
 function parseMockSessionState(raw: string | null): StoredMockSessionState | null {
@@ -129,27 +138,46 @@ function parseMockSessionState(raw: string | null): StoredMockSessionState | nul
   try {
     const parsed = JSON.parse(raw) as Partial<StoredMockSessionState>;
     const answers = Array.isArray(parsed.answers)
-      ? parsed.answers.map((value) => String(value))
+      ? parsed.answers
+          .slice(0, PREP_DATA_MOCK_MAX_ANSWERS)
+          .map((value) => String(value).slice(0, PREP_DATA_MOCK_ANSWER_MAX_CHARS))
       : [];
+    const confidenceLimit =
+      answers.length > 0 ? answers.length : PREP_DATA_MOCK_MAX_ANSWERS;
     const confidences = Array.isArray(parsed.confidences)
-      ? parsed.confidences.map((value) =>
+      ? parsed.confidences.slice(0, confidenceLimit).map((value) =>
           Math.min(5, Math.max(1, Number(value) || 3))
         )
       : [];
+    const questionOrder = Array.isArray(parsed.questionOrder)
+      ? Array.from(
+          new Set(
+            parsed.questionOrder
+              .slice(0, PREP_DATA_MOCK_MAX_QUESTION_ORDER)
+              .map((value) => Number(value))
+              .filter(
+                (value) =>
+                  Number.isFinite(value) &&
+                  Number.isInteger(value) &&
+                  value >= 0 &&
+                  value <= 99
+              )
+          )
+        )
+      : undefined;
+    const nextIndex = Math.max(0, Math.floor(Number(parsed.currentIndex) || 0));
+    const currentIndex = answers.length
+      ? Math.min(nextIndex, answers.length - 1)
+      : 0;
     return {
       answers,
       confidences,
       sessionMode: parsed.sessionMode === "pressure" ? "pressure" : "standard",
-      questionOrder: Array.isArray(parsed.questionOrder)
-        ? parsed.questionOrder.map((value) => Number(value)).filter(Number.isFinite)
-        : undefined,
-      currentIndex: Math.max(0, Math.floor(Number(parsed.currentIndex) || 0)),
+      questionOrder,
+      currentIndex,
       completed: Boolean(parsed.completed),
       started: Boolean(parsed.started),
-      updatedAt:
-        typeof parsed.updatedAt === "string"
-          ? parsed.updatedAt
-          : new Date().toISOString(),
+      updatedAt: parseIsoTimestamp(parsed.updatedAt),
     };
   } catch {
     return null;
@@ -161,11 +189,29 @@ function parseDrillState(raw: string | null): Record<string, boolean> {
   try {
     const parsed = JSON.parse(raw) as Record<string, unknown>;
     const normalized: Record<string, boolean> = {};
-    for (const [key, value] of Object.entries(parsed)) {
-      normalized[key] = Boolean(value);
+    for (const [key, value] of Object.entries(parsed).slice(
+      0,
+      PREP_DATA_STATE_MAX_KEYS
+    )) {
+      const normalizedKey = String(key).trim().slice(0, PREP_DATA_STATE_KEY_MAX_CHARS);
+      if (!normalizedKey) continue;
+      normalized[normalizedKey] = Boolean(value);
     }
     return normalized;
   } catch {
     return {};
   }
+}
+
+function parseModeId(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const normalized = raw.trim().slice(0, PREP_DATA_MODE_ID_MAX_CHARS);
+  return normalized ? normalized : null;
+}
+
+function parseIsoTimestamp(raw: unknown): string {
+  if (typeof raw !== "string") return new Date().toISOString();
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return new Date().toISOString();
+  return parsed.toISOString();
 }
