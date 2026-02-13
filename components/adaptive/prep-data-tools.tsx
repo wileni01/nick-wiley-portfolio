@@ -24,14 +24,19 @@ import {
 import { getFocusHistoryStorageKey } from "@/lib/adaptive/focus-history";
 
 type StatusTone = "neutral" | "error" | "success";
+const CROSS_MODE_IMPORT_CONFIRM_MS = 10000;
 
 export function PrepDataTools() {
   const { companyId, personaId, company, persona } = useInterviewMode();
+  const activeModeKey = companyId && personaId ? `${companyId}/${personaId}` : null;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<string>("");
   const [tone, setTone] = useState<StatusTone>("neutral");
   const [confirmReset, setConfirmReset] = useState(false);
   const [pendingImport, setPendingImport] = useState<PrepDataBundle | null>(null);
+  const [pendingImportTargetKey, setPendingImportTargetKey] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (!confirmReset) return;
@@ -40,6 +45,26 @@ export function PrepDataTools() {
     }, 5000);
     return () => window.clearTimeout(timeout);
   }, [confirmReset]);
+
+  useEffect(() => {
+    if (!pendingImport) return;
+    const timeout = window.setTimeout(() => {
+      setPendingImport(null);
+      setPendingImportTargetKey(null);
+      setTone("neutral");
+      setStatus("Cross-mode import request expired. Re-import to continue.");
+    }, CROSS_MODE_IMPORT_CONFIRM_MS);
+    return () => window.clearTimeout(timeout);
+  }, [pendingImport]);
+
+  useEffect(() => {
+    if (!pendingImport || !pendingImportTargetKey || !activeModeKey) return;
+    if (pendingImportTargetKey === activeModeKey) return;
+    setPendingImport(null);
+    setPendingImportTargetKey(null);
+    setTone("neutral");
+    setStatus("Active mode changed. Pending cross-mode import was cleared.");
+  }, [activeModeKey, pendingImport, pendingImportTargetKey]);
 
   if (!companyId || !personaId || !company || !persona) return null;
   const activeCompanyId = companyId;
@@ -126,6 +151,7 @@ export function PrepDataTools() {
   async function copyJson() {
     setConfirmReset(false);
     setPendingImport(null);
+    setPendingImportTargetKey(null);
     try {
       await navigator.clipboard.writeText(getBundleJson());
       setTone("success");
@@ -139,6 +165,7 @@ export function PrepDataTools() {
   function downloadJson() {
     setConfirmReset(false);
     setPendingImport(null);
+    setPendingImportTargetKey(null);
     const json = getBundleJson();
     const blob = new Blob([json], { type: "application/json;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -153,6 +180,7 @@ export function PrepDataTools() {
 
   function resetData() {
     setPendingImport(null);
+    setPendingImportTargetKey(null);
     if (!confirmReset) {
       setTone("neutral");
       setStatus("Click reset again within 5 seconds to confirm.");
@@ -169,11 +197,13 @@ export function PrepDataTools() {
 
   function triggerImport() {
     setPendingImport(null);
+    setPendingImportTargetKey(null);
     fileInputRef.current?.click();
   }
 
   function applyImportedBundle(parsed: PrepDataBundle) {
     setPendingImport(null);
+    setPendingImportTargetKey(null);
     localStorage.setItem(keys.readiness, JSON.stringify(parsed.readinessState));
     localStorage.setItem(keys.history, JSON.stringify(parsed.prepHistory));
     localStorage.setItem(keys.goals, JSON.stringify(parsed.prepGoal));
@@ -215,28 +245,41 @@ export function PrepDataTools() {
   }
 
   function queueCrossModeImport(parsed: PrepDataBundle) {
+    setConfirmReset(false);
     setPendingImport(parsed);
+    setPendingImportTargetKey(activeModeKey);
     setTone("neutral");
     setStatus(
-      `Bundle is from ${parsed.mode.companyId}/${parsed.mode.personaId}. Confirm to import into current mode.`
+      `Bundle is from ${parsed.mode.companyId}/${parsed.mode.personaId}. Confirm within ${
+        CROSS_MODE_IMPORT_CONFIRM_MS / 1000
+      }s to import into current mode.`
     );
   }
 
   function cancelPendingImport() {
     if (!pendingImport) return;
     setPendingImport(null);
+    setPendingImportTargetKey(null);
     setTone("neutral");
     setStatus("Cross-mode import canceled.");
   }
 
   function confirmPendingImport() {
     if (!pendingImport) return;
+    if (!activeModeKey || (pendingImportTargetKey && pendingImportTargetKey !== activeModeKey)) {
+      setPendingImport(null);
+      setPendingImportTargetKey(null);
+      setTone("neutral");
+      setStatus("Active mode changed. Re-import bundle to continue.");
+      return;
+    }
     applyImportedBundle(pendingImport);
   }
 
   async function pasteJsonFromClipboard() {
     setConfirmReset(false);
     setPendingImport(null);
+    setPendingImportTargetKey(null);
     try {
       const raw = await navigator.clipboard.readText();
       if (!raw.trim()) {
@@ -270,6 +313,7 @@ export function PrepDataTools() {
   async function onImportFile(event: React.ChangeEvent<HTMLInputElement>) {
     setConfirmReset(false);
     setPendingImport(null);
+    setPendingImportTargetKey(null);
     const file = event.target.files?.[0];
     if (!file) return;
 
