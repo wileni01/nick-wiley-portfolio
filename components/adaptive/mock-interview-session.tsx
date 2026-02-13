@@ -56,6 +56,7 @@ export interface PersistedMockSession {
   answers: string[];
   confidences: number[];
   sessionMode?: SessionMode;
+  questionOrder?: number[];
   currentIndex: number;
   completed: boolean;
   started: boolean;
@@ -84,6 +85,27 @@ function formatSeconds(seconds: number): string {
   return `${minutes}:${remainingSeconds}`;
 }
 
+function buildQuestionOrder(
+  mode: SessionMode,
+  questionCount: number
+): number[] {
+  const ordered = Array.from({ length: questionCount }, (_, index) => index);
+  if (mode !== "pressure" || questionCount <= 2) return ordered;
+
+  const tail = ordered.slice(1);
+  for (let i = tail.length - 1; i > 0; i--) {
+    const randomIndex = Math.floor(Math.random() * (i + 1));
+    [tail[i], tail[randomIndex]] = [tail[randomIndex], tail[i]];
+  }
+  return [0, ...tail];
+}
+
+function isValidQuestionOrder(order: number[], questionCount: number): boolean {
+  if (order.length !== questionCount) return false;
+  const sorted = [...order].sort((a, b) => a - b);
+  return sorted.every((value, index) => value === index);
+}
+
 export function MockInterviewSession() {
   const { companyId, personaId } = useInterviewMode();
   const [started, setStarted] = useState(false);
@@ -91,6 +113,7 @@ export function MockInterviewSession() {
   const [answers, setAnswers] = useState<string[]>([]);
   const [confidences, setConfidences] = useState<number[]>([]);
   const [sessionMode, setSessionMode] = useState<SessionMode>("standard");
+  const [questionOrder, setQuestionOrder] = useState<number[]>([]);
   const [completed, setCompleted] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [loadedFromDraft, setLoadedFromDraft] = useState(false);
@@ -103,10 +126,18 @@ export function MockInterviewSession() {
     return buildMockInterviewerScript(companyId, personaId);
   }, [companyId, personaId]);
 
-  const sessionQuestions = useMemo<SessionQuestion[]>(() => {
+  const baseQuestions = useMemo<SessionQuestion[]>(() => {
     if (!script) return [];
     return [warmupQuestion, ...script.prompts];
   }, [script]);
+
+  const sessionQuestions = useMemo<SessionQuestion[]>(() => {
+    if (!baseQuestions.length) return [];
+    if (!isValidQuestionOrder(questionOrder, baseQuestions.length)) {
+      return baseQuestions;
+    }
+    return questionOrder.map((index) => baseQuestions[index]);
+  }, [baseQuestions, questionOrder]);
 
   const currentQuestion = sessionQuestions[currentIndex];
   const currentAnswer = answers[currentIndex] ?? "";
@@ -175,7 +206,7 @@ export function MockInterviewSession() {
   ]);
 
   const loadPersistedSession = useCallback(() => {
-    if (!companyId || !personaId || !sessionQuestions.length) return;
+    if (!companyId || !personaId || !baseQuestions.length) return;
 
     const key = getMockSessionStorageKey(companyId, personaId);
     const storedRaw = localStorage.getItem(key);
@@ -188,12 +219,21 @@ export function MockInterviewSession() {
       const stored = JSON.parse(storedRaw) as PersistedMockSession;
       const restoredMode: SessionMode =
         stored.sessionMode === "pressure" ? "pressure" : "standard";
+      const restoredOrderRaw = Array.isArray(stored.questionOrder)
+        ? stored.questionOrder.map((value) => Number(value))
+        : [];
+      const restoredOrder = isValidQuestionOrder(
+        restoredOrderRaw,
+        baseQuestions.length
+      )
+        ? restoredOrderRaw
+        : buildQuestionOrder(restoredMode, baseQuestions.length);
       const normalizedAnswers = Array.from(
-        { length: sessionQuestions.length },
+        { length: baseQuestions.length },
         (_, index) => stored.answers[index] ?? ""
       );
       const normalizedConfidences = Array.from(
-        { length: sessionQuestions.length },
+        { length: baseQuestions.length },
         (_, index) => {
           const confidence = stored.confidences?.[index];
           if (typeof confidence !== "number") return 3;
@@ -202,10 +242,11 @@ export function MockInterviewSession() {
       );
 
       setSessionMode(restoredMode);
+      setQuestionOrder(restoredOrder);
       setAnswers(normalizedAnswers);
       setConfidences(normalizedConfidences);
       setCurrentIndex(
-        Math.max(0, Math.min(stored.currentIndex ?? 0, sessionQuestions.length - 1))
+        Math.max(0, Math.min(stored.currentIndex ?? 0, baseQuestions.length - 1))
       );
       setCompleted(Boolean(stored.completed));
       setStarted(Boolean(stored.started));
@@ -220,7 +261,7 @@ export function MockInterviewSession() {
       localStorage.removeItem(key);
       setLoadedFromDraft(false);
     }
-  }, [companyId, personaId, sessionQuestions.length]);
+  }, [baseQuestions.length, companyId, personaId]);
 
   useEffect(() => {
     loadPersistedSession();
@@ -306,6 +347,7 @@ export function MockInterviewSession() {
       answers,
       confidences,
       sessionMode,
+      questionOrder,
       currentIndex,
       completed,
       started,
@@ -323,13 +365,16 @@ export function MockInterviewSession() {
     confidences,
     currentIndex,
     personaId,
+    questionOrder,
     sessionMode,
     started,
   ]);
 
   function startSession() {
-    setAnswers(Array.from({ length: sessionQuestions.length }, () => ""));
-    setConfidences(Array.from({ length: sessionQuestions.length }, () => 3));
+    const order = buildQuestionOrder(sessionMode, baseQuestions.length);
+    setQuestionOrder(order);
+    setAnswers(Array.from({ length: baseQuestions.length }, () => ""));
+    setConfidences(Array.from({ length: baseQuestions.length }, () => 3));
     setCurrentIndex(0);
     setCompleted(false);
     setStarted(true);
@@ -416,6 +461,7 @@ export function MockInterviewSession() {
     setCurrentIndex(0);
     setAnswers([]);
     setConfidences([]);
+    setQuestionOrder([]);
     setCopyState("idle");
     setLoadedFromDraft(false);
     setTimerRunning(false);

@@ -6,6 +6,8 @@ import { parseFocusHistory } from "./focus-history";
 export interface StoredMockSessionState {
   answers: string[];
   confidences: number[];
+  sessionMode?: "standard" | "pressure";
+  questionOrder?: number[];
   currentIndex: number;
   completed: boolean;
   started: boolean;
@@ -124,6 +126,10 @@ function parseMockSessionState(raw: string | null): StoredMockSessionState | nul
     return {
       answers,
       confidences,
+      sessionMode: parsed.sessionMode === "pressure" ? "pressure" : "standard",
+      questionOrder: Array.isArray(parsed.questionOrder)
+        ? parsed.questionOrder.map((value) => Number(value)).filter(Number.isFinite)
+        : undefined,
       currentIndex: Math.max(0, Math.floor(Number(parsed.currentIndex) || 0)),
       completed: Boolean(parsed.completed),
       started: Boolean(parsed.started),
