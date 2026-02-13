@@ -52,7 +52,7 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
   return (
     <div
       className={`rounded-lg border border-border bg-muted/40 p-2 ${
-        mobile ? "space-y-2" : "hidden xl:flex xl:items-center xl:gap-2"
+        mobile ? "space-y-2" : "hidden xl:flex xl:flex-wrap xl:items-center xl:gap-2"
       }`}
     >
       <div className="flex items-center gap-2">
@@ -120,6 +120,28 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
         className="h-8 min-w-56 rounded-md border border-border bg-background px-2 text-xs"
         aria-label="Optional focus note"
       />
+
+      {persona?.focusPresets?.length ? (
+        <div className="flex flex-wrap items-center gap-1.5">
+          {persona.focusPresets.map((preset) => {
+            const isActive = focusNote.trim() === preset;
+            return (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => setFocusNote(isActive ? "" : preset)}
+                className={`rounded-md border px-2 py-1 text-[10px] transition-colors ${
+                  isActive
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {preset}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
 
       <Button
         size="sm"

@@ -121,6 +121,7 @@ lib/
 - **Dark mode** — System preference + manual toggle.
 - **Adaptive Interview Mode** — Company/persona-tailored recommendations and talking points (KUNGFU.AI + Anthropic CEO comparison), with adaptive theming and optional AI-enhanced interviewer briefings.
 - **Focus-note tuning** — Add an optional session focus note to steer recommendations, AI narrative, and exported prep packets.
+- **Focus presets** — One-click persona-specific focus-note presets to quickly retarget the narrative for each interviewer type.
 - **Mode health indicator** — Navbar status pill shows current readiness completion and latest mock score for selected mode.
 - **Mode health status** — Indicator is risk-coded ("On track", "Building", "Needs reps") based on readiness + latest score.
 - **Mock interviewer script** — Role-specific practice questions with answer strategies and direct links to recommended portfolio artifacts.

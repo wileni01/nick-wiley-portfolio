@@ -43,6 +43,11 @@ export const companyProfiles: CompanyProfile[] = [
         role: "Co-founder & CTO",
         recommendationGoal:
           "Show production-grade AI architecture, safety controls, and delivery quality under real constraints.",
+        focusPresets: [
+          "Emphasize architecture tradeoffs and reliability decisions.",
+          "Highlight human-in-the-loop controls and auditability.",
+          "Focus on scaling path from pilot to production.",
+        ],
         focusTags: [
           "ai-engineering",
           "ml-experimentation",
@@ -59,6 +64,11 @@ export const companyProfiles: CompanyProfile[] = [
         role: "Co-founder & Managing Director",
         recommendationGoal:
           "Emphasize client outcomes, strategic narrative, and evidence of scalable delivery leadership.",
+        focusPresets: [
+          "Frame outcomes in business value and stakeholder trust.",
+          "Show repeatable delivery patterns across organizations.",
+          "Lead with strategic decision impact, then implementation depth.",
+        ],
         focusTags: [
           "strategy",
           "leadership",
@@ -75,6 +85,11 @@ export const companyProfiles: CompanyProfile[] = [
         role: "Chief Strategy Officer",
         recommendationGoal:
           "Highlight strategic framing, adoption pathways, and governance-first AI decision support.",
+        focusPresets: [
+          "Focus on responsible AI operating model and governance.",
+          "Emphasize adoption strategy and cross-functional alignment.",
+          "Position work as decision-support, not automation theater.",
+        ],
         focusTags: [
           "strategy",
           "decision-support",
@@ -91,6 +106,11 @@ export const companyProfiles: CompanyProfile[] = [
         role: "VP of AI Strategy",
         recommendationGoal:
           "Show tactical AI execution tied to measurable business decisions and operating models.",
+        focusPresets: [
+          "Emphasize roadmap execution over model novelty.",
+          "Focus on measurable adoption and operational behavior change.",
+          "Highlight delivery governance that avoids slowing teams down.",
+        ],
         focusTags: [
           "ai-engineering",
           "strategy",
@@ -107,6 +127,11 @@ export const companyProfiles: CompanyProfile[] = [
         role: "Director of Engineering",
         recommendationGoal:
           "Focus on technical depth, model operations, and human-in-the-loop quality controls.",
+        focusPresets: [
+          "Detail observability and override telemetry loops.",
+          "Emphasize reusable architecture patterns and standards.",
+          "Focus on reducing technical risk while shipping quickly.",
+        ],
         focusTags: [
           "ml-experimentation",
           "ai-engineering",
@@ -167,6 +192,11 @@ export const companyProfiles: CompanyProfile[] = [
         role: "CEO (scenario)",
         recommendationGoal:
           "Demonstrate safety-minded delivery, robust human oversight, and disciplined deployment in regulated environments.",
+        focusPresets: [
+          "Emphasize safety-by-design and responsible deployment boundaries.",
+          "Focus on calibration between capability and governance controls.",
+          "Highlight human oversight as a product requirement, not a fallback.",
+        ],
         focusTags: [
           "ai-safety",
           "responsible-ai",

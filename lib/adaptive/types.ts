@@ -25,6 +25,7 @@ export interface PersonaProfile {
   role: string;
   focusTags: string[];
   recommendationGoal: string;
+  focusPresets?: string[];
   assetTypeWeights?: Partial<Record<AssetKind, number>>;
 }
 
