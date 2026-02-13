@@ -17,6 +17,7 @@ import {
   getMockSessionStorageKey,
   getPrepNotesStorageKey,
 } from "@/lib/adaptive/storage-keys";
+import { getFocusHistoryStorageKey } from "@/lib/adaptive/focus-history";
 
 type StatusTone = "neutral" | "error" | "success";
 
@@ -35,6 +36,7 @@ export function PrepDataTools() {
     mock: getMockSessionStorageKey(companyId, personaId),
     drills: getDrillStateStorageKey(companyId, personaId),
     notes: getPrepNotesStorageKey(companyId, personaId),
+    focusHistory: getFocusHistoryStorageKey(companyId, personaId),
   };
 
   function emitRefreshEvents() {
@@ -68,6 +70,11 @@ export function PrepDataTools() {
         detail: { key: keys.notes },
       })
     );
+    window.dispatchEvent(
+      new CustomEvent("adaptive-focus-history-updated", {
+        detail: { key: keys.focusHistory },
+      })
+    );
   }
 
   function getBundleJson() {
@@ -78,6 +85,7 @@ export function PrepDataTools() {
       prepHistoryRaw: localStorage.getItem(keys.history),
       prepGoalRaw: localStorage.getItem(keys.goals),
       prepNotesRaw: localStorage.getItem(keys.notes),
+      focusHistoryRaw: localStorage.getItem(keys.focusHistory),
       mockSessionRaw: localStorage.getItem(keys.mock),
       drillStateRaw: localStorage.getItem(keys.drills),
     });
@@ -137,6 +145,7 @@ export function PrepDataTools() {
       localStorage.setItem(keys.goals, JSON.stringify(parsed.prepGoal));
       localStorage.setItem(keys.drills, JSON.stringify(parsed.drillState));
       localStorage.setItem(keys.notes, parsed.prepNotes);
+      localStorage.setItem(keys.focusHistory, JSON.stringify(parsed.focusHistory));
       if (parsed.mockSession) {
         localStorage.setItem(keys.mock, JSON.stringify(parsed.mockSession));
       } else {

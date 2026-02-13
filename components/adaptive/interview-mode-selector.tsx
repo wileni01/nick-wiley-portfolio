@@ -43,7 +43,30 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
       return;
     }
     const key = getFocusHistoryStorageKey(companyId, personaId);
-    setFocusHistory(parseFocusHistory(localStorage.getItem(key)));
+    function refresh() {
+      setFocusHistory(parseFocusHistory(localStorage.getItem(key)));
+    }
+
+    refresh();
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === key) refresh();
+    }
+
+    function onFocusHistoryUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === key) refresh();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-focus-history-updated", onFocusHistoryUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(
+        "adaptive-focus-history-updated",
+        onFocusHistoryUpdate
+      );
+    };
   }, [companyId, personaId]);
 
   async function handleCopyPrepLink() {
@@ -77,6 +100,19 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
     );
     localStorage.setItem(key, JSON.stringify(nextHistory));
     setFocusHistory(nextHistory);
+    window.dispatchEvent(
+      new CustomEvent("adaptive-focus-history-updated", { detail: { key } })
+    );
+  }
+
+  function clearFocusHistory() {
+    if (!companyId || !personaId) return;
+    const key = getFocusHistoryStorageKey(companyId, personaId);
+    localStorage.removeItem(key);
+    setFocusHistory([]);
+    window.dispatchEvent(
+      new CustomEvent("adaptive-focus-history-updated", { detail: { key } })
+    );
   }
 
   return (
@@ -236,6 +272,15 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
       >
         <Save className="h-3.5 w-3.5" />
         Save focus
+      </Button>
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={clearFocusHistory}
+        disabled={!companyId || !personaId || !focusHistory.length}
+        className="text-xs"
+      >
+        Clear saved focus
       </Button>
     </div>
   );

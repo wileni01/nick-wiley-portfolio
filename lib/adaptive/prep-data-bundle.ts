@@ -1,6 +1,7 @@
 import { parsePrepHistory, type PrepSessionSnapshot } from "./prep-history";
 import { parsePrepGoalState, type PrepGoalState } from "./prep-goals";
 import { parseReadinessState, type ReadinessState } from "./readiness-checklist";
+import { parseFocusHistory } from "./focus-history";
 
 export interface StoredMockSessionState {
   answers: string[];
@@ -22,6 +23,7 @@ export interface PrepDataBundle {
   prepHistory: PrepSessionSnapshot[];
   prepGoal: PrepGoalState;
   prepNotes: string;
+  focusHistory: string[];
   mockSession: StoredMockSessionState | null;
   drillState: Record<string, boolean>;
 }
@@ -33,6 +35,7 @@ export function buildPrepDataBundle(input: {
   prepHistoryRaw: string | null;
   prepGoalRaw: string | null;
   prepNotesRaw: string | null;
+  focusHistoryRaw: string | null;
   mockSessionRaw: string | null;
   drillStateRaw: string | null;
 }): PrepDataBundle {
@@ -47,6 +50,7 @@ export function buildPrepDataBundle(input: {
     prepHistory: parsePrepHistory(input.prepHistoryRaw),
     prepGoal: parsePrepGoalState(input.prepGoalRaw),
     prepNotes: parsePrepNotes(input.prepNotesRaw),
+    focusHistory: parseFocusHistory(input.focusHistoryRaw),
     mockSession: parseMockSessionState(input.mockSessionRaw),
     drillState: parseDrillState(input.drillStateRaw),
   };
@@ -80,6 +84,9 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
       prepGoal: parsePrepGoalState(JSON.stringify(parsed.prepGoal ?? {})),
       prepNotes: parsePrepNotes(
         typeof parsed.prepNotes === "string" ? parsed.prepNotes : null
+      ),
+      focusHistory: parseFocusHistory(
+        JSON.stringify(parsed.focusHistory ?? [])
       ),
       mockSession: parseMockSessionState(
         parsed.mockSession ? JSON.stringify(parsed.mockSession) : null
