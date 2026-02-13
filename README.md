@@ -127,7 +127,7 @@ lib/
 - **Mode health indicator** — Navbar status pill shows current readiness completion and latest mock score for selected mode.
 - **Interview countdown pill** — Navbar displays D-day countdown (or passed state) for the active company/persona interview date.
 - **Mode health status** — Indicator is risk-coded ("On track", "Building", "Needs reps", "Urgent") based on readiness, performance, and interview-date urgency.
-- **Preflight readiness score** — Weighted 0–100 score combining checklist progress, mock results, launchpad coverage, prep context, session recency, and interview-date urgency.
+- **Preflight readiness score** — Weighted 0–100 score combining checklist progress, mock results, launchpad coverage, prep context, session recency, and interview-date urgency (with stale/missing-date timeline flags).
 - **Practice reminders** — Auto-generated next-step reminders (with due-by guidance) based on readiness, score, launchpad coverage, and interview-date proximity (including prompts to set/reset date context).
 - **Readiness gap panel** — Surfaces outstanding checklist and unopened resource gaps with direct remediation actions.
 - **Mock interviewer script** — Role-specific practice questions with answer strategies and direct links to recommended portfolio artifacts.

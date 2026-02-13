@@ -169,7 +169,25 @@ export function PreflightReadinessCard() {
           <ShieldCheck className="h-4 w-4 text-primary" />
           Preflight readiness
         </h3>
-        <Badge variant="outline">{preflight.score}/100</Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge
+            variant="outline"
+            className={
+              preflight.timelineStatus === "passed"
+                ? "border-rose-400/60 text-rose-700 dark:text-rose-300"
+                : preflight.timelineStatus === "missing"
+                  ? "border-amber-400/60 text-amber-700 dark:text-amber-300"
+                  : ""
+            }
+          >
+            {preflight.timelineStatus === "passed"
+              ? "Date passed"
+              : preflight.timelineStatus === "missing"
+                ? "Date missing"
+                : "Timeline set"}
+          </Badge>
+          <Badge variant="outline">{preflight.score}/100</Badge>
+        </div>
       </div>
       <div className="h-1.5 w-full rounded-full bg-border overflow-hidden">
         <div

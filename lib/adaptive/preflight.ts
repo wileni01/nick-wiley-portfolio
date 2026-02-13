@@ -14,6 +14,7 @@ export interface PreflightResult {
   detail: string;
   recencyDays: number | null;
   daysUntilInterview: number | null;
+  timelineStatus: "missing" | "upcoming" | "passed";
 }
 
 export function calculatePreflightScore(input: PreflightInput): PreflightResult {
@@ -32,6 +33,12 @@ export function calculatePreflightScore(input: PreflightInput): PreflightResult 
     readinessPoints + scorePoints + launchpadPoints + notesPoints + focusPoints;
   const recency = getSessionRecencyDays(input.latestSessionTimestamp);
   const daysUntilInterview = getDaysUntilInterview(input.interviewDate ?? null);
+  const timelineStatus =
+    daysUntilInterview === null
+      ? "missing"
+      : daysUntilInterview < 0
+        ? "passed"
+        : "upcoming";
 
   const stalenessPenalty =
     recency === null
@@ -57,13 +64,18 @@ export function calculatePreflightScore(input: PreflightInput): PreflightResult 
       score: adjustedTotal,
       label: "Ready to rehearse",
       detail:
-        urgencyPenalty > 0
+        timelineStatus === "passed"
+          ? "Strong prep baseline, but the tracked interview date has passed. Set your next target date to keep timeline guidance aligned."
+          : timelineStatus === "missing"
+            ? "Strong prep baseline. Set an interview date to activate countdown-aware pacing and urgency guidance."
+          : urgencyPenalty > 0
           ? "Strong baseline, but interview-day timing is tight. Run one fresh simulation today."
           : stalenessPenalty > 0
           ? "Strong prep baseline, but session recency is slipping. Run a fresh simulation before interview day."
           : "Strong signal across readiness, mock performance, and launchpad execution.",
       recencyDays: recency,
       daysUntilInterview,
+      timelineStatus,
     };
   }
 
@@ -72,13 +84,18 @@ export function calculatePreflightScore(input: PreflightInput): PreflightResult 
       score: adjustedTotal,
       label: "Almost ready",
       detail:
-        urgencyPenalty > 0
+        timelineStatus === "passed"
+          ? "Good baseline, but your tracked interview date has passed. Update to your next date and run a fresh mock cycle."
+          : timelineStatus === "missing"
+            ? "Good baseline. Set an interview date to prioritize pacing and final-week actions."
+          : urgencyPenalty > 0
           ? "Good baseline, but interview timeline is compressed. Prioritize one full mock and close critical checklist gaps now."
           : stalenessPenalty > 0
           ? "Good baseline, but stale practice is lowering readiness. Run a fresh mock round."
           : "Good baseline. Complete remaining prep actions before final interview simulation.",
       recencyDays: recency,
       daysUntilInterview,
+      timelineStatus,
     };
   }
 
@@ -86,11 +103,16 @@ export function calculatePreflightScore(input: PreflightInput): PreflightResult 
     score: adjustedTotal,
     label: "Needs preparation",
     detail:
-      daysUntilInterview !== null && daysUntilInterview >= 0 && daysUntilInterview <= 2
+      timelineStatus === "passed"
+        ? "Interview date has passed. Set your next interview target, then complete checklist gaps and run a full mock session."
+        : timelineStatus === "missing"
+          ? "Set an interview date, then focus on checklist completion, one full mock run, and opening key resources."
+        : daysUntilInterview !== null && daysUntilInterview >= 0 && daysUntilInterview <= 2
         ? "Interview is near. Prioritize one full mock run today, close top checklist gaps, and refresh key resources."
         : "Focus on checklist completion, one full mock run, and opening key resources.",
     recencyDays: recency,
     daysUntilInterview,
+    timelineStatus,
   };
 }
 
