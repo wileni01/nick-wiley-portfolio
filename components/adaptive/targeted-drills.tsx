@@ -8,6 +8,7 @@ import { useInterviewMode } from "./interview-mode-provider";
 import { parsePrepHistory, getPrepHistoryStorageKey } from "@/lib/adaptive/prep-history";
 import { buildTargetedDrills } from "@/lib/adaptive/drills";
 import { getDrillStateStorageKey } from "@/lib/adaptive/storage-keys";
+import { parseBooleanStateRecord } from "@/lib/adaptive/boolean-state";
 
 export function TargetedDrills() {
   const { companyId, personaId } = useInterviewMode();
@@ -61,10 +62,9 @@ export function TargetedDrills() {
         setChecked({});
         return;
       }
-      try {
-        setChecked(JSON.parse(raw) as Record<string, boolean>);
-      } catch {
-        setChecked({});
+      const parsed = parseBooleanStateRecord(raw);
+      setChecked(parsed);
+      if (!Object.keys(parsed).length) {
         localStorage.removeItem(key);
       }
     }

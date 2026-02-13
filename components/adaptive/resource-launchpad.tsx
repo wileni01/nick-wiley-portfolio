@@ -9,6 +9,7 @@ import { useTransientState } from "./use-transient-state";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
 import { openExternalUrl, openExternalUrls } from "@/lib/external-link";
+import { parseBooleanStateRecord } from "@/lib/adaptive/boolean-state";
 
 export function ResourceLaunchpad() {
   const { companyId, personaId } = useInterviewMode();
@@ -32,10 +33,9 @@ export function ResourceLaunchpad() {
         setOpened({});
         return;
       }
-      try {
-        setOpened(JSON.parse(raw) as Record<string, boolean>);
-      } catch {
-        setOpened({});
+      const parsed = parseBooleanStateRecord(raw);
+      setOpened(parsed);
+      if (!Object.keys(parsed).length) {
         localStorage.removeItem(key);
       }
     }

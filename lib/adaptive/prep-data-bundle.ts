@@ -3,6 +3,7 @@ import { parsePrepGoalState, type PrepGoalState } from "./prep-goals";
 import { parseReadinessState, type ReadinessState } from "./readiness-checklist";
 import { parseFocusHistory } from "./focus-history";
 import { parseInterviewDate } from "./interview-date";
+import { parseBooleanStateRecord } from "./boolean-state";
 
 export const PREP_DATA_BUNDLE_MAX_CHARS = 250_000;
 const PREP_DATA_MODE_ID_MAX_CHARS = 80;
@@ -187,22 +188,10 @@ export function parseStoredMockSessionState(
 }
 
 function parseDrillState(raw: string | null): Record<string, boolean> {
-  if (!raw) return {};
-  try {
-    const parsed = JSON.parse(raw) as Record<string, unknown>;
-    const normalized: Record<string, boolean> = {};
-    for (const [key, value] of Object.entries(parsed).slice(
-      0,
-      PREP_DATA_STATE_MAX_KEYS
-    )) {
-      const normalizedKey = String(key).trim().slice(0, PREP_DATA_STATE_KEY_MAX_CHARS);
-      if (!normalizedKey) continue;
-      normalized[normalizedKey] = Boolean(value);
-    }
-    return normalized;
-  } catch {
-    return {};
-  }
+  return parseBooleanStateRecord(raw, {
+    maxKeys: PREP_DATA_STATE_MAX_KEYS,
+    maxKeyLength: PREP_DATA_STATE_KEY_MAX_CHARS,
+  });
 }
 
 function parseModeId(raw: unknown): string | null {

@@ -16,6 +16,7 @@ import {
 } from "@/lib/adaptive/readiness-checklist";
 import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
 import { openExternalUrl } from "@/lib/external-link";
+import { parseBooleanStateRecord } from "@/lib/adaptive/boolean-state";
 
 interface ResourceGap {
   id: string;
@@ -60,15 +61,9 @@ export function ReadinessGapPanel() {
       );
       setIncompleteItems(getIncompleteReadinessItems(checklist, readinessState));
 
-      let launchpadState: Record<string, boolean> = {};
-      const rawLaunchpad = localStorage.getItem(keys.launchpad);
-      if (rawLaunchpad) {
-        try {
-          launchpadState = JSON.parse(rawLaunchpad) as Record<string, boolean>;
-        } catch {
-          launchpadState = {};
-        }
-      }
+      const launchpadState = parseBooleanStateRecord(
+        localStorage.getItem(keys.launchpad)
+      );
 
       const gaps = activeBundle.topRecommendations
         .filter((recommendation) => !launchpadState[recommendation.asset.id])
@@ -114,15 +109,7 @@ export function ReadinessGapPanel() {
 
   function markResourceOpened(resourceId: string) {
     const key = getLaunchpadStorageKey(activeCompanyId, activePersonaId);
-    let state: Record<string, boolean> = {};
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      try {
-        state = JSON.parse(raw) as Record<string, boolean>;
-      } catch {
-        state = {};
-      }
-    }
+    const state = parseBooleanStateRecord(localStorage.getItem(key));
     state[resourceId] = true;
     localStorage.setItem(key, JSON.stringify(state));
     window.dispatchEvent(

@@ -19,6 +19,7 @@ import {
 import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
 import { buildPracticeReminders } from "@/lib/adaptive/practice-reminders";
 import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
+import { parseBooleanStateRecord } from "@/lib/adaptive/boolean-state";
 
 function getPriorityBadge(priority: "high" | "medium" | "low") {
   if (priority === "high") {
@@ -75,14 +76,10 @@ export function PracticeRemindersCard() {
       if (!rawLaunchpad) {
         setLaunchpadPct(0);
       } else {
-        try {
-          const parsed = JSON.parse(rawLaunchpad) as Record<string, boolean>;
-          const values = Object.values(parsed);
-          const opened = values.filter(Boolean).length;
-          setLaunchpadPct(values.length ? Math.round((opened / values.length) * 100) : 0);
-        } catch {
-          setLaunchpadPct(0);
-        }
+        const parsed = parseBooleanStateRecord(rawLaunchpad);
+        const values = Object.values(parsed);
+        const opened = values.filter(Boolean).length;
+        setLaunchpadPct(values.length ? Math.round((opened / values.length) * 100) : 0);
       }
     }
 
