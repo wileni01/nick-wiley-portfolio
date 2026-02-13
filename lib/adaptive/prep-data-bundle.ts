@@ -4,6 +4,8 @@ import { parseReadinessState, type ReadinessState } from "./readiness-checklist"
 import { parseFocusHistory } from "./focus-history";
 import { parseInterviewDate } from "./interview-date";
 
+export const PREP_DATA_BUNDLE_MAX_CHARS = 250_000;
+
 export interface StoredMockSessionState {
   answers: string[];
   confidences: number[];
@@ -66,6 +68,10 @@ export function buildPrepDataBundle(input: {
 }
 
 export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
+  if (typeof raw !== "string") return null;
+  if (!raw.trim()) return null;
+  if (raw.length > PREP_DATA_BUNDLE_MAX_CHARS) return null;
+
   try {
     const parsed = JSON.parse(raw) as PrepDataBundle;
     if (

@@ -11,6 +11,7 @@ import { getPrepGoalStorageKey } from "@/lib/adaptive/prep-goals";
 import {
   buildPrepDataBundle,
   parsePrepDataBundle,
+  PREP_DATA_BUNDLE_MAX_CHARS,
   type PrepDataBundle,
 } from "@/lib/adaptive/prep-data-bundle";
 import {
@@ -54,6 +55,7 @@ export function PrepDataTools() {
     launchpad: getLaunchpadStorageKey(activeCompanyId, activePersonaId),
     interviewDate: getInterviewDateStorageKey(activeCompanyId, activePersonaId),
   };
+  const maxBundleSizeKb = Math.round(PREP_DATA_BUNDLE_MAX_CHARS / 1024);
 
   function emitRefreshEvents() {
     window.dispatchEvent(
@@ -208,6 +210,11 @@ export function PrepDataTools() {
         setStatus("Clipboard is empty.");
         return;
       }
+      if (raw.length > PREP_DATA_BUNDLE_MAX_CHARS) {
+        setTone("error");
+        setStatus(`Clipboard JSON is too large (max ${maxBundleSizeKb} KB).`);
+        return;
+      }
 
       const parsed = parsePrepDataBundle(raw);
       if (!parsed) {
@@ -230,6 +237,11 @@ export function PrepDataTools() {
 
     try {
       const raw = await file.text();
+      if (raw.length > PREP_DATA_BUNDLE_MAX_CHARS) {
+        setTone("error");
+        setStatus(`Selected file is too large (max ${maxBundleSizeKb} KB).`);
+        return;
+      }
       const parsed = parsePrepDataBundle(raw);
       if (!parsed) {
         setTone("error");
