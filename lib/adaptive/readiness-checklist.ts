@@ -6,6 +6,8 @@ export interface ReadinessChecklistItem {
   helper: string;
 }
 
+export type ReadinessState = Record<string, boolean>;
+
 const commonChecklist: ReadinessChecklistItem[] = [
   {
     id: "opening-story",
@@ -124,4 +126,36 @@ export function getReadinessChecklist(
   personaId: string
 ): ReadinessChecklistItem[] {
   return [...commonChecklist, ...(personaSpecificChecklist[personaId] ?? [])];
+}
+
+export function getReadinessStorageKey(
+  companyId: string,
+  personaId: string
+): string {
+  return `adaptive.readiness.${companyId}.${personaId}`;
+}
+
+export function parseReadinessState(raw: string | null): ReadinessState {
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const normalized: ReadinessState = {};
+    for (const [key, value] of Object.entries(parsed)) {
+      normalized[key] = Boolean(value);
+    }
+    return normalized;
+  } catch {
+    return {};
+  }
+}
+
+export function getReadinessCompletion(
+  items: ReadinessChecklistItem[],
+  state: ReadinessState
+): { completedCount: number; completionPct: number } {
+  const completedCount = items.filter((item) => state[item.id]).length;
+  const completionPct = items.length
+    ? Math.round((completedCount / items.length) * 100)
+    : 0;
+  return { completedCount, completionPct };
 }

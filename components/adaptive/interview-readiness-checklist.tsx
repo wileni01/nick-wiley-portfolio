@@ -5,11 +5,12 @@ import { CheckCircle2, ListChecks } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
-import { getReadinessChecklist } from "@/lib/adaptive/readiness-checklist";
-
-function getChecklistStorageKey(companyId: string, personaId: string) {
-  return `adaptive.readiness.${companyId}.${personaId}`;
-}
+import {
+  getReadinessChecklist,
+  getReadinessCompletion,
+  getReadinessStorageKey,
+  parseReadinessState,
+} from "@/lib/adaptive/readiness-checklist";
 
 export function InterviewReadinessChecklist() {
   const { companyId, personaId } = useInterviewMode();
@@ -24,34 +25,40 @@ export function InterviewReadinessChecklist() {
     if (!companyId || !personaId || !checklistItems.length) return;
 
     const storedRaw = localStorage.getItem(
-      getChecklistStorageKey(companyId, personaId)
+      getReadinessStorageKey(companyId, personaId)
     );
     if (!storedRaw) {
       setChecked({});
       return;
     }
 
-    try {
-      const parsed = JSON.parse(storedRaw) as Record<string, boolean>;
-      setChecked(parsed);
-    } catch {
-      localStorage.removeItem(getChecklistStorageKey(companyId, personaId));
+    const parsed = parseReadinessState(storedRaw);
+    if (!Object.keys(parsed).length && storedRaw) {
+      localStorage.removeItem(getReadinessStorageKey(companyId, personaId));
       setChecked({});
+      return;
     }
+    setChecked(parsed);
   }, [checklistItems.length, companyId, personaId]);
 
   useEffect(() => {
     if (!companyId || !personaId || !checklistItems.length) return;
+    const storageKey = getReadinessStorageKey(companyId, personaId);
     localStorage.setItem(
-      getChecklistStorageKey(companyId, personaId),
+      storageKey,
       JSON.stringify(checked)
+    );
+    window.dispatchEvent(
+      new CustomEvent("adaptive-readiness-updated", { detail: { key: storageKey } })
     );
   }, [checked, checklistItems.length, companyId, personaId]);
 
   if (!companyId || !personaId || !checklistItems.length) return null;
 
-  const completedCount = checklistItems.filter((item) => checked[item.id]).length;
-  const completionPct = Math.round((completedCount / checklistItems.length) * 100);
+  const { completedCount, completionPct } = getReadinessCompletion(
+    checklistItems,
+    checked
+  );
 
   function toggleItem(itemId: string) {
     setChecked((prev) => ({ ...prev, [itemId]: !prev[itemId] }));
@@ -60,7 +67,13 @@ export function InterviewReadinessChecklist() {
   function resetChecklist() {
     setChecked({});
     if (companyId && personaId) {
-      localStorage.removeItem(getChecklistStorageKey(companyId, personaId));
+      const storageKey = getReadinessStorageKey(companyId, personaId);
+      localStorage.removeItem(storageKey);
+      window.dispatchEvent(
+        new CustomEvent("adaptive-readiness-updated", {
+          detail: { key: storageKey },
+        })
+      );
     }
   }
 

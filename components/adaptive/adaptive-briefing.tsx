@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { PrepCockpitSummary } from "./prep-cockpit-summary";
 import { InterviewReadinessChecklist } from "./interview-readiness-checklist";
 import { MockInterviewSession } from "./mock-interview-session";
 import { MockInterviewerScript } from "./mock-interviewer-script";
@@ -231,6 +232,7 @@ export function AdaptiveBriefing() {
         </ul>
       </div>
 
+      <PrepCockpitSummary />
       <InterviewReadinessChecklist />
       <PrepInsights />
       <MockInterviewerScript />
