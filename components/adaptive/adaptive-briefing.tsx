@@ -262,8 +262,12 @@ export function AdaptiveBriefing() {
       </div>
 
       <ModeComparisonPanel />
-      <InterviewDateTracker />
-      <InterviewDayPlanPanel />
+      <div id="adaptive-interview-date-tracker">
+        <InterviewDateTracker />
+      </div>
+      <div id="adaptive-interview-day-plan">
+        <InterviewDayPlanPanel />
+      </div>
       <PreflightReadinessCard />
       <ReadinessGapPanel />
       <PrepCockpitSummary />
@@ -276,7 +280,9 @@ export function AdaptiveBriefing() {
       <InterviewReadinessChecklist />
       <PrepInsights />
       <MockInterviewerScript />
-      <MockInterviewSession />
+      <div id="adaptive-mock-session">
+        <MockInterviewSession />
+      </div>
 
       {companyId !== "anthropic" && (
         <Button
