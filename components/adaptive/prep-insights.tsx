@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { BarChart3, TrendingDown, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import {
   getPrepHistoryStorageKey,
@@ -26,6 +27,7 @@ import {
   parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
 import { evaluatePrepCadence } from "@/lib/adaptive/prep-cadence";
+import { setInterviewDateOffsetForMode } from "@/lib/adaptive/interview-date-actions";
 
 function formatDateLabel(timestamp: string): string {
   try {
@@ -213,6 +215,8 @@ export function PrepInsights() {
   }, [history]);
 
   if (!companyId || !personaId) return null;
+  const activeCompanyId = companyId;
+  const activePersonaId = personaId;
 
   const latest = history[0];
   const previous = history[1];
@@ -245,6 +249,33 @@ export function PrepInsights() {
     latestScore: latest?.averageScore ?? null,
     latestSessionTimestamp: latest?.timestamp ?? null,
   });
+  const isTimelineMissing = interviewTimeline.daysUntil === null;
+  const shouldShowTimelineQuickActions = cadence.status === "none";
+
+  function setInterviewDateOffset(daysFromNow: number) {
+    setInterviewDateOffsetForMode(activeCompanyId, activePersonaId, daysFromNow);
+  }
+
+  const timelineQuickActions = shouldShowTimelineQuickActions ? (
+    <div className="flex flex-wrap gap-1.5">
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-7 px-2 text-[11px]"
+        onClick={() => setInterviewDateOffset(7)}
+      >
+        {isTimelineMissing ? "Set +7d" : "Reset +7d"}
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-7 px-2 text-[11px]"
+        onClick={() => setInterviewDateOffset(14)}
+      >
+        {isTimelineMissing ? "Set +14d" : "Reset +14d"}
+      </Button>
+    </div>
+  ) : null;
 
   return (
     <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
@@ -279,6 +310,7 @@ export function PrepInsights() {
             </div>
             <p className="text-xs text-muted-foreground">{interviewTimeline.label}</p>
             <p className="text-xs text-muted-foreground">{cadence.detail}</p>
+            {timelineQuickActions}
           </div>
         </div>
       ) : (
@@ -372,6 +404,7 @@ export function PrepInsights() {
                   } ago`
                 : " · No recent session logged"}
             </p>
+            {timelineQuickActions}
           </div>
 
           <div className="space-y-2">
