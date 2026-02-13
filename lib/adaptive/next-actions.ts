@@ -1,3 +1,5 @@
+import { getDaysUntilInterview } from "./interview-date";
+
 export interface NextAction {
   id: string;
   priority: "high" | "medium" | "low";
@@ -17,17 +19,6 @@ interface BuildNextActionsInput {
   interviewDate?: string | null;
 }
 
-function getDaysUntilInterview(interviewDate: string | null | undefined): number | null {
-  if (!interviewDate) return null;
-  const date = new Date(interviewDate);
-  if (Number.isNaN(date.getTime())) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  date.setHours(0, 0, 0, 0);
-  const diffMs = date.getTime() - today.getTime();
-  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-}
-
 function getSessionRecencyDays(timestamp: string | null | undefined): number | null {
   if (!timestamp) return null;
   const parsed = new Date(timestamp);
@@ -39,7 +30,7 @@ function getSessionRecencyDays(timestamp: string | null | undefined): number | n
 
 export function buildNextActions(input: BuildNextActionsInput): NextAction[] {
   const actions: NextAction[] = [];
-  const daysUntilInterview = getDaysUntilInterview(input.interviewDate);
+  const daysUntilInterview = getDaysUntilInterview(input.interviewDate ?? null);
   const recencyDays = getSessionRecencyDays(input.latestSessionTimestamp);
   const hasPassedInterviewDate =
     daysUntilInterview !== null && daysUntilInterview < 0;

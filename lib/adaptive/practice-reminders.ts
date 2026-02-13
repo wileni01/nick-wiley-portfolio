@@ -1,3 +1,5 @@
+import { getDaysUntilInterview, toInterviewLocalDate } from "./interview-date";
+
 export interface PracticeReminder {
   id: string;
   title: string;
@@ -30,20 +32,6 @@ function addDays(date: Date, days: number): Date {
   return clone;
 }
 
-function parseInterviewDate(raw: string | null | undefined): Date | null {
-  if (!raw) return null;
-  const parsed = new Date(raw);
-  if (Number.isNaN(parsed.getTime())) return null;
-  return startOfDay(parsed);
-}
-
-function getDaysUntilInterview(now: Date, interviewDate: Date | null): number | null {
-  if (!interviewDate) return null;
-  const today = startOfDay(now);
-  const diffMs = interviewDate.getTime() - today.getTime();
-  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-}
-
 function capDueDate(baseDate: Date, interviewDate: Date | null, now: Date): Date {
   if (!interviewDate) return baseDate;
   const today = startOfDay(now);
@@ -55,8 +43,8 @@ export function buildPracticeReminders(
   input: BuildPracticeRemindersInput
 ): PracticeReminder[] {
   const reminders: PracticeReminder[] = [];
-  const interviewDate = parseInterviewDate(input.interviewDate);
-  const daysUntilInterview = getDaysUntilInterview(input.now, interviewDate);
+  const interviewDate = toInterviewLocalDate(input.interviewDate ?? null);
+  const daysUntilInterview = getDaysUntilInterview(input.interviewDate ?? null, input.now);
   const hasPassedInterviewDate =
     daysUntilInterview !== null && daysUntilInterview < 0;
   const todayIso = toIsoDate(capDueDate(startOfDay(input.now), interviewDate, input.now));

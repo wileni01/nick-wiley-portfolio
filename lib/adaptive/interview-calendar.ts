@@ -1,3 +1,5 @@
+import { parseInterviewDate } from "./interview-date";
+
 interface BuildInterviewPrepCalendarInput {
   companyName: string;
   personaName: string;
@@ -83,8 +85,9 @@ function buildEventBlock(input: {
 export function buildInterviewPrepCalendarIcs(
   input: BuildInterviewPrepCalendarInput
 ): string {
-  const interviewDate = new Date(input.interviewDate);
-  if (Number.isNaN(interviewDate.getTime())) return "";
+  const normalizedInterviewDate = parseInterviewDate(input.interviewDate);
+  if (!normalizedInterviewDate) return "";
+  const interviewDate = new Date(`${normalizedInterviewDate}T00:00:00Z`);
 
   const stamp = toIcsTimestamp(new Date());
   const { normalizedCompany, normalizedPersona } = normalizeTarget(input);
@@ -131,8 +134,9 @@ export function buildInterviewGoogleCalendarUrl(
 export function buildInterviewGoogleCalendarEvents(
   input: BuildInterviewPrepCalendarInput
 ): InterviewCalendarLink[] {
-  const interviewDate = new Date(input.interviewDate);
-  if (Number.isNaN(interviewDate.getTime())) return [];
+  const normalizedInterviewDate = parseInterviewDate(input.interviewDate);
+  if (!normalizedInterviewDate) return [];
+  const interviewDate = new Date(`${normalizedInterviewDate}T00:00:00Z`);
 
   const { normalizedCompany, normalizedPersona } = normalizeTarget(input);
   return buildCalendarCheckpoints({

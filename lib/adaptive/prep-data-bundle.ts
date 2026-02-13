@@ -2,6 +2,7 @@ import { parsePrepHistory, type PrepSessionSnapshot } from "./prep-history";
 import { parsePrepGoalState, type PrepGoalState } from "./prep-goals";
 import { parseReadinessState, type ReadinessState } from "./readiness-checklist";
 import { parseFocusHistory } from "./focus-history";
+import { parseInterviewDate } from "./interview-date";
 
 export interface StoredMockSessionState {
   answers: string[];
@@ -57,7 +58,7 @@ export function buildPrepDataBundle(input: {
     prepGoal: parsePrepGoalState(input.prepGoalRaw),
     prepNotes: parsePrepNotes(input.prepNotesRaw),
     focusHistory: parseFocusHistory(input.focusHistoryRaw),
-    interviewDate: parseInterviewDateRaw(input.interviewDateRaw),
+    interviewDate: parseInterviewDate(input.interviewDateRaw),
     launchpadState: parseDrillState(input.launchpadStateRaw),
     mockSession: parseMockSessionState(input.mockSessionRaw),
     drillState: parseDrillState(input.drillStateRaw),
@@ -96,7 +97,7 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
       focusHistory: parseFocusHistory(
         JSON.stringify(parsed.focusHistory ?? [])
       ),
-      interviewDate: parseInterviewDateRaw(
+      interviewDate: parseInterviewDate(
         typeof parsed.interviewDate === "string" ? parsed.interviewDate : null
       ),
       launchpadState: parseDrillState(
@@ -110,14 +111,6 @@ export function parsePrepDataBundle(raw: string): PrepDataBundle | null {
   } catch {
     return null;
   }
-}
-
-function parseInterviewDateRaw(raw: string | null): string | null {
-  if (!raw) return null;
-  const value = String(raw).slice(0, 10);
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return value;
 }
 
 function parsePrepNotes(raw: string | null): string {

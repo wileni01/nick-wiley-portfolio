@@ -1,3 +1,5 @@
+import { getDaysUntilInterview } from "./interview-date";
+
 export interface PreflightInput {
   readinessPct: number;
   latestScore: number | null;
@@ -123,17 +125,6 @@ function getSessionRecencyDays(timestamp: string | null): number | null {
   const diffMs = Date.now() - parsed.getTime();
   if (diffMs < 0) return 0;
   return Math.floor(diffMs / (1000 * 60 * 60 * 24));
-}
-
-function getDaysUntilInterview(interviewDate: string | null): number | null {
-  if (!interviewDate) return null;
-  const date = new Date(interviewDate);
-  if (Number.isNaN(date.getTime())) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  date.setHours(0, 0, 0, 0);
-  const diffMs = date.getTime() - today.getTime();
-  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 }
 
 function getInterviewUrgencyPenalty(input: {

@@ -1,3 +1,5 @@
+import { getDaysUntilInterview } from "./interview-date";
+
 export interface ModeHealthInput {
   readinessPct: number | null;
   latestScore: number | null;
@@ -98,17 +100,6 @@ export function evaluateModeHealth(input: ModeHealthInput): ModeHealthOutput {
     detail: `Current readiness ${readiness}% and score ${score}/100 suggest additional practice is needed before interview day.`,
     className: "border-amber-400/50 text-amber-600 dark:text-amber-300",
   };
-}
-
-function getDaysUntilInterview(interviewDate: string | null): number | null {
-  if (!interviewDate) return null;
-  const date = new Date(interviewDate);
-  if (Number.isNaN(date.getTime())) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  date.setHours(0, 0, 0, 0);
-  const diffMs = date.getTime() - today.getTime();
-  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 }
 
 function getSessionRecencyDays(timestamp: string | null): number | null {
