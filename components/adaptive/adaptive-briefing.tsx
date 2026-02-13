@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { InterviewDayPlanPanel } from "./interview-day-plan";
 import { PrepCockpitSummary } from "./prep-cockpit-summary";
 import { PrepDataTools } from "./prep-data-tools";
 import { InterviewReadinessChecklist } from "./interview-readiness-checklist";
@@ -237,6 +238,7 @@ export function AdaptiveBriefing() {
       </div>
 
       <ModeComparisonPanel />
+      <InterviewDayPlanPanel />
       <PrepCockpitSummary />
       <PrepDataTools />
       <NextBestActions />
