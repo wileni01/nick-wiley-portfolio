@@ -17,7 +17,7 @@ import {
 } from "@/lib/adaptive/interview-calendar";
 import { buildInterviewDateOffsetValue } from "@/lib/adaptive/interview-date-actions";
 import { sanitizeFileToken, triggerDownload } from "@/lib/download";
-import { openExternalUrl } from "@/lib/external-link";
+import { openExternalUrl, openExternalUrls } from "@/lib/external-link";
 
 export function InterviewDateTracker() {
   const { companyId, personaId, company, persona } = useInterviewMode();
@@ -101,15 +101,12 @@ export function InterviewDateTracker() {
 
   function openAllGoogleCalendarCheckpoints() {
     if (!googleCalendarEvents.length) return;
-    let openedCount = 0;
-    googleCalendarEvents.forEach((event) => {
-      if (openExternalUrl(event.url)) openedCount += 1;
-    });
-    if (openedCount === googleCalendarEvents.length) {
+    const result = openExternalUrls(googleCalendarEvents.map((event) => event.url));
+    if (result.opened === googleCalendarEvents.length) {
       setCalendarOpenState("opened");
       return;
     }
-    if (openedCount > 0) {
+    if (result.opened > 0) {
       setCalendarOpenState("partial");
       return;
     }

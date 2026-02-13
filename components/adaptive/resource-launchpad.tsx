@@ -9,7 +9,7 @@ import { useInterviewMode } from "./interview-mode-provider";
 import { useTransientState } from "./use-transient-state";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
-import { openExternalUrl } from "@/lib/external-link";
+import { openExternalUrls } from "@/lib/external-link";
 
 export function ResourceLaunchpad() {
   const { companyId, personaId } = useInterviewMode();
@@ -96,12 +96,14 @@ export function ResourceLaunchpad() {
 
   function openRemaining() {
     if (!remainingResources.length) return;
-    const openedIds: string[] = [];
-    remainingResources.forEach((resource) => {
-      if (openExternalUrl(resource.asset.url)) {
-        openedIds.push(resource.asset.id);
-      }
-    });
+    const result = openExternalUrls(
+      remainingResources.map((resource) => resource.asset.url)
+    );
+    const openedUrlSet = new Set(result.openedUrls);
+    const openedIds = remainingResources
+      .filter((resource) => openedUrlSet.has(resource.asset.url))
+      .map((resource) => resource.asset.id);
+
     if (openedIds.length) {
       setOpened((prev) => {
         const merged = { ...prev };
@@ -111,11 +113,11 @@ export function ResourceLaunchpad() {
         return merged;
       });
     }
-    if (openedIds.length === remainingResources.length) {
+    if (result.opened === remainingResources.length) {
       setOpenState("opened");
       return;
     }
-    if (openedIds.length > 0) {
+    if (result.opened > 0) {
       setOpenState("partial");
       return;
     }
