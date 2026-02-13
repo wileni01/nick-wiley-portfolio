@@ -1,6 +1,7 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Check, Copy, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 
@@ -21,6 +22,26 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
     setProvider,
     resetMode,
   } = useInterviewMode();
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+
+  async function handleCopyPrepLink() {
+    if (!companyId || !personaId) return;
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      params.set("company", companyId);
+      params.set("persona", personaId);
+      params.set("provider", provider);
+
+      const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+      await navigator.clipboard.writeText(url);
+      setCopyState("copied");
+    } catch {
+      setCopyState("error");
+    } finally {
+      setTimeout(() => setCopyState("idle"), 1500);
+    }
+  }
 
   return (
     <div
@@ -99,6 +120,26 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
           Reset
         </Button>
       )}
+
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={handleCopyPrepLink}
+        disabled={!companyId || !personaId}
+        className="text-xs"
+      >
+        {copyState === "copied" ? (
+          <>
+            <Check className="h-3.5 w-3.5" />
+            Copied link
+          </>
+        ) : (
+          <>
+            <Copy className="h-3.5 w-3.5" />
+            Copy prep link
+          </>
+        )}
+      </Button>
     </div>
   );
 }
