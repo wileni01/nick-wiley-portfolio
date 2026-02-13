@@ -24,6 +24,9 @@ export function PreflightReadinessCard() {
   const { companyId, personaId, focusNote } = useInterviewMode();
   const [readinessPct, setReadinessPct] = useState(0);
   const [latestScore, setLatestScore] = useState<number | null>(null);
+  const [latestSessionTimestamp, setLatestSessionTimestamp] = useState<string | null>(
+    null
+  );
   const [launchpadPct, setLaunchpadPct] = useState(0);
   const [hasNotes, setHasNotes] = useState(false);
 
@@ -47,6 +50,7 @@ export function PreflightReadinessCard() {
 
       const history = parsePrepHistory(localStorage.getItem(keys.history));
       setLatestScore(history[0]?.averageScore ?? null);
+      setLatestSessionTimestamp(history[0]?.timestamp ?? null);
 
       const launchpad = localStorage.getItem(keys.launchpad);
       if (!launchpad) {
@@ -115,11 +119,19 @@ export function PreflightReadinessCard() {
       calculatePreflightScore({
         readinessPct,
         latestScore,
+        latestSessionTimestamp,
         launchpadPct,
         hasNotes,
         hasFocusNote: Boolean(focusNote.trim()),
       }),
-    [focusNote, hasNotes, latestScore, launchpadPct, readinessPct]
+    [
+      focusNote,
+      hasNotes,
+      latestScore,
+      latestSessionTimestamp,
+      launchpadPct,
+      readinessPct,
+    ]
   );
 
   if (!companyId || !personaId) return null;
@@ -147,10 +159,16 @@ export function PreflightReadinessCard() {
         <span>Latest score: {latestScore ?? "N/A"}</span>
         <span>Launchpad: {launchpadPct}%</span>
         <span>
-          Notes/focus: {hasNotes ? "notes" : "no-notes"} +{" "}
-          {focusNote.trim() ? "focus" : "no-focus"}
+          Recency:{" "}
+          {preflight.recencyDays === null
+            ? "no-session"
+            : `${preflight.recencyDays}d ago`}
         </span>
       </div>
+      <p className="text-[11px] text-muted-foreground">
+        Context signals: {hasNotes ? "notes" : "no-notes"} +{" "}
+        {focusNote.trim() ? "focus" : "no-focus"}
+      </p>
     </div>
   );
 }
