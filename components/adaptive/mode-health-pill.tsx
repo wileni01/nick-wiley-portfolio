@@ -1,0 +1,84 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { useInterviewMode } from "./interview-mode-provider";
+import {
+  getReadinessChecklist,
+  getReadinessCompletion,
+  getReadinessStorageKey,
+  parseReadinessState,
+} from "@/lib/adaptive/readiness-checklist";
+import {
+  getPrepHistoryStorageKey,
+  parsePrepHistory,
+} from "@/lib/adaptive/prep-history";
+
+export function ModeHealthPill() {
+  const { companyId, personaId } = useInterviewMode();
+  const [readinessPct, setReadinessPct] = useState<number | null>(null);
+  const [latestScore, setLatestScore] = useState<number | null>(null);
+
+  const keys = useMemo(() => {
+    if (!companyId || !personaId) return null;
+    return {
+      readiness: getReadinessStorageKey(companyId, personaId),
+      history: getPrepHistoryStorageKey(companyId, personaId),
+    };
+  }, [companyId, personaId]);
+
+  useEffect(() => {
+    if (!companyId || !personaId || !keys) {
+      setReadinessPct(null);
+      setLatestScore(null);
+      return;
+    }
+
+    function refresh() {
+      const checklistItems = getReadinessChecklist(companyId, personaId);
+      const readinessState = parseReadinessState(
+        localStorage.getItem(keys.readiness)
+      );
+      const readiness = getReadinessCompletion(checklistItems, readinessState);
+      const history = parsePrepHistory(localStorage.getItem(keys.history));
+      setReadinessPct(readiness.completionPct);
+      setLatestScore(history[0]?.averageScore ?? null);
+    }
+
+    refresh();
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === keys.readiness || event.key === keys.history) refresh();
+    }
+
+    function onReadinessUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === keys.readiness) refresh();
+    }
+
+    function onPrepHistoryUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === keys.history) refresh();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
+    window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("adaptive-readiness-updated", onReadinessUpdate);
+      window.removeEventListener(
+        "adaptive-prep-history-updated",
+        onPrepHistoryUpdate
+      );
+    };
+  }, [companyId, keys, personaId]);
+
+  if (!companyId || !personaId) return null;
+
+  return (
+    <Badge variant="outline" className="text-[10px] whitespace-nowrap">
+      Ready {readinessPct ?? 0}% · Score {latestScore ?? "N/A"}
+    </Badge>
+  );
+}

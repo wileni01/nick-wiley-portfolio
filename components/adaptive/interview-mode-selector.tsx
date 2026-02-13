@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Copy, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { ModeHealthPill } from "./mode-health-pill";
 
 interface InterviewModeSelectorProps {
   mobile?: boolean;
@@ -59,6 +60,7 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
         <span className="text-xs font-medium text-muted-foreground">
           Interview Mode
         </span>
+        <ModeHealthPill />
       </div>
 
       <select
