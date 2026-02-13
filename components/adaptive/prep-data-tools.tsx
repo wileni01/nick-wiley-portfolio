@@ -430,6 +430,8 @@ export function PrepDataTools() {
 
       {status ? (
         <p
+          role="status"
+          aria-live="polite"
           className={`text-xs ${
             tone === "error"
               ? "text-destructive"

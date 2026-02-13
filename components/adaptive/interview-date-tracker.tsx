@@ -156,6 +156,13 @@ export function InterviewDateTracker() {
           )}
         </Button>
       </div>
+      <span className="sr-only" role="status" aria-live="polite">
+        {downloadState === "done"
+          ? "Calendar plan downloaded."
+          : downloadState === "error"
+            ? "Calendar plan download failed."
+            : ""}
+      </span>
 
       {googleCalendarEvents.length > 0 && (
         <div className="rounded-md border border-border bg-background p-3 space-y-2">

@@ -123,6 +123,17 @@ export function MockInterviewerScript() {
               )}
             </Button>
           </div>
+          <span className="sr-only" role="status" aria-live="polite">
+            {copyState === "copied"
+              ? "Mock script copied."
+              : copyState === "error"
+                ? "Mock script copy failed."
+                : downloadState === "done"
+                  ? "Mock script downloaded."
+                  : downloadState === "error"
+                    ? "Mock script download failed."
+                    : ""}
+          </span>
         </div>
       </summary>
 

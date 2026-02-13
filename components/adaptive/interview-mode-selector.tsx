@@ -302,6 +302,13 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
           </>
         )}
       </Button>
+      <span className="sr-only" role="status" aria-live="polite">
+        {copyState === "copied"
+          ? "Prep link copied."
+          : copyState === "error"
+            ? "Prep link copy failed."
+            : ""}
+      </span>
       <Button
         size="sm"
         variant="ghost"

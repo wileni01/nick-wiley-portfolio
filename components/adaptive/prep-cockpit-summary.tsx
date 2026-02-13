@@ -436,6 +436,21 @@ export function PrepCockpitSummary() {
           )}
         </Button>
       </div>
+      <span className="sr-only" role="status" aria-live="polite">
+        {copyState === "copied"
+          ? "Prep brief copied."
+          : copyState === "error"
+            ? "Prep brief copy failed."
+            : downloadState === "done"
+              ? "Prep brief downloaded."
+              : downloadState === "error"
+                ? "Prep brief download failed."
+                : packetState === "done"
+                  ? "Full prep packet downloaded."
+                  : packetState === "error"
+                    ? "Full prep packet download failed."
+                    : ""}
+      </span>
       {copyState === "error" && (
         <p className="text-xs text-muted-foreground">
           Could not copy automatically. Try again after interacting with the page.

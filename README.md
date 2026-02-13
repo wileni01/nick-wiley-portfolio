@@ -160,7 +160,7 @@ lib/
 - **Full prep packet export** — Download a consolidated Markdown packet with brief, preflight status, pacing guidance, reminders, next actions, drills, and day plan.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
-- **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.
+- **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support, and live status announcements for adaptive copy/download actions.
 
 ## Adaptive Interview Mode
 

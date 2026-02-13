@@ -728,6 +728,17 @@ export function MockInterviewSession() {
             )}
           </Button>
         </div>
+        <span className="sr-only" role="status" aria-live="polite">
+          {copyState === "copied"
+            ? "Mock report copied."
+            : copyState === "error"
+              ? "Mock report copy failed."
+              : downloadState === "done"
+                ? "Mock report downloaded."
+                : downloadState === "error"
+                  ? "Mock report download failed."
+                  : ""}
+        </span>
         {copyState === "error" && (
           <p className="text-xs text-muted-foreground">
             Could not copy automatically. Use the download option instead.
