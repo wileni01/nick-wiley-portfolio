@@ -27,6 +27,8 @@ import { sanitizeFileToken, triggerDownload } from "@/lib/download";
 
 type StatusTone = "neutral" | "error" | "success";
 const CROSS_MODE_IMPORT_CONFIRM_MS = 10000;
+const PREP_DATA_MANUAL_PASTE_PROMPT =
+  "Paste your prep data JSON bundle. Leave blank to cancel.";
 
 export function PrepDataTools() {
   const { companyId, personaId, company, persona } = useInterviewMode();
@@ -289,38 +291,68 @@ export function PrepDataTools() {
     applyImportedBundle(pendingImport);
   }
 
+  function importRawBundle(raw: string, source: "clipboard" | "file" | "manual"): boolean {
+    if (!raw.trim()) {
+      setTone("error");
+      setStatus(
+        source === "manual" ? "No JSON was provided." : `${source} content is empty.`
+      );
+      return false;
+    }
+    if (raw.length > PREP_DATA_BUNDLE_MAX_CHARS) {
+      setTone("error");
+      setStatus(
+        source === "file"
+          ? `Selected file is too large (max ${maxBundleSizeKb} KB).`
+          : `JSON is too large (max ${maxBundleSizeKb} KB).`
+      );
+      return false;
+    }
+
+    const parsed = parsePrepDataBundle(raw);
+    if (!parsed) {
+      setTone("error");
+      setStatus(
+        source === "clipboard"
+          ? "Clipboard does not contain a valid prep data bundle."
+          : source === "manual"
+            ? "Pasted content is not a valid prep data bundle."
+            : "Invalid prep data bundle."
+      );
+      return false;
+    }
+    if (isCrossModeBundle(parsed)) {
+      queueCrossModeImport(parsed);
+      return true;
+    }
+    applyImportedBundle(parsed);
+    return true;
+  }
+
   async function pasteJsonFromClipboard() {
     setConfirmReset(false);
     setPendingImport(null);
     setPendingImportTargetKey(null);
-    try {
-      const raw = await navigator.clipboard.readText();
-      if (!raw.trim()) {
-        setTone("error");
-        setStatus("Clipboard is empty.");
-        return;
-      }
-      if (raw.length > PREP_DATA_BUNDLE_MAX_CHARS) {
-        setTone("error");
-        setStatus(`Clipboard JSON is too large (max ${maxBundleSizeKb} KB).`);
-        return;
-      }
+    const canReadClipboard =
+      typeof navigator !== "undefined" &&
+      Boolean(navigator.clipboard?.readText);
 
-      const parsed = parsePrepDataBundle(raw);
-      if (!parsed) {
-        setTone("error");
-        setStatus("Clipboard does not contain a valid prep data bundle.");
-        return;
+    if (canReadClipboard) {
+      try {
+        const raw = await navigator.clipboard.readText();
+        if (importRawBundle(raw, "clipboard")) return;
+      } catch {
+        // Fall through to manual paste prompt.
       }
-      if (isCrossModeBundle(parsed)) {
-        queueCrossModeImport(parsed);
-        return;
-      }
-      applyImportedBundle(parsed);
-    } catch {
-      setTone("error");
-      setStatus("Could not read clipboard data.");
     }
+
+    const fallback = window.prompt(PREP_DATA_MANUAL_PASTE_PROMPT);
+    if (fallback === null) {
+      setTone("neutral");
+      setStatus("Paste canceled.");
+      return;
+    }
+    importRawBundle(fallback, "manual");
   }
 
   async function onImportFile(event: React.ChangeEvent<HTMLInputElement>) {
@@ -332,22 +364,7 @@ export function PrepDataTools() {
 
     try {
       const raw = await file.text();
-      if (raw.length > PREP_DATA_BUNDLE_MAX_CHARS) {
-        setTone("error");
-        setStatus(`Selected file is too large (max ${maxBundleSizeKb} KB).`);
-        return;
-      }
-      const parsed = parsePrepDataBundle(raw);
-      if (!parsed) {
-        setTone("error");
-        setStatus("Invalid prep data bundle.");
-        return;
-      }
-      if (isCrossModeBundle(parsed)) {
-        queueCrossModeImport(parsed);
-        return;
-      }
-      applyImportedBundle(parsed);
+      importRawBundle(raw, "file");
     } catch {
       setTone("error");
       setStatus("Could not read selected file.");
