@@ -1,10 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Check, Copy, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, Copy, Save, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { ModeHealthPill } from "./mode-health-pill";
+import {
+  addFocusHistoryEntry,
+  getFocusHistoryStorageKey,
+  parseFocusHistory,
+} from "@/lib/adaptive/focus-history";
+
+function formatFocusChipLabel(text: string): string {
+  return text.length > 48 ? `${text.slice(0, 47)}…` : text;
+}
 
 interface InterviewModeSelectorProps {
   mobile?: boolean;
@@ -26,6 +35,16 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
     resetMode,
   } = useInterviewMode();
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [focusHistory, setFocusHistory] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!companyId || !personaId) {
+      setFocusHistory([]);
+      return;
+    }
+    const key = getFocusHistoryStorageKey(companyId, personaId);
+    setFocusHistory(parseFocusHistory(localStorage.getItem(key)));
+  }, [companyId, personaId]);
 
   async function handleCopyPrepLink() {
     if (!companyId || !personaId) return;
@@ -47,6 +66,17 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
     } finally {
       setTimeout(() => setCopyState("idle"), 1500);
     }
+  }
+
+  function saveCurrentFocusNote() {
+    if (!companyId || !personaId || !focusNote.trim()) return;
+    const key = getFocusHistoryStorageKey(companyId, personaId);
+    const nextHistory = addFocusHistoryEntry(
+      parseFocusHistory(localStorage.getItem(key)),
+      focusNote
+    );
+    localStorage.setItem(key, JSON.stringify(nextHistory));
+    setFocusHistory(nextHistory);
   }
 
   return (
@@ -143,6 +173,26 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
         </div>
       ) : null}
 
+      {focusHistory.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-1.5">
+          {focusHistory.map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => setFocusNote(item)}
+              className={`rounded-md border px-2 py-1 text-[10px] transition-colors ${
+                focusNote.trim() === item
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background text-muted-foreground hover:text-foreground"
+              }`}
+              title={item}
+            >
+              {formatFocusChipLabel(item)}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       <Button
         size="sm"
         variant="ghost"
@@ -176,6 +226,16 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
             Copy prep link
           </>
         )}
+      </Button>
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={saveCurrentFocusNote}
+        disabled={!companyId || !personaId || !focusNote.trim()}
+        className="text-xs"
+      >
+        <Save className="h-3.5 w-3.5" />
+        Save focus
       </Button>
     </div>
   );
