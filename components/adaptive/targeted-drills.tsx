@@ -18,7 +18,9 @@ export function TargetedDrills() {
 
   useEffect(() => {
     if (!companyId || !personaId) return;
-    const historyKey = getPrepHistoryStorageKey(companyId, personaId);
+    const activeCompanyId = companyId;
+    const activePersonaId = personaId;
+    const historyKey = getPrepHistoryStorageKey(activeCompanyId, activePersonaId);
 
     function refreshThemes() {
       const history = parsePrepHistory(localStorage.getItem(historyKey));
@@ -49,7 +51,9 @@ export function TargetedDrills() {
 
   useEffect(() => {
     if (!companyId || !personaId) return;
-    const key = getDrillStateStorageKey(companyId, personaId);
+    const activeCompanyId = companyId;
+    const activePersonaId = personaId;
+    const key = getDrillStateStorageKey(activeCompanyId, activePersonaId);
 
     function refreshChecked() {
       const raw = localStorage.getItem(key);
@@ -89,11 +93,15 @@ export function TargetedDrills() {
 
   useEffect(() => {
     if (!companyId || !personaId) return;
-    const key = getDrillStateStorageKey(companyId, personaId);
+    const activeCompanyId = companyId;
+    const activePersonaId = personaId;
+    const key = getDrillStateStorageKey(activeCompanyId, activePersonaId);
     localStorage.setItem(key, JSON.stringify(checked));
   }, [checked, companyId, personaId]);
 
   if (!companyId || !personaId) return null;
+  const activeCompanyId = companyId;
+  const activePersonaId = personaId;
 
   const completed = drills.filter((drill) => checked[drill.id]).length;
 
@@ -103,7 +111,7 @@ export function TargetedDrills() {
 
   function resetDrills() {
     setChecked({});
-    const key = getDrillStateStorageKey(companyId, personaId);
+    const key = getDrillStateStorageKey(activeCompanyId, activePersonaId);
     localStorage.removeItem(key);
     window.dispatchEvent(
       new CustomEvent("adaptive-drill-state-updated", { detail: { key } })

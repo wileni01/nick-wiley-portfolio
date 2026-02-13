@@ -43,23 +43,24 @@ export function PrepInsights() {
       setHistory([]);
       return;
     }
+    const activeStorageKey = storageKey;
 
     function loadHistory() {
-      const parsed = parsePrepHistory(localStorage.getItem(storageKey));
+      const parsed = parsePrepHistory(localStorage.getItem(activeStorageKey));
       setHistory(parsed);
     }
 
     loadHistory();
 
     function onStorage(event: StorageEvent) {
-      if (event.key === storageKey) {
+      if (event.key === activeStorageKey) {
         loadHistory();
       }
     }
 
     function onPrepHistoryUpdate(event: Event) {
       const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (!detail?.key || detail.key === storageKey) {
+      if (!detail?.key || detail.key === activeStorageKey) {
         loadHistory();
       }
     }

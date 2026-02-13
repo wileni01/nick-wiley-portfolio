@@ -30,17 +30,19 @@ export function PrepDataTools() {
   const [tone, setTone] = useState<StatusTone>("neutral");
 
   if (!companyId || !personaId || !company || !persona) return null;
+  const activeCompanyId = companyId;
+  const activePersonaId = personaId;
 
   const keys = {
-    readiness: getReadinessStorageKey(companyId, personaId),
-    history: getPrepHistoryStorageKey(companyId, personaId),
-    goals: getPrepGoalStorageKey(companyId, personaId),
-    mock: getMockSessionStorageKey(companyId, personaId),
-    drills: getDrillStateStorageKey(companyId, personaId),
-    notes: getPrepNotesStorageKey(companyId, personaId),
-    focusHistory: getFocusHistoryStorageKey(companyId, personaId),
-    launchpad: getLaunchpadStorageKey(companyId, personaId),
-    interviewDate: getInterviewDateStorageKey(companyId, personaId),
+    readiness: getReadinessStorageKey(activeCompanyId, activePersonaId),
+    history: getPrepHistoryStorageKey(activeCompanyId, activePersonaId),
+    goals: getPrepGoalStorageKey(activeCompanyId, activePersonaId),
+    mock: getMockSessionStorageKey(activeCompanyId, activePersonaId),
+    drills: getDrillStateStorageKey(activeCompanyId, activePersonaId),
+    notes: getPrepNotesStorageKey(activeCompanyId, activePersonaId),
+    focusHistory: getFocusHistoryStorageKey(activeCompanyId, activePersonaId),
+    launchpad: getLaunchpadStorageKey(activeCompanyId, activePersonaId),
+    interviewDate: getInterviewDateStorageKey(activeCompanyId, activePersonaId),
   };
 
   function emitRefreshEvents() {
@@ -93,8 +95,8 @@ export function PrepDataTools() {
 
   function getBundleJson() {
     const bundle = buildPrepDataBundle({
-      companyId,
-      personaId,
+      companyId: activeCompanyId,
+      personaId: activePersonaId,
       readinessRaw: localStorage.getItem(keys.readiness),
       prepHistoryRaw: localStorage.getItem(keys.history),
       prepGoalRaw: localStorage.getItem(keys.goals),
@@ -125,7 +127,7 @@ export function PrepDataTools() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `prep-data-${companyId}-${personaId}.json`;
+    link.download = `prep-data-${activeCompanyId}-${activePersonaId}.json`;
     link.click();
     URL.revokeObjectURL(url);
     setTone("success");
@@ -176,8 +178,8 @@ export function PrepDataTools() {
       emitRefreshEvents();
 
       if (
-        parsed.mode.companyId !== companyId ||
-        parsed.mode.personaId !== personaId
+        parsed.mode.companyId !== activeCompanyId ||
+        parsed.mode.personaId !== activePersonaId
       ) {
         setTone("neutral");
         setStatus(

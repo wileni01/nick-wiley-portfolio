@@ -35,14 +35,17 @@ export function ModeHealthPill() {
       setLatestScore(null);
       return;
     }
+    const activeCompanyId = companyId;
+    const activePersonaId = personaId;
+    const activeKeys = keys;
 
     function refresh() {
-      const checklistItems = getReadinessChecklist(companyId, personaId);
+      const checklistItems = getReadinessChecklist(activeCompanyId, activePersonaId);
       const readinessState = parseReadinessState(
-        localStorage.getItem(keys.readiness)
+        localStorage.getItem(activeKeys.readiness)
       );
       const readiness = getReadinessCompletion(checklistItems, readinessState);
-      const history = parsePrepHistory(localStorage.getItem(keys.history));
+      const history = parsePrepHistory(localStorage.getItem(activeKeys.history));
       setReadinessPct(readiness.completionPct);
       setLatestScore(history[0]?.averageScore ?? null);
       setLatestConfidence(history[0]?.averageConfidence ?? null);
@@ -51,17 +54,19 @@ export function ModeHealthPill() {
     refresh();
 
     function onStorage(event: StorageEvent) {
-      if (event.key === keys.readiness || event.key === keys.history) refresh();
+      if (event.key === activeKeys.readiness || event.key === activeKeys.history) {
+        refresh();
+      }
     }
 
     function onReadinessUpdate(event: Event) {
       const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === keys.readiness) refresh();
+      if (detail?.key === activeKeys.readiness) refresh();
     }
 
     function onPrepHistoryUpdate(event: Event) {
       const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === keys.history) refresh();
+      if (detail?.key === activeKeys.history) refresh();
     }
 
     window.addEventListener("storage", onStorage);

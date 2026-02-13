@@ -14,8 +14,15 @@ import {
   getPrepHistoryStorageKey,
   parsePrepHistory,
 } from "@/lib/adaptive/prep-history";
-import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
+import {
+  getInterviewDateStorageKey,
+  getLaunchpadStorageKey,
+} from "@/lib/adaptive/storage-keys";
 import { buildPracticeReminders } from "@/lib/adaptive/practice-reminders";
+import {
+  getInterviewDateSummary,
+  parseInterviewDate,
+} from "@/lib/adaptive/interview-date";
 
 function getPriorityBadge(priority: "high" | "medium" | "low") {
   if (priority === "high") {
@@ -44,18 +51,22 @@ export function PracticeRemindersCard() {
   const [readinessPct, setReadinessPct] = useState(0);
   const [latestScore, setLatestScore] = useState<number | null>(null);
   const [launchpadPct, setLaunchpadPct] = useState(0);
+  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   useEffect(() => {
     if (!companyId || !personaId) return;
+    const activeCompanyId = companyId;
+    const activePersonaId = personaId;
 
     const keys = {
-      readiness: getReadinessStorageKey(companyId, personaId),
-      history: getPrepHistoryStorageKey(companyId, personaId),
-      launchpad: getLaunchpadStorageKey(companyId, personaId),
+      readiness: getReadinessStorageKey(activeCompanyId, activePersonaId),
+      history: getPrepHistoryStorageKey(activeCompanyId, activePersonaId),
+      launchpad: getLaunchpadStorageKey(activeCompanyId, activePersonaId),
+      interviewDate: getInterviewDateStorageKey(activeCompanyId, activePersonaId),
     };
 
     function refresh() {
-      const checklistItems = getReadinessChecklist(companyId, personaId);
+      const checklistItems = getReadinessChecklist(activeCompanyId, activePersonaId);
       const readinessState = parseReadinessState(
         localStorage.getItem(keys.readiness)
       );
@@ -68,16 +79,18 @@ export function PracticeRemindersCard() {
       const rawLaunchpad = localStorage.getItem(keys.launchpad);
       if (!rawLaunchpad) {
         setLaunchpadPct(0);
-        return;
+      } else {
+        try {
+          const parsed = JSON.parse(rawLaunchpad) as Record<string, boolean>;
+          const values = Object.values(parsed);
+          const opened = values.filter(Boolean).length;
+          setLaunchpadPct(values.length ? Math.round((opened / values.length) * 100) : 0);
+        } catch {
+          setLaunchpadPct(0);
+        }
       }
-      try {
-        const parsed = JSON.parse(rawLaunchpad) as Record<string, boolean>;
-        const values = Object.values(parsed);
-        const opened = values.filter(Boolean).length;
-        setLaunchpadPct(values.length ? Math.round((opened / values.length) * 100) : 0);
-      } catch {
-        setLaunchpadPct(0);
-      }
+
+      setInterviewDate(parseInterviewDate(localStorage.getItem(keys.interviewDate)));
     }
 
     refresh();
@@ -101,10 +114,16 @@ export function PracticeRemindersCard() {
       if (detail?.key === keys.launchpad) refresh();
     }
 
+    function onInterviewDateUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === keys.interviewDate) refresh();
+    }
+
     window.addEventListener("storage", onStorage);
     window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
     window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
     window.addEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
+    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
 
     return () => {
       window.removeEventListener("storage", onStorage);
@@ -114,6 +133,10 @@ export function PracticeRemindersCard() {
         onPrepHistoryUpdate
       );
       window.removeEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
+      window.removeEventListener(
+        "adaptive-interview-date-updated",
+        onInterviewDateUpdate
+      );
     };
   }, [companyId, personaId]);
 
@@ -124,8 +147,13 @@ export function PracticeRemindersCard() {
         latestScore,
         readinessPct,
         launchpadPct,
+        interviewDate,
       }),
-    [latestScore, launchpadPct, readinessPct]
+    [interviewDate, latestScore, launchpadPct, readinessPct]
+  );
+  const interviewDateSummary = useMemo(
+    () => getInterviewDateSummary(interviewDate),
+    [interviewDate]
   );
 
   if (!companyId || !personaId) return null;
@@ -137,7 +165,12 @@ export function PracticeRemindersCard() {
           <AlarmClock className="h-4 w-4 text-primary" />
           Practice reminders
         </h3>
-        <Badge variant="outline">{reminders.length} reminder(s)</Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline">{reminders.length} reminder(s)</Badge>
+          <Badge variant="muted" className="text-[10px]">
+            {interviewDateSummary.label}
+          </Badge>
+        </div>
       </div>
 
       <ul className="space-y-2">

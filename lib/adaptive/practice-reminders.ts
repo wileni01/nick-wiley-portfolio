@@ -11,16 +11,67 @@ interface BuildPracticeRemindersInput {
   latestScore: number | null;
   readinessPct: number;
   launchpadPct: number;
+  interviewDate?: string | null;
+}
+
+function startOfDay(date: Date): Date {
+  const clone = new Date(date);
+  clone.setHours(0, 0, 0, 0);
+  return clone;
+}
+
+function toIsoDate(date: Date): string {
+  return startOfDay(date).toISOString().slice(0, 10);
+}
+
+function addDays(date: Date, days: number): Date {
+  const clone = startOfDay(date);
+  clone.setDate(clone.getDate() + days);
+  return clone;
+}
+
+function parseInterviewDate(raw: string | null | undefined): Date | null {
+  if (!raw) return null;
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return startOfDay(parsed);
+}
+
+function getDaysUntilInterview(now: Date, interviewDate: Date | null): number | null {
+  if (!interviewDate) return null;
+  const today = startOfDay(now);
+  const diffMs = interviewDate.getTime() - today.getTime();
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+function capDueDate(baseDate: Date, interviewDate: Date | null, now: Date): Date {
+  if (!interviewDate) return baseDate;
+  const today = startOfDay(now);
+  if (interviewDate.getTime() < today.getTime()) return today;
+  return baseDate.getTime() > interviewDate.getTime() ? interviewDate : baseDate;
 }
 
 export function buildPracticeReminders(
   input: BuildPracticeRemindersInput
 ): PracticeReminder[] {
   const reminders: PracticeReminder[] = [];
-  const todayIso = input.now.toISOString().slice(0, 10);
-  const tomorrow = new Date(input.now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowIso = tomorrow.toISOString().slice(0, 10);
+  const interviewDate = parseInterviewDate(input.interviewDate);
+  const daysUntilInterview = getDaysUntilInterview(input.now, interviewDate);
+  const todayIso = toIsoDate(capDueDate(startOfDay(input.now), interviewDate, input.now));
+  const tomorrowIso = toIsoDate(
+    capDueDate(addDays(input.now, 1), interviewDate, input.now)
+  );
+
+  if (daysUntilInterview !== null && daysUntilInterview >= 0 && daysUntilInterview <= 2) {
+    reminders.push({
+      id: "interview-soon",
+      title: "Run final rehearsal loop",
+      detail:
+        "Interview is imminent. Do one full pressure-mode mock, then tighten one closing answer with clear impact and governance framing.",
+      dueBy: todayIso,
+      priority: "high",
+    });
+  }
 
   if (input.latestScore === null) {
     reminders.push({
@@ -73,5 +124,13 @@ export function buildPracticeReminders(
     });
   }
 
-  return reminders.slice(0, 3);
+  const priorityOrder: Record<PracticeReminder["priority"], number> = {
+    high: 0,
+    medium: 1,
+    low: 2,
+  };
+
+  return reminders
+    .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+    .slice(0, 3);
 }

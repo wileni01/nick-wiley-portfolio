@@ -146,6 +146,7 @@ export function MockInterviewSession() {
   const currentWordCount = countWords(currentAnswer);
   const currentSpeechSeconds = estimateSpeechSeconds(currentWordCount);
   const report = evaluateMockSession(answers.slice(0, sessionQuestions.length));
+  const scriptHeading = script?.heading ?? "Mock interview session";
   const coachingThemes = useMemo(() => {
     return deriveCoachingThemes(report.feedbackByQuestion, 3);
   }, [report.feedbackByQuestion]);
@@ -155,7 +156,7 @@ export function MockInterviewSession() {
       "Nick Wiley Interview Prep Report",
       `Generated: ${timestamp}`,
       `Mode: ${companyId ?? "general"} / ${personaId ?? "persona-not-set"}`,
-      `Session: ${script.heading}`,
+      `Session: ${scriptHeading}`,
       `Average score: ${report.averageScore}/100`,
       `Average confidence: ${
         confidences.length
@@ -201,7 +202,7 @@ export function MockInterviewSession() {
     confidences,
     personaId,
     report,
-    script.heading,
+    scriptHeading,
     sessionQuestions,
   ]);
 

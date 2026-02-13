@@ -58,6 +58,7 @@ export function ModeComparisonPanel() {
   }
 
   function switchToComparisonMode() {
+    if (!comparisonTarget) return;
     setCompanyId(comparisonTarget.companyId);
     const persona = getPersonaById(
       comparisonTarget.companyId,

@@ -5,6 +5,7 @@ export interface PreflightInput {
   launchpadPct: number;
   hasNotes: boolean;
   hasFocusNote: boolean;
+  interviewDate?: string | null;
 }
 
 export interface PreflightResult {
@@ -12,6 +13,7 @@ export interface PreflightResult {
   label: "Ready to rehearse" | "Almost ready" | "Needs preparation";
   detail: string;
   recencyDays: number | null;
+  daysUntilInterview: number | null;
 }
 
 export function calculatePreflightScore(input: PreflightInput): PreflightResult {
@@ -29,6 +31,7 @@ export function calculatePreflightScore(input: PreflightInput): PreflightResult 
   const total =
     readinessPoints + scorePoints + launchpadPoints + notesPoints + focusPoints;
   const recency = getSessionRecencyDays(input.latestSessionTimestamp);
+  const daysUntilInterview = getDaysUntilInterview(input.interviewDate ?? null);
 
   const stalenessPenalty =
     recency === null
@@ -41,17 +44,26 @@ export function calculatePreflightScore(input: PreflightInput): PreflightResult 
             ? 5
             : 0;
 
-  const adjustedTotal = Math.max(0, total - stalenessPenalty);
+  const urgencyPenalty = getInterviewUrgencyPenalty({
+    daysUntilInterview,
+    recencyDays: recency,
+    readinessPct: input.readinessPct,
+  });
+
+  const adjustedTotal = Math.max(0, total - stalenessPenalty - urgencyPenalty);
 
   if (adjustedTotal >= 80) {
     return {
       score: adjustedTotal,
       label: "Ready to rehearse",
       detail:
-        stalenessPenalty > 0
+        urgencyPenalty > 0
+          ? "Strong baseline, but interview-day timing is tight. Run one fresh simulation today."
+          : stalenessPenalty > 0
           ? "Strong prep baseline, but session recency is slipping. Run a fresh simulation before interview day."
           : "Strong signal across readiness, mock performance, and launchpad execution.",
       recencyDays: recency,
+      daysUntilInterview,
     };
   }
 
@@ -60,10 +72,13 @@ export function calculatePreflightScore(input: PreflightInput): PreflightResult 
       score: adjustedTotal,
       label: "Almost ready",
       detail:
-        stalenessPenalty > 0
+        urgencyPenalty > 0
+          ? "Good baseline, but interview timeline is compressed. Prioritize one full mock and close critical checklist gaps now."
+          : stalenessPenalty > 0
           ? "Good baseline, but stale practice is lowering readiness. Run a fresh mock round."
           : "Good baseline. Complete remaining prep actions before final interview simulation.",
       recencyDays: recency,
+      daysUntilInterview,
     };
   }
 
@@ -71,8 +86,11 @@ export function calculatePreflightScore(input: PreflightInput): PreflightResult 
     score: adjustedTotal,
     label: "Needs preparation",
     detail:
-      "Focus on checklist completion, one full mock run, and opening key resources.",
+      daysUntilInterview !== null && daysUntilInterview >= 0 && daysUntilInterview <= 2
+        ? "Interview is near. Prioritize one full mock run today, close top checklist gaps, and refresh key resources."
+        : "Focus on checklist completion, one full mock run, and opening key resources.",
     recencyDays: recency,
+    daysUntilInterview,
   };
 }
 
@@ -83,4 +101,37 @@ function getSessionRecencyDays(timestamp: string | null): number | null {
   const diffMs = Date.now() - parsed.getTime();
   if (diffMs < 0) return 0;
   return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+}
+
+function getDaysUntilInterview(interviewDate: string | null): number | null {
+  if (!interviewDate) return null;
+  const date = new Date(interviewDate);
+  if (Number.isNaN(date.getTime())) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  date.setHours(0, 0, 0, 0);
+  const diffMs = date.getTime() - today.getTime();
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+function getInterviewUrgencyPenalty(input: {
+  daysUntilInterview: number | null;
+  recencyDays: number | null;
+  readinessPct: number;
+}): number {
+  if (input.daysUntilInterview === null || input.daysUntilInterview < 0) return 0;
+
+  let penalty = 0;
+
+  if (input.daysUntilInterview <= 1) {
+    penalty += input.recencyDays === null ? 10 : input.recencyDays > 1 ? 8 : 0;
+  } else if (input.daysUntilInterview <= 3) {
+    penalty += input.recencyDays === null ? 6 : input.recencyDays > 3 ? 5 : 0;
+  }
+
+  if (input.daysUntilInterview <= 2 && input.readinessPct < 70) {
+    penalty += 4;
+  }
+
+  return penalty;
 }

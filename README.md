@@ -125,8 +125,8 @@ lib/
 - **Focus-note memory** — Save and reuse recent focus notes per company/persona for faster iterative prep sessions.
 - **Mode health indicator** — Navbar status pill shows current readiness completion and latest mock score for selected mode.
 - **Mode health status** — Indicator is risk-coded ("On track", "Building", "Needs reps") based on readiness + latest score.
-- **Preflight readiness score** — Weighted 0–100 score combining checklist progress, mock results, launchpad coverage, prep context, and session recency.
-- **Practice reminders** — Auto-generated next-step reminders (with due-by guidance) based on readiness, score, and launchpad coverage.
+- **Preflight readiness score** — Weighted 0–100 score combining checklist progress, mock results, launchpad coverage, prep context, session recency, and interview-date urgency.
+- **Practice reminders** — Auto-generated next-step reminders (with due-by guidance) based on readiness, score, launchpad coverage, and interview-date proximity.
 - **Readiness gap panel** — Surfaces outstanding checklist and unopened resource gaps with direct remediation actions.
 - **Mock interviewer script** — Role-specific practice questions with answer strategies and direct links to recommended portfolio artifacts.
 - **Mock script export** — Copy/download persona-specific interviewer scripts as Markdown for offline rehearsal.

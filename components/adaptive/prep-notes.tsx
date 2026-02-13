@@ -51,9 +51,11 @@ export function PrepNotes() {
   }, [companyId, notes, personaId]);
 
   if (!companyId || !personaId) return null;
+  const activeCompanyId = companyId;
+  const activePersonaId = personaId;
 
   function clearNotes() {
-    const key = getPrepNotesStorageKey(companyId, personaId);
+    const key = getPrepNotesStorageKey(activeCompanyId, activePersonaId);
     localStorage.removeItem(key);
     setNotes("");
     window.dispatchEvent(

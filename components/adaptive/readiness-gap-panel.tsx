@@ -38,14 +38,17 @@ export function ReadinessGapPanel() {
       setResourceGaps([]);
       return;
     }
+    const activeCompanyId = companyId;
+    const activePersonaId = personaId;
+    const activeBundle = bundle;
 
     const keys = {
-      readiness: getReadinessStorageKey(companyId, personaId),
-      launchpad: getLaunchpadStorageKey(companyId, personaId),
+      readiness: getReadinessStorageKey(activeCompanyId, activePersonaId),
+      launchpad: getLaunchpadStorageKey(activeCompanyId, activePersonaId),
     };
 
     function refresh() {
-      const checklist = getReadinessChecklist(companyId, personaId);
+      const checklist = getReadinessChecklist(activeCompanyId, activePersonaId);
       const readinessState = parseReadinessState(
         localStorage.getItem(keys.readiness)
       );
@@ -61,7 +64,7 @@ export function ReadinessGapPanel() {
         }
       }
 
-      const gaps = bundle.topRecommendations
+      const gaps = activeBundle.topRecommendations
         .filter((recommendation) => !launchpadState[recommendation.asset.id])
         .slice(0, 4)
         .map((recommendation) => ({
@@ -100,9 +103,11 @@ export function ReadinessGapPanel() {
   }, [bundle, companyId, personaId]);
 
   if (!companyId || !personaId) return null;
+  const activeCompanyId = companyId;
+  const activePersonaId = personaId;
 
   function markResourceOpened(resourceId: string) {
-    const key = getLaunchpadStorageKey(companyId, personaId);
+    const key = getLaunchpadStorageKey(activeCompanyId, activePersonaId);
     let state: Record<string, boolean> = {};
     const raw = localStorage.getItem(key);
     if (raw) {

@@ -68,6 +68,8 @@ export function ResourceLaunchpad() {
   }, [companyId, opened, personaId]);
 
   if (!bundle || !companyId || !personaId) return null;
+  const activeCompanyId = companyId;
+  const activePersonaId = personaId;
 
   const resources = bundle.topRecommendations.slice(0, 5);
   const openedCount = resources.filter((resource) => opened[resource.asset.id]).length;
@@ -97,7 +99,7 @@ export function ResourceLaunchpad() {
 
   function resetLaunchpad() {
     setOpened({});
-    const key = getLaunchpadStorageKey(companyId, personaId);
+    const key = getLaunchpadStorageKey(activeCompanyId, activePersonaId);
     localStorage.removeItem(key);
     window.dispatchEvent(
       new CustomEvent("adaptive-launchpad-updated", { detail: { key } })

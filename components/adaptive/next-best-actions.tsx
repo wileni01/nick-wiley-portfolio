@@ -54,11 +54,13 @@ export function NextBestActions() {
 
   useEffect(() => {
     if (!companyId || !personaId) return;
-    const readinessKey = getReadinessStorageKey(companyId, personaId);
-    const historyKey = getPrepHistoryStorageKey(companyId, personaId);
+    const activeCompanyId = companyId;
+    const activePersonaId = personaId;
+    const readinessKey = getReadinessStorageKey(activeCompanyId, activePersonaId);
+    const historyKey = getPrepHistoryStorageKey(activeCompanyId, activePersonaId);
 
     function refresh() {
-      const checklistItems = getReadinessChecklist(companyId, personaId);
+      const checklistItems = getReadinessChecklist(activeCompanyId, activePersonaId);
       const readinessState = parseReadinessState(localStorage.getItem(readinessKey));
       const completion = getReadinessCompletion(checklistItems, readinessState);
       setReadiness({

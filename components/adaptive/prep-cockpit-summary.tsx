@@ -59,15 +59,17 @@ export function PrepCockpitSummary() {
 
   useEffect(() => {
     if (!companyId || !personaId) return;
+    const activeCompanyId = companyId;
+    const activePersonaId = personaId;
 
-    const readinessKey = getReadinessStorageKey(companyId, personaId);
-    const historyKey = getPrepHistoryStorageKey(companyId, personaId);
-    const notesKey = getPrepNotesStorageKey(companyId, personaId);
-    const launchpadKey = getLaunchpadStorageKey(companyId, personaId);
-    const interviewDateKey = getInterviewDateStorageKey(companyId, personaId);
+    const readinessKey = getReadinessStorageKey(activeCompanyId, activePersonaId);
+    const historyKey = getPrepHistoryStorageKey(activeCompanyId, activePersonaId);
+    const notesKey = getPrepNotesStorageKey(activeCompanyId, activePersonaId);
+    const launchpadKey = getLaunchpadStorageKey(activeCompanyId, activePersonaId);
+    const interviewDateKey = getInterviewDateStorageKey(activeCompanyId, activePersonaId);
 
     function refresh() {
-      const checklistItems = getReadinessChecklist(companyId, personaId);
+      const checklistItems = getReadinessChecklist(activeCompanyId, activePersonaId);
       const readinessState = parseReadinessState(localStorage.getItem(readinessKey));
       const completion = getReadinessCompletion(checklistItems, readinessState);
       setChecklistCompletion({
@@ -188,6 +190,7 @@ export function PrepCockpitSummary() {
       launchpadPct,
       hasNotes: Boolean(prepNotes.trim()),
       hasFocusNote: Boolean(focusNote.trim()),
+      interviewDate,
     }),
     topResources: recommendationBundle.topRecommendations.slice(0, 3).map(
       (recommendation) => ({
@@ -202,6 +205,7 @@ export function PrepCockpitSummary() {
       latestScore,
       readinessPct: checklistCompletion.completionPct,
       launchpadPct,
+      interviewDate,
     }),
   });
 
@@ -228,6 +232,7 @@ export function PrepCockpitSummary() {
       launchpadPct,
       hasNotes: Boolean(prepNotes.trim()),
       hasFocusNote: Boolean(focusNote.trim()),
+      interviewDate,
     }),
     topResources: recommendationBundle.topRecommendations.slice(0, 3).map(
       (recommendation) => ({
@@ -242,6 +247,7 @@ export function PrepCockpitSummary() {
       latestScore,
       readinessPct: checklistCompletion.completionPct,
       launchpadPct,
+      interviewDate,
     }),
     nextActions: buildNextActions({
       readinessPct: checklistCompletion.completionPct,
@@ -268,6 +274,7 @@ export function PrepCockpitSummary() {
   }
 
   function downloadPrepBrief() {
+    if (!companyId || !personaId) return;
     const safeCompany = companyId.replace(/[^a-z0-9-]/gi, "-");
     const safePersona = personaId.replace(/[^a-z0-9-]/gi, "-");
     const blob = new Blob([prepBriefMarkdown], {
@@ -284,6 +291,7 @@ export function PrepCockpitSummary() {
   }
 
   function downloadFullPacket() {
+    if (!companyId || !personaId) return;
     const safeCompany = companyId.replace(/[^a-z0-9-]/gi, "-");
     const safePersona = personaId.replace(/[^a-z0-9-]/gi, "-");
     const blob = new Blob([prepPacketMarkdown], {
