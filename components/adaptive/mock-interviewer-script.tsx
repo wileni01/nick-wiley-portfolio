@@ -16,10 +16,9 @@ export function MockInterviewerScript() {
   const [copyState, setCopyState] = useTransientState<
     "idle" | "copied" | "error"
   >("idle", 1800);
-  const [downloadState, setDownloadState] = useTransientState<"idle" | "done">(
-    "idle",
-    1800
-  );
+  const [downloadState, setDownloadState] = useTransientState<
+    "idle" | "done" | "error"
+  >("idle", 1800);
 
   const script =
     companyId && personaId ? buildMockInterviewerScript(companyId, personaId) : null;
@@ -55,8 +54,7 @@ export function MockInterviewerScript() {
         "company"
       )}-${sanitizeFileToken(personaId, "persona")}.md`,
     });
-    if (!downloaded) return;
-    setDownloadState("done");
+    setDownloadState(downloaded ? "done" : "error");
   }
 
   return (
@@ -107,6 +105,11 @@ export function MockInterviewerScript() {
                   <Check className="h-3.5 w-3.5" />
                   Downloaded
                 </>
+              ) : downloadState === "error" ? (
+                <>
+                  <Download className="h-3.5 w-3.5" />
+                  Download failed
+                </>
               ) : (
                 <>
                   <Download className="h-3.5 w-3.5" />
@@ -147,6 +150,12 @@ export function MockInterviewerScript() {
       {copyState === "error" && (
         <p className="mt-2 text-xs text-muted-foreground">
           Could not copy automatically. Use download instead.
+        </p>
+      )}
+      {downloadState === "error" && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Could not start download automatically. Try again after interacting with
+          the page.
         </p>
       )}
     </details>

@@ -24,10 +24,9 @@ export function InterviewDateTracker() {
     companyId,
     personaId,
   });
-  const [downloadState, setDownloadState] = useTransientState<"idle" | "done">(
-    "idle",
-    1800
-  );
+  const [downloadState, setDownloadState] = useTransientState<
+    "idle" | "done" | "error"
+  >("idle", 1800);
 
   const summary = useMemo(
     () => getInterviewDateSummary(interviewDate),
@@ -70,8 +69,7 @@ export function InterviewDateTracker() {
         "company"
       )}-${sanitizeFileToken(activePersonaId, "persona")}.ics`,
     });
-    if (!downloaded) return;
-    setDownloadState("done");
+    setDownloadState(downloaded ? "done" : "error");
   }
 
   function openGoogleCalendar() {
@@ -145,6 +143,11 @@ export function InterviewDateTracker() {
               <Check className="h-3.5 w-3.5" />
               Downloaded .ics
             </>
+          ) : downloadState === "error" ? (
+            <>
+              <Download className="h-3.5 w-3.5" />
+              Download failed
+            </>
           ) : (
             <>
               <Download className="h-3.5 w-3.5" />
@@ -216,6 +219,12 @@ export function InterviewDateTracker() {
         export a calendar plan with prep checkpoints or launch interview + prep
         checkpoint events in Google Calendar.
       </p>
+      {downloadState === "error" && (
+        <p className="text-xs text-muted-foreground">
+          Could not start calendar download automatically. Try again after
+          interacting with the page.
+        </p>
+      )}
     </div>
   );
 }

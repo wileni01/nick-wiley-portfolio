@@ -46,14 +46,12 @@ export function PrepCockpitSummary() {
   const [copyState, setCopyState] = useTransientState<
     "idle" | "copied" | "error"
   >("idle", 1800);
-  const [downloadState, setDownloadState] = useTransientState<"idle" | "done">(
-    "idle",
-    1800
-  );
-  const [packetState, setPacketState] = useTransientState<"idle" | "done">(
-    "idle",
-    1800
-  );
+  const [downloadState, setDownloadState] = useTransientState<
+    "idle" | "done" | "error"
+  >("idle", 1800);
+  const [packetState, setPacketState] = useTransientState<
+    "idle" | "done" | "error"
+  >("idle", 1800);
   const [checklistCompletion, setChecklistCompletion] = useState({
     completedCount: 0,
     completionPct: 0,
@@ -310,8 +308,7 @@ export function PrepCockpitSummary() {
         "company"
       )}-${sanitizeFileToken(personaId, "persona")}.md`,
     });
-    if (!downloaded) return;
-    setDownloadState("done");
+    setDownloadState(downloaded ? "done" : "error");
   }
 
   function downloadFullPacket() {
@@ -324,8 +321,7 @@ export function PrepCockpitSummary() {
         "company"
       )}-${sanitizeFileToken(personaId, "persona")}.md`,
     });
-    if (!downloaded) return;
-    setPacketState("done");
+    setPacketState(downloaded ? "done" : "error");
   }
 
   return (
@@ -404,6 +400,11 @@ export function PrepCockpitSummary() {
               <Check className="h-3.5 w-3.5" />
               Downloaded brief
             </>
+          ) : downloadState === "error" ? (
+            <>
+              <Download className="h-3.5 w-3.5" />
+              Brief download failed
+            </>
           ) : (
             <>
               <Download className="h-3.5 w-3.5" />
@@ -417,6 +418,11 @@ export function PrepCockpitSummary() {
               <Check className="h-3.5 w-3.5" />
               Downloaded packet
             </>
+          ) : packetState === "error" ? (
+            <>
+              <Download className="h-3.5 w-3.5" />
+              Packet download failed
+            </>
           ) : (
             <>
               <Download className="h-3.5 w-3.5" />
@@ -428,6 +434,12 @@ export function PrepCockpitSummary() {
       {copyState === "error" && (
         <p className="text-xs text-muted-foreground">
           Could not copy automatically. Try again after interacting with the page.
+        </p>
+      )}
+      {(downloadState === "error" || packetState === "error") && (
+        <p className="text-xs text-muted-foreground">
+          A download could not start automatically. Try again after interacting with
+          the page.
         </p>
       )}
     </div>
