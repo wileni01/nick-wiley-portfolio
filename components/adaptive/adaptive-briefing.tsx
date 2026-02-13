@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
+import { MockInterviewSession } from "./mock-interview-session";
 import { MockInterviewerScript } from "./mock-interviewer-script";
 import {
   buildDeterministicNarrative,
@@ -229,6 +230,7 @@ export function AdaptiveBriefing() {
       </div>
 
       <MockInterviewerScript />
+      <MockInterviewSession />
 
       {companyId !== "anthropic" && (
         <Button

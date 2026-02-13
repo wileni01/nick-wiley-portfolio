@@ -1,0 +1,250 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { CheckCircle2, ChevronLeft, ChevronRight, Timer } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useInterviewMode } from "./interview-mode-provider";
+import {
+  buildMockInterviewerScript,
+  evaluateMockAnswer,
+  evaluateMockSession,
+} from "@/lib/adaptive/mock-interviewer";
+import type { AssetKind } from "@/lib/adaptive/types";
+
+interface SessionQuestion {
+  question: string;
+  whatTheyAreTesting: string;
+  answerStrategy: string;
+  recommendedArtifact?: {
+    title: string;
+    url: string;
+    kind: AssetKind;
+  };
+}
+
+const warmupQuestion: SessionQuestion = {
+  question:
+    "Give me a 60-second opening: why are you a strong fit for this team and role?",
+  whatTheyAreTesting:
+    "Narrative clarity, positioning, and your ability to frame relevance quickly.",
+  answerStrategy:
+    "Use a compact arc: role fit, one credible example, and what value you can create in the first 90 days.",
+};
+
+export function MockInterviewSession() {
+  const { companyId, personaId } = useInterviewMode();
+  const [started, setStarted] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [completed, setCompleted] = useState(false);
+
+  const script = useMemo(() => {
+    if (!companyId || !personaId) return null;
+    return buildMockInterviewerScript(companyId, personaId);
+  }, [companyId, personaId]);
+
+  const sessionQuestions = useMemo<SessionQuestion[]>(() => {
+    if (!script) return [];
+    return [warmupQuestion, ...script.prompts];
+  }, [script]);
+
+  const currentQuestion = sessionQuestions[currentIndex];
+  const currentAnswer = answers[currentIndex] ?? "";
+  const currentFeedback = evaluateMockAnswer(currentAnswer);
+  const report = evaluateMockSession(answers.slice(0, sessionQuestions.length));
+
+  function startSession() {
+    setAnswers(Array.from({ length: sessionQuestions.length }, () => ""));
+    setCurrentIndex(0);
+    setCompleted(false);
+    setStarted(true);
+  }
+
+  function updateCurrentAnswer(nextValue: string) {
+    setAnswers((prev) => {
+      const next = [...prev];
+      next[currentIndex] = nextValue;
+      return next;
+    });
+  }
+
+  function nextQuestion() {
+    if (currentIndex >= sessionQuestions.length - 1) {
+      setCompleted(true);
+      return;
+    }
+    setCurrentIndex((index) => index + 1);
+  }
+
+  function previousQuestion() {
+    if (currentIndex === 0) return;
+    setCurrentIndex((index) => index - 1);
+  }
+
+  function resetSession() {
+    setStarted(false);
+    setCompleted(false);
+    setCurrentIndex(0);
+    setAnswers([]);
+  }
+
+  if (!script || !sessionQuestions.length) return null;
+
+  if (!started) {
+    return (
+      <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Timer className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold">5-question mock session</h3>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Practice live answers for this persona. You will get local feedback on
+          structure, metrics, impact framing, and governance signals.
+        </p>
+        <Button size="sm" onClick={startSession}>
+          Start mock session
+        </Button>
+      </div>
+    );
+  }
+
+  if (completed) {
+    return (
+      <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-sm font-semibold inline-flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-primary" />
+            Session complete
+          </h3>
+          <Badge variant="outline">Average score: {report.averageScore}/100</Badge>
+        </div>
+
+        <div className="space-y-3">
+          {sessionQuestions.map((question, index) => {
+            const feedback = report.feedbackByQuestion[index];
+            return (
+              <div key={question.question} className="rounded-md border border-border p-3">
+                <p className="text-xs font-medium">
+                  Q{index + 1}. {question.question}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Score: {feedback?.score ?? 0}/100
+                </p>
+                {feedback?.gaps.length ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Next improvement: {feedback.gaps[0]}
+                  </p>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="rounded-md border border-border bg-background p-3">
+          <p className="text-xs font-medium">Coaching prompt</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {report.feedbackByQuestion[report.feedbackByQuestion.length - 1]
+              ?.coachingPrompt ??
+              "Re-run the session and tighten each answer with context-action-result."}
+          </p>
+        </div>
+
+        <Button size="sm" variant="outline" onClick={resetSession}>
+          Run again
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-sm font-semibold">Mock session in progress</h3>
+        <Badge variant="muted">
+          Question {currentIndex + 1} / {sessionQuestions.length}
+        </Badge>
+      </div>
+
+      <div className="rounded-md border border-border bg-background p-3 space-y-2">
+        <p className="text-sm font-medium">{currentQuestion.question}</p>
+        <p className="text-xs text-muted-foreground">
+          Testing: {currentQuestion.whatTheyAreTesting}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Strategy: {currentQuestion.answerStrategy}
+        </p>
+        {currentQuestion.recommendedArtifact ? (
+          <div className="inline-flex items-center gap-2">
+            <Badge variant="outline" className="text-[10px] uppercase">
+              {currentQuestion.recommendedArtifact.kind}
+            </Badge>
+            <Link
+              href={currentQuestion.recommendedArtifact.url}
+              className="text-xs text-primary hover:underline"
+            >
+              Review {currentQuestion.recommendedArtifact.title}
+            </Link>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-xs font-medium" htmlFor="mock-answer">
+          Your answer draft
+        </label>
+        <Textarea
+          id="mock-answer"
+          rows={6}
+          value={currentAnswer}
+          onChange={(event) => updateCurrentAnswer(event.target.value)}
+          placeholder="Write your spoken answer draft here..."
+          maxLength={3000}
+        />
+      </div>
+
+      <div className="rounded-md border border-border bg-background p-3 space-y-2">
+        <p className="text-xs font-medium">Live feedback ({currentFeedback.score}/100)</p>
+        {currentFeedback.strengths.length ? (
+          <ul className="space-y-1">
+            {currentFeedback.strengths.map((strength) => (
+              <li key={strength} className="text-xs text-muted-foreground">
+                ✅ {strength}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {currentFeedback.gaps.length ? (
+          <ul className="space-y-1">
+            {currentFeedback.gaps.map((gap) => (
+              <li key={gap} className="text-xs text-muted-foreground">
+                • {gap}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={previousQuestion}
+          disabled={currentIndex === 0}
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+          Back
+        </Button>
+        <Button size="sm" onClick={nextQuestion}>
+          {currentIndex >= sessionQuestions.length - 1 ? "Finish session" : "Next"}
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Button>
+        <Button size="sm" variant="ghost" onClick={resetSession}>
+          Reset
+        </Button>
+      </div>
+    </div>
+  );
+}

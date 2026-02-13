@@ -1,5 +1,5 @@
 import { getInterviewRecommendationBundle } from "./recommendations";
-import type { CompanyId } from "./types";
+import type { AssetKind, CompanyId } from "./types";
 
 export interface MockInterviewerPrompt {
   question: string;
@@ -8,13 +8,26 @@ export interface MockInterviewerPrompt {
   recommendedArtifact?: {
     title: string;
     url: string;
-    kind: string;
+    kind: AssetKind;
   };
 }
 
 export interface MockInterviewerScript {
   heading: string;
   prompts: MockInterviewerPrompt[];
+}
+
+export interface MockAnswerFeedback {
+  score: number;
+  strengths: string[];
+  gaps: string[];
+  coachingPrompt: string;
+}
+
+export interface MockSessionReport {
+  averageScore: number;
+  answerCount: number;
+  feedbackByQuestion: MockAnswerFeedback[];
 }
 
 const personaQuestionBanks: Record<
@@ -209,5 +222,93 @@ export function buildMockInterviewerScript(
   return {
     heading: `Mock interviewer script for ${bundle.persona.name} (${bundle.persona.role})`,
     prompts,
+  };
+}
+
+const metricRegex = /\b(\d+[%+]?|one|two|three|four|five|million|billion)\b/i;
+const governanceRegex = /\b(governance|audit|override|risk|safety|accountability|responsible)\b/i;
+const actionRegex = /\b(built|designed|led|implemented|delivered|shipped|deployed)\b/i;
+const outcomeRegex = /\b(result|impact|outcome|improved|reduced|increased|streamlined)\b/i;
+
+export function evaluateMockAnswer(answer: string): MockAnswerFeedback {
+  const normalized = answer.trim().toLowerCase();
+
+  if (!normalized) {
+    return {
+      score: 0,
+      strengths: [],
+      gaps: ["No answer captured yet."],
+      coachingPrompt:
+        "Start with context, then explain your action, and close with a concrete outcome.",
+    };
+  }
+
+  let score = 0;
+  const strengths: string[] = [];
+  const gaps: string[] = [];
+
+  if (normalized.length >= 220) {
+    score += 25;
+    strengths.push("Provided enough detail for a structured response.");
+  } else {
+    gaps.push("Add more detail (target ~4–6 concise sentences).");
+  }
+
+  if (actionRegex.test(normalized)) {
+    score += 25;
+    strengths.push("Includes clear ownership/action language.");
+  } else {
+    gaps.push("Use stronger ownership verbs (built, led, designed, delivered).");
+  }
+
+  if (metricRegex.test(normalized)) {
+    score += 20;
+    strengths.push("Includes a measurable signal or concrete quantity.");
+  } else {
+    gaps.push("Add one concrete metric or scale cue.");
+  }
+
+  if (outcomeRegex.test(normalized)) {
+    score += 15;
+    strengths.push("Connects effort to an observable outcome.");
+  } else {
+    gaps.push("Close with impact: what improved and for whom.");
+  }
+
+  if (governanceRegex.test(normalized)) {
+    score += 15;
+    strengths.push("Shows governance/safety/accountability awareness.");
+  } else {
+    gaps.push("Include governance/safety guardrails in your framing.");
+  }
+
+  const boundedScore = Math.max(0, Math.min(100, score));
+  const coachingPrompt =
+    boundedScore >= 80
+      ? "Strong answer. Tighten by leading with the decision context in one sentence."
+      : boundedScore >= 60
+        ? "Good baseline. Add one stronger metric and a clearer governance decision."
+        : "Rebuild using CAR/STAR: context, your action, governance choice, measurable result.";
+
+  return {
+    score: boundedScore,
+    strengths,
+    gaps,
+    coachingPrompt,
+  };
+}
+
+export function evaluateMockSession(answers: string[]): MockSessionReport {
+  const feedbackByQuestion = answers.map((answer) => evaluateMockAnswer(answer));
+  const total = feedbackByQuestion.reduce((acc, item) => acc + item.score, 0);
+  const averageScore =
+    feedbackByQuestion.length > 0
+      ? Math.round(total / feedbackByQuestion.length)
+      : 0;
+
+  return {
+    averageScore,
+    answerCount: feedbackByQuestion.length,
+    feedbackByQuestion,
   };
 }
