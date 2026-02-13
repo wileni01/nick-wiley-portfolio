@@ -14,7 +14,9 @@ import {
 import {
   defaultPrepGoal,
   getPrepGoalStorageKey,
+  normalizePrepGoalState,
   parsePrepGoalState,
+  serializePrepGoalState,
 } from "@/lib/adaptive/prep-goals";
 import {
   getReadinessChecklist,
@@ -94,7 +96,9 @@ export function PrepInsights() {
 
     function refreshGoal() {
       const parsed = parsePrepGoalState(localStorage.getItem(goalKey));
-      setWeeklyTarget(parsed.weeklyTarget);
+      setWeeklyTarget((prev) =>
+        prev === parsed.weeklyTarget ? prev : parsed.weeklyTarget
+      );
     }
 
     refreshGoal();
@@ -119,7 +123,14 @@ export function PrepInsights() {
   useEffect(() => {
     if (!companyId || !personaId) return;
     const goalKey = getPrepGoalStorageKey(companyId, personaId);
-    localStorage.setItem(goalKey, JSON.stringify({ weeklyTarget }));
+    const normalized = normalizePrepGoalState({ weeklyTarget });
+    if (normalized.weeklyTarget !== weeklyTarget) {
+      setWeeklyTarget(normalized.weeklyTarget);
+      return;
+    }
+    const serialized = serializePrepGoalState(normalized);
+    if (localStorage.getItem(goalKey) === serialized) return;
+    localStorage.setItem(goalKey, serialized);
     window.dispatchEvent(
       new CustomEvent("adaptive-prep-goal-updated", { detail: { key: goalKey } })
     );
@@ -318,7 +329,12 @@ export function PrepInsights() {
               <select
                 value={weeklyTarget}
                 onChange={(event) =>
-                  setWeeklyTarget(Number(event.target.value) || defaultPrepGoal.weeklyTarget)
+                  setWeeklyTarget(
+                    normalizePrepGoalState({
+                      weeklyTarget:
+                        Number(event.target.value) || defaultPrepGoal.weeklyTarget,
+                    }).weeklyTarget
+                  )
                 }
                 className="h-7 rounded border border-border bg-background px-2 text-xs"
                 aria-label="Select weekly prep target"
