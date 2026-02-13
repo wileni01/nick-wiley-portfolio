@@ -14,6 +14,8 @@ import {
   getDefaultPersonaForCompany,
   getPersonaById,
 } from "@/lib/adaptive/profiles";
+import { parseInterviewDate } from "@/lib/adaptive/interview-date";
+import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
 import type { CompanyId, CompanyProfile, PersonaProfile } from "@/lib/adaptive/types";
 
 interface InterviewModeContextValue {
@@ -65,6 +67,7 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
     const urlPersona = params.get("persona");
     const urlProvider = params.get("provider");
     const urlFocus = params.get("focus");
+    const urlInterviewDate = parseInterviewDate(params.get("date"));
 
     const storedCompany = localStorage.getItem(STORAGE_KEYS.companyId);
     const storedPersona = localStorage.getItem(STORAGE_KEYS.personaId);
@@ -96,6 +99,16 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
           : "openai";
 
     const nextFocus = (urlFocus ?? storedFocus ?? "").slice(0, 200);
+
+    if (nextCompany && nextPersona && urlInterviewDate) {
+      const interviewDateKey = getInterviewDateStorageKey(nextCompany, nextPersona);
+      localStorage.setItem(interviewDateKey, urlInterviewDate);
+      window.dispatchEvent(
+        new CustomEvent("adaptive-interview-date-updated", {
+          detail: { key: interviewDateKey },
+        })
+      );
+    }
 
     setCompanyIdState(nextCompany);
     setPersonaIdState(nextPersona);
@@ -135,6 +148,18 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
       params.set("persona", personaId);
     } else {
       params.delete("persona");
+    }
+    if (companyId && personaId) {
+      const interviewDate = parseInterviewDate(
+        localStorage.getItem(getInterviewDateStorageKey(companyId, personaId))
+      );
+      if (interviewDate) {
+        params.set("date", interviewDate);
+      } else {
+        params.delete("date");
+      }
+    } else {
+      params.delete("date");
     }
     params.set("provider", provider);
     if (focusNote.trim()) {

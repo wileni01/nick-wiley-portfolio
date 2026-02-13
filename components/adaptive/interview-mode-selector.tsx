@@ -11,6 +11,8 @@ import {
   getFocusHistoryStorageKey,
   parseFocusHistory,
 } from "@/lib/adaptive/focus-history";
+import { parseInterviewDate } from "@/lib/adaptive/interview-date";
+import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
 
 function formatFocusChipLabel(text: string): string {
   return text.length > 48 ? `${text.slice(0, 47)}…` : text;
@@ -80,6 +82,14 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
       params.set("provider", provider);
       if (focusNote.trim()) {
         params.set("focus", focusNote.trim());
+      }
+      const interviewDate = parseInterviewDate(
+        localStorage.getItem(getInterviewDateStorageKey(companyId, personaId))
+      );
+      if (interviewDate) {
+        params.set("date", interviewDate);
+      } else {
+        params.delete("date");
       }
 
       const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
