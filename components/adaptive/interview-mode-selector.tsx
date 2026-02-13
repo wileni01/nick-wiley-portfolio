@@ -11,7 +11,10 @@ import {
   getFocusHistoryStorageKey,
   parseFocusHistory,
 } from "@/lib/adaptive/focus-history";
-import { parseInterviewDate } from "@/lib/adaptive/interview-date";
+import {
+  getInterviewDateSummary,
+  parseInterviewDate,
+} from "@/lib/adaptive/interview-date";
 import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
 
 function formatFocusChipLabel(text: string): string {
@@ -39,6 +42,7 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
   } = useInterviewMode();
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [focusHistory, setFocusHistory] = useState<string[]>([]);
+  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   useEffect(() => {
     if (!companyId || !personaId) {
@@ -71,6 +75,59 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
       );
     };
   }, [companyId, personaId]);
+
+  useEffect(() => {
+    if (!companyId || !personaId) {
+      setInterviewDate(null);
+      return;
+    }
+    const key = getInterviewDateStorageKey(companyId, personaId);
+
+    function refresh() {
+      setInterviewDate(parseInterviewDate(localStorage.getItem(key)));
+    }
+
+    refresh();
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === key) refresh();
+    }
+
+    function onInterviewDateUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === key) refresh();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(
+        "adaptive-interview-date-updated",
+        onInterviewDateUpdate
+      );
+    };
+  }, [companyId, personaId]);
+
+  const interviewTimeline = getInterviewDateSummary(interviewDate);
+  const shouldPromptDateSetup =
+    interviewTimeline.daysUntil === null || interviewTimeline.daysUntil < 0;
+
+  function setInterviewDateOffset(daysFromNow: number) {
+    if (!companyId || !personaId) return;
+    const base = new Date();
+    base.setHours(0, 0, 0, 0);
+    base.setDate(base.getDate() + daysFromNow);
+    const year = base.getFullYear();
+    const month = String(base.getMonth() + 1).padStart(2, "0");
+    const day = String(base.getDate()).padStart(2, "0");
+    const nextDate = `${year}-${month}-${day}`;
+    const key = getInterviewDateStorageKey(companyId, personaId);
+    localStorage.setItem(key, nextDate);
+    window.dispatchEvent(
+      new CustomEvent("adaptive-interview-date-updated", { detail: { key } })
+    );
+  }
 
   async function handleCopyPrepLink() {
     if (!companyId || !personaId) return;
@@ -139,6 +196,16 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
         </span>
         <ModeHealthPill />
         <InterviewCountdownPill />
+        {companyId && personaId && shouldPromptDateSetup ? (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-6 px-2 text-[10px]"
+            onClick={() => setInterviewDateOffset(7)}
+          >
+            {interviewTimeline.daysUntil === null ? "Set date +7d" : "Reset date +7d"}
+          </Button>
+        ) : null}
       </div>
 
       <select
