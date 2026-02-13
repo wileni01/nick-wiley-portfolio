@@ -132,6 +132,7 @@ lib/
 - **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode.
 - **Mode comparison panel** — Side-by-side view of current vs alternate company mode with top resources and one-click switching.
 - **Next best actions** — Dynamic, priority-ranked guidance based on readiness, latest mock outcomes, and confidence calibration.
+- **Targeted drills** — Theme-driven micro-exercises generated from your latest coaching gaps, with local completion tracking.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.

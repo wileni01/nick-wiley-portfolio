@@ -20,6 +20,7 @@ import { MockInterviewSession } from "./mock-interview-session";
 import { MockInterviewerScript } from "./mock-interviewer-script";
 import { NextBestActions } from "./next-best-actions";
 import { PrepInsights } from "./prep-insights";
+import { TargetedDrills } from "./targeted-drills";
 import {
   buildDeterministicNarrative,
   getInterviewRecommendationBundle,
@@ -237,6 +238,7 @@ export function AdaptiveBriefing() {
       <ModeComparisonPanel />
       <PrepCockpitSummary />
       <NextBestActions />
+      <TargetedDrills />
       <InterviewReadinessChecklist />
       <PrepInsights />
       <MockInterviewerScript />
