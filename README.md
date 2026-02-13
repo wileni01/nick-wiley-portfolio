@@ -149,7 +149,7 @@ lib/
 - **Prep data tools** — Export/import/reset local prep state (JSON), including notes, focus history, and interview date, per company/persona mode.
 - **Prep notes pad** — Persist mode-specific interviewer notes and include them in exported briefs/packets.
 - **Interview day plan** — Time-phased execution plan (prep window + T-45 to close) tuned to selected company/persona priorities and interview-date timeline.
-- **Interview date tracker** — Set a per-mode interview date to anchor urgency and include date context in exported briefs.
+- **Interview date tracker** — Set a per-mode interview date to anchor urgency, include date context in exported briefs, and download an `.ics` calendar plan with prep checkpoints.
 - **Full prep packet export** — Download a consolidated Markdown packet with brief, preflight status, reminders, next actions, drills, and day plan.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.

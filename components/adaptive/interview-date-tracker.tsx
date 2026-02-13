@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CalendarClock } from "lucide-react";
+import { CalendarClock, Check, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
@@ -9,11 +9,13 @@ import {
   getInterviewDateSummary,
   parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
+import { buildInterviewPrepCalendarIcs } from "@/lib/adaptive/interview-calendar";
 import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
 
 export function InterviewDateTracker() {
-  const { companyId, personaId } = useInterviewMode();
+  const { companyId, personaId, company, persona } = useInterviewMode();
   const [interviewDate, setInterviewDate] = useState<string>("");
+  const [downloadState, setDownloadState] = useState<"idle" | "done">("idle");
 
   useEffect(() => {
     if (!companyId || !personaId) return;
@@ -65,6 +67,32 @@ export function InterviewDateTracker() {
   );
 
   if (!companyId || !personaId) return null;
+  const activeCompanyId = companyId;
+  const activePersonaId = personaId;
+
+  function downloadCalendarPlan() {
+    if (!interviewDate) return;
+    const companyName = company?.name ?? activeCompanyId;
+    const personaName = persona?.name ?? activePersonaId;
+    const icsContent = buildInterviewPrepCalendarIcs({
+      companyName,
+      personaName,
+      interviewDate,
+    });
+    if (!icsContent) return;
+
+    const safeCompany = activeCompanyId.replace(/[^a-z0-9-]/gi, "-");
+    const safePersona = activePersonaId.replace(/[^a-z0-9-]/gi, "-");
+    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `interview-prep-calendar-${safeCompany}-${safePersona}.ics`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setDownloadState("done");
+    setTimeout(() => setDownloadState("idle"), 1800);
+  }
 
   return (
     <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
@@ -87,10 +115,29 @@ export function InterviewDateTracker() {
         <Button size="sm" variant="ghost" onClick={() => setInterviewDate("")}>
           Clear date
         </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={downloadCalendarPlan}
+          disabled={!interviewDate}
+        >
+          {downloadState === "done" ? (
+            <>
+              <Check className="h-3.5 w-3.5" />
+              Downloaded .ics
+            </>
+          ) : (
+            <>
+              <Download className="h-3.5 w-3.5" />
+              Download .ics plan
+            </>
+          )}
+        </Button>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Set your interview date to contextualize readiness and prep urgency.
+        Set your interview date to contextualize readiness and prep urgency, then
+        export a calendar plan with prep checkpoints.
       </p>
     </div>
   );
