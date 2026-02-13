@@ -5,6 +5,7 @@ import { AlarmClock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useInterviewMode } from "./interview-mode-provider";
 import { TimelineQuickFixActions } from "./timeline-quick-fix-actions";
+import { useModeInterviewDate } from "./use-mode-interview-date";
 import {
   getReadinessChecklist,
   getReadinessCompletion,
@@ -15,15 +16,9 @@ import {
   getPrepHistoryStorageKey,
   parsePrepHistory,
 } from "@/lib/adaptive/prep-history";
-import {
-  getInterviewDateStorageKey,
-  getLaunchpadStorageKey,
-} from "@/lib/adaptive/storage-keys";
+import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
 import { buildPracticeReminders } from "@/lib/adaptive/practice-reminders";
-import {
-  getInterviewDateSummary,
-  parseInterviewDate,
-} from "@/lib/adaptive/interview-date";
+import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
 
 function getPriorityBadge(priority: "high" | "medium" | "low") {
   if (priority === "high") {
@@ -49,10 +44,10 @@ function getPriorityBadge(priority: "high" | "medium" | "low") {
 
 export function PracticeRemindersCard() {
   const { companyId, personaId } = useInterviewMode();
+  const { interviewDate } = useModeInterviewDate({ companyId, personaId });
   const [readinessPct, setReadinessPct] = useState(0);
   const [latestScore, setLatestScore] = useState<number | null>(null);
   const [launchpadPct, setLaunchpadPct] = useState(0);
-  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   useEffect(() => {
     if (!companyId || !personaId) return;
@@ -63,7 +58,6 @@ export function PracticeRemindersCard() {
       readiness: getReadinessStorageKey(activeCompanyId, activePersonaId),
       history: getPrepHistoryStorageKey(activeCompanyId, activePersonaId),
       launchpad: getLaunchpadStorageKey(activeCompanyId, activePersonaId),
-      interviewDate: getInterviewDateStorageKey(activeCompanyId, activePersonaId),
     };
 
     function refresh() {
@@ -90,8 +84,6 @@ export function PracticeRemindersCard() {
           setLaunchpadPct(0);
         }
       }
-
-      setInterviewDate(parseInterviewDate(localStorage.getItem(keys.interviewDate)));
     }
 
     refresh();
@@ -115,16 +107,10 @@ export function PracticeRemindersCard() {
       if (detail?.key === keys.launchpad) refresh();
     }
 
-    function onInterviewDateUpdate(event: Event) {
-      const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === keys.interviewDate) refresh();
-    }
-
     window.addEventListener("storage", onStorage);
     window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
     window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
     window.addEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
-    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
 
     return () => {
       window.removeEventListener("storage", onStorage);
@@ -134,10 +120,6 @@ export function PracticeRemindersCard() {
         onPrepHistoryUpdate
       );
       window.removeEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
-      window.removeEventListener(
-        "adaptive-interview-date-updated",
-        onInterviewDateUpdate
-      );
     };
   }, [companyId, personaId]);
 

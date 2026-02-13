@@ -5,6 +5,7 @@ import { AlertCircle, ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useInterviewMode } from "./interview-mode-provider";
 import { TimelineQuickFixActions } from "./timeline-quick-fix-actions";
+import { useModeInterviewDate } from "./use-mode-interview-date";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import {
   getReadinessChecklist,
@@ -17,11 +18,7 @@ import {
   parsePrepHistory,
 } from "@/lib/adaptive/prep-history";
 import { buildNextActions } from "@/lib/adaptive/next-actions";
-import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
-import {
-  getInterviewDateSummary,
-  parseInterviewDate,
-} from "@/lib/adaptive/interview-date";
+import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
 
 function getPriorityStyle(priority: "high" | "medium" | "low") {
   if (priority === "high") {
@@ -44,6 +41,7 @@ function getPriorityStyle(priority: "high" | "medium" | "low") {
 
 export function NextBestActions() {
   const { companyId, personaId } = useInterviewMode();
+  const { interviewDate } = useModeInterviewDate({ companyId, personaId });
   const [readiness, setReadiness] = useState({
     completed: 0,
     total: 0,
@@ -55,7 +53,6 @@ export function NextBestActions() {
   const [latestSessionTimestamp, setLatestSessionTimestamp] = useState<string | null>(
     null
   );
-  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   const bundle = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -68,10 +65,6 @@ export function NextBestActions() {
     const activePersonaId = personaId;
     const readinessKey = getReadinessStorageKey(activeCompanyId, activePersonaId);
     const historyKey = getPrepHistoryStorageKey(activeCompanyId, activePersonaId);
-    const interviewDateKey = getInterviewDateStorageKey(
-      activeCompanyId,
-      activePersonaId
-    );
 
     function refresh() {
       const checklistItems = getReadinessChecklist(activeCompanyId, activePersonaId);
@@ -88,7 +81,6 @@ export function NextBestActions() {
       setHistoryConfidence(history[0]?.averageConfidence ?? null);
       setHistoryThemes(history[0]?.topThemes ?? []);
       setLatestSessionTimestamp(history[0]?.timestamp ?? null);
-      setInterviewDate(parseInterviewDate(localStorage.getItem(interviewDateKey)));
     }
 
     refresh();
@@ -96,8 +88,7 @@ export function NextBestActions() {
     function onStorage(event: StorageEvent) {
       if (
         event.key === readinessKey ||
-        event.key === historyKey ||
-        event.key === interviewDateKey
+        event.key === historyKey
       ) {
         refresh();
       }
@@ -113,25 +104,15 @@ export function NextBestActions() {
       if (detail?.key === historyKey) refresh();
     }
 
-    function onInterviewDateUpdate(event: Event) {
-      const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === interviewDateKey) refresh();
-    }
-
     window.addEventListener("storage", onStorage);
     window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
     window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
-    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("adaptive-readiness-updated", onReadinessUpdate);
       window.removeEventListener(
         "adaptive-prep-history-updated",
         onPrepHistoryUpdate
-      );
-      window.removeEventListener(
-        "adaptive-interview-date-updated",
-        onInterviewDateUpdate
       );
     };
   }, [companyId, personaId]);

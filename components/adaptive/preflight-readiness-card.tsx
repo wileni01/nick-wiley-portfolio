@@ -5,6 +5,7 @@ import { ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useInterviewMode } from "./interview-mode-provider";
 import { TimelineQuickFixActions } from "./timeline-quick-fix-actions";
+import { useModeInterviewDate } from "./use-mode-interview-date";
 import {
   getReadinessChecklist,
   getReadinessCompletion,
@@ -16,18 +17,15 @@ import {
   parsePrepHistory,
 } from "@/lib/adaptive/prep-history";
 import {
-  getInterviewDateStorageKey,
   getLaunchpadStorageKey,
   getPrepNotesStorageKey,
 } from "@/lib/adaptive/storage-keys";
 import { calculatePreflightScore } from "@/lib/adaptive/preflight";
-import {
-  getInterviewDateSummary,
-  parseInterviewDate,
-} from "@/lib/adaptive/interview-date";
+import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
 
 export function PreflightReadinessCard() {
   const { companyId, personaId, focusNote } = useInterviewMode();
+  const { interviewDate } = useModeInterviewDate({ companyId, personaId });
   const [readinessPct, setReadinessPct] = useState(0);
   const [latestScore, setLatestScore] = useState<number | null>(null);
   const [latestSessionTimestamp, setLatestSessionTimestamp] = useState<string | null>(
@@ -35,7 +33,6 @@ export function PreflightReadinessCard() {
   );
   const [launchpadPct, setLaunchpadPct] = useState(0);
   const [hasNotes, setHasNotes] = useState(false);
-  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   useEffect(() => {
     if (!companyId || !personaId) return;
@@ -47,7 +44,6 @@ export function PreflightReadinessCard() {
       history: getPrepHistoryStorageKey(activeCompanyId, activePersonaId),
       launchpad: getLaunchpadStorageKey(activeCompanyId, activePersonaId),
       notes: getPrepNotesStorageKey(activeCompanyId, activePersonaId),
-      interviewDate: getInterviewDateStorageKey(activeCompanyId, activePersonaId),
     };
 
     function refresh() {
@@ -79,7 +75,6 @@ export function PreflightReadinessCard() {
 
       const notes = localStorage.getItem(keys.notes) ?? "";
       setHasNotes(Boolean(notes.trim()));
-      setInterviewDate(parseInterviewDate(localStorage.getItem(keys.interviewDate)));
     }
 
     refresh();
@@ -108,17 +103,11 @@ export function PreflightReadinessCard() {
       if (detail?.key === keys.notes) refresh();
     }
 
-    function onInterviewDateUpdate(event: Event) {
-      const detail = (event as CustomEvent<{ key?: string }>).detail;
-      if (detail?.key === keys.interviewDate) refresh();
-    }
-
     window.addEventListener("storage", onStorage);
     window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
     window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
     window.addEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
     window.addEventListener("adaptive-prep-notes-updated", onNotesUpdate);
-    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("adaptive-readiness-updated", onReadinessUpdate);
@@ -128,10 +117,6 @@ export function PreflightReadinessCard() {
       );
       window.removeEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
       window.removeEventListener("adaptive-prep-notes-updated", onNotesUpdate);
-      window.removeEventListener(
-        "adaptive-interview-date-updated",
-        onInterviewDateUpdate
-      );
     };
   }, [companyId, personaId]);
 
