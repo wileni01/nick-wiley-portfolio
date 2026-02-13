@@ -42,6 +42,16 @@ export function buildNextActions(input: BuildNextActionsInput): NextAction[] {
   const daysUntilInterview = getDaysUntilInterview(input.interviewDate);
   const recencyDays = getSessionRecencyDays(input.latestSessionTimestamp);
 
+  if (daysUntilInterview === null) {
+    actions.push({
+      id: "set-interview-date",
+      priority: "medium",
+      title: "Set interview date for timeline planning",
+      detail:
+        "Add your interview date to unlock countdown-aware pacing, urgency scoring, and prep checkpoint scheduling.",
+    });
+  }
+
   if (daysUntilInterview !== null && daysUntilInterview >= 0 && daysUntilInterview <= 2) {
     actions.push({
       id: "interview-countdown",

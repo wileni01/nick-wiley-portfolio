@@ -62,6 +62,17 @@ export function buildPracticeReminders(
     capDueDate(addDays(input.now, 1), interviewDate, input.now)
   );
 
+  if (daysUntilInterview === null) {
+    reminders.push({
+      id: "set-interview-date",
+      title: "Set your interview date",
+      detail:
+        "Add your interview date so reminders, pacing guidance, and countdown status can prioritize the right prep window.",
+      dueBy: todayIso,
+      priority: "medium",
+    });
+  }
+
   if (daysUntilInterview !== null && daysUntilInterview >= 0 && daysUntilInterview <= 2) {
     reminders.push({
       id: "interview-soon",
