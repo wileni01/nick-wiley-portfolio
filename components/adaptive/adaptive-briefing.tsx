@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Building2, Loader2, Sparkles, Target } from "lucide-react";
+import {
+  ArrowRight,
+  Building2,
+  ExternalLink,
+  Loader2,
+  Sparkles,
+  Target,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
@@ -148,6 +155,40 @@ export function AdaptiveBriefing() {
           Fallback used: {apiError}
         </p>
       )}
+
+      <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
+        <h3 className="text-sm font-semibold">Company priorities in this mode</h3>
+        <div className="flex flex-wrap gap-1.5">
+          {company.priorityTags.map((priority) => (
+            <Badge key={priority} variant="outline" className="text-[10px]">
+              {priority}
+            </Badge>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+          <a
+            href={company.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 hover:text-foreground"
+          >
+            Company site
+            <ExternalLink className="h-3 w-3" />
+          </a>
+          {company.sources.slice(0, 3).map((source, index) => (
+            <a
+              key={source}
+              href={source}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 hover:text-foreground"
+            >
+              Source {index + 1}
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          ))}
+        </div>
+      </div>
 
       <div className="space-y-3">
         <h3 className="text-sm font-semibold">What they should see first</h3>
