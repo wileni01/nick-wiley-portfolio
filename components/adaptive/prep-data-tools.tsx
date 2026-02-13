@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ClipboardPaste, Download, FileUp, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useInterviewMode } from "./interview-mode-provider";
 import { getReadinessStorageKey } from "@/lib/adaptive/readiness-checklist";
 import { getPrepHistoryStorageKey } from "@/lib/adaptive/prep-history";
@@ -27,8 +28,6 @@ import { sanitizeFileToken, triggerDownload } from "@/lib/download";
 
 type StatusTone = "neutral" | "error" | "success";
 const CROSS_MODE_IMPORT_CONFIRM_MS = 10000;
-const PREP_DATA_MANUAL_PASTE_PROMPT =
-  "Paste your prep data JSON bundle. Leave blank to cancel.";
 
 export function PrepDataTools() {
   const { companyId, personaId, company, persona } = useInterviewMode();
@@ -41,6 +40,7 @@ export function PrepDataTools() {
   const [pendingImportTargetKey, setPendingImportTargetKey] = useState<string | null>(
     null
   );
+  const [manualJson, setManualJson] = useState("");
 
   useEffect(() => {
     if (!confirmReset) return;
@@ -323,9 +323,15 @@ export function PrepDataTools() {
     }
     if (isCrossModeBundle(parsed)) {
       queueCrossModeImport(parsed);
+      if (source === "manual") {
+        setManualJson("");
+      }
       return true;
     }
     applyImportedBundle(parsed);
+    if (source === "manual") {
+      setManualJson("");
+    }
     return true;
   }
 
@@ -345,14 +351,15 @@ export function PrepDataTools() {
         // Fall through to manual paste prompt.
       }
     }
+    setTone("neutral");
+    setStatus("Clipboard read unavailable. Paste JSON manually below.");
+  }
 
-    const fallback = window.prompt(PREP_DATA_MANUAL_PASTE_PROMPT);
-    if (fallback === null) {
-      setTone("neutral");
-      setStatus("Paste canceled.");
-      return;
-    }
-    importRawBundle(fallback, "manual");
+  function importManualJson() {
+    setConfirmReset(false);
+    setPendingImport(null);
+    setPendingImportTargetKey(null);
+    importRawBundle(manualJson, "manual");
   }
 
   async function onImportFile(event: React.ChangeEvent<HTMLInputElement>) {
@@ -444,6 +451,37 @@ export function PrepDataTools() {
           </div>
         </div>
       ) : null}
+
+      <div className="rounded-md border border-border bg-background p-3 space-y-2">
+        <p className="text-xs font-medium">Manual paste import</p>
+        <Textarea
+          value={manualJson}
+          onChange={(event) => setManualJson(event.target.value)}
+          rows={5}
+          placeholder='Paste exported prep JSON here, then click "Import pasted JSON".'
+          className="text-xs"
+        />
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 px-2 text-[11px]"
+            onClick={importManualJson}
+            disabled={!manualJson.trim()}
+          >
+            Import pasted JSON
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-[11px]"
+            onClick={() => setManualJson("")}
+            disabled={!manualJson}
+          >
+            Clear pasted JSON
+          </Button>
+        </div>
+      </div>
 
       {status ? (
         <p
