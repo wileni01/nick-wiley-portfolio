@@ -24,6 +24,7 @@ import {
   getInterviewDateSummary,
   parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
+import { setInterviewDateOffsetForMode } from "@/lib/adaptive/interview-date-actions";
 
 function getPriorityBadge(priority: "high" | "medium" | "low") {
   if (priority === "high") {
@@ -162,17 +163,7 @@ export function PracticeRemindersCard() {
   const activePersonaId = personaId;
 
   function setInterviewDateOffset(daysFromNow: number) {
-    const base = new Date();
-    base.setHours(0, 0, 0, 0);
-    base.setDate(base.getDate() + daysFromNow);
-    const year = base.getFullYear();
-    const month = String(base.getMonth() + 1).padStart(2, "0");
-    const day = String(base.getDate()).padStart(2, "0");
-    const key = getInterviewDateStorageKey(activeCompanyId, activePersonaId);
-    localStorage.setItem(key, `${year}-${month}-${day}`);
-    window.dispatchEvent(
-      new CustomEvent("adaptive-interview-date-updated", { detail: { key } })
-    );
+    setInterviewDateOffsetForMode(activeCompanyId, activePersonaId, daysFromNow);
   }
 
   return (

@@ -25,6 +25,7 @@ import {
   getInterviewDateSummary,
   parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
+import { setInterviewDateOffsetForMode } from "@/lib/adaptive/interview-date-actions";
 
 export function PreflightReadinessCard() {
   const { companyId, personaId, focusNote } = useInterviewMode();
@@ -162,21 +163,11 @@ export function PreflightReadinessCard() {
   );
 
   if (!companyId || !personaId) return null;
-  const interviewDateKey = getInterviewDateStorageKey(companyId, personaId);
+  const activeCompanyId = companyId;
+  const activePersonaId = personaId;
 
   function setInterviewDateOffset(daysFromNow: number) {
-    const base = new Date();
-    base.setHours(0, 0, 0, 0);
-    base.setDate(base.getDate() + daysFromNow);
-    const year = base.getFullYear();
-    const month = String(base.getMonth() + 1).padStart(2, "0");
-    const day = String(base.getDate()).padStart(2, "0");
-    localStorage.setItem(interviewDateKey, `${year}-${month}-${day}`);
-    window.dispatchEvent(
-      new CustomEvent("adaptive-interview-date-updated", {
-        detail: { key: interviewDateKey },
-      })
-    );
+    setInterviewDateOffsetForMode(activeCompanyId, activePersonaId, daysFromNow);
   }
 
   return (

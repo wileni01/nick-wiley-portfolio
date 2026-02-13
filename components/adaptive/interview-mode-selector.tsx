@@ -15,6 +15,7 @@ import {
   getInterviewDateSummary,
   parseInterviewDate,
 } from "@/lib/adaptive/interview-date";
+import { setInterviewDateOffsetForMode } from "@/lib/adaptive/interview-date-actions";
 import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
 
 function formatFocusChipLabel(text: string): string {
@@ -115,18 +116,7 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
 
   function setInterviewDateOffset(daysFromNow: number) {
     if (!companyId || !personaId) return;
-    const base = new Date();
-    base.setHours(0, 0, 0, 0);
-    base.setDate(base.getDate() + daysFromNow);
-    const year = base.getFullYear();
-    const month = String(base.getMonth() + 1).padStart(2, "0");
-    const day = String(base.getDate()).padStart(2, "0");
-    const nextDate = `${year}-${month}-${day}`;
-    const key = getInterviewDateStorageKey(companyId, personaId);
-    localStorage.setItem(key, nextDate);
-    window.dispatchEvent(
-      new CustomEvent("adaptive-interview-date-updated", { detail: { key } })
-    );
+    setInterviewDateOffsetForMode(companyId, personaId, daysFromNow);
   }
 
   async function handleCopyPrepLink() {

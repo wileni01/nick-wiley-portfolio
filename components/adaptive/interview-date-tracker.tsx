@@ -14,6 +14,7 @@ import {
   buildInterviewGoogleCalendarUrl,
   buildInterviewPrepCalendarIcs,
 } from "@/lib/adaptive/interview-calendar";
+import { buildInterviewDateOffsetValue } from "@/lib/adaptive/interview-date-actions";
 import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
 
 export function InterviewDateTracker() {
@@ -126,13 +127,7 @@ export function InterviewDateTracker() {
   }
 
   function setDateOffset(daysFromNow: number) {
-    const base = new Date();
-    base.setHours(0, 0, 0, 0);
-    base.setDate(base.getDate() + daysFromNow);
-    const year = base.getFullYear();
-    const month = String(base.getMonth() + 1).padStart(2, "0");
-    const day = String(base.getDate()).padStart(2, "0");
-    setInterviewDate(`${year}-${month}-${day}`);
+    setInterviewDate(buildInterviewDateOffsetValue(daysFromNow));
   }
 
   function openGoogleCalendarCheckpoint(url: string) {
