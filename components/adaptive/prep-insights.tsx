@@ -14,6 +14,18 @@ import {
   getPrepGoalStorageKey,
   parsePrepGoalState,
 } from "@/lib/adaptive/prep-goals";
+import {
+  getReadinessChecklist,
+  getReadinessCompletion,
+  getReadinessStorageKey,
+  parseReadinessState,
+} from "@/lib/adaptive/readiness-checklist";
+import { getInterviewDateStorageKey } from "@/lib/adaptive/storage-keys";
+import {
+  getInterviewDateSummary,
+  parseInterviewDate,
+} from "@/lib/adaptive/interview-date";
+import { evaluatePrepCadence } from "@/lib/adaptive/prep-cadence";
 
 function formatDateLabel(timestamp: string): string {
   try {
@@ -32,6 +44,8 @@ export function PrepInsights() {
   const { companyId, personaId } = useInterviewMode();
   const [history, setHistory] = useState<PrepSessionSnapshot[]>([]);
   const [weeklyTarget, setWeeklyTarget] = useState(defaultPrepGoal.weeklyTarget);
+  const [readinessPct, setReadinessPct] = useState(0);
+  const [interviewDate, setInterviewDate] = useState<string | null>(null);
 
   const storageKey = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -113,6 +127,60 @@ export function PrepInsights() {
     );
   }, [companyId, personaId, weeklyTarget]);
 
+  useEffect(() => {
+    if (!companyId || !personaId) {
+      setReadinessPct(0);
+      setInterviewDate(null);
+      return;
+    }
+    const activeCompanyId = companyId;
+    const activePersonaId = personaId;
+
+    const readinessKey = getReadinessStorageKey(activeCompanyId, activePersonaId);
+    const interviewDateKey = getInterviewDateStorageKey(
+      activeCompanyId,
+      activePersonaId
+    );
+
+    function refresh() {
+      const checklistItems = getReadinessChecklist(activeCompanyId, activePersonaId);
+      const readinessState = parseReadinessState(localStorage.getItem(readinessKey));
+      const completion = getReadinessCompletion(checklistItems, readinessState);
+      setReadinessPct(completion.completionPct);
+      setInterviewDate(parseInterviewDate(localStorage.getItem(interviewDateKey)));
+    }
+
+    refresh();
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === readinessKey || event.key === interviewDateKey) {
+        refresh();
+      }
+    }
+
+    function onReadinessUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === readinessKey) refresh();
+    }
+
+    function onInterviewDateUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === interviewDateKey) refresh();
+    }
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
+    window.addEventListener("adaptive-interview-date-updated", onInterviewDateUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("adaptive-readiness-updated", onReadinessUpdate);
+      window.removeEventListener(
+        "adaptive-interview-date-updated",
+        onInterviewDateUpdate
+      );
+    };
+  }, [companyId, personaId]);
+
   const prepCalendar = useMemo(() => {
     const now = new Date();
     const startOfWeek = new Date(now);
@@ -170,6 +238,13 @@ export function PrepInsights() {
     });
     return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3);
   })();
+  const interviewTimeline = getInterviewDateSummary(interviewDate);
+  const cadence = evaluatePrepCadence({
+    daysUntilInterview: interviewTimeline.daysUntil,
+    readinessPct,
+    latestScore: latest?.averageScore ?? null,
+    latestSessionTimestamp: latest?.timestamp ?? null,
+  });
 
   return (
     <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
@@ -182,9 +257,30 @@ export function PrepInsights() {
       </div>
 
       {!history.length ? (
-        <p className="text-xs text-muted-foreground">
-          Complete at least one mock session to see trend insights.
-        </p>
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">
+            Complete at least one mock session to see trend insights.
+          </p>
+          <div className="rounded-md border border-border bg-background p-3 space-y-1">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-medium">Interview pacing status</p>
+              <Badge
+                variant="outline"
+                className={
+                  cadence.status === "urgent"
+                    ? "border-rose-400/60 text-rose-700 dark:text-rose-300"
+                    : cadence.status === "watch"
+                      ? "border-amber-400/60 text-amber-700 dark:text-amber-300"
+                      : "text-muted-foreground"
+                }
+              >
+                {cadence.label}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">{interviewTimeline.label}</p>
+            <p className="text-xs text-muted-foreground">{cadence.detail}</p>
+          </div>
+        </div>
       ) : (
         <>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -245,6 +341,36 @@ export function PrepInsights() {
             <p className="text-xs text-muted-foreground">
               Current daily streak: {prepCalendar.streakDays} day
               {prepCalendar.streakDays === 1 ? "" : "s"}
+            </p>
+          </div>
+
+          <div className="rounded-md border border-border bg-background p-3 space-y-1">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-medium">Interview pacing status</p>
+              <Badge
+                variant="outline"
+                className={
+                  cadence.status === "urgent"
+                    ? "border-rose-400/60 text-rose-700 dark:text-rose-300"
+                    : cadence.status === "watch"
+                      ? "border-amber-400/60 text-amber-700 dark:text-amber-300"
+                      : cadence.status === "on-track"
+                        ? "border-emerald-400/60 text-emerald-700 dark:text-emerald-300"
+                        : "text-muted-foreground"
+                }
+              >
+                {cadence.label}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">{interviewTimeline.label}</p>
+            <p className="text-xs text-muted-foreground">{cadence.detail}</p>
+            <p className="text-[11px] text-muted-foreground">
+              Suggested reps remaining: {cadence.sessionsNeeded}
+              {cadence.recencyDays !== null
+                ? ` · Last session ${cadence.recencyDays} day${
+                    cadence.recencyDays === 1 ? "" : "s"
+                  } ago`
+                : " · No recent session logged"}
             </p>
           </div>
 
