@@ -25,6 +25,7 @@ import { PreflightReadinessCard } from "./preflight-readiness-card";
 import { PrepNotes } from "./prep-notes";
 import { PracticeRemindersCard } from "./practice-reminders-card";
 import { PrepInsights } from "./prep-insights";
+import { ReadinessGapPanel } from "./readiness-gap-panel";
 import { ResourceLaunchpad } from "./resource-launchpad";
 import { TargetedDrills } from "./targeted-drills";
 import {
@@ -259,6 +260,7 @@ export function AdaptiveBriefing() {
       <ModeComparisonPanel />
       <InterviewDayPlanPanel />
       <PreflightReadinessCard />
+      <ReadinessGapPanel />
       <PrepCockpitSummary />
       <ResourceLaunchpad />
       <PrepNotes />

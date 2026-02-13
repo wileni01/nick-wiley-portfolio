@@ -159,3 +159,10 @@ export function getReadinessCompletion(
     : 0;
   return { completedCount, completionPct };
 }
+
+export function getIncompleteReadinessItems(
+  items: ReadinessChecklistItem[],
+  state: ReadinessState
+): ReadinessChecklistItem[] {
+  return items.filter((item) => !state[item.id]);
+}
