@@ -19,11 +19,16 @@ import {
 import { buildNextActions } from "@/lib/adaptive/next-actions";
 import { buildTargetedDrills } from "@/lib/adaptive/drills";
 import { buildInterviewDayPlan } from "@/lib/adaptive/interview-day-plan";
+import { calculatePreflightScore } from "@/lib/adaptive/preflight";
+import { buildPracticeReminders } from "@/lib/adaptive/practice-reminders";
 import {
   getPrepHistoryStorageKey,
   parsePrepHistory,
 } from "@/lib/adaptive/prep-history";
-import { getPrepNotesStorageKey } from "@/lib/adaptive/storage-keys";
+import {
+  getLaunchpadStorageKey,
+  getPrepNotesStorageKey,
+} from "@/lib/adaptive/storage-keys";
 
 export function PrepCockpitSummary() {
   const { companyId, personaId, focusNote, company, persona } = useInterviewMode();
@@ -37,6 +42,10 @@ export function PrepCockpitSummary() {
   });
   const [latestScore, setLatestScore] = useState<number | null>(null);
   const [latestConfidence, setLatestConfidence] = useState<number | null>(null);
+  const [latestSessionTimestamp, setLatestSessionTimestamp] = useState<string | null>(
+    null
+  );
+  const [launchpadPct, setLaunchpadPct] = useState(0);
   const [latestThemes, setLatestThemes] = useState<string[]>([]);
   const [prepNotes, setPrepNotes] = useState("");
 
@@ -51,6 +60,7 @@ export function PrepCockpitSummary() {
     const readinessKey = getReadinessStorageKey(companyId, personaId);
     const historyKey = getPrepHistoryStorageKey(companyId, personaId);
     const notesKey = getPrepNotesStorageKey(companyId, personaId);
+    const launchpadKey = getLaunchpadStorageKey(companyId, personaId);
 
     function refresh() {
       const checklistItems = getReadinessChecklist(companyId, personaId);
@@ -65,8 +75,23 @@ export function PrepCockpitSummary() {
       const history = parsePrepHistory(localStorage.getItem(historyKey));
       setLatestScore(history[0]?.averageScore ?? null);
       setLatestConfidence(history[0]?.averageConfidence ?? null);
+      setLatestSessionTimestamp(history[0]?.timestamp ?? null);
       setLatestThemes(history[0]?.topThemes ?? []);
       setPrepNotes((localStorage.getItem(notesKey) ?? "").slice(0, 1200));
+
+      const rawLaunchpad = localStorage.getItem(launchpadKey);
+      if (!rawLaunchpad) {
+        setLaunchpadPct(0);
+      } else {
+        try {
+          const parsed = JSON.parse(rawLaunchpad) as Record<string, boolean>;
+          const values = Object.values(parsed);
+          const opened = values.filter(Boolean).length;
+          setLaunchpadPct(values.length ? Math.round((opened / values.length) * 100) : 0);
+        } catch {
+          setLaunchpadPct(0);
+        }
+      }
     }
 
     refresh();
@@ -75,7 +100,8 @@ export function PrepCockpitSummary() {
       if (
         event.key === readinessKey ||
         event.key === historyKey ||
-        event.key === notesKey
+        event.key === notesKey ||
+        event.key === launchpadKey
       ) {
         refresh();
       }
@@ -96,10 +122,16 @@ export function PrepCockpitSummary() {
       if (detail?.key === notesKey) refresh();
     }
 
+    function onLaunchpadUpdate(event: Event) {
+      const detail = (event as CustomEvent<{ key?: string }>).detail;
+      if (detail?.key === launchpadKey) refresh();
+    }
+
     window.addEventListener("storage", onStorage);
     window.addEventListener("adaptive-readiness-updated", onReadinessUpdate);
     window.addEventListener("adaptive-prep-history-updated", onPrepHistoryUpdate);
     window.addEventListener("adaptive-prep-notes-updated", onPrepNotesUpdate);
+    window.addEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
 
     return () => {
       window.removeEventListener("storage", onStorage);
@@ -109,6 +141,7 @@ export function PrepCockpitSummary() {
         onPrepHistoryUpdate
       );
       window.removeEventListener("adaptive-prep-notes-updated", onPrepNotesUpdate);
+      window.removeEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
     };
   }, [companyId, personaId]);
 
@@ -131,6 +164,14 @@ export function PrepCockpitSummary() {
     },
     latestScore,
     latestConfidence,
+    preflight: calculatePreflightScore({
+      readinessPct: checklistCompletion.completionPct,
+      latestScore,
+      latestSessionTimestamp,
+      launchpadPct,
+      hasNotes: Boolean(prepNotes.trim()),
+      hasFocusNote: Boolean(focusNote.trim()),
+    }),
     topResources: recommendationBundle.topRecommendations.slice(0, 3).map(
       (recommendation) => ({
         title: recommendation.asset.title,
@@ -139,6 +180,12 @@ export function PrepCockpitSummary() {
       })
     ),
     talkingPoints: recommendationBundle.talkingPoints,
+    reminders: buildPracticeReminders({
+      now: new Date(),
+      latestScore,
+      readinessPct: checklistCompletion.completionPct,
+      launchpadPct,
+    }),
   });
 
   const prepPacketMarkdown = buildPrepPacketMarkdown({
@@ -156,6 +203,14 @@ export function PrepCockpitSummary() {
     },
     latestScore,
     latestConfidence,
+    preflight: calculatePreflightScore({
+      readinessPct: checklistCompletion.completionPct,
+      latestScore,
+      latestSessionTimestamp,
+      launchpadPct,
+      hasNotes: Boolean(prepNotes.trim()),
+      hasFocusNote: Boolean(focusNote.trim()),
+    }),
     topResources: recommendationBundle.topRecommendations.slice(0, 3).map(
       (recommendation) => ({
         title: recommendation.asset.title,
@@ -164,6 +219,12 @@ export function PrepCockpitSummary() {
       })
     ),
     talkingPoints: recommendationBundle.talkingPoints,
+    reminders: buildPracticeReminders({
+      now: new Date(),
+      latestScore,
+      readinessPct: checklistCompletion.completionPct,
+      launchpadPct,
+    }),
     nextActions: buildNextActions({
       readinessPct: checklistCompletion.completionPct,
       readinessCompleted: checklistCompletion.completedCount,

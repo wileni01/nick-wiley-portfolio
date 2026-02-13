@@ -147,7 +147,7 @@ lib/
 - **Prep data tools** — Export/import/reset local prep state (JSON), including notes and focus history, per company/persona mode.
 - **Prep notes pad** — Persist mode-specific interviewer notes and include them in exported briefs/packets.
 - **Interview day plan** — Time-phased execution plan (T-45 to close) tuned to selected company/persona priorities.
-- **Full prep packet export** — Download a consolidated Markdown packet with brief, next actions, drills, and day plan.
+- **Full prep packet export** — Download a consolidated Markdown packet with brief, preflight status, reminders, next actions, drills, and day plan.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.

@@ -13,12 +13,23 @@ export interface PrepBriefInput {
   };
   latestScore: number | null;
   latestConfidence: number | null;
+  preflight?: {
+    score: number;
+    label: string;
+    detail: string;
+  };
   topResources: Array<{
     title: string;
     url: string;
     reason: string;
   }>;
   talkingPoints: string[];
+  reminders?: Array<{
+    title: string;
+    detail: string;
+    dueBy: string;
+    priority: "high" | "medium" | "low";
+  }>;
 }
 
 export interface PrepPacketInput extends PrepBriefInput {
@@ -81,12 +92,25 @@ ${input.prepNotes?.trim() ? input.prepNotes : "No prep notes captured."}
 - Latest confidence rating: ${
     input.latestConfidence !== null ? `${input.latestConfidence}/5` : "N/A"
   }
+${input.preflight ? `- Preflight: ${input.preflight.score}/100 (${input.preflight.label})` : ""}
 
 ## Recommended Resources (open first)
 ${resourceLines}
 
 ## Talking Points
 ${talkingPointLines}
+
+## Practice Reminders
+${
+  input.reminders?.length
+    ? input.reminders
+        .map(
+          (reminder, index) =>
+            `${index + 1}. [${reminder.priority.toUpperCase()} · due ${reminder.dueBy}] ${reminder.title} — ${reminder.detail}`
+        )
+        .join("\n")
+    : "- No reminders generated."
+}
 `;
 }
 
