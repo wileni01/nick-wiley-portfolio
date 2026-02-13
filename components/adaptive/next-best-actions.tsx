@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AlertCircle, ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useInterviewMode } from "./interview-mode-provider";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import {
@@ -149,6 +150,23 @@ export function NextBestActions() {
     interviewDate,
   });
   const interviewDateSummary = getInterviewDateSummary(interviewDate);
+  const activeCompanyId = companyId;
+  const activePersonaId = personaId;
+
+  function setInterviewDateOffset(daysFromNow: number) {
+    if (!activeCompanyId || !activePersonaId) return;
+    const base = new Date();
+    base.setHours(0, 0, 0, 0);
+    base.setDate(base.getDate() + daysFromNow);
+    const year = base.getFullYear();
+    const month = String(base.getMonth() + 1).padStart(2, "0");
+    const day = String(base.getDate()).padStart(2, "0");
+    const key = getInterviewDateStorageKey(activeCompanyId, activePersonaId);
+    localStorage.setItem(key, `${year}-${month}-${day}`);
+    window.dispatchEvent(
+      new CustomEvent("adaptive-interview-date-updated", { detail: { key } })
+    );
+  }
 
   return (
     <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
@@ -177,6 +195,27 @@ export function NextBestActions() {
                 </Badge>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{action.detail}</p>
+              {(action.id === "set-interview-date" ||
+                action.id === "reset-interview-date") && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-[11px]"
+                    onClick={() => setInterviewDateOffset(7)}
+                  >
+                    {action.id === "set-interview-date" ? "Set +7d" : "Reset +7d"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-[11px]"
+                    onClick={() => setInterviewDateOffset(14)}
+                  >
+                    {action.id === "set-interview-date" ? "Set +14d" : "Reset +14d"}
+                  </Button>
+                </div>
+              )}
             </li>
           );
         })}
