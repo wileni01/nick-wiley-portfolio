@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, Rocket, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +8,7 @@ import { useInterviewMode } from "./interview-mode-provider";
 import { useTransientState } from "./use-transient-state";
 import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
-import { openExternalUrls } from "@/lib/external-link";
+import { openExternalUrl, openExternalUrls } from "@/lib/external-link";
 
 export function ResourceLaunchpad() {
   const { companyId, personaId } = useInterviewMode();
@@ -84,6 +83,16 @@ export function ResourceLaunchpad() {
 
   function markOpened(resourceId: string) {
     setOpened((prev) => ({ ...prev, [resourceId]: true }));
+  }
+
+  function openResource(resourceId: string, url: string) {
+    const didOpen = openExternalUrl(url);
+    if (!didOpen) {
+      setOpenState("error");
+      return;
+    }
+    markOpened(resourceId);
+    setOpenState("opened");
   }
 
   function markAllOpened() {
@@ -165,7 +174,7 @@ export function ResourceLaunchpad() {
       </div>
       <span className="sr-only" role="status" aria-live="polite">
         {openState === "opened"
-          ? "Remaining resources opened."
+          ? "Resource link opened."
           : openState === "partial"
             ? "Some resource pop-ups were blocked."
             : openState === "error"
@@ -174,8 +183,9 @@ export function ResourceLaunchpad() {
       </span>
       {(openState === "partial" || openState === "error") && (
         <p className="text-xs text-muted-foreground">
-          Some resource tabs were blocked. Allow pop-ups for this site to open all
-          launchpad links automatically.
+          {openState === "partial"
+            ? "Some resource tabs were blocked. Allow pop-ups for this site to open all launchpad links automatically."
+            : "Resource tab was blocked. Allow pop-ups for this site and try again."}
         </p>
       )}
 
@@ -198,17 +208,10 @@ export function ResourceLaunchpad() {
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => markOpened(resource.asset.id)}
-                asChild
+                onClick={() => openResource(resource.asset.id, resource.asset.url)}
               >
-                <Link
-                  href={resource.asset.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Open
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </Link>
+                Open
+                <ExternalLink className="h-3.5 w-3.5" />
               </Button>
             </div>
           </li>
