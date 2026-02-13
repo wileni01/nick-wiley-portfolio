@@ -126,6 +126,7 @@ lib/
 - **Session autosave** — Mock interview drafts persist locally per company/persona, so you can continue prep later.
 - **Pacing + coaching themes** — Mock mode estimates speaking time per answer and surfaces recurring improvement themes at session completion.
 - **Readiness checklist** — Persona-aware prep checklist with local progress tracking and completion percentage.
+- **Prep insights dashboard** — Tracks session history, latest/best scores, trend, and recurring coaching themes per company/persona.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.

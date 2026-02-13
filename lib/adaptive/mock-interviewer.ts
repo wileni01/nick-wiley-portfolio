@@ -230,6 +230,21 @@ const governanceRegex = /\b(governance|audit|override|risk|safety|accountability
 const actionRegex = /\b(built|designed|led|implemented|delivered|shipped|deployed)\b/i;
 const outcomeRegex = /\b(result|impact|outcome|improved|reduced|increased|streamlined)\b/i;
 
+function mapGapToTheme(gap: string): string {
+  const normalized = gap.toLowerCase();
+  if (normalized.includes("metric")) return "Add concrete metrics";
+  if (normalized.includes("ownership") || normalized.includes("verbs")) {
+    return "Use stronger ownership language";
+  }
+  if (normalized.includes("impact") || normalized.includes("outcome")) {
+    return "Close with clearer impact";
+  }
+  if (normalized.includes("governance") || normalized.includes("safety")) {
+    return "Include governance and safety framing";
+  }
+  return "Add structured detail";
+}
+
 export function evaluateMockAnswer(answer: string): MockAnswerFeedback {
   const normalized = answer.trim().toLowerCase();
 
@@ -311,4 +326,22 @@ export function evaluateMockSession(answers: string[]): MockSessionReport {
     answerCount: feedbackByQuestion.length,
     feedbackByQuestion,
   };
+}
+
+export function deriveCoachingThemes(
+  feedbackByQuestion: MockAnswerFeedback[],
+  limit: number = 3
+): Array<[string, number]> {
+  const counts = new Map<string, number>();
+
+  feedbackByQuestion.forEach((feedback) => {
+    feedback.gaps.forEach((gap) => {
+      const theme = mapGapToTheme(gap);
+      counts.set(theme, (counts.get(theme) ?? 0) + 1);
+    });
+  });
+
+  return Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
 }

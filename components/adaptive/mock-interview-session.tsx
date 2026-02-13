@@ -17,10 +17,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { useInterviewMode } from "./interview-mode-provider";
 import {
   buildMockInterviewerScript,
+  deriveCoachingThemes,
   evaluateMockAnswer,
   evaluateMockSession,
 } from "@/lib/adaptive/mock-interviewer";
 import type { AssetKind } from "@/lib/adaptive/types";
+import {
+  appendPrepHistoryEntry,
+  getPrepHistoryStorageKey,
+  parsePrepHistory,
+  type PrepSessionSnapshot,
+} from "@/lib/adaptive/prep-history";
 
 interface SessionQuestion {
   question: string;
@@ -65,21 +72,6 @@ function estimateSpeechSeconds(wordCount: number, wordsPerMinute = 140): number 
   return Math.round((wordCount / wordsPerMinute) * 60);
 }
 
-function mapGapToTheme(gap: string): string {
-  const normalized = gap.toLowerCase();
-  if (normalized.includes("metric")) return "Add concrete metrics";
-  if (normalized.includes("ownership") || normalized.includes("verbs")) {
-    return "Use stronger ownership language";
-  }
-  if (normalized.includes("impact") || normalized.includes("outcome")) {
-    return "Close with clearer impact";
-  }
-  if (normalized.includes("governance") || normalized.includes("safety")) {
-    return "Include governance and safety framing";
-  }
-  return "Add structured detail";
-}
-
 export function MockInterviewSession() {
   const { companyId, personaId } = useInterviewMode();
   const [started, setStarted] = useState(false);
@@ -106,17 +98,7 @@ export function MockInterviewSession() {
   const currentSpeechSeconds = estimateSpeechSeconds(currentWordCount);
   const report = evaluateMockSession(answers.slice(0, sessionQuestions.length));
   const coachingThemes = useMemo(() => {
-    const counts = new Map<string, number>();
-    report.feedbackByQuestion.forEach((feedback) => {
-      feedback.gaps.forEach((gap) => {
-        const theme = mapGapToTheme(gap);
-        counts.set(theme, (counts.get(theme) ?? 0) + 1);
-      });
-    });
-
-    return Array.from(counts.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
+    return deriveCoachingThemes(report.feedbackByQuestion, 3);
   }, [report.feedbackByQuestion]);
   const reportText = useMemo(() => {
     const timestamp = new Date().toISOString();
@@ -222,10 +204,36 @@ export function MockInterviewSession() {
 
   function nextQuestion() {
     if (currentIndex >= sessionQuestions.length - 1) {
-      setCompleted(true);
+      completeSession();
       return;
     }
     setCurrentIndex((index) => index + 1);
+  }
+
+  function completeSession() {
+    if (companyId && personaId) {
+      const topThemes = deriveCoachingThemes(report.feedbackByQuestion, 3).map(
+        ([theme]) => theme
+      );
+      const historyKey = getPrepHistoryStorageKey(companyId, personaId);
+      const existing = parsePrepHistory(localStorage.getItem(historyKey));
+      const entry: PrepSessionSnapshot = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        timestamp: new Date().toISOString(),
+        averageScore: report.averageScore,
+        answerCount: report.answerCount,
+        topThemes,
+      };
+      const nextHistory = appendPrepHistoryEntry(existing, entry);
+      localStorage.setItem(historyKey, JSON.stringify(nextHistory));
+      window.dispatchEvent(
+        new CustomEvent("adaptive-prep-history-updated", {
+          detail: { key: historyKey },
+        })
+      );
+    }
+
+    setCompleted(true);
   }
 
   function previousQuestion() {

@@ -16,6 +16,7 @@ import { useInterviewMode } from "./interview-mode-provider";
 import { InterviewReadinessChecklist } from "./interview-readiness-checklist";
 import { MockInterviewSession } from "./mock-interview-session";
 import { MockInterviewerScript } from "./mock-interviewer-script";
+import { PrepInsights } from "./prep-insights";
 import {
   buildDeterministicNarrative,
   getInterviewRecommendationBundle,
@@ -231,6 +232,7 @@ export function AdaptiveBriefing() {
       </div>
 
       <InterviewReadinessChecklist />
+      <PrepInsights />
       <MockInterviewerScript />
       <MockInterviewSession />
 
