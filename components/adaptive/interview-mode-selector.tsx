@@ -288,6 +288,11 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
             <Check className="h-3.5 w-3.5" />
             Copied link
           </>
+        ) : copyState === "error" ? (
+          <>
+            <Copy className="h-3.5 w-3.5" />
+            Copy failed
+          </>
         ) : (
           <>
             <Copy className="h-3.5 w-3.5" />
