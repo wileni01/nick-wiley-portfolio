@@ -13,7 +13,10 @@ import {
   openExternalUrl,
   openExternalUrls,
 } from "@/lib/external-link";
-import { parseBooleanStateRecord } from "@/lib/adaptive/boolean-state";
+import {
+  areBooleanStateRecordsEqual,
+  parseBooleanStateRecord,
+} from "@/lib/adaptive/boolean-state";
 
 export function ResourceLaunchpad() {
   const { companyId, personaId } = useInterviewMode();
@@ -34,11 +37,13 @@ export function ResourceLaunchpad() {
     function refresh() {
       const raw = localStorage.getItem(key);
       if (!raw) {
-        setOpened({});
+        setOpened((prev) => (Object.keys(prev).length ? {} : prev));
         return;
       }
       const parsed = parseBooleanStateRecord(raw);
-      setOpened(parsed);
+      setOpened((prev) =>
+        areBooleanStateRecordsEqual(prev, parsed) ? prev : parsed
+      );
       if (!Object.keys(parsed).length) {
         localStorage.removeItem(key);
       }
@@ -69,7 +74,9 @@ export function ResourceLaunchpad() {
   useEffect(() => {
     if (!companyId || !personaId) return;
     const key = getLaunchpadStorageKey(companyId, personaId);
-    localStorage.setItem(key, JSON.stringify(opened));
+    const serialized = JSON.stringify(opened);
+    if (localStorage.getItem(key) === serialized) return;
+    localStorage.setItem(key, serialized);
     window.dispatchEvent(
       new CustomEvent("adaptive-launchpad-updated", { detail: { key } })
     );

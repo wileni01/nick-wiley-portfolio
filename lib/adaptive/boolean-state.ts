@@ -46,3 +46,13 @@ export function summarizeBooleanStateRecord(
   return { total, truthy, percentage };
 }
 
+export function areBooleanStateRecordsEqual(
+  left: Record<string, boolean>,
+  right: Record<string, boolean>
+): boolean {
+  const leftKeys = Object.keys(left);
+  const rightKeys = Object.keys(right);
+  if (leftKeys.length !== rightKeys.length) return false;
+  return leftKeys.every((key) => right[key] === left[key]);
+}
+
