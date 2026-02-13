@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Check,
@@ -42,6 +42,18 @@ const warmupQuestion: SessionQuestion = {
     "Use a compact arc: role fit, one credible example, and what value you can create in the first 90 days.",
 };
 
+interface PersistedMockSession {
+  answers: string[];
+  currentIndex: number;
+  completed: boolean;
+  started: boolean;
+  updatedAt: string;
+}
+
+function getSessionStorageKey(companyId: string, personaId: string) {
+  return `adaptive.mock-session.${companyId}.${personaId}`;
+}
+
 export function MockInterviewSession() {
   const { companyId, personaId } = useInterviewMode();
   const [started, setStarted] = useState(false);
@@ -49,6 +61,7 @@ export function MockInterviewSession() {
   const [answers, setAnswers] = useState<string[]>([]);
   const [completed, setCompleted] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [loadedFromDraft, setLoadedFromDraft] = useState(false);
 
   const script = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -103,11 +116,59 @@ export function MockInterviewSession() {
     return [...header, ...questionSections].join("\n");
   }, [answers, companyId, personaId, report, script.heading, sessionQuestions]);
 
+  useEffect(() => {
+    if (!companyId || !personaId || !sessionQuestions.length) return;
+
+    const storedRaw = localStorage.getItem(getSessionStorageKey(companyId, personaId));
+    if (!storedRaw) return;
+
+    try {
+      const stored = JSON.parse(storedRaw) as PersistedMockSession;
+      const normalizedAnswers = Array.from(
+        { length: sessionQuestions.length },
+        (_, index) => stored.answers[index] ?? ""
+      );
+
+      setAnswers(normalizedAnswers);
+      setCurrentIndex(
+        Math.max(0, Math.min(stored.currentIndex ?? 0, sessionQuestions.length - 1))
+      );
+      setCompleted(Boolean(stored.completed));
+      setStarted(Boolean(stored.started));
+      setLoadedFromDraft(Boolean(stored.started || stored.answers.some(Boolean)));
+    } catch {
+      localStorage.removeItem(getSessionStorageKey(companyId, personaId));
+    }
+  }, [companyId, personaId, sessionQuestions.length]);
+
+  useEffect(() => {
+    if (!companyId || !personaId) return;
+
+    if (!started && answers.every((answer) => !answer.trim())) {
+      localStorage.removeItem(getSessionStorageKey(companyId, personaId));
+      return;
+    }
+
+    const payload: PersistedMockSession = {
+      answers,
+      currentIndex,
+      completed,
+      started,
+      updatedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(
+      getSessionStorageKey(companyId, personaId),
+      JSON.stringify(payload)
+    );
+  }, [answers, companyId, completed, currentIndex, personaId, started]);
+
   function startSession() {
     setAnswers(Array.from({ length: sessionQuestions.length }, () => ""));
     setCurrentIndex(0);
     setCompleted(false);
     setStarted(true);
+    setLoadedFromDraft(false);
   }
 
   function updateCurrentAnswer(nextValue: string) {
@@ -132,11 +193,15 @@ export function MockInterviewSession() {
   }
 
   function resetSession() {
+    if (companyId && personaId) {
+      localStorage.removeItem(getSessionStorageKey(companyId, personaId));
+    }
     setStarted(false);
     setCompleted(false);
     setCurrentIndex(0);
     setAnswers([]);
     setCopyState("idle");
+    setLoadedFromDraft(false);
   }
 
   async function copyReport() {
@@ -175,9 +240,27 @@ export function MockInterviewSession() {
           Practice live answers for this persona. You will get local feedback on
           structure, metrics, impact framing, and governance signals.
         </p>
-        <Button size="sm" onClick={startSession}>
-          Start mock session
-        </Button>
+        {loadedFromDraft && (
+          <p className="text-xs text-muted-foreground">
+            Saved draft found for this interviewer mode.
+          </p>
+        )}
+        <div className="flex flex-wrap gap-2">
+          {loadedFromDraft ? (
+            <Button size="sm" onClick={() => setStarted(true)}>
+              Continue saved draft
+            </Button>
+          ) : (
+            <Button size="sm" onClick={startSession}>
+              Start mock session
+            </Button>
+          )}
+          {loadedFromDraft && (
+            <Button size="sm" variant="outline" onClick={resetSession}>
+              Clear saved draft
+            </Button>
+          )}
+        </div>
       </div>
     );
   }
@@ -250,6 +333,9 @@ export function MockInterviewSession() {
             Could not copy automatically. Use the download option instead.
           </p>
         )}
+        <p className="text-xs text-muted-foreground">
+          This session report is saved locally for this company/persona mode.
+        </p>
       </div>
     );
   }
