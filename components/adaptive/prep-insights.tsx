@@ -9,6 +9,11 @@ import {
   parsePrepHistory,
   type PrepSessionSnapshot,
 } from "@/lib/adaptive/prep-history";
+import {
+  defaultPrepGoal,
+  getPrepGoalStorageKey,
+  parsePrepGoalState,
+} from "@/lib/adaptive/prep-goals";
 
 function formatDateLabel(timestamp: string): string {
   try {
@@ -26,6 +31,7 @@ function formatDateLabel(timestamp: string): string {
 export function PrepInsights() {
   const { companyId, personaId } = useInterviewMode();
   const [history, setHistory] = useState<PrepSessionSnapshot[]>([]);
+  const [weeklyTarget, setWeeklyTarget] = useState(defaultPrepGoal.weeklyTarget);
 
   const storageKey = useMemo(() => {
     if (!companyId || !personaId) return null;
@@ -68,6 +74,50 @@ export function PrepInsights() {
       );
     };
   }, [storageKey]);
+
+  useEffect(() => {
+    if (!companyId || !personaId) return;
+    const goalKey = getPrepGoalStorageKey(companyId, personaId);
+    const parsed = parsePrepGoalState(localStorage.getItem(goalKey));
+    setWeeklyTarget(parsed.weeklyTarget);
+  }, [companyId, personaId]);
+
+  useEffect(() => {
+    if (!companyId || !personaId) return;
+    const goalKey = getPrepGoalStorageKey(companyId, personaId);
+    localStorage.setItem(goalKey, JSON.stringify({ weeklyTarget }));
+  }, [companyId, personaId, weeklyTarget]);
+
+  const prepCalendar = useMemo(() => {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    const day = startOfWeek.getDay();
+    const offset = day === 0 ? 6 : day - 1;
+    startOfWeek.setDate(startOfWeek.getDate() - offset);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    let thisWeekCount = 0;
+    const daySet = new Set<string>();
+    history.forEach((entry) => {
+      const date = new Date(entry.timestamp);
+      if (date >= startOfWeek) {
+        thisWeekCount += 1;
+      }
+      daySet.add(date.toISOString().slice(0, 10));
+    });
+
+    let streakDays = 0;
+    const cursor = new Date(now);
+    cursor.setHours(0, 0, 0, 0);
+    while (true) {
+      const key = cursor.toISOString().slice(0, 10);
+      if (!daySet.has(key)) break;
+      streakDays += 1;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+
+    return { thisWeekCount, streakDays };
+  }, [history]);
 
   if (!companyId || !personaId) return null;
 
@@ -144,6 +194,33 @@ export function PrepInsights() {
                 </p>
               )}
             </div>
+          </div>
+
+          <div className="rounded-md border border-border bg-background p-3 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-medium">Weekly prep target</p>
+              <select
+                value={weeklyTarget}
+                onChange={(event) =>
+                  setWeeklyTarget(Number(event.target.value) || defaultPrepGoal.weeklyTarget)
+                }
+                className="h-7 rounded border border-border bg-background px-2 text-xs"
+                aria-label="Select weekly prep target"
+              >
+                {[1, 2, 3, 4, 5, 6, 7].map((target) => (
+                  <option key={target} value={target}>
+                    {target}/week
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              This week: {prepCalendar.thisWeekCount}/{weeklyTarget} sessions
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Current daily streak: {prepCalendar.streakDays} day
+              {prepCalendar.streakDays === 1 ? "" : "s"}
+            </p>
           </div>
 
           <div className="space-y-2">
