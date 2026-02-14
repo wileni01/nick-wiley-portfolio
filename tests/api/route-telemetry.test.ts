@@ -76,6 +76,7 @@ test("chat invalid payload path emits explicit invalid_payload telemetry headers
   assert.equal(response.status, 400);
   assert.equal(response.headers.get("X-Chat-Context-Source"), "none");
   assert.equal(response.headers.get("X-Chat-Context-Fallback"), "invalid_payload");
+  assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(response.headers.get("X-AI-Provider"), "none");
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
 });
@@ -262,6 +263,23 @@ test("interview-mode invalid mode path reports invalid_mode fallback", async () 
       assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
     }
   ));
+
+test("interview-mode invalid payload keeps invalid_payload narrative defaults", async () => {
+  const response = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: "{}",
+      ip: uniqueIp(),
+    })
+  );
+
+  assert.equal(response.status, 400);
+  assert.equal(response.headers.get("X-AI-Narrative-Source"), "none");
+  assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_payload");
+  assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(response.headers.get("X-AI-Provider"), "none");
+  assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
 
 test("interview-mode provider fallback headers are explicit on deterministic error paths", async () =>
   withEnv(
