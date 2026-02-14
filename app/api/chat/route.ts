@@ -41,7 +41,8 @@ type ChatContextFallbackReason =
   | "rate_limited"
   | "retrieval_error"
   | "retrieval_timeout"
-  | "empty_context";
+  | "empty_context"
+  | "internal_error";
 
 class RetrievalTimeoutError extends Error {
   constructor() {
@@ -235,6 +236,8 @@ ${effectiveContext}`;
       },
     });
   } catch (error) {
+    responseHeaders.set("X-Chat-Context-Source", "fallback");
+    responseHeaders.set("X-Chat-Context-Fallback", "internal_error");
     logServerError({
       route: "api/chat",
       requestId,

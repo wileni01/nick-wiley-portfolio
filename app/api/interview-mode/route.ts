@@ -33,9 +33,11 @@ type NarrativeFallbackReason =
   | "invalid_mode"
   | "rate_limited"
   | "no_provider"
+  | "response_validation_error"
   | "generation_error"
   | "generation_timeout"
-  | "empty_ai_output";
+  | "empty_ai_output"
+  | "internal_error";
 
 const responseSchema = z.object({
   mode: z.object({
@@ -289,6 +291,8 @@ Write two short paragraphs:
     };
     const validatedResponse = responseSchema.safeParse(response);
     if (!validatedResponse.success) {
+      responseHeaders.set("X-AI-Narrative-Source", "fallback");
+      responseHeaders.set("X-AI-Narrative-Fallback", "response_validation_error");
       logServerWarning({
         route: "api/interview-mode",
         requestId,
@@ -309,6 +313,8 @@ Write two short paragraphs:
 
     return jsonResponse(validatedResponse.data, 200, responseHeaders);
   } catch (error) {
+    responseHeaders.set("X-AI-Narrative-Source", "fallback");
+    responseHeaders.set("X-AI-Narrative-Fallback", "internal_error");
     logServerError({
       route: "api/interview-mode",
       requestId,
