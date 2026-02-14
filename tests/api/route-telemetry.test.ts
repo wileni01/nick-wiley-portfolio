@@ -148,6 +148,19 @@ function assertRetryAfterMatchesResetHeader(response: Response) {
   assert.equal(Number(retryAfterHeader), Number(resetHeader));
 }
 
+function assertRateLimitPayloadResetParity(
+  payload: Record<string, unknown>,
+  response: Response
+) {
+  const resetIn = Number(payload.resetIn);
+  assert.ok(Number.isInteger(resetIn));
+  assert.ok(resetIn >= 1);
+  const resetHeader = Number(response.headers.get("X-RateLimit-Reset"));
+  const retryAfterHeader = Number(response.headers.get("Retry-After"));
+  assert.equal(resetIn, resetHeader);
+  assert.equal(resetIn, retryAfterHeader);
+}
+
 function assertStandardJsonSecurityHeaders(response: Response) {
   assert.equal(response.headers.get("Content-Type"), "application/json; charset=utf-8");
   assert.equal(response.headers.get("Cache-Control"), "no-store");
@@ -399,13 +412,7 @@ test("chat rate-limited responses report fallback context source and reason", as
   assert.equal(rateLimitedResponse.headers.get("X-AI-Provider-Fallback"), "none");
   const payload = await assertErrorPayloadRequestIdMatchesHeader(rateLimitedResponse);
   assert.equal(payload.error, "Rate limit exceeded. Please try again later.");
-  const resetIn = Number(payload.resetIn);
-  assert.ok(Number.isInteger(resetIn));
-  assert.ok(resetIn >= 0);
-  const resetHeader = Number(rateLimitedResponse.headers.get("X-RateLimit-Reset"));
-  const retryAfterHeader = Number(rateLimitedResponse.headers.get("Retry-After"));
-  assert.equal(resetIn, resetHeader);
-  assert.equal(resetIn, retryAfterHeader);
+  assertRateLimitPayloadResetParity(payload, rateLimitedResponse);
 });
 
 test("chat content-type validation keeps invalid_payload fallback semantics", async () => {
@@ -880,13 +887,7 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
   assert.equal(rateLimitedResponse.headers.get("X-AI-Provider-Fallback"), "none");
   const payload = await assertErrorPayloadRequestIdMatchesHeader(rateLimitedResponse);
   assert.equal(payload.error, "Rate limit exceeded. Please try again shortly.");
-  const resetIn = Number(payload.resetIn);
-  assert.ok(Number.isInteger(resetIn));
-  assert.ok(resetIn >= 0);
-  const resetHeader = Number(rateLimitedResponse.headers.get("X-RateLimit-Reset"));
-  const retryAfterHeader = Number(rateLimitedResponse.headers.get("Retry-After"));
-  assert.equal(resetIn, resetHeader);
-  assert.equal(resetIn, retryAfterHeader);
+  assertRateLimitPayloadResetParity(payload, rateLimitedResponse);
 });
 
 test("interview-mode content-type validation keeps invalid_payload narrative fallback semantics", async () => {
@@ -1476,11 +1477,5 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
     rateLimitedResponse
   );
   assert.equal(errorPayload.error, "Too many submissions. Please try again later.");
-  const resetIn = Number(errorPayload.resetIn);
-  assert.ok(Number.isInteger(resetIn));
-  assert.ok(resetIn >= 0);
-  const resetHeader = Number(rateLimitedResponse.headers.get("X-RateLimit-Reset"));
-  const retryAfterHeader = Number(rateLimitedResponse.headers.get("Retry-After"));
-  assert.equal(resetIn, resetHeader);
-  assert.equal(resetIn, retryAfterHeader);
+  assertRateLimitPayloadResetParity(errorPayload, rateLimitedResponse);
 });
