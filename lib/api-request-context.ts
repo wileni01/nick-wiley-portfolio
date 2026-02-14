@@ -22,8 +22,29 @@ export interface ApiRequestContext {
   exceededHeaders: Headers;
 }
 
-function normalizeRateLimitNamespace(value: string): string {
-  const bounded = value.slice(0, RATE_LIMIT_NAMESPACE_MAX_CHARS);
+function readContextInputValue<T>(
+  input: { req: Request; rateLimitNamespace: string; rateLimitConfig: RateLimitConfig },
+  key: "req" | "rateLimitNamespace" | "rateLimitConfig"
+): T | undefined {
+  try {
+    return input[key] as T | undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function normalizeRateLimitNamespace(value: unknown): string {
+  let rawValue = "";
+  if (typeof value === "string") {
+    rawValue = value;
+  } else {
+    try {
+      rawValue = String(value ?? "");
+    } catch {
+      rawValue = "";
+    }
+  }
+  const bounded = rawValue.slice(0, RATE_LIMIT_NAMESPACE_MAX_CHARS);
   const sanitized = bounded.replace(SAFE_RATE_LIMIT_NAMESPACE_PATTERN, "");
   return sanitized ? sanitized.toLowerCase() : "api";
 }
@@ -34,9 +55,22 @@ export function buildApiRequestContext(input: {
   rateLimitConfig: RateLimitConfig;
 }): ApiRequestContext {
   const requestId = createRequestId();
-  const ip = getRequestIp(input.req);
-  const namespace = normalizeRateLimitNamespace(input.rateLimitNamespace);
-  const normalizedRateLimitConfig = normalizeRateLimitConfig(input.rateLimitConfig);
+  const req =
+    readContextInputValue<Request>(input, "req") ??
+    new Request("http://localhost/api/request-context-fallback");
+  let ip = "anonymous";
+  try {
+    ip = getRequestIp(req);
+  } catch {
+    ip = "anonymous";
+  }
+  const namespace = normalizeRateLimitNamespace(
+    readContextInputValue<unknown>(input, "rateLimitNamespace")
+  );
+  const normalizedRateLimitConfig = normalizeRateLimitConfig(
+    readContextInputValue<RateLimitConfig>(input, "rateLimitConfig") ??
+      ({} as RateLimitConfig)
+  );
   const rateLimitResult = rateLimit(`${namespace}:${ip}`, normalizedRateLimitConfig);
   const responseHeaders = buildApiResponseHeaders({
     config: normalizedRateLimitConfig,

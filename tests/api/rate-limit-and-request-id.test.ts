@@ -688,3 +688,77 @@ test("buildApiRequestContext truncates overlong namespace values consistently", 
     Number(second.exceededHeaders.get("X-RateLimit-Reset"))
   );
 });
+
+test("buildApiRequestContext tolerates unreadable input getters", () => {
+  const throwingInput = {} as {
+    req: Request;
+    rateLimitNamespace: string;
+    rateLimitConfig: RateLimitConfig;
+  };
+  Object.defineProperty(throwingInput, "req", {
+    configurable: true,
+    get() {
+      throw new Error("req getter failed");
+    },
+  });
+  Object.defineProperty(throwingInput, "rateLimitNamespace", {
+    configurable: true,
+    get() {
+      throw new Error("namespace getter failed");
+    },
+  });
+  Object.defineProperty(throwingInput, "rateLimitConfig", {
+    configurable: true,
+    get() {
+      throw new Error("config getter failed");
+    },
+  });
+
+  assert.doesNotThrow(() =>
+    buildApiRequestContext(
+      throwingInput as unknown as {
+        req: Request;
+        rateLimitNamespace: string;
+        rateLimitConfig: RateLimitConfig;
+      }
+    )
+  );
+  const context = buildApiRequestContext(
+    throwingInput as unknown as {
+      req: Request;
+      rateLimitNamespace: string;
+      rateLimitConfig: RateLimitConfig;
+    }
+  );
+
+  assert.equal(context.ip, "anonymous");
+  assert.equal(context.responseHeaders.get("X-RateLimit-Limit"), "50");
+  assert.equal(context.exceededHeaders.get("X-RateLimit-Limit"), "50");
+  assert.ok(context.requestId.length > 10);
+});
+
+test("buildApiRequestContext falls back namespace when coercion fails", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: { "x-forwarded-for": "198.51.100.171" },
+  });
+  const badNamespace = {
+    toString() {
+      throw new Error("namespace coercion failed");
+    },
+  };
+  const first = buildApiRequestContext({
+    req,
+    rateLimitNamespace: badNamespace as unknown as string,
+    rateLimitConfig: { maxRequests: 1, windowMs: 60_000 },
+  });
+  const second = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "***" as unknown as string,
+    rateLimitConfig: { maxRequests: 1, windowMs: 60_000 },
+  });
+
+  assert.equal(first.rateLimitResult.success, true);
+  assert.equal(second.rateLimitResult.success, false);
+  assert.equal(second.exceededHeaders.get("X-RateLimit-Limit"), "1");
+  assert.equal(second.exceededHeaders.get("X-RateLimit-Remaining"), "0");
+});
