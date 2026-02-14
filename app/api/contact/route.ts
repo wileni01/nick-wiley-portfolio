@@ -17,6 +17,13 @@ const CONTACT_RATE_LIMIT = {
   windowMs: 3600000,
 } as const;
 
+function redactEmail(email: string): string {
+  const [localPart, domain = ""] = email.split("@");
+  if (!localPart) return `***@${domain}`.replace(/^@\*+/, "***");
+  const visiblePrefix = localPart.slice(0, Math.min(2, localPart.length));
+  return `${visiblePrefix}***@${domain}`.slice(0, 254);
+}
+
 export async function POST(req: Request) {
   const context = buildApiRequestContext({
     req,
@@ -70,12 +77,15 @@ export async function POST(req: Request) {
       );
     }
 
-    // Log the submission (in production, send email via Resend, SendGrid, etc.)
-    console.log("=== NEW CONTACT FORM SUBMISSION ===");
-    console.log(`From: ${sanitized.name} <${sanitized.email}>`);
-    console.log(`Subject: ${sanitized.subject || "(none)"}`);
-    console.log(`Message: ${sanitized.message}`);
-    console.log("===================================");
+    // Log metadata only (avoid full user-message content in logs).
+    console.log("Contact form submission received:", {
+      requestId,
+      fromName: sanitized.name,
+      fromEmail: redactEmail(sanitized.email),
+      subject: sanitized.subject || "(none)",
+      messageChars: sanitized.message.length,
+      messagePreview: sanitized.message.slice(0, 120),
+    });
 
     const delivery = await deliverContactSubmission(sanitized);
     if (delivery.attempted && !delivery.delivered) {

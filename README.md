@@ -165,7 +165,7 @@ lib/
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support, and live status announcements for adaptive copy/download actions.
-- **Contact API hardening** — Contact submissions use schema validation, honeypot filtering, rate limiting, input sanitization, and optional Resend delivery with failure handling.
+- **Contact API hardening** — Contact submissions use schema validation, honeypot filtering, rate limiting, input sanitization, minimal metadata logging, and optional Resend delivery with failure handling.
 - **Chat API hardening** — Chat requests use schema validation, provider allowlisting, bounded message windows, sanitized inputs/context, rate limiting, and shared automatic provider fallback when only one API key is configured, with provider-request/selection headers for observability.
 - **Interview-mode API hardening** — Interview briefing requests/responses use schema validation, allowlisted IDs/providers, bounded/sanitized narrative fields, shared provider fallback routing when available, deterministic fallback behavior, and provider-request/selection headers.
 - **API IP normalization** — Server routes normalize forwarded IP headers before rate-limit keying to reduce malformed header edge cases, with lazy in-memory rate-limit cleanup.
