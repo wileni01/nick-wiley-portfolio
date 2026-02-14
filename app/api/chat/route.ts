@@ -8,7 +8,7 @@ import {
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import { buildApiRequestContext } from "@/lib/api-request-context";
 import { findRelevantContext } from "@/lib/embeddings";
-import { logServerError } from "@/lib/server-error";
+import { logServerError, logServerWarning } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 
 export const maxDuration = 30;
@@ -103,8 +103,18 @@ export async function POST(req: Request) {
     }
     const query = lastUserMessage.content;
 
-    // Find relevant context from knowledge base
-    const context = sanitizeInput(await findRelevantContext(query), 10000);
+    // Find relevant context from knowledge base (fallback safely if retrieval fails).
+    let context = "";
+    try {
+      context = sanitizeInput(await findRelevantContext(query), 10000);
+    } catch (error) {
+      logServerWarning({
+        route: "api/chat",
+        requestId,
+        message: "Context retrieval failed; continuing with model-only response",
+        details: { error },
+      });
+    }
 
     // System prompt with RAG context
     const systemPrompt = `You are Nick Wiley's AI assistant on his professional portfolio website. You answer questions about Nick's professional experience, skills, projects, and background in a helpful, conversational, and professional tone. You speak in first person as if you are representing Nick directly.
