@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { streamText } from "ai";
 import { getModel, type AIProvider } from "@/lib/ai";
 import { findRelevantContext } from "@/lib/embeddings";
@@ -5,6 +6,26 @@ import { rateLimit } from "@/lib/rate-limit";
 import { sanitizeInput } from "@/lib/utils";
 
 export const maxDuration = 30;
+
+const chatRequestSchema = z.object({
+  provider: z.enum(["openai", "anthropic"]).optional().default("openai"),
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string().trim().min(1).max(4000),
+      })
+    )
+    .min(1)
+    .max(24),
+});
+
+function jsonResponse(body: Record<string, unknown>, status: number) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
 
 export async function POST(req: Request) {
   try {
@@ -20,38 +41,58 @@ export async function POST(req: Request) {
     });
 
     if (!rateLimitResult.success) {
-      return new Response(
-        JSON.stringify({
+      return jsonResponse(
+        {
           error: "Rate limit exceeded. Please try again later.",
           resetIn: Math.ceil(rateLimitResult.resetIn / 1000),
-        }),
-        {
-          status: 429,
-          headers: { "Content-Type": "application/json" },
-        }
+        },
+        429
       );
     }
 
-    const body = await req.json();
-    const messages = body.messages || [];
-    const provider: AIProvider = body.provider || "openai";
+    let rawBody: unknown;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return jsonResponse({ error: "Invalid JSON payload." }, 400);
+    }
+    const parsed = chatRequestSchema.safeParse(rawBody);
 
-    // Validate messages
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return new Response(
-        JSON.stringify({ error: "Messages are required." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+    if (!parsed.success) {
+      return jsonResponse(
+        { error: "Messages are required and must be valid chat entries." },
+        400
       );
     }
 
-    // Sanitize the latest user message
-    const lastMessage = messages[messages.length - 1];
-    if (lastMessage?.role === "user") {
-      lastMessage.content = sanitizeInput(lastMessage.content);
+    const provider: AIProvider = parsed.data.provider;
+    const messages = parsed.data.messages
+      .map((message) => ({
+        role: message.role,
+        content: sanitizeInput(message.content, 2000),
+      }))
+      .filter((message) => message.content.length > 0);
+
+    if (!messages.length) {
+      return jsonResponse(
+        { error: "Messages are empty after sanitization." },
+        400
+      );
+    }
+
+    const lastUserMessage = [...messages].reverse().find(
+      (message) => message.role === "user"
+    );
+    const query = lastUserMessage?.content ?? messages[messages.length - 1]?.content;
+    if (!query) {
+      return jsonResponse(
+        { error: "A user message is required to generate a response." },
+        400
+      );
     }
 
     // Find relevant context from knowledge base
-    const context = await findRelevantContext(lastMessage.content);
+    const context = sanitizeInput(await findRelevantContext(query), 10000);
 
     // System prompt with RAG context
     const systemPrompt = `You are Nick Wiley's AI assistant on his professional portfolio website. You answer questions about Nick's professional experience, skills, projects, and background in a helpful, conversational, and professional tone. You speak in first person as if you are representing Nick directly.
@@ -73,16 +114,18 @@ ${context}`;
       model,
       system: systemPrompt,
       messages,
+      temperature: 0.2,
+      maxTokens: 500,
     });
 
     return result.toDataStreamResponse();
   } catch (error) {
     console.error("Chat API error:", error);
-    return new Response(
-      JSON.stringify({
+    return jsonResponse(
+      {
         error: "An error occurred processing your request. Please check that API keys are configured.",
-      }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      },
+      500
     );
   }
 }

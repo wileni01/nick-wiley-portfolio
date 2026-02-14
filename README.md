@@ -163,6 +163,7 @@ lib/
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support, and live status announcements for adaptive copy/download actions.
 - **Contact API hardening** — Contact submissions use schema validation, honeypot filtering, rate limiting, and input sanitization before processing.
+- **Chat API hardening** — Chat requests use schema validation, provider allowlisting, bounded message windows, sanitized inputs/context, and rate limiting before model execution.
 
 ## Adaptive Interview Mode
 
