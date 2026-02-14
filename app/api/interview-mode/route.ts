@@ -96,6 +96,7 @@ export async function POST(req: Request) {
       invalidPayloadMessage: "Invalid interview mode payload.",
       invalidContentTypeMessage:
         "Interview mode requests must use application/json.",
+      emptyBodyMessage: "Interview mode payload is required.",
       maxChars: 10000,
       tooLargeMessage: "Interview mode payload is too large.",
       responseHeaders,

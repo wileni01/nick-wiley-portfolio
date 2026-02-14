@@ -4,6 +4,7 @@ export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
   invalidPayloadMessage?: string;
   invalidContentTypeMessage?: string;
+  emptyBodyMessage?: string;
   maxChars?: number;
   tooLargeMessage?: string;
   responseHeaders?: HeadersInit;
@@ -52,6 +53,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     options?.invalidPayloadMessage ?? "Invalid request payload.";
   const invalidContentTypeMessage =
     options?.invalidContentTypeMessage ?? "Content-Type must be application/json.";
+  const emptyBodyMessage = options?.emptyBodyMessage ?? "Request body is required.";
   const tooLargeMessage =
     options?.tooLargeMessage ?? "Request payload is too large.";
   const responseHeaders = options?.responseHeaders;
@@ -105,6 +107,12 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     return {
       success: false,
       response: jsonResponse({ error: invalidJsonMessage }, 400, responseHeaders),
+    };
+  }
+  if (!rawText.trim()) {
+    return {
+      success: false,
+      response: jsonResponse({ error: emptyBodyMessage }, 400, responseHeaders),
     };
   }
   if (maxChars !== null && rawText.length > maxChars) {
