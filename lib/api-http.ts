@@ -10,6 +10,7 @@ const DEFAULT_JSON_CONTENT_TYPE = "application/json; charset=utf-8";
 const DEFAULT_CACHE_CONTROL = "no-store";
 const DEFAULT_CONTENT_TYPE_OPTIONS = "nosniff";
 const DEFAULT_ERROR_STATUS = 500;
+const UTF8_BOM = "\uFEFF";
 
 export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
@@ -193,6 +194,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     };
   }
   const rawTextBytesLength = UTF8_TEXT_ENCODER.encode(rawText).length;
+  const bodyText = rawText.startsWith(UTF8_BOM) ? rawText.slice(1) : rawText;
   if (
     declaredContentLength !== null &&
     Number.isFinite(declaredContentLength) &&
@@ -207,13 +209,13 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
       ),
     };
   }
-  if (!rawText.trim()) {
+  if (!bodyText.trim()) {
     return {
       success: false,
       response: jsonResponse({ error: emptyBodyMessage }, 400, responseHeaders),
     };
   }
-  if (maxChars !== null && rawText.length > maxChars) {
+  if (maxChars !== null && bodyText.length > maxChars) {
     return {
       success: false,
       response: jsonResponse({ error: tooLargeMessage }, 413, responseHeaders),
@@ -228,7 +230,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
 
   let rawBody: unknown;
   try {
-    rawBody = JSON.parse(rawText) as unknown;
+    rawBody = JSON.parse(bodyText) as unknown;
   } catch {
     return {
       success: false,
