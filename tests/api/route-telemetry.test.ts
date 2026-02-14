@@ -132,6 +132,12 @@ function assertStandardRateLimitHeaders(
   }
 }
 
+function assertRateLimitLimitHeaderEquals(response: Response, expected: number) {
+  const limitHeader = response.headers.get("X-RateLimit-Limit");
+  assert.notEqual(limitHeader, null);
+  assert.equal(Number(limitHeader), expected);
+}
+
 function assertRetryAfterHeader(response: Response) {
   const retryAfterHeader = response.headers.get("Retry-After");
   assert.notEqual(retryAfterHeader, null);
@@ -407,6 +413,7 @@ test("chat rate-limited responses report fallback context source and reason", as
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
   assertExhaustedRateLimitHeaders(rateLimitedResponse);
+  assertRateLimitLimitHeaderEquals(rateLimitedResponse, 50);
   assert.equal(rateLimitedResponse.headers.get("X-Chat-Context-Source"), "fallback");
   assert.equal(
     rateLimitedResponse.headers.get("X-Chat-Context-Fallback"),
@@ -878,6 +885,7 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
   assertExhaustedRateLimitHeaders(rateLimitedResponse);
+  assertRateLimitLimitHeaderEquals(rateLimitedResponse, 40);
   assert.equal(rateLimitedResponse.headers.get("X-AI-Narrative-Source"), "fallback");
   assert.equal(
     rateLimitedResponse.headers.get("X-AI-Narrative-Fallback"),
@@ -1465,6 +1473,7 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
   assertExhaustedRateLimitHeaders(rateLimitedResponse);
+  assertRateLimitLimitHeaderEquals(rateLimitedResponse, 5);
   assert.equal(rateLimitedResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     rateLimitedResponse.headers.get("X-Contact-Delivery-Reason"),
