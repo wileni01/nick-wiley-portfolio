@@ -106,6 +106,20 @@ test("parseJsonRequest rejects missing content-type when required", async () => 
   }
 });
 
+test("parseJsonRequest allows missing content-type by default", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    body: new Uint8Array(Buffer.from('{"value":"ok"}')),
+  });
+
+  const result = await parseJsonRequest(req, schema);
+  assert.equal(result.success, true);
+  if (result.success) {
+    assert.equal(result.data.value, "ok");
+  }
+});
+
 test("parseJsonRequest rejects empty body with configured message", async () => {
   const schema = z.object({ value: z.string() });
   const req = new Request("http://localhost/api/test", {
@@ -145,6 +159,28 @@ test("parseJsonRequest rejects declared oversized payload before parse", async (
     assert.equal(result.response.status, 413);
     const body = (await result.response.json()) as { error: string };
     assert.equal(body.error, "Payload too large for parser.");
+  }
+});
+
+test("parseJsonRequest rejects non-safe integer content-length header values", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "content-length": "9007199254740993",
+    },
+    body: '{"value":"ok"}',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    invalidContentLengthMessage: "Content length must be a safe integer.",
+  });
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 400);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Content length must be a safe integer.");
   }
 });
 
