@@ -6,13 +6,8 @@ import {
   resolveAIProvider,
 } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
-import {
-  buildApiResponseHeaders,
-} from "@/lib/api-rate-limit";
+import { buildApiRequestContext } from "@/lib/api-request-context";
 import { findRelevantContext } from "@/lib/embeddings";
-import { rateLimit } from "@/lib/rate-limit";
-import { getRequestIp } from "@/lib/request-ip";
-import { createRequestId } from "@/lib/request-id";
 import { serializeServerError } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 
@@ -36,19 +31,13 @@ const CHAT_RATE_LIMIT = {
 } as const;
 
 export async function POST(req: Request) {
-  const requestId = createRequestId();
-  let responseHeaders = new Headers({ "X-Request-Id": requestId });
+  const context = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "chat",
+    rateLimitConfig: CHAT_RATE_LIMIT,
+  });
+  const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
   try {
-    // Rate limiting
-    const ip = getRequestIp(req);
-
-    const rateLimitResult = rateLimit(`chat:${ip}`, CHAT_RATE_LIMIT);
-    responseHeaders = buildApiResponseHeaders({
-      config: CHAT_RATE_LIMIT,
-      snapshot: rateLimitResult,
-      requestId,
-    });
-
     if (!rateLimitResult.success) {
       return jsonResponse(
         {
@@ -56,12 +45,7 @@ export async function POST(req: Request) {
           resetIn: Math.ceil(rateLimitResult.resetIn / 1000),
         },
         429,
-        buildApiResponseHeaders({
-          config: CHAT_RATE_LIMIT,
-          snapshot: rateLimitResult,
-          requestId,
-          includeRetryAfter: true,
-        })
+        exceededHeaders
       );
     }
 

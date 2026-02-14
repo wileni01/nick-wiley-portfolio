@@ -6,12 +6,7 @@ import {
   resolveAIProvider,
 } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
-import {
-  buildApiResponseHeaders,
-} from "@/lib/api-rate-limit";
-import { rateLimit } from "@/lib/rate-limit";
-import { getRequestIp } from "@/lib/request-ip";
-import { createRequestId } from "@/lib/request-id";
+import { buildApiRequestContext } from "@/lib/api-request-context";
 import { serializeServerError } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 import {
@@ -79,31 +74,21 @@ function sanitizeRecommendationUrl(url: string): string {
 }
 
 export async function POST(req: Request) {
-  const requestId = createRequestId();
-  let responseHeaders = new Headers({ "X-Request-Id": requestId });
+  const context = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "interview-mode",
+    rateLimitConfig: INTERVIEW_MODE_RATE_LIMIT,
+  });
+  const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
   try {
-    const ip = getRequestIp(req);
-
-    const limit = rateLimit(`interview-mode:${ip}`, INTERVIEW_MODE_RATE_LIMIT);
-    responseHeaders = buildApiResponseHeaders({
-      config: INTERVIEW_MODE_RATE_LIMIT,
-      snapshot: limit,
-      requestId,
-    });
-
-    if (!limit.success) {
+    if (!rateLimitResult.success) {
       return jsonResponse(
         {
           error: "Rate limit exceeded. Please try again shortly.",
-          resetIn: Math.ceil(limit.resetIn / 1000),
+          resetIn: Math.ceil(rateLimitResult.resetIn / 1000),
         },
         429,
-        buildApiResponseHeaders({
-          config: INTERVIEW_MODE_RATE_LIMIT,
-          snapshot: limit,
-          requestId,
-          includeRetryAfter: true,
-        })
+        exceededHeaders
       );
     }
 
