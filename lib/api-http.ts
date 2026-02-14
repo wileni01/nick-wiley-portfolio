@@ -5,6 +5,7 @@ const JSON_SERIALIZATION_FALLBACK_ERROR = "Internal response serialization error
 const INVALID_CONTENT_LENGTH_ERROR = "Invalid Content-Length header.";
 const JSON_MEDIA_TYPE_PATTERN =
   /^(?:application\/json|application\/[a-z0-9!#$&^_.+-]+\+json)(?:\s*;|$)/i;
+const CONTENT_TYPE_MULTI_VALUE_SEPARATOR = ",";
 const CONTENT_LENGTH_DIGITS_PATTERN = /^\d+$/;
 const DEFAULT_JSON_CONTENT_TYPE = "application/json; charset=utf-8";
 const DEFAULT_CACHE_CONTROL = "no-store";
@@ -128,7 +129,10 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
   const contentType = req.headers.get("content-type");
   if (contentType) {
     const normalizedContentType = contentType.trim();
-    if (!JSON_MEDIA_TYPE_PATTERN.test(normalizedContentType)) {
+    if (
+      normalizedContentType.includes(CONTENT_TYPE_MULTI_VALUE_SEPARATOR) ||
+      !JSON_MEDIA_TYPE_PATTERN.test(normalizedContentType)
+    ) {
       return {
         success: false,
         response: jsonResponse(
