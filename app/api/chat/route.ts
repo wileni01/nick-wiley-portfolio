@@ -8,7 +8,7 @@ import {
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import { buildApiRequestContext } from "@/lib/api-request-context";
 import { findRelevantContext } from "@/lib/embeddings";
-import { serializeServerError } from "@/lib/server-error";
+import { logServerError } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 
 export const maxDuration = 30;
@@ -137,9 +137,10 @@ ${context}`;
       },
     });
   } catch (error) {
-    console.error("Chat API error:", {
+    logServerError({
+      route: "api/chat",
       requestId,
-      error: serializeServerError(error),
+      error,
     });
     return jsonResponse(
       {

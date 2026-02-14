@@ -2,7 +2,7 @@ import { z } from "zod";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import { buildApiRequestContext } from "@/lib/api-request-context";
 import { deliverContactSubmission } from "@/lib/contact-delivery";
-import { serializeServerError } from "@/lib/server-error";
+import { logServerError, logServerWarning } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 
 const contactRequestSchema = z.object({
@@ -89,9 +89,13 @@ export async function POST(req: Request) {
 
     const delivery = await deliverContactSubmission(sanitized);
     if (delivery.attempted && !delivery.delivered) {
-      console.error("Contact form delivery error:", {
+      logServerWarning({
+        route: "api/contact",
         requestId,
-        deliveryError: delivery.error ?? "unknown delivery error",
+        message: "Contact delivery failed",
+        details: {
+          deliveryError: delivery.error ?? "unknown delivery error",
+        },
       });
       return jsonResponse(
         {
@@ -112,9 +116,10 @@ export async function POST(req: Request) {
       responseHeaders
     );
   } catch (error) {
-    console.error("Contact form error:", {
+    logServerError({
+      route: "api/contact",
       requestId,
-      error: serializeServerError(error),
+      error,
     });
     return jsonResponse(
       { error: "An error occurred. Please try again." },

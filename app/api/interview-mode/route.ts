@@ -7,7 +7,7 @@ import {
 } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import { buildApiRequestContext } from "@/lib/api-request-context";
-import { serializeServerError } from "@/lib/server-error";
+import { logServerError, logServerWarning } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 import {
   buildDeterministicNarrative,
@@ -204,9 +204,13 @@ Write two short paragraphs:
     };
     const validatedResponse = responseSchema.safeParse(response);
     if (!validatedResponse.success) {
-      console.error("Interview mode response validation error:", {
+      logServerWarning({
+        route: "api/interview-mode",
         requestId,
-        error: validatedResponse.error.issues.slice(0, 5),
+        message: "Interview-mode response validation failed",
+        details: {
+          issues: validatedResponse.error.issues.slice(0, 5),
+        },
       });
       return jsonResponse(
         {
@@ -220,9 +224,10 @@ Write two short paragraphs:
 
     return jsonResponse(validatedResponse.data, 200, responseHeaders);
   } catch (error) {
-    console.error("Interview mode API error:", {
+    logServerError({
+      route: "api/interview-mode",
       requestId,
-      error: serializeServerError(error),
+      error,
     });
     return jsonResponse(
       {
