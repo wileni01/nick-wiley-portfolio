@@ -146,6 +146,13 @@ function assertStandardJsonSecurityHeaders(response: Response) {
   assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
 }
 
+function assertRequestIdAndReturn(response: Response): string {
+  const requestId = response.headers.get("X-Request-Id");
+  assert.notEqual(requestId, null);
+  assert.match(requestId!, SAFE_REQUEST_ID_HEADER_PATTERN);
+  return requestId!;
+}
+
 test("chat invalid payload path emits explicit invalid_payload telemetry headers", async () => {
   const response = await postChat(
     buildJsonRequest({
@@ -163,6 +170,26 @@ test("chat invalid payload path emits explicit invalid_payload telemetry headers
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(response.headers.get("X-AI-Provider"), "none");
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
+test("chat generates unique request ids across repeated requests", async () => {
+  const firstResponse = await postChat(
+    buildJsonRequest({
+      url: "http://localhost/api/chat",
+      body: "{}",
+      ip: uniqueIp(),
+    })
+  );
+  const secondResponse = await postChat(
+    buildJsonRequest({
+      url: "http://localhost/api/chat",
+      body: "{}",
+      ip: uniqueIp(),
+    })
+  );
+  const firstRequestId = assertRequestIdAndReturn(firstResponse);
+  const secondRequestId = assertRequestIdAndReturn(secondResponse);
+  assert.notEqual(firstRequestId, secondRequestId);
 });
 
 test("chat empty-body payload keeps invalid_payload fallback semantics", async () => {
@@ -555,6 +582,26 @@ test("interview-mode invalid payload keeps invalid_payload narrative defaults", 
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(response.headers.get("X-AI-Provider"), "none");
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
+test("interview-mode generates unique request ids across repeated requests", async () => {
+  const firstResponse = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: "{}",
+      ip: uniqueIp(),
+    })
+  );
+  const secondResponse = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: "{}",
+      ip: uniqueIp(),
+    })
+  );
+  const firstRequestId = assertRequestIdAndReturn(firstResponse);
+  const secondRequestId = assertRequestIdAndReturn(secondResponse);
+  assert.notEqual(firstRequestId, secondRequestId);
 });
 
 test("interview-mode empty-body payload keeps invalid_payload narrative defaults", async () => {
@@ -951,6 +998,33 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
     honeypotResponse.headers.get("X-Contact-Delivery-Reason"),
     "honeypot"
   );
+});
+
+test("contact generates unique request ids across repeated requests", async () => {
+  const payload = JSON.stringify({
+    name: "Nick Wiley",
+    email: "nick@example.com",
+    subject: "Interview follow-up",
+    message: "Would love to connect further.",
+    honeypot: "",
+  });
+  const firstResponse = await postContact(
+    buildJsonRequest({
+      url: "http://localhost/api/contact",
+      body: payload,
+      ip: uniqueIp(),
+    })
+  );
+  const secondResponse = await postContact(
+    buildJsonRequest({
+      url: "http://localhost/api/contact",
+      body: payload,
+      ip: uniqueIp(),
+    })
+  );
+  const firstRequestId = assertRequestIdAndReturn(firstResponse);
+  const secondRequestId = assertRequestIdAndReturn(secondResponse);
+  assert.notEqual(firstRequestId, secondRequestId);
 });
 
 test("contact content-type validation keeps explicit invalid_payload delivery reason", async () => {
