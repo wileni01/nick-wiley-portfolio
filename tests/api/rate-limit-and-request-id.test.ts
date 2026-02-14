@@ -238,3 +238,47 @@ test("buildApiRequestContext sanitizes namespace and reuses same rate-limit buck
   assert.ok(first.responseHeaders.get("X-Request-Id"));
   assert.ok(second.exceededHeaders.get("Retry-After"));
 });
+
+test("buildApiRequestContext falls back to anonymous IP when proxy headers are invalid", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": "unknown, not-an-ip",
+      forwarded: "for=invalid-host",
+    },
+  });
+  const context = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "chat",
+    rateLimitConfig: { maxRequests: 2, windowMs: 60_000 },
+  });
+
+  assert.equal(context.ip, "anonymous");
+  assert.equal(context.rateLimitResult.success, true);
+  assert.ok(context.responseHeaders.get("X-Request-Id"));
+});
+
+test("buildApiRequestContext falls back empty namespace values to api bucket", () => {
+  const ip = `198.51.100.${(Date.now() % 200) + 20}`;
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": ip,
+    },
+  });
+  const config = { maxRequests: 1, windowMs: 60_000 };
+
+  const first = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "###",
+    rateLimitConfig: config,
+  });
+  const second = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "***",
+    rateLimitConfig: config,
+  });
+
+  assert.equal(first.rateLimitResult.success, true);
+  assert.equal(second.rateLimitResult.success, false);
+  assert.equal(second.rateLimitResult.remaining, 0);
+  assert.ok(second.exceededHeaders.get("Retry-After"));
+});
