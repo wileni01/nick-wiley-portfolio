@@ -243,6 +243,51 @@ test("parseJsonRequest rejects non-safe integer content-length header values", a
   }
 });
 
+test("parseJsonRequest rejects non-numeric content-length header values", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "content-length": "12 bytes",
+    },
+    body: '{"value":"ok"}',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    invalidContentLengthMessage: "Content-Length must be numeric.",
+  });
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 400);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Content-Length must be numeric.");
+  }
+});
+
+test("parseJsonRequest returns invalid-json response when request body cannot be read", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: '{"value":"ok"}',
+  });
+
+  await req.text();
+  const result = await parseJsonRequest(req, schema, {
+    invalidJsonMessage: "Request body could not be read.",
+  });
+
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 400);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Request body could not be read.");
+  }
+});
+
 test("jsonResponse enforces immutable JSON security headers", () => {
   const response = jsonResponse(
     { ok: true },
@@ -292,6 +337,24 @@ test("jsonResponse uses normalized request-id header over body on error response
   assert.equal(response.headers.get("X-Request-Id"), "headerid");
   const body = (await response.json()) as { requestId?: string };
   assert.equal(body.requestId, "headerid");
+});
+
+test("jsonResponse falls back to body request-id when header request-id is invalid", async () => {
+  const response = jsonResponse(
+    {
+      error: "bad request",
+      requestId: " body-id ",
+    },
+    400,
+    {
+      "x-request-id": "   ",
+    }
+  );
+
+  assert.equal(response.status, 400);
+  assert.equal(response.headers.get("X-Request-Id"), "body-id");
+  const body = (await response.json()) as { requestId?: string };
+  assert.equal(body.requestId, "body-id");
 });
 
 test("jsonResponse drops invalid request-id from successful payloads", async () => {
