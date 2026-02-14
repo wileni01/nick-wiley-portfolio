@@ -1,5 +1,7 @@
 const FALLBACK_RANDOM_TOKEN_CHARS = 24;
 const FALLBACK_COUNTER_MODULO = 36 ** 4;
+const DEFAULT_REQUEST_ID_MAX_CHARS = 120;
+const SAFE_REQUEST_ID_PATTERN = /[^a-zA-Z0-9._:-]/g;
 let requestIdFallbackCounter = 0;
 
 function getFallbackCounterToken(): string {
@@ -19,6 +21,20 @@ function createFallbackRandomToken(): string {
   }
 
   return Math.random().toString(36).slice(2, 2 + FALLBACK_RANDOM_TOKEN_CHARS);
+}
+
+export function normalizeRequestId(
+  value: unknown,
+  maxChars: number = DEFAULT_REQUEST_ID_MAX_CHARS
+): string | null {
+  if (typeof value !== "string") return null;
+  const safeMaxChars = Number.isFinite(maxChars)
+    ? Math.max(1, Math.floor(maxChars))
+    : DEFAULT_REQUEST_ID_MAX_CHARS;
+  const bounded = value.trim().slice(0, safeMaxChars);
+  if (!bounded) return null;
+  const sanitized = bounded.replace(SAFE_REQUEST_ID_PATTERN, "");
+  return sanitized || null;
 }
 
 export function createRequestId(): string {

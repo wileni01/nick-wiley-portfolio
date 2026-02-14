@@ -1,11 +1,10 @@
 import { z } from "zod";
+import { normalizeRequestId } from "@/lib/request-id";
 const UTF8_TEXT_ENCODER = new TextEncoder();
 const JSON_SERIALIZATION_FALLBACK_ERROR = "Internal response serialization error.";
 const INVALID_CONTENT_LENGTH_ERROR = "Invalid Content-Length header.";
 const JSON_MEDIA_TYPE_PATTERN = /^application\/json(?:\s*;|$)/i;
 const CONTENT_LENGTH_DIGITS_PATTERN = /^\d+$/;
-const REQUEST_ID_HEADER_MAX_CHARS = 120;
-const SAFE_REQUEST_ID_HEADER_PATTERN = /[^a-zA-Z0-9._:-]/g;
 const DEFAULT_JSON_CONTENT_TYPE = "application/json; charset=utf-8";
 const DEFAULT_CACHE_CONTROL = "no-store";
 const DEFAULT_CONTENT_TYPE_OPTIONS = "nosniff";
@@ -38,14 +37,6 @@ function parseDeclaredContentLength(headerValue: string | null): number | null {
   return parsed;
 }
 
-function normalizeRequestIdHeaderValue(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const bounded = value.trim().slice(0, REQUEST_ID_HEADER_MAX_CHARS);
-  if (!bounded) return null;
-  const sanitized = bounded.replace(SAFE_REQUEST_ID_HEADER_PATTERN, "");
-  return sanitized || null;
-}
-
 function normalizeHttpStatus(value: number): number {
   const normalized = Number.isFinite(value) ? Math.floor(value) : NaN;
   if (!Number.isFinite(normalized)) return DEFAULT_ERROR_STATUS;
@@ -73,14 +64,12 @@ export function jsonResponse(
   responseHeaders.set("Content-Type", DEFAULT_JSON_CONTENT_TYPE);
   responseHeaders.set("Cache-Control", DEFAULT_CACHE_CONTROL);
   responseHeaders.set("X-Content-Type-Options", DEFAULT_CONTENT_TYPE_OPTIONS);
-  let requestId = normalizeRequestIdHeaderValue(
-    responseHeaders.get("X-Request-Id")
-  );
+  let requestId = normalizeRequestId(responseHeaders.get("X-Request-Id"));
   if (requestId) {
     responseHeaders.set("X-Request-Id", requestId);
   } else {
     responseHeaders.delete("X-Request-Id");
-    const bodyRequestId = normalizeRequestIdHeaderValue(body.requestId);
+    const bodyRequestId = normalizeRequestId(body.requestId);
     if (bodyRequestId) {
       responseHeaders.set("X-Request-Id", bodyRequestId);
       requestId = bodyRequestId;

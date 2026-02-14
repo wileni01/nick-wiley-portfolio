@@ -1,3 +1,5 @@
+import { normalizeRequestId } from "@/lib/request-id";
+
 const ERROR_MESSAGE_MAX_CHARS = 1200;
 const LOG_MESSAGE_MAX_CHARS = 240;
 const LOG_ROUTE_MAX_CHARS = 80;
@@ -36,9 +38,12 @@ function sanitizeRouteLabel(route: string): string {
 }
 
 function sanitizeRequestIdLabel(requestId: string): string {
-  const normalized = sanitizeLogString(requestId, LOG_REQUEST_ID_MAX_CHARS).replace(
-    SAFE_LOG_REQUEST_ID_PATTERN,
-    ""
+  const normalized = normalizeRequestId(
+    sanitizeLogString(requestId, LOG_REQUEST_ID_MAX_CHARS).replace(
+      SAFE_LOG_REQUEST_ID_PATTERN,
+      ""
+    ),
+    LOG_REQUEST_ID_MAX_CHARS
   );
   return normalized || "unknown-request";
 }
