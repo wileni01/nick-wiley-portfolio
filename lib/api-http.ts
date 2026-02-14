@@ -6,6 +6,9 @@ const JSON_MEDIA_TYPE_PATTERN = /^application\/json(?:\s*;|$)/i;
 const CONTENT_LENGTH_DIGITS_PATTERN = /^\d+$/;
 const REQUEST_ID_HEADER_MAX_CHARS = 120;
 const SAFE_REQUEST_ID_HEADER_PATTERN = /[^a-zA-Z0-9._:-]/g;
+const DEFAULT_JSON_CONTENT_TYPE = "application/json; charset=utf-8";
+const DEFAULT_CACHE_CONTROL = "no-store";
+const DEFAULT_CONTENT_TYPE_OPTIONS = "nosniff";
 
 export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
@@ -47,9 +50,9 @@ export function jsonResponse(
   headers?: HeadersInit
 ): Response {
   const responseHeaders = new Headers({
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "X-Content-Type-Options": "nosniff",
+    "Content-Type": DEFAULT_JSON_CONTENT_TYPE,
+    "Cache-Control": DEFAULT_CACHE_CONTROL,
+    "X-Content-Type-Options": DEFAULT_CONTENT_TYPE_OPTIONS,
   });
   if (headers) {
     const customHeaders = new Headers(headers);
@@ -57,6 +60,9 @@ export function jsonResponse(
       responseHeaders.set(key, value);
     });
   }
+  responseHeaders.set("Content-Type", DEFAULT_JSON_CONTENT_TYPE);
+  responseHeaders.set("Cache-Control", DEFAULT_CACHE_CONTROL);
+  responseHeaders.set("X-Content-Type-Options", DEFAULT_CONTENT_TYPE_OPTIONS);
   let requestId = normalizeRequestIdHeaderValue(
     responseHeaders.get("X-Request-Id")
   );
