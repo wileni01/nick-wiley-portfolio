@@ -12,15 +12,28 @@ interface BuildApiResponseHeadersInput {
   includeRetryAfter?: boolean;
 }
 
+function normalizeResetInSeconds(resetInMs: number): number {
+  if (!Number.isFinite(resetInMs)) return 0;
+  return Math.max(0, Math.ceil(resetInMs / 1000));
+}
+
+function normalizeRemaining(
+  remaining: number,
+  maxRequests: number
+): number {
+  if (!Number.isFinite(remaining)) return 0;
+  return Math.min(maxRequests, Math.max(0, Math.floor(remaining)));
+}
+
 export function buildRateLimitHeaders(
   config: RateLimitConfig,
   snapshot: RateLimitSnapshot
 ): HeadersInit {
   const normalizedConfig = normalizeRateLimitConfig(config);
-  const resetInSeconds = Math.max(0, Math.ceil(snapshot.resetIn / 1000));
-  const boundedRemaining = Math.min(
-    normalizedConfig.maxRequests,
-    Math.max(0, snapshot.remaining)
+  const resetInSeconds = normalizeResetInSeconds(snapshot.resetIn);
+  const boundedRemaining = normalizeRemaining(
+    snapshot.remaining,
+    normalizedConfig.maxRequests
   );
   return {
     "X-RateLimit-Limit": String(normalizedConfig.maxRequests),
@@ -33,9 +46,10 @@ export function buildRateLimitExceededHeaders(
   config: RateLimitConfig,
   snapshot: RateLimitSnapshot
 ): HeadersInit {
+  const retryAfterSeconds = Math.max(1, normalizeResetInSeconds(snapshot.resetIn));
   return {
     ...buildRateLimitHeaders(config, snapshot),
-    "Retry-After": String(Math.max(1, Math.ceil(snapshot.resetIn / 1000))),
+    "Retry-After": String(retryAfterSeconds),
   };
 }
 
