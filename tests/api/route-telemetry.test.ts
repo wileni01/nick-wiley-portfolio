@@ -199,6 +199,21 @@ function assertExhaustedRateLimitHeaders(response: Response) {
   assert.equal(response.headers.get("X-RateLimit-Remaining"), "0");
 }
 
+function assertChatExhaustedRateLimitHeaders(response: Response) {
+  assertExhaustedRateLimitHeaders(response);
+  assertRouteRateLimitLimitHeader(response, "chat");
+}
+
+function assertInterviewModeExhaustedRateLimitHeaders(response: Response) {
+  assertExhaustedRateLimitHeaders(response);
+  assertRouteRateLimitLimitHeader(response, "interviewMode");
+}
+
+function assertContactExhaustedRateLimitHeaders(response: Response) {
+  assertExhaustedRateLimitHeaders(response);
+  assertRouteRateLimitLimitHeader(response, "contact");
+}
+
 function assertRateLimitPayloadResetParity(
   payload: Record<string, unknown>,
   response: Response
@@ -495,8 +510,7 @@ test("chat rate-limited responses report fallback context source and reason", as
   );
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
-  assertExhaustedRateLimitHeaders(rateLimitedResponse);
-  assertRouteRateLimitLimitHeader(rateLimitedResponse, "chat");
+  assertChatExhaustedRateLimitHeaders(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-Chat-Context-Source"), "fallback");
   assert.equal(
     rateLimitedResponse.headers.get("X-Chat-Context-Fallback"),
@@ -968,8 +982,7 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
   );
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
-  assertExhaustedRateLimitHeaders(rateLimitedResponse);
-  assertRouteRateLimitLimitHeader(rateLimitedResponse, "interviewMode");
+  assertInterviewModeExhaustedRateLimitHeaders(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-AI-Narrative-Source"), "fallback");
   assert.equal(
     rateLimitedResponse.headers.get("X-AI-Narrative-Fallback"),
@@ -1556,8 +1569,7 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
   );
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
-  assertExhaustedRateLimitHeaders(rateLimitedResponse);
-  assertRouteRateLimitLimitHeader(rateLimitedResponse, "contact");
+  assertContactExhaustedRateLimitHeaders(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     rateLimitedResponse.headers.get("X-Contact-Delivery-Reason"),
