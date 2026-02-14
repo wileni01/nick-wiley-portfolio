@@ -59,15 +59,13 @@ export function applyResolvedAIProviderHeaders(
   headers: Headers,
   resolution: ResolvedAIProvider
 ): Headers {
+  applyDefaultAIProviderHeaders(headers);
   headers.set("X-AI-Provider-Requested", resolution.requested);
   if (resolution.selected) {
     headers.set("X-AI-Provider", resolution.selected);
     headers.set("X-AI-Provider-Fallback", resolution.didFallback ? "1" : "none");
     return headers;
   }
-
-  headers.set("X-AI-Provider", "none");
-  headers.set("X-AI-Provider-Fallback", "none");
   return headers;
 }
 
