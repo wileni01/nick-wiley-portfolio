@@ -9,6 +9,7 @@ const SAFE_REQUEST_ID_HEADER_PATTERN = /[^a-zA-Z0-9._:-]/g;
 const DEFAULT_JSON_CONTENT_TYPE = "application/json; charset=utf-8";
 const DEFAULT_CACHE_CONTROL = "no-store";
 const DEFAULT_CONTENT_TYPE_OPTIONS = "nosniff";
+const DEFAULT_ERROR_STATUS = 500;
 
 export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
@@ -44,11 +45,19 @@ function normalizeRequestIdHeaderValue(value: unknown): string | null {
   return sanitized || null;
 }
 
+function normalizeHttpStatus(value: number): number {
+  const normalized = Number.isFinite(value) ? Math.floor(value) : NaN;
+  if (!Number.isFinite(normalized)) return DEFAULT_ERROR_STATUS;
+  if (normalized < 100 || normalized > 599) return DEFAULT_ERROR_STATUS;
+  return normalized;
+}
+
 export function jsonResponse(
   body: Record<string, unknown>,
   status: number,
   headers?: HeadersInit
 ): Response {
+  const requestedStatus = normalizeHttpStatus(status);
   const responseHeaders = new Headers({
     "Content-Type": DEFAULT_JSON_CONTENT_TYPE,
     "Cache-Control": DEFAULT_CACHE_CONTROL,
@@ -76,15 +85,17 @@ export function jsonResponse(
       requestId = bodyRequestId;
     }
   }
-  const payload = status >= 400 && requestId ? { ...body, requestId } : body;
+  const payload =
+    requestedStatus >= 400 && requestId ? { ...body, requestId } : body;
   let serializedPayload: string;
-  let responseStatus = status;
+  let responseStatus = requestedStatus;
   try {
     serializedPayload = JSON.stringify(payload, (_key, value) =>
       typeof value === "bigint" ? value.toString() : value
     );
   } catch {
-    responseStatus = status >= 400 ? status : 500;
+    responseStatus =
+      requestedStatus >= 400 ? requestedStatus : DEFAULT_ERROR_STATUS;
     serializedPayload = JSON.stringify({
       error: JSON_SERIALIZATION_FALLBACK_ERROR,
       ...(requestId ? { requestId } : {}),
