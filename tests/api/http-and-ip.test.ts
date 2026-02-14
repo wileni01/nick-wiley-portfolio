@@ -311,6 +311,28 @@ test("parseJsonRequest returns invalid-json response when request body cannot be
   }
 });
 
+test("parseJsonRequest rejects invalid UTF-8 request bodies", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: new Uint8Array([0xff, 0xfe, 0xfd]),
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    invalidJsonMessage: "Request payload is not valid UTF-8 JSON.",
+  });
+
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 400);
+    const payload = (await result.response.json()) as { error: string };
+    assert.equal(payload.error, "Request payload is not valid UTF-8 JSON.");
+  }
+});
+
 test("parseJsonRequest accepts BOM payload when content-length matches raw bytes", async () => {
   const schema = z.object({ value: z.string() });
   const body = '\uFEFF{"value":"ok"}';

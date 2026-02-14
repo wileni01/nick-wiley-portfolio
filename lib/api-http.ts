@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { normalizeRequestId } from "@/lib/request-id";
-const UTF8_TEXT_DECODER = new TextDecoder();
+const UTF8_TEXT_DECODER = new TextDecoder("utf-8", { fatal: true });
 const JSON_SERIALIZATION_FALLBACK_ERROR = "Internal response serialization error.";
 const INVALID_CONTENT_LENGTH_ERROR = "Invalid Content-Length header.";
 const JSON_MEDIA_TYPE_PATTERN =
@@ -200,7 +200,15 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     };
   }
   const rawTextBytesLength = rawBytes.byteLength;
-  const rawText = UTF8_TEXT_DECODER.decode(rawBytes);
+  let rawText: string;
+  try {
+    rawText = UTF8_TEXT_DECODER.decode(rawBytes);
+  } catch {
+    return {
+      success: false,
+      response: jsonResponse({ error: invalidJsonMessage }, 400, responseHeaders),
+    };
+  }
   const bodyText = rawText.startsWith(UTF8_BOM) ? rawText.slice(1) : rawText;
   if (
     declaredContentLength !== null &&
