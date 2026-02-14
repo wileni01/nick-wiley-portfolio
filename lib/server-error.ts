@@ -6,6 +6,7 @@ const LOG_DETAILS_MAX_ARRAY_ITEMS = 20;
 const SENSITIVE_LOG_KEY_PATTERN =
   /(password|passphrase|secret|token|api[-_]?key|authorization|cookie|set-cookie)/i;
 const REDACTED_LOG_VALUE = "[redacted]";
+const CIRCULAR_LOG_VALUE = "[circular]";
 
 export interface SerializedServerError {
   name: string;
@@ -40,7 +41,11 @@ interface ServerWarningLogInput extends ServerLogBaseInput {
   message: string;
 }
 
-function sanitizeLogValue(value: unknown, depth: number): unknown {
+function sanitizeLogValue(
+  value: unknown,
+  depth: number,
+  seen: WeakSet<object>
+): unknown {
   if (value === null || value === undefined) return value;
   if (typeof value === "string") {
     return value.slice(0, ERROR_MESSAGE_MAX_CHARS);
@@ -58,35 +63,47 @@ function sanitizeLogValue(value: unknown, depth: number): unknown {
     return serializeServerError(value);
   }
   if (Array.isArray(value)) {
+    if (seen.has(value)) return CIRCULAR_LOG_VALUE;
     if (depth >= LOG_DETAILS_MAX_DEPTH) {
       return `[array:${value.length}]`;
     }
-    return value
-      .slice(0, LOG_DETAILS_MAX_ARRAY_ITEMS)
-      .map((item) => sanitizeLogValue(item, depth + 1));
+    seen.add(value);
+    try {
+      return value
+        .slice(0, LOG_DETAILS_MAX_ARRAY_ITEMS)
+        .map((item) => sanitizeLogValue(item, depth + 1, seen));
+    } finally {
+      seen.delete(value);
+    }
   }
   if (typeof value === "object") {
+    if (seen.has(value)) return CIRCULAR_LOG_VALUE;
     if (depth >= LOG_DETAILS_MAX_DEPTH) {
       return "[object]";
     }
-    const entries = Object.entries(value as Record<string, unknown>).slice(
-      0,
-      LOG_DETAILS_MAX_KEYS
-    );
-    const sanitizedObject: Record<string, unknown> = {};
-    for (const [key, nestedValue] of entries) {
-      sanitizedObject[key] = SENSITIVE_LOG_KEY_PATTERN.test(key)
-        ? REDACTED_LOG_VALUE
-        : sanitizeLogValue(nestedValue, depth + 1);
+    seen.add(value);
+    try {
+      const entries = Object.entries(value as Record<string, unknown>).slice(
+        0,
+        LOG_DETAILS_MAX_KEYS
+      );
+      const sanitizedObject: Record<string, unknown> = {};
+      for (const [key, nestedValue] of entries) {
+        sanitizedObject[key] = SENSITIVE_LOG_KEY_PATTERN.test(key)
+          ? REDACTED_LOG_VALUE
+          : sanitizeLogValue(nestedValue, depth + 1, seen);
+      }
+      return sanitizedObject;
+    } finally {
+      seen.delete(value);
     }
-    return sanitizedObject;
   }
   return String(value).slice(0, ERROR_MESSAGE_MAX_CHARS);
 }
 
 function sanitizeLogDetails(details?: Record<string, unknown>): Record<string, unknown> | undefined {
   if (!details) return undefined;
-  const sanitized = sanitizeLogValue(details, 0);
+  const sanitized = sanitizeLogValue(details, 0, new WeakSet());
   if (!sanitized || typeof sanitized !== "object" || Array.isArray(sanitized)) {
     return undefined;
   }
