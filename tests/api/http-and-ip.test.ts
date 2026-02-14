@@ -181,6 +181,29 @@ test("parseJsonRequest rejects declared oversized payload before parse", async (
   }
 });
 
+test("parseJsonRequest uses maxChars for declared-size precheck when maxBytes is unset", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "content-length": "2000",
+    },
+    body: '{"value":"ok"}',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    maxChars: 100,
+    tooLargeMessage: "Declared payload exceeds character cap.",
+  });
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 413);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Declared payload exceeds character cap.");
+  }
+});
+
 test("parseJsonRequest enforces maxChars on parsed text length", async () => {
   const schema = z.object({ value: z.string() });
   const req = new Request("http://localhost/api/test", {
@@ -285,6 +308,28 @@ test("parseJsonRequest returns invalid-json response when request body cannot be
     assert.equal(result.response.status, 400);
     const body = (await result.response.json()) as { error: string };
     assert.equal(body.error, "Request body could not be read.");
+  }
+});
+
+test("parseJsonRequest accepts BOM payload when content-length matches raw bytes", async () => {
+  const schema = z.object({ value: z.string() });
+  const body = '\uFEFF{"value":"ok"}';
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "content-length": String(Buffer.byteLength(body, "utf8")),
+    },
+    body,
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    allowMissingContentType: false,
+  });
+
+  assert.equal(result.success, true);
+  if (result.success) {
+    assert.equal(result.data.value, "ok");
   }
 });
 
