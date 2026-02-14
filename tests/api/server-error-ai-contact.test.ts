@@ -309,6 +309,18 @@ test("applyResolvedAIProviderHeaders always emits fallback header", () => {
   assert.equal(fallbackHeaders.get("X-AI-Provider-Fallback"), "1");
 });
 
+test("applyResolvedAIProviderHeaders marks non-fallback selected provider explicitly", () => {
+  const headers = applyResolvedAIProviderHeaders(new Headers(), {
+    requested: "openai",
+    selected: "openai",
+    didFallback: false,
+  });
+
+  assert.equal(headers.get("X-AI-Provider-Requested"), "openai");
+  assert.equal(headers.get("X-AI-Provider"), "openai");
+  assert.equal(headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("applyDefaultAIProviderHeaders seeds unspecified provider observability state", () => {
   const headers = applyDefaultAIProviderHeaders(new Headers());
   assert.equal(headers.get("X-AI-Provider-Requested"), "unspecified");
