@@ -148,6 +148,15 @@ function assertRetryAfterMatchesResetHeader(response: Response) {
   assert.equal(Number(retryAfterHeader), Number(resetHeader));
 }
 
+function assertExhaustedRateLimitHeaders(response: Response) {
+  assertStandardRateLimitHeaders(response, {
+    allowRetryAfter: true,
+  });
+  assertRetryAfterHeader(response);
+  assertRetryAfterMatchesResetHeader(response);
+  assert.equal(response.headers.get("X-RateLimit-Remaining"), "0");
+}
+
 function assertRateLimitPayloadResetParity(
   payload: Record<string, unknown>,
   response: Response
@@ -397,11 +406,7 @@ test("chat rate-limited responses report fallback context source and reason", as
   );
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
-  assertStandardRateLimitHeaders(rateLimitedResponse, {
-    allowRetryAfter: true,
-  });
-  assertRetryAfterHeader(rateLimitedResponse);
-  assertRetryAfterMatchesResetHeader(rateLimitedResponse);
+  assertExhaustedRateLimitHeaders(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-Chat-Context-Source"), "fallback");
   assert.equal(
     rateLimitedResponse.headers.get("X-Chat-Context-Fallback"),
@@ -872,11 +877,7 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
   );
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
-  assertStandardRateLimitHeaders(rateLimitedResponse, {
-    allowRetryAfter: true,
-  });
-  assertRetryAfterHeader(rateLimitedResponse);
-  assertRetryAfterMatchesResetHeader(rateLimitedResponse);
+  assertExhaustedRateLimitHeaders(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-AI-Narrative-Source"), "fallback");
   assert.equal(
     rateLimitedResponse.headers.get("X-AI-Narrative-Fallback"),
@@ -1463,11 +1464,7 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
   );
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
-  assertStandardRateLimitHeaders(rateLimitedResponse, {
-    allowRetryAfter: true,
-  });
-  assertRetryAfterHeader(rateLimitedResponse);
-  assertRetryAfterMatchesResetHeader(rateLimitedResponse);
+  assertExhaustedRateLimitHeaders(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     rateLimitedResponse.headers.get("X-Contact-Delivery-Reason"),
