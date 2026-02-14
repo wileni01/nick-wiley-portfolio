@@ -165,6 +165,24 @@ test("chat rate-limited responses report fallback context source and reason", as
   );
 });
 
+test("chat content-type validation keeps invalid_payload fallback semantics", async () => {
+  const response = await postChat(
+    buildJsonRequest({
+      url: "http://localhost/api/chat",
+      body: "{}",
+      ip: uniqueIp(),
+      contentType: "text/plain",
+    })
+  );
+
+  assert.equal(response.status, 415);
+  assert.equal(response.headers.get("X-Chat-Context-Source"), "none");
+  assert.equal(response.headers.get("X-Chat-Context-Fallback"), "invalid_payload");
+  assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(response.headers.get("X-AI-Provider"), "none");
+  assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("interview-mode invalid mode path reports invalid_mode fallback", async () =>
   withEnv(
     {
@@ -288,6 +306,24 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
     rateLimitedResponse.headers.get("X-AI-Narrative-Fallback"),
     "rate_limited"
   );
+});
+
+test("interview-mode content-type validation keeps invalid_payload narrative fallback semantics", async () => {
+  const response = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: "{}",
+      ip: uniqueIp(),
+      contentType: "text/plain",
+    })
+  );
+
+  assert.equal(response.status, 415);
+  assert.equal(response.headers.get("X-AI-Narrative-Source"), "none");
+  assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_payload");
+  assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(response.headers.get("X-AI-Provider"), "none");
+  assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
 });
 
 test("contact invalid payload and honeypot paths emit explicit delivery reasons", async () => {
