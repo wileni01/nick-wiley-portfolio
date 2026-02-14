@@ -26,10 +26,8 @@ function normalizeRemaining(
   return Math.min(maxRequests, Math.max(0, Math.floor(remaining)));
 }
 
-export function normalizeExceededResetInSeconds(
-  snapshot: RateLimitSnapshot
-): number {
-  return Math.max(1, normalizeResetInSeconds(snapshot.resetIn));
+export function normalizeExceededResetInSeconds(resetInMs: number): number {
+  return Math.max(1, normalizeResetInSeconds(resetInMs));
 }
 
 export function buildRateLimitHeaders(
@@ -53,7 +51,7 @@ export function buildRateLimitExceededHeaders(
   config: RateLimitConfig,
   snapshot: RateLimitSnapshot
 ): HeadersInit {
-  const retryAfterSeconds = normalizeExceededResetInSeconds(snapshot);
+  const retryAfterSeconds = normalizeExceededResetInSeconds(snapshot.resetIn);
   return {
     ...buildRateLimitHeaders(config, snapshot),
     "X-RateLimit-Reset": String(retryAfterSeconds),

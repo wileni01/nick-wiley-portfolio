@@ -209,18 +209,9 @@ test("rate-limit reset normalization keeps bounded exceeded window floor", () =>
   assert.equal(normalizeResetInSeconds(1), 1);
   assert.equal(normalizeResetInSeconds(1500), 2);
 
-  assert.equal(
-    normalizeExceededResetInSeconds({ remaining: 0, resetIn: -250 }),
-    1
-  );
-  assert.equal(
-    normalizeExceededResetInSeconds({ remaining: 0, resetIn: Number.NaN }),
-    1
-  );
-  assert.equal(
-    normalizeExceededResetInSeconds({ remaining: 0, resetIn: 1900 }),
-    2
-  );
+  assert.equal(normalizeExceededResetInSeconds(-250), 1);
+  assert.equal(normalizeExceededResetInSeconds(Number.NaN), 1);
+  assert.equal(normalizeExceededResetInSeconds(1900), 2);
 });
 
 test("buildApiResponseHeaders sanitizes request id and include retry metadata", () => {

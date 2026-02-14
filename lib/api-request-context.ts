@@ -50,7 +50,7 @@ export function buildApiRequestContext(input: {
     includeRetryAfter: true,
   });
   const rateLimitExceededResetInSeconds = normalizeExceededResetInSeconds(
-    rateLimitResult
+    rateLimitResult.resetIn
   );
 
   return {
