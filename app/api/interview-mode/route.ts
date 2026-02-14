@@ -27,6 +27,10 @@ const INTERVIEW_MODE_RATE_LIMIT = {
   maxRequests: 40,
   windowMs: 3600000,
 } as const;
+const FALLBACK_PROVIDER_BY_PREFERENCE = {
+  openai: "anthropic",
+  anthropic: "openai",
+} as const;
 
 const responseSchema = z.object({
   mode: z.object({
@@ -110,6 +114,20 @@ export async function POST(req: Request) {
     }
 
     const { companyId, personaId, provider } = parsed.data;
+    const fallbackProvider = FALLBACK_PROVIDER_BY_PREFERENCE[provider];
+    const executionProvider = hasProviderApiKey(provider)
+      ? provider
+      : hasProviderApiKey(fallbackProvider)
+        ? fallbackProvider
+        : null;
+    if (executionProvider) {
+      responseHeaders.set("X-AI-Provider", executionProvider);
+      if (executionProvider !== provider) {
+        responseHeaders.set("X-AI-Provider-Fallback", "1");
+      }
+    } else {
+      responseHeaders.set("X-AI-Provider", "none");
+    }
     const contextNote = sanitizeInput(parsed.data.contextNote ?? "", 300);
 
     const company = getCompanyProfileById(companyId);
@@ -132,7 +150,7 @@ export async function POST(req: Request) {
     let aiNarrative: string | undefined;
     let narrativeSource: "deterministic" | "ai" = "deterministic";
 
-    if (hasProviderApiKey(provider)) {
+    if (executionProvider) {
       try {
         const topRecommendations = bundle.topRecommendations
           .slice(0, 4)
@@ -143,7 +161,7 @@ export async function POST(req: Request) {
           .join("\n");
 
         const { text } = await generateText({
-          model: getModel(provider),
+          model: getModel(executionProvider),
           temperature: 0.2,
           maxTokens: 320,
           system: `You are generating a focused interviewer briefing for Nick Wiley's portfolio.
@@ -174,6 +192,7 @@ Write two short paragraphs:
         narrativeSource = "deterministic";
       }
     }
+    responseHeaders.set("X-AI-Narrative-Source", narrativeSource);
 
     const response: InterviewModeResponse = {
       mode: { companyId, personaId },
