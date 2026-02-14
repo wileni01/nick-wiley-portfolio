@@ -211,6 +211,18 @@ test("buildApiResponseHeaders sanitizes request id and include retry metadata", 
   assert.equal(headers.get("Retry-After"), "2");
 });
 
+test("buildApiResponseHeaders omits invalid request-id values", () => {
+  const headers = buildApiResponseHeaders({
+    config: { maxRequests: 5, windowMs: 1000 },
+    snapshot: { remaining: 4, resetIn: 500 },
+    requestId: "   ",
+  });
+
+  assert.equal(headers.get("X-Request-Id"), null);
+  assert.equal(headers.get("X-RateLimit-Limit"), "5");
+  assert.equal(headers.get("X-RateLimit-Remaining"), "4");
+});
+
 test("buildApiRequestContext sanitizes namespace and reuses same rate-limit bucket", () => {
   const requestIp = "198.51.100.140";
   const req = new Request("http://localhost/api/test", {
@@ -274,6 +286,35 @@ test("buildApiRequestContext falls back empty namespace values to api bucket", (
   const second = buildApiRequestContext({
     req,
     rateLimitNamespace: "***",
+    rateLimitConfig: config,
+  });
+
+  assert.equal(first.rateLimitResult.success, true);
+  assert.equal(second.rateLimitResult.success, false);
+  assert.equal(second.rateLimitResult.remaining, 0);
+  assert.ok(second.exceededHeaders.get("Retry-After"));
+});
+
+test("buildApiRequestContext truncates overlong namespace values consistently", () => {
+  const ip = `198.51.100.${(Date.now() % 200) + 40}`;
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": ip,
+    },
+  });
+  const config = { maxRequests: 1, windowMs: 60_000 };
+  const longPrefix = "A".repeat(70);
+  const firstNamespace = `${longPrefix}-first`;
+  const secondNamespace = `${longPrefix}-second`;
+
+  const first = buildApiRequestContext({
+    req,
+    rateLimitNamespace: firstNamespace,
+    rateLimitConfig: config,
+  });
+  const second = buildApiRequestContext({
+    req,
+    rateLimitNamespace: secondNamespace,
     rateLimitConfig: config,
   });
 
