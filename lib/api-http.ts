@@ -2,6 +2,7 @@ import { z } from "zod";
 const UTF8_TEXT_ENCODER = new TextEncoder();
 const JSON_SERIALIZATION_FALLBACK_ERROR = "Internal response serialization error.";
 const INVALID_CONTENT_LENGTH_ERROR = "Invalid Content-Length header.";
+const JSON_MEDIA_TYPE_PATTERN = /^application\/json(?:\s*;|$)/i;
 
 export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
@@ -88,7 +89,8 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     : null;
   const contentType = req.headers.get("content-type");
   if (contentType) {
-    if (!contentType.toLowerCase().startsWith("application/json")) {
+    const normalizedContentType = contentType.trim();
+    if (!JSON_MEDIA_TYPE_PATTERN.test(normalizedContentType)) {
       return {
         success: false,
         response: jsonResponse(
