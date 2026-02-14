@@ -68,12 +68,20 @@ function applyCustomHeadersSafely(
   if (!headers) return;
 
   let iteratorFactory: (() => Iterator<unknown>) | undefined;
+  let iteratorLookupFailed = false;
   try {
     iteratorFactory = (
       headers as { [Symbol.iterator]?: (() => Iterator<unknown>) | undefined }
     )[Symbol.iterator];
   } catch {
+    iteratorLookupFailed = true;
     iteratorFactory = undefined;
+  }
+  const isArrayHeadersInit = Array.isArray(headers);
+  const isHeadersInstance =
+    typeof Headers !== "undefined" && headers instanceof Headers;
+  if (iteratorLookupFailed && (isArrayHeadersInit || isHeadersInstance)) {
+    return;
   }
   if (typeof iteratorFactory === "function") {
     try {
@@ -89,7 +97,10 @@ function applyCustomHeadersSafely(
       }
       return;
     } catch {
-      // Fall through to object-style parsing.
+      if (isArrayHeadersInit || isHeadersInstance) {
+        return;
+      }
+      // Fall through to object-style parsing for plain object inputs.
     }
   }
 

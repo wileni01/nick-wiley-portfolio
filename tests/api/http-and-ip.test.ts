@@ -592,6 +592,50 @@ test("parseJsonRequest tolerates malformed responseHeaders objects", async () =>
   }
 });
 
+test("parseJsonRequest falls back to object header parsing when iterator getter throws", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    body: '{"value":"ok"}',
+  });
+  const iterableLikeHeaders = Object.create(null) as Record<string, unknown>;
+  Object.defineProperty(iterableLikeHeaders, Symbol.iterator, {
+    configurable: true,
+    get() {
+      throw new Error("iterator getter failed");
+    },
+  });
+  Object.defineProperty(iterableLikeHeaders, "x-request-id", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return " request id ";
+    },
+  });
+  Object.defineProperty(iterableLikeHeaders, "x-debug-token", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return "debug-iterable-fallback";
+    },
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    allowMissingContentType: false,
+    responseHeaders: iterableLikeHeaders as HeadersInit,
+  });
+
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 415);
+    assert.equal(result.response.headers.get("X-Request-Id"), "requestid");
+    assert.equal(
+      result.response.headers.get("X-Debug-Token"),
+      "debug-iterable-fallback"
+    );
+  }
+});
+
 test("parseJsonRequest error responses enforce immutable JSON security headers", async () => {
   const schema = z.object({ value: z.string() });
   const req = new Request("http://localhost/api/test", {
@@ -688,6 +732,27 @@ test("jsonResponse tolerates malformed custom header entries", async () => {
   assert.equal(response.headers.get("X-Throwing-Getter"), null);
   const body = (await response.json()) as { requestId?: string };
   assert.equal(body.requestId, "reqid");
+});
+
+test("jsonResponse skips object-key fallback for broken tuple-array headers", () => {
+  const malformedTupleHeaders = [["x-debug-token", "debug-array-entry"]];
+  Object.defineProperty(malformedTupleHeaders, Symbol.iterator, {
+    configurable: true,
+    get() {
+      throw new Error("array iterator failed");
+    },
+  });
+
+  const response = jsonResponse(
+    { error: "invalid request", requestId: "body-id" },
+    400,
+    malformedTupleHeaders as unknown as HeadersInit
+  );
+
+  assert.equal(response.status, 400);
+  assert.equal(response.headers.get("X-Debug-Token"), null);
+  assert.equal(response.headers.get("0"), null);
+  assert.equal(response.headers.get("X-Request-Id"), "body-id");
 });
 
 test("jsonResponse normalizes request-id and backfills it on error responses", async () => {
