@@ -1,0 +1,56 @@
+---
+title: "RoboRA: Modernizing document generation with intelligent automation"
+slug: "nsf-robora"
+client: "National Science Foundation (sanitized)"
+timeframe: "Recent (sanitized)"
+role: "Solutions architect / developer"
+stack:
+  - Python
+  - Chrome automation
+  - Template engine
+  - Data pipelines
+  - Legacy system integration
+tags:
+  - Automation
+  - Document generation
+  - Legacy modernization
+  - Browser automation
+featured: false
+executiveSummary: "Replaced a fragile Excel-based document generation workflow with an automated system that queries large datasets to populate templates — plus Chrome automation to bridge legacy systems."
+builderSummary: "Built a data-driven document generation tool with template population from large datasets and Chrome browser automation for legacy system posting."
+---
+
+## The problem
+
+Program staff relied on a manual, Excel-based process to generate recurring operational documents. Each document required pulling data from multiple sources, manually copying values into spreadsheet templates, and then re-entering the results into an internal system. The process was slow, error-prone, and entirely dependent on institutional knowledge of which cells mapped to which data sources.
+
+As document volumes grew, the manual approach became a bottleneck — and a risk, since copy-paste errors in operational documents can have downstream consequences.
+
+## What I built
+
+### Automated document generation
+
+**RoboRA** replaced the Excel-based workflow with an automated pipeline that:
+- **Queries large datasets** programmatically to retrieve the values needed for each document
+- **Populates document templates** using a structured mapping between data fields and template positions
+- **Handles edge cases** — missing data, format variations, conditional sections — that the manual process handled inconsistently
+- **Produces audit-ready output** with clear traceability from source data to final document
+
+### Chrome browser automation for legacy system integration
+
+The internal system where documents needed to be posted had no API — only a web interface designed for manual data entry. Rather than waiting for a system modernization that might never come, I wrote **Chrome browser automation** that:
+- Crawls the legacy web interface
+- Navigates to the correct posting locations
+- Automatically enters document data into form fields
+- Validates successful submission
+
+This pragmatic approach bridged the gap between a modern data pipeline and a legacy system, eliminating the most tedious and error-prone step in the workflow.
+
+## Impact
+
+- **Eliminated manual data entry**: document generation that previously required hours of copy-paste work now runs automatically
+- **Reduced errors**: programmatic template population removes the human transcription errors that plagued the Excel-based process
+- **Bridged legacy systems**: browser automation provided integration where no API existed, without requiring infrastructure changes
+- **Scalable**: the system handles growing document volumes without proportional increases in manual effort
+
+*Details are sanitized to protect agency-specific information.*

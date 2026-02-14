@@ -1,0 +1,90 @@
+---
+title: "AI-Powered Research Proposal Classification System"
+slug: "nsf-proposal-classification"
+client: "National Science Foundation (sanitized)"
+timeframe: "Recent (sanitized)"
+role: "Applied data scientist / ML engineer"
+stack:
+  - Python
+  - BERTopic
+  - UMAP
+  - HDBSCAN
+  - Sentence Transformers
+  - Optuna
+  - Plotly
+  - Pandas
+  - scikit-learn
+tags:
+  - NLP
+  - Topic modeling
+  - Unsupervised learning
+  - BERTopic
+  - Optimization
+  - AI/ML
+featured: false
+executiveSummary: "Built an ML pipeline that automatically clustered 7,000+ research proposals into 70+ distinct themes, reducing panel formation time from weeks to hours through Bayesian-optimized topic modeling."
+builderSummary: "BERTopic with UMAP + HDBSCAN + transformer embeddings, optimized via Optuna across 100+ trials. Interactive dashboards for topic exploration and organizational alignment."
+---
+
+## The problem
+
+Research funding agencies receive thousands of proposals each review cycle. Before proposals can be evaluated, they must be grouped into thematically coherent clusters — each assigned to a review panel with the appropriate domain expertise. Doing this manually at scale is slow, inconsistent, and heavily dependent on institutional knowledge that doesn't transfer when experienced staff rotate.
+
+The goal: build an automated system that discovers the natural thematic structure in a corpus of **7,000+ research proposals** and surfaces those groupings for human review.
+
+## Technical approach
+
+### BERTopic framework
+
+The classification system was built on the **BERTopic** framework — a modular topic modeling pipeline that combines three powerful techniques:
+
+1. **Transformer-based embeddings** (Sentence Transformers) convert proposal abstracts into dense 768-dimensional vector representations that capture semantic meaning far beyond what keyword approaches can achieve
+2. **UMAP dimensionality reduction** projects high-dimensional embeddings into a lower-dimensional space that preserves local and global structure, making clustering computationally tractable
+3. **HDBSCAN clustering** discovers natural groupings without requiring the number of topics to be pre-specified — critical when the thematic landscape of a proposal corpus isn't known in advance
+
+This combination produces interpretable topic clusters with associated keywords, representative documents, and confidence scores.
+
+### Bayesian hyperparameter optimization
+
+Topic modeling involves dozens of interconnected parameters — UMAP neighbors, minimum distances, HDBSCAN cluster sizes, embedding model selection — and the interactions between them are non-obvious. Manual tuning would have taken weeks.
+
+I implemented **Optuna Bayesian optimization** to automatically search the hyperparameter space across **100+ trials**, optimizing for clustering quality metrics including:
+- Topic coherence (are the discovered themes internally consistent?)
+- Coverage (what percentage of proposals receive meaningful topic assignments?)
+- Granularity (are topics specific enough to be actionable for panel formation?)
+
+This automated tuning process **improved clustering quality by 40%** over baseline parameters — a substantial gain that would have been difficult to achieve through manual iteration alone.
+
+### Results
+
+The optimized model discovered **70+ distinct research themes** across the proposal corpus, achieving:
+- **70% topic assignment accuracy** — proposals correctly mapped to coherent thematic clusters
+- **30% noise ratio** — proposals that didn't clearly fit any single topic, flagged for manual review rather than forced into poor-fit clusters
+- Interpretable topic labels derived from representative keywords and documents
+
+The noise ratio is an intentional design choice: forcing every proposal into a cluster would inflate apparent accuracy while degrading actual usefulness. Flagging ambiguous proposals for human judgment is the honest approach.
+
+## Interactive dashboards and analysis
+
+The system included interactive visualizations built with **Plotly**:
+- **Topic maps** showing the semantic landscape of the proposal corpus
+- **Organizational alignment analysis** mapping topics to institutional priorities and review panel structures
+- **Quality metrics dashboards** tracking clustering performance across optimization trials
+- **Topic drilldowns** allowing exploration of representative proposals and keyword distributions within each theme
+
+## Data engineering
+
+The ML pipeline included robust data engineering:
+- Document preprocessing (text normalization, abstract extraction, metadata joining)
+- Embedding generation with batch processing for large datasets
+- Caching and checkpoint infrastructure for long-running optimization runs
+- Export pipelines connecting classification results to downstream panel formation workflows
+
+## Impact
+
+- **Automated a manual process**: proposal clustering went from a weeks-long effort to an hours-long guided review
+- **Improved topic coherence**: Bayesian optimization discovered parameter combinations that human tuners had not explored
+- **Enabled efficient panel formation**: thematic groupings directly informed reviewer-proposal matching
+- **Scalable**: the pipeline handles growing submission volumes without proportional increases in manual effort
+
+*Details are sanitized to protect agency-specific information.*

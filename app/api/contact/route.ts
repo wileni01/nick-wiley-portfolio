@@ -1,6 +1,29 @@
 import { rateLimit } from "@/lib/rate-limit";
 import { sanitizeInput } from "@/lib/utils";
 
+const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
+
+async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
+  try {
+    const res = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          secret: TURNSTILE_SECRET_KEY!,
+          response: token,
+          remoteip: ip,
+        }),
+      }
+    );
+    const data = await res.json();
+    return data.success === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(req: Request) {
   try {
     // Rate limiting
@@ -24,7 +47,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, email, subject, message, honeypot } = body;
+    const { name, email, subject, message, honeypot, turnstileToken } = body;
 
     // Honeypot check — if filled, it's a bot
     if (honeypot) {
@@ -33,6 +56,24 @@ export async function POST(req: Request) {
         JSON.stringify({ success: true }),
         { status: 200, headers: { "Content-Type": "application/json" } }
       );
+    }
+
+    // Cloudflare Turnstile verification (when secret key is configured)
+    if (TURNSTILE_SECRET_KEY) {
+      if (!turnstileToken) {
+        return new Response(
+          JSON.stringify({ error: "CAPTCHA verification is required." }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
+      const turnstileValid = await verifyTurnstile(turnstileToken, ip);
+      if (!turnstileValid) {
+        return new Response(
+          JSON.stringify({ error: "CAPTCHA verification failed. Please try again." }),
+          { status: 403, headers: { "Content-Type": "application/json" } }
+        );
+      }
     }
 
     // Validation

@@ -1,13 +1,17 @@
 ---
-title: "USDA Organic Analytics: Warehouse + Tableau suite for 50,000+ operations"
+title: "USDA Organic Analytics: Global Data Warehouse + Tableau suite for 50,000+ operations"
 slug: "usda-organic-analytics"
 client: "USDA (organic program)"
 timeframe: "Recent (sanitized)"
 role: "Technical PM / analytics lead"
 stack:
-  - SQL
+  - AWS
   - Python
+  - SQL
   - Tableau
+  - Salesforce
+  - scikit-learn
+  - CBP integration
   - ETL
   - Data warehouse
 tags:
@@ -16,9 +20,11 @@ tags:
   - ETL
   - Reporting
   - "508"
+  - NLP
+  - AWS
 featured: true
-executiveSummary: "Trustworthy reporting and visibility across a complex operational program supporting 50,000+ certified organic operations."
-builderSummary: "Warehouse + ETL feeding 48+ Tableau dashboards; governance and accessibility baked in from day one."
+executiveSummary: "Built a global data warehouse on AWS integrating Salesforce, an integrity database, and CBP customs records — with NLP-powered import taxonomy and dozens of Tableau reports."
+builderSummary: "AWS-hosted warehouse integrating Salesforce, CBP customs, and investigative data; built NLP taxonomy classifier with scikit-learn; created dozens of Tableau dashboards."
 ---
 
 ## Scope and stakeholders
@@ -27,24 +33,39 @@ The USDA's organic program oversees more than **50,000 certified organic operati
 
 Stakeholders ranged from program analysts running daily reports to senior leadership preparing briefings. The platform needed to serve both audiences without requiring each to build their own queries.
 
-## Warehouse and reporting architecture
+## Global data warehouse architecture
 
-### Data warehouse
+### AWS-hosted data warehouse
 
-The analytics platform was built on a structured data warehouse containing data described as **5+ billion records**, with ETL pipelines processing **millions of records daily**. The warehouse consolidated data from multiple operational systems into a single, governed source of truth.
+The analytics platform was built as a **global data warehouse on AWS**, consolidating data from multiple previously siloed systems into a single governed source of truth. The warehouse contained data described as **5+ billion records**, with ETL pipelines processing **millions of records daily**.
+
+What made this warehouse unique was the breadth of systems it integrated:
+
+- **Salesforce**: operational CRM data tracking certifier interactions, compliance workflows, and program communications
+- **Integrity Database**: the program's core investigative and enforcement records
+- **CBP customs import records**: cross-referencing organic import claims with U.S. Customs and Border Protection data to identify discrepancies between what was claimed as organic and what actually crossed the border
+- **Investigative software**: connecting enforcement case data with operational records for end-to-end compliance visibility
 
 Key design decisions:
 - **Incremental ETL** to keep processing times manageable at scale
 - **Slowly changing dimensions** to preserve historical context for trend analysis
 - **Clear data lineage** so analysts could trace any number back to its source system
+- **Cross-system entity resolution** to match records across Salesforce, CBP, and internal databases
+
+### NLP for organic import taxonomy
+
+I built a **natural language processing classifier using scikit-learn** to automatically categorize organic import records into the program's taxonomy. Import descriptions arrive in inconsistent, free-text formats — different languages, abbreviations, and trade terminology. The NLP pipeline standardized this unstructured text into the program's official product categories, enabling accurate reporting on import volumes by product type and origin country.
+
+This was a practical ML application: not flashy, but essential for making the warehouse's import data analytically useful at scale.
 
 ### Tableau reporting suite
 
-The reporting layer comprised **more than four dozen Tableau reports** (approx. 48+), organized by program area and audience:
+The reporting layer comprised **dozens of Tableau reports**, organized by program area and audience:
 - Operational dashboards for day-to-day monitoring
 - Executive summaries for leadership briefings
 - Ad-hoc exploration views for analysts
 - Public-facing reports supporting transparency requirements
+- Import analysis views connecting CBP data with certification records
 
 ## Governance and accessibility
 
@@ -72,7 +93,9 @@ Building reports is straightforward. Getting people to use them — and trust th
 
 ## Outcomes
 
-- **Improved visibility**: leadership gained consistent, timely access to program performance data.
+- **Improved visibility**: leadership gained consistent, timely access to program performance data across all integrated systems.
+- **Cross-system intelligence**: connecting Salesforce, CBP customs records, and investigative data enabled compliance insights that no single system could provide alone.
+- **Automated classification**: NLP-powered taxonomy reduced manual categorization effort for organic import records.
 - **Streamlined reporting**: consolidated dozens of ad-hoc processes into a governed, repeatable reporting suite.
 - **Auditable**: every number could be traced back to source systems and transformation logic.
 - **Reduced analyst burden**: self-service dashboards allowed analysts to answer routine questions without custom queries.

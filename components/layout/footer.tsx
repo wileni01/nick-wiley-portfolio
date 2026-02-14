@@ -64,8 +64,8 @@ export function Footer() {
                 <Linkedin className="h-5 w-5" />
               </a>
               <a
-                href="mailto:wileni01@gmail.com"
-                aria-label="Email"
+                href="/contact"
+                aria-label="Contact"
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-all hover:border-primary hover:text-primary hover:shadow-md"
               >
                 <Mail className="h-5 w-5" />

@@ -1,0 +1,57 @@
+---
+title: "ADCC: Automated data compliance checking"
+slug: "nsf-adcc"
+client: "National Science Foundation (sanitized)"
+timeframe: "Recent (sanitized)"
+role: "Solutions architect / developer"
+stack:
+  - Python
+  - Data pipelines
+  - SQL
+  - Compliance rules engine
+tags:
+  - Compliance
+  - Data quality
+  - Automation
+  - Governance
+featured: false
+executiveSummary: "A compliance checking tool that connects to operational data and runs 28 automated checks — replacing manual auditing with systematic, repeatable validation."
+builderSummary: "Built a rules-based compliance engine with live data connections that executes 28 checks on data status, surfacing issues before they become problems."
+---
+
+## The problem
+
+Operational data across the program needed to meet specific compliance requirements — but checking compliance was a manual, ad-hoc process. Staff would run queries, compare results to standards, and report findings — a process that was inconsistent, time-consuming, and rarely comprehensive. With no systematic approach, compliance gaps could go undetected until they surfaced in audits or operational failures.
+
+## What I built
+
+**ADCC** (Automated Data Compliance Checker) is a tool with live data connections that allows users to perform **28 distinct compliance checks** on the status of operational data. Each check is:
+
+- **Clearly defined**: what it checks, what constitutes a pass or fail, and what the remediation path looks like
+- **Automated**: runs against live data with no manual query writing required
+- **Repeatable**: can be executed on a schedule or on-demand, producing consistent results every time
+- **Documented**: results are logged for audit trail purposes
+
+The checks cover a range of data quality and compliance dimensions — completeness, timeliness, consistency, referential integrity, and business rule adherence.
+
+## Design approach
+
+Rather than building a monolithic compliance report, I designed ADCC as a **modular rules engine** where each check is independently defined and can be:
+- Run individually or as a full suite
+- Configured with different thresholds for different data domains
+- Extended with new checks as compliance requirements evolve
+
+The tool provides a user-facing interface where staff can:
+- Select which checks to run
+- View results with clear pass/fail indicators
+- Drill into specific records that triggered failures
+- Export findings for remediation tracking
+
+## Impact
+
+- **Replaced manual auditing** with systematic, automated compliance validation
+- **28 checks running consistently** — far more comprehensive than any manual spot-check approach could achieve
+- **Early detection**: issues surfaced proactively rather than discovered during formal audits
+- **Staff empowerment**: users can check compliance themselves without writing queries or depending on analysts
+
+*Details are sanitized to protect agency-specific information.*

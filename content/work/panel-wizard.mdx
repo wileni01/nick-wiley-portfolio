@@ -6,28 +6,33 @@ timeframe: "Recent (sanitized)"
 role: "Solutions architect / applied data scientist (consulting)"
 stack:
   - Python
+  - Streamlit
+  - Sentence Transformers
   - SciBERT/BERT embeddings
-  - HDBSCAN
-  - k-means
-  - Jupyter
-  - SQL
-  - Dashboards
+  - K-Means clustering
+  - Cosine similarity
+  - Silhouette analysis
+  - TF-IDF
+  - PCA/t-SNE
+  - SQLAlchemy
+  - Altair
 tags:
   - Human-in-the-loop
   - NLP
   - Clustering
   - Decision support
   - Governance
+  - Sentence embeddings
 featured: true
-executiveSummary: "Reduced manual triage burden by generating auditable grouping suggestions while keeping program staff in control."
-builderSummary: "SciBERT embeddings + clustering to propose groups, surfaced with fit signals in a drag-and-drop UI."
+executiveSummary: "A decision-support tool that consolidated 8 screens into 1, using language embeddings and ML clustering to help panelists rate, rank, and bin proposals — reducing panel formation time from weeks to hours."
+builderSummary: "Sentence transformer embeddings + K-Means clustering in a Streamlit UI with drag-and-drop overrides, fit scoring, and real-time silhouette analysis. Consolidated data from multiple systems into a unified view."
 ---
 
 ## Context and why it mattered
 
 Federal research agencies review thousands of proposals each cycle. Grouping proposals into thematically coherent review panels is a labor-intensive, high-stakes task — get the groupings wrong and reviewers lack relevant expertise, slowing decisions and risking fairness.
 
-Program staff had been managing this process manually, relying on institutional knowledge and spreadsheets. As submission volumes grew, the approach didn't scale — and new staff couldn't replicate the reasoning of experienced colleagues.
+Program staff had been managing this process manually, relying on institutional knowledge and spreadsheets spread across **8 different screens and systems**. As submission volumes grew, the approach didn't scale — and new staff couldn't replicate the reasoning of experienced colleagues.
 
 ## Constraints
 
@@ -38,24 +43,52 @@ Program staff had been managing this process manually, relying on institutional 
 
 ## Approach
 
-### Embedding pipeline
+### Deep use of language embeddings
 
-Proposal abstracts were encoded using **SciBERT** (a domain-adapted BERT model trained on scientific text) to produce dense vector representations. These embeddings capture semantic similarity between proposals far better than keyword matching.
+The system makes extensive use of **sentence transformer embeddings** to convert proposal text into dense vector representations that capture semantic meaning. Four embedding models are available, each optimized for different accuracy/performance tradeoffs:
 
-### Clustering
+- **sentence-transformers/all-MiniLM-L6-v2** — 384-dimensional, fast, recommended default for rapid iteration
+- **allenai/scibert_scivocab_uncased** — SciBERT, pre-trained on scientific publications for domain-specific accuracy
+- **sentence-transformers/all-MiniLM-L12-v2** — 768-dimensional, higher quality than L6
+- **sentence-transformers/all-mpnet-base-v2** — 768-dimensional, highest accuracy, heaviest computation
 
-Multiple clustering algorithms were evaluated:
-- **HDBSCAN** for discovering natural groupings without pre-specifying cluster count
-- **k-means** for generating fixed-size panels when operational constraints required it
+### ML algorithms and clustering
 
-Clustering parameters were iteratively tuned with stakeholder feedback — not just optimized against a metric, but tested against program staff's qualitative judgment of "does this grouping make sense?"
+The core clustering pipeline uses **K-Means** (sklearn) to group proposals into review panels based on semantic similarity, with `n_init=10` and `random_state=42` for reproducibility. Supporting algorithms include:
+
+- **Cosine similarity** for fit scores (proposal-to-centroid), inter-panel similarity matrices, and reassignment recommendations
+- **Silhouette analysis** (global and per-sample) for evaluating cluster quality and optimal-k selection
+- **TF-IDF** for extracting top keywords per cluster, enabling automatic panel naming and topic labeling
+- **PCA** and **t-SNE** for 2D dimensionality reduction and visualization (t-SNE perplexity auto-scaled to sample count)
+
+### Consolidating 8 screens into 1
+
+The Panel Wizard serves as a **decision-support copilot** — a central UI that consolidates data from several disparate systems into one unified view. Before this tool, panelists navigated across 8 different screens to track proposal ratings, compare rankings, and manage binning boards. The Wizard **reduced that to a single screen** and updates multiple downstream systems simultaneously.
 
 ### Human-in-the-loop UI
 
-The core interface — internally called **Panel Wizard** — presented clustering suggestions alongside transparency signals:
+Built in **Streamlit** (including components.v1 for embedded HTML/JS), the interface presented clustering suggestions alongside transparency signals:
 - **Fit scores** showing how strongly each proposal matched its assigned cluster
-- **"Why" signals** surfacing the most similar proposals and shared topical themes
+- **"Why" signals** surfacing the most similar proposals and shared topical themes via TF-IDF keywords
 - **Drag-and-drop overrides** so staff could move proposals between panels, with the system updating fit metrics in real time
+- **Silhouette plots and k-evaluation charts** (Altair) for visual cluster quality assessment
+- **Adoption trend tracking** to monitor how staff engaged with suggestions over time
+
+### Technical stack
+
+The full Python ecosystem powering the tool:
+
+| Library | Role |
+|---------|------|
+| sentence-transformers | SBERT embedding models |
+| scikit-learn | K-Means, silhouette, cosine similarity, TF-IDF, PCA, t-SNE |
+| numpy | Array operations, embedding math |
+| pandas | DataFrames for proposal data and assignments |
+| streamlit | UI framework |
+| altair | Charting (silhouette plots, k-evaluation, adoption trends) |
+| sqlalchemy | DB connection and parameterized queries |
+| hashlib | Embedding cache keys, error hashing |
+| pickle / io | Session state serialization for progress save/load |
 
 ### Monitoring and evaluation
 
@@ -63,15 +96,17 @@ Telemetry dashboards tracked adoption patterns, override rates, and cluster qual
 
 ## What shipped (sanitized)
 
-- A working application enabling program staff to review ML-generated panel groupings, understand the rationale, and override as needed.
+- A working application enabling program staff to review ML-generated panel groupings, understand the rationale, and override as needed — **from a single unified screen**.
 - Dashboards providing operational visibility into clustering quality and staff interaction patterns.
 - Documentation and training materials supporting adoption by new team members.
+- **Reduced panel formation time from weeks to hours** while improving topic coherence and reviewer-proposal matching accuracy.
 
 *What I can share is limited by the sensitivity of the work. The above describes the approach and design — specific data, metrics, and internal details are not included.*
 
 ## Outcomes
 
-- Staff reported reduced time spent on manual grouping tasks.
+- **Dramatic time savings**: panel formation went from a weeks-long manual process to hours of guided review.
+- **Consolidated workflow**: reduced 8 screens to 1, eliminating context-switching and manual data reconciliation.
 - The tool created a repeatable, auditable process where one had not existed before.
 - Override patterns provided valuable signal for improving future model iterations.
 - The human-in-the-loop design built trust with stakeholders who were initially cautious about ML-assisted workflows.

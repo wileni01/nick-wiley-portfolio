@@ -31,9 +31,23 @@ const projects = [
     availability: "Available on request",
   },
   {
+    title: "Stack Overflow Code Language Classifier",
+    description:
+      "Graduate school project that scraped Stack Overflow data using SQL and built a deep learning model with Keras to identify the programming language of code snippets from posts. An exploration of NLP applied to source code classification.",
+    stack: ["Python", "Keras", "SQL", "NLP", "Deep Learning"],
+    availability: "Academic project (2017)",
+  },
+  {
+    title: "DC Intersection Risk Scoring Model",
+    description:
+      "Machine learning project using Washington, DC car accident data to assign risk scores to intersections. Built predictive models identifying the highest-risk locations for traffic incidents based on historical patterns and environmental features.",
+    stack: ["Python", "scikit-learn", "Pandas", "Machine Learning"],
+    availability: "Academic project (2017)",
+  },
+  {
     title: "Portfolio Site (this site)",
     description:
-      "A production-grade portfolio built with Next.js, TypeScript, and Tailwind CSS. Features MDX-driven content, global search, dark mode, print-ready resume, and accessibility-first design.",
+      "A production-grade portfolio built with Next.js, TypeScript, and Tailwind CSS. Features MDX-driven content, global search, adaptive briefing, dark mode, print-ready resume, and accessibility-first design.",
     stack: ["Next.js", "TypeScript", "Tailwind CSS", "MDX"],
     availability: "Source available",
   },

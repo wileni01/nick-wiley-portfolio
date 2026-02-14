@@ -9,36 +9,53 @@ stack:
   - Tableau
   - SQL
   - Python
+  - Public data APIs
 tags:
   - Dashboards
   - Data integration
   - Stakeholder alignment
+  - Public data
 featured: false
-executiveSummary: "A shared view of funding histories and collaboration networks that improved portfolio review and executive reporting."
-builderSummary: "Integrated data sources into a lineage-oriented dashboard experience using BigQuery and Tableau."
+executiveSummary: "Integrated public and internal data to map researcher funding trajectories — revealing co-funders, international funding sources, and career-stage patterns before, during, and after agency funding."
+builderSummary: "Built a lineage dashboard incorporating public data with internal records to trace researchers' principal funding sources and identify large co-funders and international funders."
 ---
 
 ## The decision it supported
 
-Program leadership needed to understand the full arc of researcher engagement: who had been funded before, how researchers collaborated across awards, and what patterns emerged across funding portfolios.
+Program leadership needed to understand the full arc of researcher engagement: who had been funded before, how researchers collaborated across awards, and what patterns emerged across funding portfolios. But the picture was incomplete when viewed through internal data alone.
 
-Without this visibility, portfolio reviews relied on institutional memory and manual lookups — limiting the depth of analysis and making it difficult to spot trends or gaps.
+Without visibility into researchers' broader funding landscape — including other federal agencies, international sources, and industry partnerships — portfolio reviews relied on institutional memory and manual lookups, limiting the depth of strategic analysis.
 
 ## What "lineage" meant
 
-In this context, "lineage" referred to the connected history of a researcher's relationship with the agency:
-- **Funding history**: prior awards, renewal patterns, and funding trajectories
-- **Collaboration networks**: co-PI relationships and cross-disciplinary connections
+In this context, "lineage" referred to the connected history of a researcher's relationship with the funding ecosystem — not just the agency itself:
+
+- **Funding trajectories**: where were researchers' principal places of funding *before*, *during*, and *after* agency awards?
+- **Co-funder identification**: which organizations — federal, state, industry, and international — were co-funding the same researchers, and at what scale?
+- **International funding sources**: which foreign governments and international bodies were providing significant research funding to the same investigators?
+- **Collaboration networks**: co-PI relationships and cross-disciplinary connections across awards
 - **Impact indicators**: publications, outcomes, and downstream effects tied to funded work
 
-The challenge was integrating these signals from multiple data sources — each with different schemas, update frequencies, and quality characteristics — into a coherent view.
+The challenge was integrating these signals from **both public and internal data sources** — each with different schemas, update frequencies, and quality characteristics — into a coherent view.
+
+## Incorporating public data with internal records
+
+A key innovation was blending the agency's internal award data with **publicly available research funding databases** to construct a more complete picture of each researcher's funding portfolio. This meant:
+
+- Ingesting and normalizing public grant data from external sources
+- Resolving entity matching challenges (researchers publish under different name variations, change institutions, hold multiple affiliations)
+- Building derived metrics that compared agency funding to a researcher's total funding landscape
+- Identifying **large co-funders** whose investment patterns aligned with — or diverged from — the agency's own portfolio priorities
+- Flagging **international funders** to support strategic awareness of global research investment patterns
+
+This public-private data integration turned the dashboard from a retrospective record into a **strategic intelligence tool**.
 
 ## Balancing stakeholder needs and data quality
 
 Different stakeholders wanted different things:
-- **Executives** wanted high-level summaries: portfolio composition, trends over time, notable clusters of activity.
-- **Program officers** wanted drill-down capability: individual researcher histories, specific award details, collaboration maps.
-- **Data quality teams** needed transparency about gaps, caveats, and known issues.
+- **Executives** wanted high-level summaries: portfolio composition, major co-funders, trends over time, and international funding patterns.
+- **Program officers** wanted drill-down capability: individual researcher histories, specific award details, collaboration maps, and before/during/after funding trajectories.
+- **Data quality teams** needed transparency about gaps, caveats, and known issues — especially around public data completeness.
 
 Balancing these needs required:
 - Layered dashboard design (summary → detail → source)
@@ -47,15 +64,16 @@ Balancing these needs required:
 
 ## Technical approach
 
-- **BigQuery** served as the analytical layer, joining data from multiple operational systems
-- **SQL-based transformations** standardized naming conventions, resolved entity matching challenges, and built derived metrics
-- **Tableau dashboards** presented the lineage view with interactive filtering and drill-down
-- **Python scripts** handled data quality checks and automated refresh monitoring
+- **BigQuery** served as the analytical layer, joining internal award data with public funding records
+- **SQL-based transformations** standardized naming conventions, resolved entity matching challenges, and built derived metrics including co-funder rankings and international funding breakdowns
+- **Tableau dashboards** presented the lineage view with interactive filtering and drill-down across funding stages
+- **Python scripts** handled public data ingestion, entity resolution, data quality checks, and automated refresh monitoring
 
 ## Outcomes
 
-- **Better executive reporting**: leadership could review portfolio-level trends without requesting custom analyses.
-- **Shared understanding**: a common data layer reduced disagreements about "what the numbers mean."
+- **Strategic portfolio intelligence**: leadership could see not just their own investments, but how they fit into researchers' broader funding ecosystems.
+- **Co-funder visibility**: identified major co-funding organizations, enabling more informed partnership and coordination discussions.
+- **International awareness**: surfaced international funding patterns that informed strategic planning.
 - **Faster portfolio reviews**: pre-built views replaced manual data gathering, shortening preparation time.
 - **Foundation for future work**: the lineage data model proved useful for subsequent analytical projects.
 

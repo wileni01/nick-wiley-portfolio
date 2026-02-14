@@ -19,13 +19,14 @@ export const knowledgeBase: KnowledgeEntry[] = [
   {
     id: "identity",
     category: "overview",
-    content: `Nick Wiley is a Full-Stack Software Engineer and AI Solutions Architect based in the United States. 
-He specializes in building production-grade web applications with AI integration, data engineering pipelines, 
-and cybersecurity analysis tools. He has experience across federal government contracts (IBM), 
-nonprofit client work (Lincoln Leadership Institute), and open-source development.
+    content: `Nick Wiley is a Managing Consultant, Full-Stack Software Engineer, and AI Solutions Architect based in Alexandria, VA. 
+He specializes in building decision-support tools, analytics platforms, and production-grade applications with AI integration. 
+He has experience across federal government consulting (IBM — NSF, USDA, USPS, Census), digital transformation leadership 
+(Lincoln Leadership Institute), a startup he founded (VisiTime — augmented reality, 2 U.S. utility patents), and open-source development.
 
-His core strengths include: React/Next.js frontend development, Python backend services (FastAPI, Flask), 
-AI/ML integration (OpenAI GPT-4o, Azure AI, embeddings/RAG), CRM and data platform integration (HubSpot, Stripe, Apollo.io), 
+His core strengths include: human-in-the-loop ML workflows, NLP embeddings and clustering (BERTopic, SciBERT, sentence transformers), 
+React/Next.js frontend development, Python backend services (FastAPI, Flask, Streamlit), data warehousing (AWS, BigQuery), 
+Tableau reporting, CRM and data platform integration (HubSpot, Stripe, Salesforce), browser automation, 
 DevOps (Docker, Vercel, PowerShell automation), and cybersecurity (fraud detection, graph analysis).`,
   },
 
@@ -33,9 +34,15 @@ DevOps (Docker, Vercel, PowerShell automation), and cybersecurity (fraud detecti
   {
     id: "lli-overview",
     category: "work-experience",
-    content: `Nick serves as Lead Software Engineer & AI Solutions Architect for the Lincoln Leadership Institute at Gettysburg (LLI). 
+    content: `Nick serves as Lead Software Engineer & Digital Strategist for the Lincoln Leadership Institute at Gettysburg (LLI). 
 LLI is a premier executive leadership development organization that uses historic battlefields as teaching environments for Fortune 500 companies 
-and government agencies. Nick led their complete digital transformation.`,
+and government agencies. Nick led their comprehensive digital transformation including:
+- Converted the flagship in-person leadership program to digital format (conceptualized approach, vetted producers, adapted content, trained presenters, managed enrollment)
+- Rebuilt gettysburgleadership.com from WordPress to Next.js with Stripe, HubSpot, and analytics integrations using Cursor and Claude Code
+- Conceptualized the "America at 250" program using AI-powered market research — the program has generated significant revenue since launch
+- Designed email marketing campaigns (migrated from Emma to HubSpot) that drove direct program registrations contributing to hundreds of thousands in revenue
+- Automated creation of marketing materials
+- Mentored an intern through conversion to full-time hire to manage digital assets`,
   },
   {
     id: "lli-website",
@@ -93,9 +100,15 @@ relationships. Docker Compose orchestrates the full stack with hot-reload develo
   {
     id: "gov-experience",
     category: "work-experience",
-    content: `Nick has experience working on federal government technology projects through IBM's Federal Division. 
-He contributed to projects for USPS, the U.S. Census Bureau, USDA, and multiple National Science Foundation (NSF) 
-research computing initiatives. [Details to be filled in — these are placeholder entries for upcoming project descriptions.]`,
+    content: `Nick has extensive experience delivering analytics, ML, and decision-support solutions for federal civilian agencies through IBM Global Business Services.
+
+**NSF (National Science Foundation):** Built the Panel Wizard — a decision-support copilot that consolidated 8 screens into 1, using sentence transformer embeddings and K-Means clustering to help panelists rate, rank, and bin proposals. Reduced panel formation from weeks to hours. Also built an AI-powered research proposal classification system using BERTopic (UMAP + HDBSCAN + transformer embeddings) optimized via Optuna across 100+ trials, discovering 70+ research themes from 7,000+ proposals. Created the Researcher Lineage Dashboard integrating public and internal data to trace funding trajectories and identify co-funders and international funders. Developed RoboRA (automated document generation with Chrome browser automation for legacy systems), ADCC (28 automated compliance checks), and telemetry dashboards for anonymous usage monitoring across all tools.
+
+**USDA (Organic Program):** Built a global data warehouse on AWS integrating Salesforce, an integrity database, investigative software, and CBP customs import records. Created an NLP taxonomy classifier using scikit-learn for organic import categorization. Developed dozens of Tableau reports supporting 50,000+ certified organic operations.
+
+**USPS:** Managed data analytics for international mail operations, identifying leads and operational insights using SAS.
+
+**Census Bureau:** Provided data analytics support including ServiceNow administration and Python-based reporting.`,
   },
 
   // ── Technical Skills ─────────────────────────────────
@@ -151,9 +164,13 @@ wine production chains, and brand reputation systems.`,
     id: "differentiators",
     category: "overview",
     content: `What sets Nick apart: 1) He bridges the gap between AI research and production deployment — every AI feature 
-he builds ships to real users. 2) He has rare cross-domain expertise spanning frontend, backend, AI/ML, DevOps, 
-cybersecurity, and data engineering. 3) His government experience (IBM Federal) combined with startup-speed execution 
-(LLI) means he can navigate both enterprise and agile environments. 4) He builds complete systems, not just features — 
-from Chrome extensions to fraud analysis platforms to CRM integrations.`,
+he builds ships to real users, from BERTopic proposal classification to sentence-embedding-powered panel formation. 
+2) He has rare cross-domain expertise spanning frontend, backend, AI/ML, DevOps, cybersecurity, data engineering, 
+and digital marketing/business strategy. 3) His government experience (IBM Federal — NSF, USDA, USPS, Census) combined 
+with startup founding (VisiTime, 2 patents) and digital transformation leadership (LLI) means he can navigate enterprise, 
+regulated, and scrappy environments equally well. 4) He builds complete systems, not just features — from consolidated 
+8-screen-to-1 decision tools to global data warehouses integrating Salesforce with CBP customs records. 
+5) He conceived an investigation that identified 90 contract misrepresentations at the RATB, showing he doesn't just 
+build tools — he designs the analytical approaches that generate results.`,
   },
 ];

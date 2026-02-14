@@ -22,13 +22,14 @@ export const projects: Project[] = [
     slug: "gettysburg-leadership",
     title: "GettysburgLeadership.com",
     description:
-      "Full rebuild of the Lincoln Leadership Institute's website with integrated payments, CRM, and analytics.",
-    longDescription: `Led the complete redesign and rebuild of the Lincoln Leadership Institute at Gettysburg's web presence. 
-The site serves Fortune 500 clients and government agencies seeking executive leadership development programs at historic battlefields.
+      "Full rebuild of the Lincoln Leadership Institute's website — modernized from WordPress with integrated payments, CRM, and analytics.",
+    longDescription: `Led the complete redesign and rebuild of the Lincoln Leadership Institute at Gettysburg's web presence, 
+modernizing from a legacy WordPress site. The site serves Fortune 500 clients and government agencies seeking executive 
+leadership development programs at historic battlefields.
 
-Built a performant, SEO-optimized Next.js 14 application with Stripe payment processing for program registration, 
-HubSpot CRM integration for lead capture and first-touch attribution, Calendly for consultation scheduling, 
-PostHog analytics for conversion tracking, and Sentry for error monitoring. Deployed on Vercel's edge network.`,
+Built a performant, SEO-optimized Next.js 14 application using Cursor and Claude Code with Stripe payment processing 
+for program registration, HubSpot CRM integration for lead capture and first-touch attribution, Calendly for consultation 
+scheduling, PostHog analytics for conversion tracking, and Sentry for error monitoring. Deployed on Vercel's edge network.`,
     category: ["LLI Client Work", "Full-Stack"],
     technologies: [
       "Next.js 14",
@@ -42,6 +43,8 @@ PostHog analytics for conversion tracking, and Sentry for error monitoring. Depl
       "Sentry",
       "Vercel",
       "Calendly",
+      "Cursor",
+      "Claude Code",
     ],
     image: "/images/projects/gettysburg-leadership.png",
     live: "https://gettysburgleadership.com",
@@ -49,11 +52,119 @@ PostHog analytics for conversion tracking, and Sentry for error monitoring. Depl
     featured: true,
     status: "completed",
     problem:
-      "The Lincoln Leadership Institute's legacy website was outdated, had no payment processing, poor SEO, and no CRM integration — losing leads and requiring manual registration workflows.",
+      "The Lincoln Leadership Institute's legacy WordPress website was outdated, had no payment processing, poor SEO, and no CRM integration — losing leads and requiring manual registration workflows.",
     solution:
-      "Built a modern Next.js 14 site with Stripe checkout, HubSpot forms with UTM attribution, Calendly scheduling, PostHog analytics, and MDX-driven content for easy faculty and program management.",
+      "Modernized from WordPress to a Next.js 14 site using Cursor and Claude Code, with Stripe checkout, HubSpot forms with UTM attribution, Calendly scheduling, PostHog analytics, and MDX-driven content.",
     impact:
       "Streamlined registration flow from manual email to self-service checkout. Improved page load times by 4x. Enabled data-driven marketing with full attribution tracking across all touchpoints.",
+  },
+  {
+    slug: "lli-digital-transformation",
+    title: "LLI Digital Program Transformation",
+    description:
+      "Led the conversion of a premier in-person leadership development program to a digital format — from concept to revenue.",
+    longDescription: `Led the digital transformation of the Lincoln Leadership Institute's flagship in-person leadership 
+development program. Conceptualized the digital format, identified and vetted production partners, hired producers, 
+adapted content for virtual delivery, trained and led presenters, managed advertising and enrollment, and added 
+digital interactions to maintain the engagement that made the in-person experience valuable.
+
+This wasn't just putting a camera in a room — it required fundamentally rethinking how experiential leadership 
+lessons translate to a screen while preserving the impact that Fortune 500 companies and government agencies pay for.`,
+    category: ["LLI Client Work"],
+    technologies: [
+      "Digital Production",
+      "Content Strategy",
+      "Virtual Events",
+      "Marketing",
+    ],
+    image: "/images/projects/placeholder-gov.svg",
+    featured: false,
+    status: "completed",
+    problem:
+      "A premier in-person leadership development program needed to reach audiences digitally without losing the experiential quality that made it valuable.",
+    solution:
+      "Conceptualized the digital format, vetted and hired production partners, adapted content, trained presenters, and managed the full enrollment pipeline.",
+    impact:
+      "Successfully launched a digital program that expanded the institute's reach beyond in-person attendees while maintaining program quality and revenue.",
+  },
+  {
+    slug: "lli-america-250",
+    title: "America at 250 Program",
+    description:
+      "Conceptualized a new leadership program using AI-powered market research — generating significant revenue since launch.",
+    longDescription: `Conceptualized the "America at 250" program for the Lincoln Leadership Institute, leveraging AI-powered 
+market research to identify the opportunity, validate demand, and shape the program's positioning. The program connects 
+America's 250th anniversary to leadership lessons from historic battlefields.
+
+Used AI tools for competitive analysis, audience research, and content positioning — then worked with the team to 
+develop programming, pricing, and go-to-market strategy.`,
+    category: ["LLI Client Work", "AI/ML"],
+    technologies: [
+      "AI Market Research",
+      "Content Strategy",
+      "Program Design",
+    ],
+    image: "/images/projects/placeholder-gov.svg",
+    featured: false,
+    status: "completed",
+    problem:
+      "The institute needed a new revenue stream tied to a major cultural moment — America's 250th anniversary — but lacked market research on demand and positioning.",
+    solution:
+      "Used AI-powered market research to conceptualize the program, validate demand, and develop the go-to-market strategy.",
+    impact:
+      "The program has generated significant revenue since launch, creating a new product line for the institute.",
+  },
+  {
+    slug: "lli-email-marketing",
+    title: "LLI Digital Marketing & Email Campaigns",
+    description:
+      "Designed email marketing campaigns and led Emma-to-HubSpot migration, driving program registrations and significant revenue.",
+    longDescription: `Designed and executed digital marketing campaigns for the Lincoln Leadership Institute, identifying key 
+metrics for email campaigns that converted into direct program registrations. Led the migration from Emma to HubSpot 
+for email marketing, enabling better segmentation, automation, and attribution tracking.
+
+Also automated the creation of marketing materials, reducing the time and effort required to produce 
+consistent, professional collateral for program promotion.`,
+    category: ["LLI Client Work"],
+    technologies: [
+      "HubSpot",
+      "Emma (migrated from)",
+      "Email Automation",
+      "Marketing Analytics",
+    ],
+    image: "/images/projects/placeholder-gov.svg",
+    featured: false,
+    status: "completed",
+    problem:
+      "Email campaigns lacked attribution tracking and segmentation; marketing materials were created manually; the email platform (Emma) couldn't support needed automation.",
+    solution:
+      "Migrated from Emma to HubSpot, identified digital marketing metrics, designed targeted campaigns, and automated marketing material creation.",
+    impact:
+      "Email campaigns drove direct program signups contributing to hundreds of thousands in revenue. Automated marketing materials reduced production time.",
+  },
+  {
+    slug: "lli-intern-mentorship",
+    title: "LLI Intern-to-Hire Mentorship",
+    description:
+      "Mentored an intern through conversion to full-time hire to manage digital assets and marketing operations.",
+    longDescription: `Mentored an intern through a structured development program, building their skills in digital asset 
+management, HubSpot administration, and marketing operations. Successfully guided their transition from intern 
+to full-time hire, where they now manage the institute's digital assets and ongoing marketing operations.`,
+    category: ["LLI Client Work"],
+    technologies: [
+      "HubSpot",
+      "Digital Asset Management",
+      "Marketing Operations",
+    ],
+    image: "/images/projects/placeholder-gov.svg",
+    featured: false,
+    status: "completed",
+    problem:
+      "The institute needed dedicated digital operations support but lacked internal expertise to develop new talent for the role.",
+    solution:
+      "Mentored an intern through skill development in digital assets, HubSpot, and marketing operations, guiding them to a full-time role.",
+    impact:
+      "Created sustainable internal capacity for digital marketing operations through successful intern-to-hire pipeline.",
   },
   {
     slug: "lli-email-data-miner",
@@ -298,186 +409,221 @@ and a winery management UI for tracking brand reputation and wine inventory.`,
       "Adds 20+ hours of late-game content with a realistic wine production chain that rewards long-term planning and brand management.",
   },
 
-  // ── Government Project Templates ─────────────────────
+  // ── Government Projects ─────────────────────────────
   {
-    slug: "usps-mail-processing",
-    title: "[USPS] Mail Processing Optimization",
-    description: "[FILL IN] Brief description of the USPS project.",
-    longDescription: `[FILL IN] Detailed description of the project, including scope, objectives, and your specific contributions.
+    slug: "usps-international-ops",
+    title: "USPS International Operations Analytics",
+    description:
+      "Data analytics for USPS international mail operations, identifying leads and optimizing operational workflows using SAS.",
+    longDescription: `Managed data analytics for USPS international mail operations, developing analytical workflows 
+that identified operational leads and surfaced insights for process optimization.
 
 **Agency:** United States Postal Service (USPS)
-**Duration:** [FILL IN] e.g., June 2023 - December 2023
-**Team Size:** [FILL IN] e.g., 5 engineers
-**Funding Source:** [FILL IN] e.g., IBM Federal contract`,
+**Role:** Data Analyst (via IBM)`,
     category: ["Government"],
-    technologies: ["[FILL IN]"],
+    technologies: ["SAS", "Data Analytics", "SQL"],
     image: "/images/projects/placeholder-gov.svg",
     agency: "USPS",
     featured: false,
-    status: "template",
-    problem: "[FILL IN] What problem was the agency facing?",
-    solution: "[FILL IN] What solution did you build or contribute to?",
-    impact: "[FILL IN] Quantifiable outcomes — time saved, accuracy improved, cost reduced.",
+    status: "completed",
+    problem:
+      "International mail operations lacked systematic analytics to identify leads and optimize processing workflows across global operations.",
+    solution:
+      "Developed SAS-based analytical workflows that surfaced operational leads and provided data-driven insights for international mail processing.",
+    impact:
+      "Improved operational visibility across international mail workflows, enabling data-driven decision-making for process optimization.",
   },
   {
-    slug: "census-data-platform",
-    title: "[Census Bureau] Data Platform",
-    description: "[FILL IN] Brief description of the Census Bureau project.",
-    longDescription: `[FILL IN] Detailed description of the project.
+    slug: "census-data-analytics",
+    title: "Census Bureau Data Analytics Support",
+    description:
+      "Data analytics support for Census Bureau operations including ServiceNow administration and Python-based reporting.",
+    longDescription: `Provided data analytics support for Census Bureau operations, including ServiceNow platform administration 
+and Python-based reporting and automation.
 
 **Agency:** U.S. Census Bureau
-**Duration:** [FILL IN]
-**Team Size:** [FILL IN]
-**Funding Source:** [FILL IN]`,
+**Role:** Data Analytics Consultant (via IBM)`,
     category: ["Government"],
-    technologies: ["[FILL IN]"],
+    technologies: ["Python", "ServiceNow", "SQL", "Data Analytics"],
     image: "/images/projects/placeholder-gov.svg",
     agency: "Census Bureau",
     featured: false,
-    status: "template",
-    problem: "[FILL IN] What problem was the agency facing?",
-    solution: "[FILL IN] What solution did you build or contribute to?",
-    impact: "[FILL IN] Quantifiable outcomes.",
+    status: "completed",
+    problem:
+      "Census Bureau operations needed improved data analytics capabilities and streamlined service management workflows.",
+    solution:
+      "Delivered data analytics support including ServiceNow administration and Python-based reporting tools for operational visibility.",
+    impact:
+      "Improved operational reporting capabilities and streamlined service management workflows through Python automation and ServiceNow optimization.",
   },
   {
-    slug: "usda-project-1",
-    title: "[USDA] Agricultural Data System",
-    description: "[FILL IN] Brief description of USDA project 1.",
-    longDescription: `[FILL IN] Detailed description of the project.
-
-**Agency:** U.S. Department of Agriculture (USDA)
-**Duration:** [FILL IN]
-**Team Size:** [FILL IN]
-**Funding Source:** [FILL IN]`,
-    category: ["Government"],
-    technologies: ["[FILL IN]"],
-    image: "/images/projects/placeholder-gov.svg",
-    agency: "USDA",
-    featured: false,
-    status: "template",
-    problem: "[FILL IN] What problem was the agency facing?",
-    solution: "[FILL IN] What solution did you build or contribute to?",
-    impact: "[FILL IN] Quantifiable outcomes.",
-  },
-  {
-    slug: "usda-project-2",
-    title: "[USDA] Resource Management Platform",
-    description: "[FILL IN] Brief description of USDA project 2.",
-    longDescription: `[FILL IN] Detailed description of the project.
-
-**Agency:** U.S. Department of Agriculture (USDA)
-**Duration:** [FILL IN]
-**Team Size:** [FILL IN]
-**Funding Source:** [FILL IN]`,
-    category: ["Government"],
-    technologies: ["[FILL IN]"],
-    image: "/images/projects/placeholder-gov.svg",
-    agency: "USDA",
-    featured: false,
-    status: "template",
-    problem: "[FILL IN] What problem was the agency facing?",
-    solution: "[FILL IN] What solution did you build or contribute to?",
-    impact: "[FILL IN] Quantifiable outcomes.",
-  },
-  {
-    slug: "nsf-project-1",
-    title: "[NSF] Research Computing Platform",
-    description: "[FILL IN] Brief description of NSF project 1.",
-    longDescription: `[FILL IN] Detailed description of the project.
+    slug: "nsf-proposal-classification",
+    title: "NSF AI-Powered Proposal Classification",
+    description:
+      "ML pipeline using BERTopic and Bayesian optimization to classify 7,000+ research proposals into 70+ themes.",
+    longDescription: `Built a machine learning pipeline to automatically cluster and categorize 7,000+ NSF research proposals 
+using advanced NLP and unsupervised learning techniques. Implemented BERTopic framework combining UMAP dimensionality reduction, 
+HDBSCAN clustering, and transformer-based embeddings to discover 70+ distinct research themes. Optimized model performance 
+using Optuna Bayesian optimization, improving clustering quality by 40% through automated hyperparameter tuning across 100+ trials.
 
 **Agency:** National Science Foundation (NSF)
-**Duration:** [FILL IN]
-**Team Size:** [FILL IN]
-**Grant Number:** [FILL IN]`,
-    category: ["Government"],
-    technologies: ["[FILL IN]"],
+**Role:** Applied Data Scientist (via IBM)`,
+    category: ["Government", "AI/ML"],
+    technologies: [
+      "Python",
+      "BERTopic",
+      "UMAP",
+      "HDBSCAN",
+      "Sentence Transformers",
+      "Optuna",
+      "Plotly",
+      "Pandas",
+      "scikit-learn",
+    ],
     image: "/images/projects/placeholder-gov.svg",
     agency: "NSF",
     featured: false,
-    status: "template",
-    problem: "[FILL IN] What research challenge was being addressed?",
-    solution: "[FILL IN] What system/tool did you build?",
-    impact: "[FILL IN] Research outcomes, publications, datasets produced.",
+    status: "completed",
+    problem:
+      "Manually clustering thousands of research proposals into thematic panels was slow, inconsistent, and dependent on institutional knowledge.",
+    solution:
+      "Built a BERTopic pipeline with UMAP + HDBSCAN + transformer embeddings, optimized via Optuna across 100+ trials to discover 70+ research themes.",
+    impact:
+      "Automated manual proposal clustering, reducing panel formation time from weeks to hours while improving topic coherence by 40%.",
   },
   {
-    slug: "nsf-project-2",
-    title: "[NSF] Data Analytics Framework",
-    description: "[FILL IN] Brief description of NSF project 2.",
-    longDescription: `[FILL IN] Detailed description of the project.
+    slug: "nsf-panel-wizard",
+    title: "NSF Panel Wizard Decision Support",
+    description:
+      "Human-in-the-loop decision support tool using sentence embeddings and K-Means clustering, consolidating 8 screens into 1.",
+    longDescription: `Designed and delivered Panel Wizard — a decision-support copilot that consolidated data from 8 separate screens 
+into a single unified view. Uses sentence transformer embeddings with K-Means clustering, cosine similarity fit scoring, 
+silhouette analysis, and TF-IDF topic labeling. Built in Streamlit with Altair charting.
 
 **Agency:** National Science Foundation (NSF)
-**Duration:** [FILL IN]
-**Team Size:** [FILL IN]
-**Grant Number:** [FILL IN]`,
+**Role:** Solutions Architect / Applied Data Scientist (via IBM)`,
+    category: ["Government", "AI/ML"],
+    technologies: [
+      "Python",
+      "Streamlit",
+      "Sentence Transformers",
+      "scikit-learn",
+      "K-Means",
+      "Altair",
+      "SQLAlchemy",
+      "Pandas",
+    ],
+    image: "/images/projects/placeholder-gov.svg",
+    agency: "NSF",
+    featured: true,
+    status: "completed",
+    problem:
+      "Panelists navigated 8 different screens to track proposal ratings and rankings, making the review process fragmented and slow.",
+    solution:
+      "Built a Streamlit-based decision support tool with sentence embeddings and clustering that consolidates all panel review data into a single, intelligent interface.",
+    impact:
+      "Reduced panel formation time from weeks to hours. Consolidated 8 screens into 1 unified view with real-time fit scoring and override capabilities.",
+  },
+  {
+    slug: "nsf-robora",
+    title: "NSF RoboRA Document Automation",
+    description:
+      "Automated document generation tool with Chrome browser automation for legacy system integration.",
+    longDescription: `Modernized an Excel-based document generation process into an automated pipeline that queries large datasets 
+to populate template documents. Wrote Chrome browser automation that crawls legacy web interfaces and automatically posts 
+generated documents to internal systems where no API existed.
+
+**Agency:** National Science Foundation (NSF)
+**Role:** Solutions Architect / Developer (via IBM)`,
     category: ["Government"],
-    technologies: ["[FILL IN]"],
+    technologies: [
+      "Python",
+      "Chrome Automation",
+      "Template Engine",
+      "Data Pipelines",
+    ],
     image: "/images/projects/placeholder-gov.svg",
     agency: "NSF",
     featured: false,
-    status: "template",
-    problem: "[FILL IN] What research challenge was being addressed?",
-    solution: "[FILL IN] What system/tool did you build?",
-    impact: "[FILL IN] Research outcomes, publications, datasets produced.",
+    status: "completed",
+    problem:
+      "Document generation relied on manual Excel workflows with copy-paste data entry into legacy web systems that had no API.",
+    solution:
+      "Built an automated document generation pipeline with Chrome browser automation to bridge modern data pipelines with legacy systems.",
+    impact:
+      "Eliminated hours of manual data entry per document cycle and reduced transcription errors in operational documents.",
   },
   {
-    slug: "nsf-project-3",
-    title: "[NSF] Machine Learning Pipeline",
-    description: "[FILL IN] Brief description of NSF project 3.",
-    longDescription: `[FILL IN] Detailed description of the project.
+    slug: "nsf-adcc",
+    title: "NSF ADCC Compliance Checker",
+    description:
+      "Automated compliance checking tool that performs 28 data quality and compliance checks against live operational data.",
+    longDescription: `Built ADCC (Automated Data Compliance Checker) — a tool with live data connections that allows users 
+to perform 28 distinct compliance checks on the status of operational data. Each check is clearly defined, automated, 
+repeatable, and produces audit-ready results.
 
 **Agency:** National Science Foundation (NSF)
-**Duration:** [FILL IN]
-**Team Size:** [FILL IN]
-**Grant Number:** [FILL IN]`,
+**Role:** Solutions Architect / Developer (via IBM)`,
     category: ["Government"],
-    technologies: ["[FILL IN]"],
+    technologies: ["Python", "SQL", "Data Pipelines", "Compliance Rules Engine"],
     image: "/images/projects/placeholder-gov.svg",
     agency: "NSF",
     featured: false,
-    status: "template",
-    problem: "[FILL IN] What research challenge was being addressed?",
-    solution: "[FILL IN] What system/tool did you build?",
-    impact: "[FILL IN] Research outcomes, publications, datasets produced.",
+    status: "completed",
+    problem:
+      "Compliance checking was manual, ad-hoc, and rarely comprehensive — leaving data quality gaps undetected until formal audits.",
+    solution:
+      "Built a modular compliance engine with 28 automated checks running against live data, with clear pass/fail indicators and drill-down capability.",
+    impact:
+      "Replaced manual auditing with systematic, repeatable compliance validation. Issues now surface proactively rather than in audits.",
   },
   {
-    slug: "nsf-project-4",
-    title: "[NSF] Scientific Visualization Tool",
-    description: "[FILL IN] Brief description of NSF project 4.",
-    longDescription: `[FILL IN] Detailed description of the project.
+    slug: "nsf-telemetry",
+    title: "NSF Telemetry Dashboards",
+    description:
+      "Anonymous usage telemetry dashboards monitoring adoption and engagement across the full analytics tool suite.",
+    longDescription: `Designed and deployed anonymous telemetry dashboards that monitor real-world usage of every tool 
+in the analytics suite. Tracks adoption metrics, feature engagement, workflow patterns, and trend analysis — 
+all with privacy-first design that collects behavioral patterns without identifying individual users.
 
 **Agency:** National Science Foundation (NSF)
-**Duration:** [FILL IN]
-**Team Size:** [FILL IN]
-**Grant Number:** [FILL IN]`,
+**Role:** Analytics Lead (via IBM)`,
     category: ["Government"],
-    technologies: ["[FILL IN]"],
+    technologies: ["Python", "Dashboards", "Telemetry", "Analytics"],
     image: "/images/projects/placeholder-gov.svg",
     agency: "NSF",
     featured: false,
-    status: "template",
-    problem: "[FILL IN] What research challenge was being addressed?",
-    solution: "[FILL IN] What system/tool did you build?",
-    impact: "[FILL IN] Research outcomes, publications, datasets produced.",
+    status: "completed",
+    problem:
+      "No systematic way to measure whether tools were being adopted, which features were used, or where workflows stalled.",
+    solution:
+      "Built anonymous telemetry collection across all tools with dashboards tracking adoption patterns, feature engagement, and workflow bottlenecks.",
+    impact:
+      "Enabled evidence-based iteration and gave leadership visibility into which tools were delivering value.",
   },
   {
-    slug: "nsf-project-5",
-    title: "[NSF] Cloud Infrastructure for Research",
-    description: "[FILL IN] Brief description of NSF project 5.",
-    longDescription: `[FILL IN] Detailed description of the project.
+    slug: "nsf-researcher-lineage",
+    title: "NSF Researcher Lineage Dashboard",
+    description:
+      "Funding lineage dashboard integrating public and internal data to map researcher trajectories and co-funder networks.",
+    longDescription: `Built a researcher lineage dashboard that incorporates public funding data with internal records to identify 
+researchers' principal places of funding before, during, and after agency funding. Surfaces large co-funders and international 
+funding sources for strategic portfolio intelligence.
 
 **Agency:** National Science Foundation (NSF)
-**Duration:** [FILL IN]
-**Team Size:** [FILL IN]
-**Grant Number:** [FILL IN]`,
+**Role:** Analytics Lead (via IBM)`,
     category: ["Government"],
-    technologies: ["[FILL IN]"],
+    technologies: ["BigQuery", "Tableau", "SQL", "Python", "Public Data APIs"],
     image: "/images/projects/placeholder-gov.svg",
     agency: "NSF",
     featured: false,
-    status: "template",
-    problem: "[FILL IN] What research challenge was being addressed?",
-    solution: "[FILL IN] What system/tool did you build?",
-    impact: "[FILL IN] Research outcomes, publications, datasets produced.",
+    status: "completed",
+    problem:
+      "Portfolio reviews relied on institutional memory with no visibility into researchers' broader funding ecosystem or international funding patterns.",
+    solution:
+      "Integrated public grant data with internal records to build a lineage dashboard showing funding trajectories, co-funders, and international sources.",
+    impact:
+      "Enabled strategic portfolio intelligence with visibility into co-funders and international funding patterns for the first time.",
   },
 ];
 
