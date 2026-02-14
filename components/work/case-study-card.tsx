@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useViewMode } from "./mode-toggle";
+import { RelevanceBadge } from "@/components/adaptive/relevance-banner";
 import type { CaseStudyFrontmatter } from "@/lib/types";
 
 interface CaseStudyCardProps {
@@ -20,9 +21,12 @@ export function CaseStudyCard({ study }: CaseStudyCardProps) {
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-1 flex-1">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {study.client}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  {study.client}
+                </p>
+                <RelevanceBadge slug={study.slug} />
+              </div>
               <CardTitle className="text-lg leading-snug group-hover:text-primary transition-colors">
                 {study.title}
               </CardTitle>

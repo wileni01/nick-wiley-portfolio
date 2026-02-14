@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResumeActions } from "@/components/resume/resume-actions";
+import { SkillsHighlight } from "@/components/adaptive/skills-highlight";
 
 export const metadata: Metadata = {
   title: "Resume",
@@ -25,6 +26,11 @@ export default function ResumePage() {
               </a>
             </Button>
           </div>
+        </div>
+
+        {/* Adaptive skills highlight */}
+        <div className="mb-6 no-print">
+          <SkillsHighlight />
         </div>
 
         {/* Resume Content */}

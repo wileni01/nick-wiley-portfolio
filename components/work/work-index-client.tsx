@@ -2,6 +2,7 @@
 
 import { ViewModeProvider, ViewModeToggle } from "./mode-toggle";
 import { CaseStudyCard } from "./case-study-card";
+import { RelevanceBanner } from "@/components/adaptive/relevance-banner";
 import type { CaseStudyFrontmatter } from "@/lib/types";
 
 interface WorkIndexClientProps {
@@ -12,6 +13,9 @@ export function WorkIndexClient({ studies }: WorkIndexClientProps) {
   return (
     <ViewModeProvider>
       <div className="space-y-8">
+        {/* Adaptive relevance banner */}
+        <RelevanceBanner />
+
         {/* Mode toggle */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">

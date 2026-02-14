@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { PersonJsonLd, WebsiteJsonLd } from "@/components/seo/json-ld";
 import { SearchDialog } from "@/components/search/search-dialog";
+import { AdaptiveProvider } from "@/components/adaptive/adaptive-provider";
+import { AdaptiveTheme } from "@/components/adaptive/adaptive-theme";
 import "./globals.css";
 
 const inter = Inter({
@@ -97,20 +100,25 @@ export default function RootLayout({
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased bg-background text-foreground`}
       >
         <ThemeProvider>
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none"
-          >
-            Skip to main content
-          </a>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <main id="main-content" className="flex-1 pt-16">
-              {children}
-            </main>
-            <Footer />
-          </div>
-          <SearchDialog />
+          <Suspense>
+            <AdaptiveProvider>
+              <AdaptiveTheme />
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none"
+              >
+                Skip to main content
+              </a>
+              <div className="flex min-h-screen flex-col">
+                <Navbar />
+                <main id="main-content" className="flex-1 pt-16">
+                  {children}
+                </main>
+                <Footer />
+              </div>
+              <SearchDialog />
+            </AdaptiveProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

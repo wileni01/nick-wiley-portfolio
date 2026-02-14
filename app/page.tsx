@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getFeaturedCaseStudies } from "@/lib/mdx";
 import { HomeClient } from "@/components/home/home-client";
+import { PersonalizedHero } from "@/components/adaptive/personalized-hero";
 
 const whatIDo = [
   {
@@ -84,6 +85,9 @@ export default function HomePage() {
                 <Link href="/contact">Contact</Link>
               </Button>
             </div>
+
+            {/* Adaptive personalization */}
+            <PersonalizedHero />
 
             {/* Tour + trust signals */}
             <HomeClient />

@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
+import { AdaptiveSelector } from "@/components/adaptive/adaptive-selector";
 
 const navLinks = [
   { href: "/work", label: "Work", icon: Briefcase },
@@ -106,6 +107,8 @@ export function Navbar() {
                 <span className="hidden lg:inline">Resume</span>
               </a>
             </Button>
+
+            <AdaptiveSelector />
 
             <div className="ml-2 border-l border-border pl-2">
               <ThemeToggle />

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SkillsHighlight } from "@/components/adaptive/skills-highlight";
 
 export const metadata: Metadata = {
   title: "About",
@@ -135,6 +136,11 @@ export default function AboutPage() {
               at LLI. Based in Alexandria, VA.
             </span>
           </div>
+        </div>
+
+        {/* Adaptive skills highlight */}
+        <div className="mt-8">
+          <SkillsHighlight />
         </div>
 
         {/* CTAs */}
