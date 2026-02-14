@@ -18,7 +18,7 @@ function cleanupExpiredRateLimitEntries(now: number) {
   if (now - lastCleanupAt < RATE_LIMIT_CLEANUP_INTERVAL_MS) return;
   lastCleanupAt = now;
   for (const [key, entry] of rateLimitMap.entries()) {
-    if (now > entry.resetTime) {
+    if (now >= entry.resetTime) {
       rateLimitMap.delete(key);
     }
   }
@@ -68,7 +68,7 @@ export function rateLimit(
   const normalizedConfig = normalizeRateLimitConfig(config);
   const entry = rateLimitMap.get(normalizedIdentifier);
 
-  if (!entry || now > entry.resetTime) {
+  if (!entry || now >= entry.resetTime) {
     rateLimitMap.set(normalizedIdentifier, {
       count: 1,
       resetTime: now + normalizedConfig.windowMs,
