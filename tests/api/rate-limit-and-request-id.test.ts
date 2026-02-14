@@ -346,6 +346,50 @@ test("buildApiRequestContext response headers mirror non-exceeded snapshot state
   assert.equal(context.responseHeaders.get("Retry-After"), null);
 });
 
+test("buildApiRequestContext normalizes non-integer config values for headers and snapshots", () => {
+  const ip = `198.51.100.${(Date.now() % 200) + 60}`;
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": ip,
+    },
+  });
+  const config = { maxRequests: 3.8, windowMs: 500.2 };
+
+  const first = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "config-normalization",
+    rateLimitConfig: config,
+  });
+  const second = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "config-normalization",
+    rateLimitConfig: config,
+  });
+  const third = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "config-normalization",
+    rateLimitConfig: config,
+  });
+  const fourth = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "config-normalization",
+    rateLimitConfig: config,
+  });
+
+  assert.equal(first.rateLimitResult.success, true);
+  assert.equal(second.rateLimitResult.success, true);
+  assert.equal(third.rateLimitResult.success, true);
+  assert.equal(fourth.rateLimitResult.success, false);
+  assert.equal(first.responseHeaders.get("X-RateLimit-Limit"), "3");
+  assert.equal(first.responseHeaders.get("X-RateLimit-Reset"), "1");
+  assert.equal(third.responseHeaders.get("X-RateLimit-Remaining"), "0");
+  assert.equal(fourth.exceededHeaders.get("X-RateLimit-Limit"), "3");
+  assert.equal(fourth.exceededHeaders.get("X-RateLimit-Remaining"), "0");
+  assert.equal(fourth.exceededHeaders.get("X-RateLimit-Reset"), "1");
+  assert.equal(fourth.exceededHeaders.get("Retry-After"), "1");
+  assert.equal(fourth.rateLimitExceededResetInSeconds, 1);
+});
+
 test("buildApiRequestContext falls back empty namespace values to api bucket", () => {
   const ip = `198.51.100.${(Date.now() % 200) + 20}`;
   const req = new Request("http://localhost/api/test", {
