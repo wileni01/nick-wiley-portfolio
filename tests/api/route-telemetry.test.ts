@@ -99,6 +99,12 @@ const EXPECTED_RATE_LIMIT_LIMITS = {
   contact: 5,
 } as const;
 
+const EXPECTED_RATE_LIMIT_WINDOW_SECONDS = {
+  chat: 3600,
+  interviewMode: 3600,
+  contact: 3600,
+} as const;
+
 function uniqueIp() {
   ipCounter += 1;
   const thirdOctet = Math.floor(ipCounter / 200) % 200;
@@ -225,6 +231,19 @@ function assertRateLimitPayloadResetParity(
   const retryAfterHeader = Number(response.headers.get("Retry-After"));
   assert.equal(resetIn, resetHeader);
   assert.equal(resetIn, retryAfterHeader);
+}
+
+function assertRouteRateLimitResetUpperBound(
+  response: Response,
+  route: keyof typeof EXPECTED_RATE_LIMIT_WINDOW_SECONDS
+) {
+  const maxWindowSeconds = EXPECTED_RATE_LIMIT_WINDOW_SECONDS[route];
+  const resetHeader = Number(response.headers.get("X-RateLimit-Reset"));
+  const retryAfterHeader = Number(response.headers.get("Retry-After"));
+  assert.ok(Number.isInteger(resetHeader));
+  assert.ok(Number.isInteger(retryAfterHeader));
+  assert.ok(resetHeader <= maxWindowSeconds);
+  assert.ok(retryAfterHeader <= maxWindowSeconds);
 }
 
 function assertStandardJsonSecurityHeaders(response: Response) {
@@ -522,6 +541,7 @@ test("chat rate-limited responses report fallback context source and reason", as
   const payload = await assertErrorPayloadRequestIdMatchesHeader(rateLimitedResponse);
   assert.equal(payload.error, "Rate limit exceeded. Please try again later.");
   assertRateLimitPayloadResetParity(payload, rateLimitedResponse);
+  assertRouteRateLimitResetUpperBound(rateLimitedResponse, "chat");
 });
 
 test("chat content-type validation keeps invalid_payload fallback semantics", async () => {
@@ -994,6 +1014,7 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
   const payload = await assertErrorPayloadRequestIdMatchesHeader(rateLimitedResponse);
   assert.equal(payload.error, "Rate limit exceeded. Please try again shortly.");
   assertRateLimitPayloadResetParity(payload, rateLimitedResponse);
+  assertRouteRateLimitResetUpperBound(rateLimitedResponse, "interviewMode");
 });
 
 test("interview-mode content-type validation keeps invalid_payload narrative fallback semantics", async () => {
@@ -1580,4 +1601,5 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
   );
   assert.equal(errorPayload.error, "Too many submissions. Please try again later.");
   assertRateLimitPayloadResetParity(errorPayload, rateLimitedResponse);
+  assertRouteRateLimitResetUpperBound(rateLimitedResponse, "contact");
 });
