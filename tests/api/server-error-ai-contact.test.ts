@@ -402,3 +402,69 @@ test("deliverContactSubmission redacts emails in thrown request errors", async (
       }
     }
   ));
+
+test("deliverContactSubmission uses unknown-delivery fallback for non-Error throws", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: "resend-api-key-12345",
+      CONTACT_EMAIL: "team@example.com",
+      CONTACT_FROM_EMAIL: undefined,
+    },
+    async () => {
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = (async () => {
+        throw "unexpected failure";
+      }) as typeof fetch;
+
+      try {
+        const result = await deliverContactSubmission({
+          name: "Nick",
+          email: "nick@example.com",
+          subject: "hello",
+          message: "world",
+        });
+        assert.equal(result.attempted, true);
+        assert.equal(result.delivered, false);
+        assert.equal(
+          result.error,
+          "Resend request error: unknown delivery error"
+        );
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    }
+  ));
+
+test("deliverContactSubmission uses unknown-error fallback when provider returns empty body", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: "resend-api-key-12345",
+      CONTACT_EMAIL: "team@example.com",
+      CONTACT_FROM_EMAIL: undefined,
+    },
+    async () => {
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = (async () =>
+        new Response("", {
+          status: 502,
+          headers: { "content-type": "text/plain" },
+        })) as typeof fetch;
+
+      try {
+        const result = await deliverContactSubmission({
+          name: "Nick",
+          email: "nick@example.com",
+          subject: "hello",
+          message: "world",
+        });
+        assert.equal(result.attempted, true);
+        assert.equal(result.delivered, false);
+        assert.equal(
+          result.error,
+          "Resend delivery failed (502): unknown error"
+        );
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    }
+  ));
