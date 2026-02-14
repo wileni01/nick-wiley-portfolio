@@ -200,6 +200,16 @@ test("rate-limit header builders clamp malformed snapshot values", () => {
   assert.equal(exceededHeaders.get("X-RateLimit-Remaining"), "0");
   assert.equal(exceededHeaders.get("X-RateLimit-Reset"), "1");
   assert.equal(exceededHeaders.get("Retry-After"), "1");
+
+  const exceededPositiveRemainingHeaders = new Headers(
+    buildRateLimitExceededHeaders(
+      { maxRequests: 5, windowMs: 1000 },
+      { remaining: 4, resetIn: 1500 }
+    )
+  );
+  assert.equal(exceededPositiveRemainingHeaders.get("X-RateLimit-Remaining"), "0");
+  assert.equal(exceededPositiveRemainingHeaders.get("X-RateLimit-Reset"), "2");
+  assert.equal(exceededPositiveRemainingHeaders.get("Retry-After"), "2");
 });
 
 test("rate-limit reset normalization keeps bounded exceeded window floor", () => {
@@ -214,7 +224,7 @@ test("rate-limit reset normalization keeps bounded exceeded window floor", () =>
   assert.equal(normalizeExceededResetInSeconds(1900), 2);
 });
 
-test("buildApiResponseHeaders sanitizes request id and include retry metadata", () => {
+test("buildApiResponseHeaders sanitizes request id and normalizes exceeded retry metadata", () => {
   const headers = buildApiResponseHeaders({
     config: { maxRequests: 2, windowMs: 1000 },
     snapshot: { remaining: 1, resetIn: 1900 },
@@ -224,7 +234,7 @@ test("buildApiResponseHeaders sanitizes request id and include retry metadata", 
 
   assert.equal(headers.get("X-Request-Id"), "reqidscript");
   assert.equal(headers.get("X-RateLimit-Limit"), "2");
-  assert.equal(headers.get("X-RateLimit-Remaining"), "1");
+  assert.equal(headers.get("X-RateLimit-Remaining"), "0");
   assert.equal(headers.get("X-RateLimit-Reset"), "2");
   assert.equal(headers.get("Retry-After"), "2");
 });

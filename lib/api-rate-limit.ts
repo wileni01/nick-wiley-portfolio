@@ -52,8 +52,12 @@ export function buildRateLimitExceededHeaders(
   snapshot: RateLimitSnapshot
 ): HeadersInit {
   const retryAfterSeconds = normalizeExceededResetInSeconds(snapshot.resetIn);
+  const exhaustedHeaders = buildRateLimitHeaders(config, {
+    ...snapshot,
+    remaining: 0,
+  });
   return {
-    ...buildRateLimitHeaders(config, snapshot),
+    ...exhaustedHeaders,
     "X-RateLimit-Reset": String(retryAfterSeconds),
     "Retry-After": String(retryAfterSeconds),
   };
