@@ -79,6 +79,11 @@ function getResetInMs(now: number, resetTime: number): number {
   return Math.max(0, Math.ceil(resetTime - now));
 }
 
+function getSafeWindowMs(windowMs: number, now: number): number {
+  const maxWindowFromNow = Math.max(1, Math.floor(Number.MAX_SAFE_INTEGER - now));
+  return Math.min(windowMs, maxWindowFromNow);
+}
+
 export function rateLimit(
   identifier: string,
   config: RateLimitConfig = { maxRequests: 50, windowMs: 3600000 }
@@ -90,15 +95,16 @@ export function rateLimit(
   const entry = rateLimitMap.get(normalizedIdentifier);
 
   if (!entry || now >= entry.resetTime) {
+    const safeWindowMs = getSafeWindowMs(normalizedConfig.windowMs, now);
     rateLimitMap.set(normalizedIdentifier, {
       count: 1,
-      resetTime: now + normalizedConfig.windowMs,
+      resetTime: now + safeWindowMs,
     });
     trimRateLimitEntriesToCapacity(now);
     return {
       success: true,
       remaining: normalizedConfig.maxRequests - 1,
-      resetIn: normalizedConfig.windowMs,
+      resetIn: safeWindowMs,
     };
   }
 

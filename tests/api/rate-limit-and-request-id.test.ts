@@ -189,6 +189,38 @@ test("rateLimit resets at inclusive window boundary and reports rolling reset ti
   }
 });
 
+test("rateLimit bounds new-entry reset windows near safe-integer time ceiling", () => {
+  const originalNow = Date.now;
+  let now = Number.MAX_SAFE_INTEGER - 1000;
+  Date.now = () => now;
+
+  try {
+    const identifier = `safe-window:${Math.random().toString(36).slice(2)}`;
+    const config = { maxRequests: 1, windowMs: Number.MAX_SAFE_INTEGER };
+
+    const first = rateLimit(identifier, config);
+    assert.equal(first.success, true);
+    assert.equal(first.remaining, 0);
+    assert.equal(first.resetIn, 1000);
+    assert.ok(Number.isSafeInteger(first.resetIn));
+
+    const second = rateLimit(identifier, config);
+    assert.equal(second.success, false);
+    assert.equal(second.remaining, 0);
+    assert.equal(second.resetIn, 1000);
+    assert.ok(Number.isSafeInteger(second.resetIn));
+
+    now += 1000;
+    const resetAtBoundary = rateLimit(identifier, config);
+    assert.equal(resetAtBoundary.success, true);
+    assert.equal(resetAtBoundary.remaining, 0);
+    assert.equal(resetAtBoundary.resetIn, 1);
+    assert.ok(Number.isSafeInteger(resetAtBoundary.resetIn));
+  } finally {
+    Date.now = originalNow;
+  }
+});
+
 test("rate-limit header builders clamp malformed snapshot values", () => {
   const headers = new Headers(
     buildRateLimitHeaders(
