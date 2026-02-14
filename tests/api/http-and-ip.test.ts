@@ -48,6 +48,26 @@ test("parseJsonRequest rejects multi-valued content-type headers", async () => {
   }
 });
 
+test("parseJsonRequest accepts structured +json content-type media types", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: {
+      "content-type": "application/vnd.api+json; charset=utf-8",
+    },
+    body: '{"value":"ok"}',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    allowMissingContentType: false,
+  });
+
+  assert.equal(result.success, true);
+  if (result.success) {
+    assert.equal(result.data.value, "ok");
+  }
+});
+
 test("parseJsonRequest rejects invalid content-length mismatch", async () => {
   const schema = z.object({ value: z.string() });
   const req = new Request("http://localhost/api/test", {
@@ -164,6 +184,20 @@ test("jsonResponse normalizes request-id and backfills it on error responses", a
 test("jsonResponse normalizes invalid status values to 500", () => {
   const response = jsonResponse({ ok: true }, 999);
   assert.equal(response.status, 500);
+});
+
+test("jsonResponse serializes BigInt values as strings", async () => {
+  const response = jsonResponse({ total: 42n, nested: { count: 7n } }, 200);
+
+  assert.equal(response.status, 200);
+  const body = (await response.json()) as {
+    total: string;
+    nested: { count: string };
+  };
+  assert.deepEqual(body, {
+    total: "42",
+    nested: { count: "7" },
+  });
 });
 
 test("jsonResponse promotes success status to 500 on serialization failure", async () => {
