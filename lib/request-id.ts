@@ -20,11 +20,32 @@ function createFallbackRandomToken(): string {
     // Ignore and fallback to Math.random token path.
   }
 
+  const createCounterSeedToken = () =>
+    getFallbackCounterToken()
+      .repeat(Math.ceil(FALLBACK_RANDOM_TOKEN_CHARS / 4))
+      .slice(0, FALLBACK_RANDOM_TOKEN_CHARS);
+
   let token = "";
-  while (token.length < FALLBACK_RANDOM_TOKEN_CHARS) {
-    token += Math.random().toString(36).slice(2);
+  try {
+    while (token.length < FALLBACK_RANDOM_TOKEN_CHARS) {
+      token += Math.random().toString(36).slice(2);
+    }
+  } catch {
+    return createCounterSeedToken();
   }
   return token.slice(0, FALLBACK_RANDOM_TOKEN_CHARS);
+}
+
+function getNowToken(): string {
+  try {
+    const now = Date.now();
+    if (Number.isFinite(now)) {
+      return Math.floor(now).toString(36);
+    }
+  } catch {
+    // Fallback to bounded deterministic timestamp token.
+  }
+  return "0";
 }
 
 export function normalizeRequestId(
@@ -50,5 +71,5 @@ export function createRequestId(): string {
     // Fall back to timestamp + random token.
   }
 
-  return `${Date.now().toString(36)}-${getFallbackCounterToken()}-${createFallbackRandomToken()}`;
+  return `${getNowToken()}-${getFallbackCounterToken()}-${createFallbackRandomToken()}`;
 }

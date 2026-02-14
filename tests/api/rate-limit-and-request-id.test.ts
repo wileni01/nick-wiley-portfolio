@@ -121,6 +121,55 @@ test("createRequestId falls back to Math.random token when getRandomValues fails
   }
 });
 
+test("createRequestId remains safe when Date.now and Math.random throw", () => {
+  const originalNow = Date.now;
+  const originalMathRandom = Math.random;
+  const originalCryptoDescriptor = Object.getOwnPropertyDescriptor(globalThis, "crypto");
+
+  Date.now = () => {
+    throw new Error("Date.now unavailable");
+  };
+  Math.random = () => {
+    throw new Error("Math.random unavailable");
+  };
+  Object.defineProperty(globalThis, "crypto", {
+    value: {
+      randomUUID() {
+        throw new Error("randomUUID unavailable");
+      },
+      getRandomValues() {
+        throw new Error("getRandomValues unavailable");
+      },
+    },
+    configurable: true,
+  });
+
+  try {
+    const first = createRequestId();
+    const second = createRequestId();
+
+    assert.match(first, /^[a-zA-Z0-9._:-]+$/);
+    assert.match(second, /^[a-zA-Z0-9._:-]+$/);
+    const [firstNow, firstCounter, firstToken] = first.split("-");
+    const [secondNow, secondCounter, secondToken] = second.split("-");
+    assert.equal(firstNow, "0");
+    assert.equal(secondNow, "0");
+    assert.match(firstCounter ?? "", /^[a-z0-9]{4}$/i);
+    assert.match(secondCounter ?? "", /^[a-z0-9]{4}$/i);
+    assert.equal((firstToken ?? "").length, 24);
+    assert.equal((secondToken ?? "").length, 24);
+    assert.notEqual(first, second);
+  } finally {
+    Date.now = originalNow;
+    Math.random = originalMathRandom;
+    if (originalCryptoDescriptor) {
+      Object.defineProperty(globalThis, "crypto", originalCryptoDescriptor);
+    } else {
+      delete (globalThis as { crypto?: unknown }).crypto;
+    }
+  }
+});
+
 test("normalizeRateLimitConfig applies finite/default/minimum guards", () => {
   assert.deepEqual(
     normalizeRateLimitConfig({ maxRequests: 3.8, windowMs: 500.2 }),
