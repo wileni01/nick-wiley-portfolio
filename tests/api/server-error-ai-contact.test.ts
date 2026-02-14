@@ -316,6 +316,21 @@ test("applyDefaultAIProviderHeaders seeds unspecified provider observability sta
   assert.equal(headers.get("X-AI-Provider-Fallback"), "none");
 });
 
+test("applyDefaultAIProviderHeaders resets prior provider header values", () => {
+  const headers = new Headers({
+    "X-AI-Provider-Requested": "anthropic",
+    "X-AI-Provider": "openai",
+    "X-AI-Provider-Fallback": "1",
+  });
+
+  const result = applyDefaultAIProviderHeaders(headers);
+
+  assert.equal(result, headers);
+  assert.equal(headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(headers.get("X-AI-Provider"), "none");
+  assert.equal(headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("applyResolvedAIProviderHeaders overrides default provider header state", () => {
   const headers = new Headers({ "X-Custom-Header": "keep" });
   applyDefaultAIProviderHeaders(headers);
