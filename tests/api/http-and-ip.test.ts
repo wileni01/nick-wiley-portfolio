@@ -288,6 +288,57 @@ test("parseJsonRequest returns invalid-json response when request body cannot be
   }
 });
 
+test("parseJsonRequest error responses preserve responseHeaders with normalized request-id", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    body: '{"value":"ok"}',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    allowMissingContentType: false,
+    responseHeaders: {
+      "x-request-id": " req id ",
+      "x-debug-token": "debug-1",
+    },
+  });
+
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 415);
+    assert.equal(result.response.headers.get("X-Request-Id"), "reqid");
+    assert.equal(result.response.headers.get("X-Debug-Token"), "debug-1");
+  }
+});
+
+test("parseJsonRequest error responses enforce immutable JSON security headers", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    body: '{"value":"ok"}',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    allowMissingContentType: false,
+    responseHeaders: {
+      "Content-Type": "text/plain",
+      "Cache-Control": "public, max-age=3600",
+      "X-Content-Type-Options": "none",
+    },
+  });
+
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 415);
+    assert.equal(
+      result.response.headers.get("Content-Type"),
+      "application/json; charset=utf-8"
+    );
+    assert.equal(result.response.headers.get("Cache-Control"), "no-store");
+    assert.equal(result.response.headers.get("X-Content-Type-Options"), "nosniff");
+  }
+});
+
 test("jsonResponse enforces immutable JSON security headers", () => {
   const response = jsonResponse(
     { ok: true },
