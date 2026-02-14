@@ -3,6 +3,7 @@ const UTF8_TEXT_ENCODER = new TextEncoder();
 const JSON_SERIALIZATION_FALLBACK_ERROR = "Internal response serialization error.";
 const INVALID_CONTENT_LENGTH_ERROR = "Invalid Content-Length header.";
 const JSON_MEDIA_TYPE_PATTERN = /^application\/json(?:\s*;|$)/i;
+const CONTENT_LENGTH_DIGITS_PATTERN = /^\d+$/;
 
 export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
@@ -20,6 +21,15 @@ export interface ParseJsonRequestOptions {
 type ParseJsonRequestResult<TSchema extends z.ZodTypeAny> =
   | { success: true; data: z.infer<TSchema> }
   | { success: false; response: Response };
+
+function parseDeclaredContentLength(headerValue: string | null): number | null {
+  if (headerValue === null) return null;
+  const normalized = headerValue.trim();
+  if (!CONTENT_LENGTH_DIGITS_PATTERN.test(normalized)) return Number.NaN;
+  const parsed = Number(normalized);
+  if (!Number.isSafeInteger(parsed)) return Number.NaN;
+  return parsed;
+}
 
 export function jsonResponse(
   body: Record<string, unknown>,
@@ -111,9 +121,9 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     };
   }
   if (maxPayloadBytes !== null) {
-    const contentLengthHeader = req.headers.get("content-length");
-    const declaredContentLength =
-      contentLengthHeader === null ? null : Number(contentLengthHeader);
+    const declaredContentLength = parseDeclaredContentLength(
+      req.headers.get("content-length")
+    );
     if (
       declaredContentLength !== null &&
       (!Number.isFinite(declaredContentLength) || declaredContentLength < 0)
