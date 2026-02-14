@@ -630,6 +630,7 @@ test("chat no-provider path emits fallback telemetry and explicit provider defau
       assert.equal(response.status, 503);
       assertStandardJsonSecurityHeaders(response);
       assertStandardRateLimitHeaders(response);
+      assertRateLimitLimitHeaderEquals(response, 50);
       assert.equal(response.headers.get("X-Chat-Context-Source"), "fallback");
       assert.equal(response.headers.get("X-Chat-Context-Fallback"), "no_provider");
       assert.equal(response.headers.get("X-AI-Provider-Requested"), "openai");
@@ -838,6 +839,7 @@ test("interview-mode valid mode returns deterministic payload with no-provider f
       assert.equal(response.status, 200);
       assertStandardJsonSecurityHeaders(response);
       assertStandardRateLimitHeaders(response);
+      assertRateLimitLimitHeaderEquals(response, 40);
       assert.equal(response.headers.get("X-AI-Provider-Requested"), "openai");
       assert.equal(response.headers.get("X-AI-Provider"), "none");
       assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
@@ -1386,6 +1388,7 @@ test("contact valid submission without provider keeps provider_unconfigured deli
       assert.equal(response.status, 200);
       assertStandardJsonSecurityHeaders(response);
       assertStandardRateLimitHeaders(response);
+      assertRateLimitLimitHeaderEquals(response, 5);
       assert.equal(response.headers.get("X-Contact-Delivery"), "skipped");
       assert.equal(
         response.headers.get("X-Contact-Delivery-Reason"),
