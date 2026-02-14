@@ -204,6 +204,39 @@ test("chat missing content-type keeps invalid_payload fallback semantics", async
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
 });
 
+test("chat no-provider path emits fallback telemetry and explicit provider defaults", async () =>
+  withEnv(
+    {
+      OPENAI_API_KEY: undefined,
+      ANTHROPIC_API_KEY: undefined,
+    },
+    async () => {
+      const response = await postChat(
+        buildJsonRequest({
+          url: "http://localhost/api/chat",
+          body: JSON.stringify({
+            provider: "openai",
+            messages: [{ role: "user", content: "Hello Nick" }],
+          }),
+          ip: uniqueIp(),
+        })
+      );
+
+      assert.equal(response.status, 503);
+      assert.equal(response.headers.get("X-Chat-Context-Source"), "fallback");
+      assert.equal(response.headers.get("X-Chat-Context-Fallback"), "no_provider");
+      assert.equal(response.headers.get("X-AI-Provider-Requested"), "openai");
+      assert.equal(response.headers.get("X-AI-Provider"), "none");
+      assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+
+      const payload = (await response.json()) as { error: string };
+      assert.equal(
+        payload.error,
+        "No AI provider key is configured. Set OPENAI_API_KEY or ANTHROPIC_API_KEY."
+      );
+    }
+  ));
+
 test("interview-mode invalid mode path reports invalid_mode fallback", async () =>
   withEnv(
     {
@@ -431,6 +464,42 @@ test("contact missing content-type keeps explicit invalid_payload delivery reaso
   assert.equal(response.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(response.headers.get("X-Contact-Delivery-Reason"), "invalid_payload");
 });
+
+test("contact valid submission without provider keeps provider_unconfigured delivery reason", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: undefined,
+      CONTACT_TO_EMAIL: undefined,
+      CONTACT_FROM_EMAIL: undefined,
+      CONTACT_REPLY_TO_EMAIL: undefined,
+    },
+    async () => {
+      const response = await postContact(
+        buildJsonRequest({
+          url: "http://localhost/api/contact",
+          body: JSON.stringify({
+            name: "Nick Wiley",
+            email: "nick@example.com",
+            subject: "Interview follow-up",
+            message: "Would love to connect further.",
+            honeypot: "",
+          }),
+          ip: uniqueIp(),
+        })
+      );
+
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get("X-Contact-Delivery"), "skipped");
+      assert.equal(
+        response.headers.get("X-Contact-Delivery-Reason"),
+        "provider_unconfigured"
+      );
+
+      const payload = (await response.json()) as { success: boolean; message: string };
+      assert.equal(payload.success, true);
+      assert.equal(payload.message, "Thank you! Your message has been received.");
+    }
+  ));
 
 test("contact rate-limited responses emit rate_limited delivery reason", async () => {
   const ip = uniqueIp();
