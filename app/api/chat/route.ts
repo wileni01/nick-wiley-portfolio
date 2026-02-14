@@ -140,6 +140,8 @@ export async function POST(req: Request) {
       .filter((message) => message.content.length > 0);
 
     if (!messages.length) {
+      responseHeaders.set("X-Chat-Context-Source", "none");
+      responseHeaders.set("X-Chat-Context-Fallback", "invalid_payload");
       return jsonResponse(
         { error: "Messages are empty after sanitization." },
         400,
@@ -151,6 +153,8 @@ export async function POST(req: Request) {
       (message) => message.role === "user"
     );
     if (!lastUserMessage?.content) {
+      responseHeaders.set("X-Chat-Context-Source", "none");
+      responseHeaders.set("X-Chat-Context-Fallback", "invalid_payload");
       return jsonResponse(
         { error: "At least one user message is required to generate a response." },
         400,
