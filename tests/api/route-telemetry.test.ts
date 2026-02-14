@@ -824,6 +824,7 @@ test("interview-mode provider fallback headers are explicit on deterministic err
       assert.equal(response.headers.get("X-AI-Provider-Requested"), "anthropic");
       assert.equal(response.headers.get("X-AI-Provider"), "openai");
       assert.equal(response.headers.get("X-AI-Provider-Fallback"), "1");
+      assertRouteRateLimitLimitHeader(response, "interviewMode");
       assert.equal(response.headers.get("X-AI-Narrative-Source"), "fallback");
       assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_mode");
     }
@@ -1169,6 +1170,7 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
   assert.equal(honeypotResponse.status, 200);
   assertStandardJsonSecurityHeaders(honeypotResponse);
   assertStandardRateLimitHeaders(honeypotResponse);
+  assertRouteRateLimitLimitHeader(honeypotResponse, "contact");
   assert.equal(honeypotResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     honeypotResponse.headers.get("X-Contact-Delivery-Reason"),
@@ -1448,6 +1450,7 @@ test("contact provider delivery failures emit provider_error telemetry", async (
           assert.equal(response.status, 502);
           assertStandardJsonSecurityHeaders(response);
           assertStandardRateLimitHeaders(response);
+          assertRouteRateLimitLimitHeader(response, "contact");
           assert.equal(response.headers.get("X-Contact-Delivery"), "error");
           assert.equal(
             response.headers.get("X-Contact-Delivery-Reason"),
