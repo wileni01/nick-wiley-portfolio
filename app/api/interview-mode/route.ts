@@ -106,7 +106,13 @@ export async function POST(req: Request) {
     rateLimitNamespace: "interview-mode",
     rateLimitConfig: INTERVIEW_MODE_RATE_LIMIT,
   });
-  const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
+  const {
+    requestId,
+    responseHeaders,
+    exceededHeaders,
+    rateLimitResult,
+    rateLimitExceededResetInSeconds,
+  } = context;
   responseHeaders.set("X-AI-Provider-Requested", "unspecified");
   responseHeaders.set("X-AI-Provider", "none");
   responseHeaders.set("X-AI-Provider-Fallback", "none");
@@ -122,7 +128,7 @@ export async function POST(req: Request) {
       return jsonResponse(
         {
           error: "Rate limit exceeded. Please try again shortly.",
-          resetIn: Math.ceil(rateLimitResult.resetIn / 1000),
+          resetIn: rateLimitExceededResetInSeconds,
         },
         429,
         exceededHeaders

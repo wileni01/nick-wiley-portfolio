@@ -30,7 +30,13 @@ export async function POST(req: Request) {
     rateLimitNamespace: "contact",
     rateLimitConfig: CONTACT_RATE_LIMIT,
   });
-  const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
+  const {
+    requestId,
+    responseHeaders,
+    exceededHeaders,
+    rateLimitResult,
+    rateLimitExceededResetInSeconds,
+  } = context;
   responseHeaders.set("X-Contact-Delivery", "skipped");
   responseHeaders.set("X-Contact-Delivery-Reason", "invalid_payload");
   exceededHeaders.set("X-Contact-Delivery", "skipped");
@@ -40,7 +46,7 @@ export async function POST(req: Request) {
       return jsonResponse(
         {
           error: "Too many submissions. Please try again later.",
-          resetIn: Math.ceil(rateLimitResult.resetIn / 1000),
+          resetIn: rateLimitExceededResetInSeconds,
         },
         429,
         exceededHeaders
