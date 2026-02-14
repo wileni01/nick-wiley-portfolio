@@ -74,38 +74,45 @@ async function readResponseTextSafely(response: Response): Promise<string> {
   const stream = response.body;
   const maxBytes = Math.max(1, LOG_ERROR_BODY_MAX_CHARS * MAX_UTF8_BYTES_PER_CHAR);
   if (stream) {
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+    let totalBytes = 0;
+    let output = "";
     try {
-      const reader = stream.getReader();
-      const decoder = new TextDecoder();
-      let totalBytes = 0;
-      let output = "";
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          if (!value || value.byteLength === 0) continue;
-          totalBytes += value.byteLength;
-          if (totalBytes > maxBytes) {
-            const overflowBytes = totalBytes - maxBytes;
-            const allowedLength = Math.max(0, value.byteLength - overflowBytes);
-            if (allowedLength > 0) {
-              output += decoder.decode(value.slice(0, allowedLength), {
-                stream: true,
-              });
-            }
-            output += decoder.decode();
-            await reader.cancel();
-            return output;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (!value || value.byteLength === 0) continue;
+        totalBytes += value.byteLength;
+        if (totalBytes > maxBytes) {
+          const overflowBytes = totalBytes - maxBytes;
+          const allowedLength = Math.max(0, value.byteLength - overflowBytes);
+          if (allowedLength > 0) {
+            output += decoder.decode(value.slice(0, allowedLength), {
+              stream: true,
+            });
           }
-          output += decoder.decode(value, { stream: true });
+          output += decoder.decode();
+          try {
+            await reader.cancel();
+          } catch {
+            // Ignore cancellation failures.
+          }
+          return output;
         }
-        output += decoder.decode();
-        return output;
-      } finally {
-        reader.releaseLock();
+        output += decoder.decode(value, { stream: true });
       }
+      output += decoder.decode();
+      return output;
     } catch {
-      return "";
+      try {
+        await reader.cancel();
+      } catch {
+        // Ignore cancellation failures.
+      }
+      return output;
+    } finally {
+      reader.releaseLock();
     }
   }
   try {
