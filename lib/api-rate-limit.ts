@@ -36,6 +36,8 @@ export function buildRateLimitHeaders(
 ): HeadersInit {
   const normalizedConfig = normalizeRateLimitConfig(config);
   const resetInSeconds = normalizeResetInSeconds(snapshot.resetIn);
+  const maxResetInSeconds = normalizeResetInSeconds(normalizedConfig.windowMs);
+  const boundedResetInSeconds = Math.min(maxResetInSeconds, resetInSeconds);
   const boundedRemaining = normalizeRemaining(
     snapshot.remaining,
     normalizedConfig.maxRequests
@@ -43,7 +45,7 @@ export function buildRateLimitHeaders(
   return {
     "X-RateLimit-Limit": String(normalizedConfig.maxRequests),
     "X-RateLimit-Remaining": String(boundedRemaining),
-    "X-RateLimit-Reset": String(resetInSeconds),
+    "X-RateLimit-Reset": String(boundedResetInSeconds),
   };
 }
 
@@ -51,8 +53,13 @@ export function buildRateLimitExceededHeaders(
   config: RateLimitConfig,
   snapshot: RateLimitSnapshot
 ): HeadersInit {
-  const retryAfterSeconds = normalizeExceededResetInSeconds(snapshot.resetIn);
-  const exhaustedHeaders = buildRateLimitHeaders(config, {
+  const normalizedConfig = normalizeRateLimitConfig(config);
+  const maxResetInSeconds = normalizeResetInSeconds(normalizedConfig.windowMs);
+  const retryAfterSeconds = Math.min(
+    maxResetInSeconds,
+    normalizeExceededResetInSeconds(snapshot.resetIn)
+  );
+  const exhaustedHeaders = buildRateLimitHeaders(normalizedConfig, {
     ...snapshot,
     remaining: 0,
   });

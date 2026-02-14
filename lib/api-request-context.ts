@@ -49,9 +49,11 @@ export function buildApiRequestContext(input: {
     requestId,
     includeRetryAfter: true,
   });
-  const rateLimitExceededResetInSeconds = normalizeExceededResetInSeconds(
-    rateLimitResult.resetIn
-  );
+  const exceededResetHeader = Number(exceededHeaders.get("Retry-After"));
+  const rateLimitExceededResetInSeconds =
+    Number.isInteger(exceededResetHeader) && exceededResetHeader >= 1
+      ? exceededResetHeader
+      : normalizeExceededResetInSeconds(rateLimitResult.resetIn);
 
   return {
     requestId,

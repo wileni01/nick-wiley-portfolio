@@ -208,8 +208,28 @@ test("rate-limit header builders clamp malformed snapshot values", () => {
     )
   );
   assert.equal(exceededPositiveRemainingHeaders.get("X-RateLimit-Remaining"), "0");
-  assert.equal(exceededPositiveRemainingHeaders.get("X-RateLimit-Reset"), "2");
-  assert.equal(exceededPositiveRemainingHeaders.get("Retry-After"), "2");
+  assert.equal(exceededPositiveRemainingHeaders.get("X-RateLimit-Reset"), "1");
+  assert.equal(exceededPositiveRemainingHeaders.get("Retry-After"), "1");
+
+  const boundedResetHeaders = new Headers(
+    buildRateLimitHeaders(
+      { maxRequests: 5, windowMs: 1500 },
+      { remaining: 4, resetIn: 9000 }
+    )
+  );
+  assert.equal(boundedResetHeaders.get("X-RateLimit-Limit"), "5");
+  assert.equal(boundedResetHeaders.get("X-RateLimit-Remaining"), "4");
+  assert.equal(boundedResetHeaders.get("X-RateLimit-Reset"), "2");
+
+  const boundedExceededResetHeaders = new Headers(
+    buildRateLimitExceededHeaders(
+      { maxRequests: 5, windowMs: 1500 },
+      { remaining: 4, resetIn: 9000 }
+    )
+  );
+  assert.equal(boundedExceededResetHeaders.get("X-RateLimit-Remaining"), "0");
+  assert.equal(boundedExceededResetHeaders.get("X-RateLimit-Reset"), "2");
+  assert.equal(boundedExceededResetHeaders.get("Retry-After"), "2");
 });
 
 test("rate-limit reset normalization keeps bounded exceeded window floor", () => {
@@ -235,8 +255,8 @@ test("buildApiResponseHeaders sanitizes request id and normalizes exceeded retry
   assert.equal(headers.get("X-Request-Id"), "reqidscript");
   assert.equal(headers.get("X-RateLimit-Limit"), "2");
   assert.equal(headers.get("X-RateLimit-Remaining"), "0");
-  assert.equal(headers.get("X-RateLimit-Reset"), "2");
-  assert.equal(headers.get("Retry-After"), "2");
+  assert.equal(headers.get("X-RateLimit-Reset"), "1");
+  assert.equal(headers.get("Retry-After"), "1");
 });
 
 test("buildApiResponseHeaders omits invalid request-id values", () => {
