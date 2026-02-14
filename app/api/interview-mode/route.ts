@@ -106,7 +106,7 @@ export async function POST(req: Request) {
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
   responseHeaders.set("X-AI-Narrative-Source", "none");
   responseHeaders.set("X-AI-Narrative-Fallback", "invalid_payload");
-  exceededHeaders.set("X-AI-Narrative-Source", "none");
+  exceededHeaders.set("X-AI-Narrative-Source", "fallback");
   exceededHeaders.set("X-AI-Narrative-Fallback", "rate_limited");
   try {
     if (!rateLimitResult.success) {
