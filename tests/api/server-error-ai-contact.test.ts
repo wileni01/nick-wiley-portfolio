@@ -58,6 +58,20 @@ test("serializeServerError normalizes unknown and Error inputs", () => {
   });
 });
 
+test("serializeServerError strips control/bidi chars and enforces length bounds", () => {
+  const oversizedMessage = `\u0000\u202E${"m".repeat(1400)}`;
+  const error = new Error(oversizedMessage);
+  error.name = `\u0007\u202D${"n".repeat(300)}`;
+
+  const serialized = serializeServerError(error);
+  assert.equal(serialized.name.length, 240);
+  assert.equal(serialized.message.length, 1200);
+  assert.equal(serialized.name.includes("\u202D"), false);
+  assert.equal(serialized.message.includes("\u202E"), false);
+  assert.equal(serialized.name.includes("\u0007"), false);
+  assert.equal(serialized.message.includes("\u0000"), false);
+});
+
 test("server log helpers sanitize route/request/message and redact details", () => {
   const originalError = console.error;
   const originalWarn = console.warn;
