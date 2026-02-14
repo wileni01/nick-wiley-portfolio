@@ -223,6 +223,24 @@ test("chat content-type validation keeps invalid_payload fallback semantics", as
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
 });
 
+test("chat multi-valued content-type keeps invalid_payload fallback semantics", async () => {
+  const response = await postChat(
+    buildJsonRequest({
+      url: "http://localhost/api/chat",
+      body: "{}",
+      ip: uniqueIp(),
+      contentType: "application/json, text/plain",
+    })
+  );
+
+  assert.equal(response.status, 415);
+  assert.equal(response.headers.get("X-Chat-Context-Source"), "none");
+  assert.equal(response.headers.get("X-Chat-Context-Fallback"), "invalid_payload");
+  assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(response.headers.get("X-AI-Provider"), "none");
+  assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("chat application plus-json media type remains valid and keeps invalid_payload fallback semantics", async () => {
   const response = await postChat(
     buildJsonRequest({
@@ -508,6 +526,24 @@ test("interview-mode content-type validation keeps invalid_payload narrative fal
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
 });
 
+test("interview-mode multi-valued content-type keeps invalid_payload narrative fallback semantics", async () => {
+  const response = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: "{}",
+      ip: uniqueIp(),
+      contentType: "application/json, text/plain",
+    })
+  );
+
+  assert.equal(response.status, 415);
+  assert.equal(response.headers.get("X-AI-Narrative-Source"), "none");
+  assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_payload");
+  assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(response.headers.get("X-AI-Provider"), "none");
+  assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("interview-mode application plus-json media type remains valid and keeps invalid_payload narrative fallback semantics", async () => {
   const response = await postInterviewMode(
     buildJsonRequest({
@@ -640,6 +676,20 @@ test("contact content-type validation keeps explicit invalid_payload delivery re
       body: "{}",
       ip: uniqueIp(),
       contentType: "text/plain",
+    })
+  );
+  assert.equal(response.status, 415);
+  assert.equal(response.headers.get("X-Contact-Delivery"), "skipped");
+  assert.equal(response.headers.get("X-Contact-Delivery-Reason"), "invalid_payload");
+});
+
+test("contact multi-valued content-type keeps explicit invalid_payload delivery reason", async () => {
+  const response = await postContact(
+    buildJsonRequest({
+      url: "http://localhost/api/contact",
+      body: "{}",
+      ip: uniqueIp(),
+      contentType: "application/json, text/plain",
     })
   );
   assert.equal(response.status, 415);
