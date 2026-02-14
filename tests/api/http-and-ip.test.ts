@@ -694,6 +694,29 @@ test("getRequestIp skips invalid forwarded segments until first valid entry", ()
   assert.equal(getRequestIp(req), "2001:db8::7");
 });
 
+test("getRequestIp parses standardized forwarded for= values with optional spacing", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": "unknown",
+      forwarded: 'by=_proxy; For = "[2001:db8::90]:443"; proto=https',
+    },
+  });
+
+  assert.equal(getRequestIp(req), "2001:db8::90");
+});
+
+test("getRequestIp ignores non-for forwarded parameters containing for substring", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": "unknown",
+      forwarded:
+        "before=198.51.100.91;proto=https,for=198.51.100.92;proto=https",
+    },
+  });
+
+  assert.equal(getRequestIp(req), "198.51.100.92");
+});
+
 test("getRequestIp returns anonymous when no valid headers exist", () => {
   const req = new Request("http://localhost/api/test", {
     headers: {

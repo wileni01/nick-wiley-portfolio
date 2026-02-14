@@ -2,7 +2,6 @@ import { isIP } from "node:net";
 
 const IP_TOKEN_MAX_CHARS = 80;
 const SAFE_IP_TOKEN_PATTERN = /^[a-fA-F0-9:.]+$/;
-const FORWARDED_FOR_PATTERN = /for=(?:"?\[?([^\];",]+)\]?"?)/i;
 const BRACKETED_IP_PATTERN = /^\[([^[\]]+)\](?::\d+)?$/;
 const IPV4_WITH_PORT_PATTERN = /^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/;
 const DIRECT_IP_HEADER_CANDIDATES = [
@@ -36,12 +35,24 @@ function normalizeIpToken(value: string | null | undefined): string | null {
   return isIP(normalized) > 0 ? normalized : null;
 }
 
+function getForwardedSegmentForValue(segment: string): string | null {
+  for (const part of segment.split(";")) {
+    const separatorIndex = part.indexOf("=");
+    if (separatorIndex === -1) continue;
+    const key = part.slice(0, separatorIndex).trim().toLowerCase();
+    if (key !== "for") continue;
+    const value = part.slice(separatorIndex + 1).trim();
+    return value || null;
+  }
+  return null;
+}
+
 function getForwardedHeaderIp(forwardedHeader: string | null): string | null {
   if (!forwardedHeader) return null;
   for (const segment of forwardedHeader.split(",")) {
-    const match = segment.match(FORWARDED_FOR_PATTERN);
-    if (!match) continue;
-    const normalized = normalizeIpToken(match[1]);
+    const forValue = getForwardedSegmentForValue(segment);
+    if (!forValue) continue;
+    const normalized = normalizeIpToken(forValue);
     if (normalized) return normalized;
   }
   return null;
