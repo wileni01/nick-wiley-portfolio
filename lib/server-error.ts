@@ -76,6 +76,10 @@ interface ServerWarningLogInput extends ServerLogBaseInput {
   message: string;
 }
 
+interface ServerInfoLogInput extends ServerLogBaseInput {
+  message: string;
+}
+
 function sanitizeLogValue(
   value: unknown,
   depth: number,
@@ -159,6 +163,16 @@ export function logServerWarning(input: ServerWarningLogInput) {
   const sanitizedDetails = sanitizeLogDetails(input.details);
   const route = sanitizeRouteLabel(input.route);
   console.warn(`${route} warning`, {
+    requestId: sanitizeRequestIdLabel(input.requestId),
+    message: sanitizeLogString(input.message, LOG_MESSAGE_MAX_CHARS),
+    ...(sanitizedDetails ? { details: sanitizedDetails } : {}),
+  });
+}
+
+export function logServerInfo(input: ServerInfoLogInput) {
+  const sanitizedDetails = sanitizeLogDetails(input.details);
+  const route = sanitizeRouteLabel(input.route);
+  console.info(`${route} info`, {
     requestId: sanitizeRequestIdLabel(input.requestId),
     message: sanitizeLogString(input.message, LOG_MESSAGE_MAX_CHARS),
     ...(sanitizedDetails ? { details: sanitizedDetails } : {}),

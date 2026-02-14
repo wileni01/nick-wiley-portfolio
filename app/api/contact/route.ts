@@ -2,7 +2,7 @@ import { z } from "zod";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import { buildApiRequestContext } from "@/lib/api-request-context";
 import { deliverContactSubmission } from "@/lib/contact-delivery";
-import { logServerError, logServerWarning } from "@/lib/server-error";
+import { logServerError, logServerInfo, logServerWarning } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 
 const contactRequestSchema = z.object({
@@ -79,11 +79,15 @@ export async function POST(req: Request) {
     }
 
     // Log metadata only (avoid full user-message content in logs).
-    console.log("Contact form submission received:", {
+    logServerInfo({
+      route: "api/contact",
       requestId,
-      fromEmail: redactEmail(sanitized.email),
-      subjectChars: sanitized.subject.length,
-      messageChars: sanitized.message.length,
+      message: "Contact form submission received",
+      details: {
+        fromEmail: redactEmail(sanitized.email),
+        subjectChars: sanitized.subject.length,
+        messageChars: sanitized.message.length,
+      },
     });
 
     const delivery = await deliverContactSubmission(sanitized);
