@@ -8,6 +8,8 @@ interface RateLimitEntry {
 
 const rateLimitMap = new Map<string, RateLimitEntry>();
 const RATE_LIMIT_CLEANUP_INTERVAL_MS = 60000;
+const RATE_LIMIT_MAX_ENTRIES = 50000;
+const MIN_RATE_LIMIT_WINDOW_MS = 1000;
 let lastCleanupAt = 0;
 
 function cleanupExpiredRateLimitEntries(now: number) {
@@ -18,6 +20,29 @@ function cleanupExpiredRateLimitEntries(now: number) {
       rateLimitMap.delete(key);
     }
   }
+}
+
+function trimRateLimitEntriesToCapacity() {
+  if (rateLimitMap.size <= RATE_LIMIT_MAX_ENTRIES) return;
+  const overflowCount = rateLimitMap.size - RATE_LIMIT_MAX_ENTRIES;
+  const keysToEvict = rateLimitMap.keys();
+  for (let i = 0; i < overflowCount; i++) {
+    const nextKey = keysToEvict.next();
+    if (nextKey.done) break;
+    rateLimitMap.delete(nextKey.value);
+  }
+}
+
+function normalizeRateLimitConfig(
+  config: RateLimitConfig
+): { maxRequests: number; windowMs: number } {
+  const maxRequests = Number.isFinite(config.maxRequests)
+    ? Math.max(1, Math.floor(config.maxRequests))
+    : 50;
+  const windowMs = Number.isFinite(config.windowMs)
+    ? Math.max(MIN_RATE_LIMIT_WINDOW_MS, Math.floor(config.windowMs))
+    : 3600000;
+  return { maxRequests, windowMs };
 }
 
 export interface RateLimitConfig {
@@ -31,21 +56,23 @@ export function rateLimit(
 ): { success: boolean; remaining: number; resetIn: number } {
   const now = Date.now();
   cleanupExpiredRateLimitEntries(now);
+  const normalizedConfig = normalizeRateLimitConfig(config);
   const entry = rateLimitMap.get(identifier);
 
   if (!entry || now > entry.resetTime) {
     rateLimitMap.set(identifier, {
       count: 1,
-      resetTime: now + config.windowMs,
+      resetTime: now + normalizedConfig.windowMs,
     });
+    trimRateLimitEntriesToCapacity();
     return {
       success: true,
-      remaining: config.maxRequests - 1,
-      resetIn: config.windowMs,
+      remaining: normalizedConfig.maxRequests - 1,
+      resetIn: normalizedConfig.windowMs,
     };
   }
 
-  if (entry.count >= config.maxRequests) {
+  if (entry.count >= normalizedConfig.maxRequests) {
     return {
       success: false,
       remaining: 0,
@@ -56,7 +83,7 @@ export function rateLimit(
   entry.count++;
   return {
     success: true,
-    remaining: config.maxRequests - entry.count,
+    remaining: normalizedConfig.maxRequests - entry.count,
     resetIn: entry.resetTime - now,
   };
 }
