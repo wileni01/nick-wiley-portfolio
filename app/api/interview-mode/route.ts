@@ -107,9 +107,12 @@ export async function POST(req: Request) {
 
     const parsed = await parseJsonRequest(req, requestSchema, {
       invalidPayloadMessage: "Invalid interview mode payload.",
+      invalidContentTypeMessage:
+        "Interview mode requests must use application/json.",
       maxChars: 10000,
       tooLargeMessage: "Interview mode payload is too large.",
       responseHeaders,
+      allowMissingContentType: false,
     });
     if (!parsed.success) {
       return parsed.response;

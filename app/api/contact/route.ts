@@ -51,9 +51,11 @@ export async function POST(req: Request) {
 
     const parsedBody = await parseJsonRequest(req, contactRequestSchema, {
       invalidPayloadMessage: "Please provide valid name, email, and message.",
+      invalidContentTypeMessage: "Contact form requests must use application/json.",
       maxChars: 12000,
       tooLargeMessage: "Contact form payload is too large.",
       responseHeaders,
+      allowMissingContentType: false,
     });
     if (!parsedBody.success) {
       return parsedBody.response;

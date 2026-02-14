@@ -3,9 +3,11 @@ import { z } from "zod";
 export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
   invalidPayloadMessage?: string;
+  invalidContentTypeMessage?: string;
   maxChars?: number;
   tooLargeMessage?: string;
   responseHeaders?: HeadersInit;
+  allowMissingContentType?: boolean;
 }
 
 type ParseJsonRequestResult<TSchema extends z.ZodTypeAny> =
@@ -43,12 +45,37 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
   const invalidJsonMessage = options?.invalidJsonMessage ?? "Invalid JSON payload.";
   const invalidPayloadMessage =
     options?.invalidPayloadMessage ?? "Invalid request payload.";
+  const invalidContentTypeMessage =
+    options?.invalidContentTypeMessage ?? "Content-Type must be application/json.";
   const tooLargeMessage =
     options?.tooLargeMessage ?? "Request payload is too large.";
   const responseHeaders = options?.responseHeaders;
+  const allowMissingContentType = options?.allowMissingContentType ?? true;
   const maxChars = Number.isFinite(options?.maxChars)
     ? Math.max(1, Math.floor(options?.maxChars ?? 0))
     : null;
+  const contentType = req.headers.get("content-type");
+  if (contentType) {
+    if (!contentType.toLowerCase().startsWith("application/json")) {
+      return {
+        success: false,
+        response: jsonResponse(
+          { error: invalidContentTypeMessage },
+          415,
+          responseHeaders
+        ),
+      };
+    }
+  } else if (!allowMissingContentType) {
+    return {
+      success: false,
+      response: jsonResponse(
+        { error: invalidContentTypeMessage },
+        415,
+        responseHeaders
+      ),
+    };
+  }
 
   let rawText: string;
   try {

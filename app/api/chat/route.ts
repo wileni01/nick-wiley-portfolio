@@ -65,9 +65,11 @@ export async function POST(req: Request) {
 
     const parsed = await parseJsonRequest(req, chatRequestSchema, {
       invalidPayloadMessage: "Messages are required and must be valid chat entries.",
+      invalidContentTypeMessage: "Chat requests must use application/json.",
       maxChars: 120000,
       tooLargeMessage: "Chat payload is too large.",
       responseHeaders,
+      allowMissingContentType: false,
     });
     if (!parsed.success) {
       return parsed.response;
