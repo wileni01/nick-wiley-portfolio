@@ -149,6 +149,64 @@ test("server log helpers sanitize route/request/message and redact details", () 
   assert.equal(infoPayload.details.cookie, "[redacted]");
 });
 
+test("server log helpers bound nested detail depth, key count, and array length", () => {
+  const originalInfo = console.info;
+  const captured: Array<{ args: unknown[] }> = [];
+  console.info = (...args: unknown[]) => {
+    captured.push({ args });
+  };
+
+  const details: Record<string, unknown> = {};
+  details.big = 123n;
+  details.timestamp = new Date("2024-01-01T00:00:00.000Z");
+  details.list = Array.from({ length: 25 }, (_, index) => ({
+    item: index,
+    nested: { tooDeep: true },
+  }));
+  details.nested = {
+    child: {
+      deepObject: { value: "ignored" },
+      deepArray: [1, 2, 3],
+    },
+  };
+  for (let index = 0; index < 25; index += 1) {
+    details[`overflow${index}`] = index;
+  }
+
+  try {
+    logServerInfo({
+      route: "api/interview-mode",
+      requestId: "info-depth-test",
+      message: "bounded details",
+      details,
+    });
+  } finally {
+    console.info = originalInfo;
+  }
+
+  assert.equal(captured.length, 1);
+  const payload = captured[0]?.args[1] as {
+    details?: Record<string, unknown>;
+  };
+  assert.ok(payload.details);
+  const serializedDetails = payload.details as Record<string, unknown>;
+
+  assert.equal(Object.keys(serializedDetails).length, 20);
+  assert.equal("overflow17" in serializedDetails, false);
+  assert.equal(serializedDetails.big, "123");
+  assert.equal(serializedDetails.timestamp, "2024-01-01T00:00:00.000Z");
+
+  const list = serializedDetails.list as unknown[];
+  assert.ok(Array.isArray(list));
+  assert.equal(list.length, 20);
+  assert.equal(list[0], "[object]");
+
+  const nested = serializedDetails.nested as Record<string, unknown>;
+  assert.deepEqual(nested, {
+    child: "[object]",
+  });
+});
+
 test("resolveAIProvider honors available keys and fallback behavior", () =>
   withEnv(
     {
