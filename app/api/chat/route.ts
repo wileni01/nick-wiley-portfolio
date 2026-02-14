@@ -36,12 +36,13 @@ const CHAT_RATE_LIMIT = {
 
 export async function POST(req: Request) {
   const requestId = createRequestId();
+  let responseHeaders = new Headers({ "X-Request-Id": requestId });
   try {
     // Rate limiting
     const ip = getRequestIp(req);
 
     const rateLimitResult = rateLimit(`chat:${ip}`, CHAT_RATE_LIMIT);
-    const responseHeaders = buildApiResponseHeaders({
+    responseHeaders = buildApiResponseHeaders({
       config: CHAT_RATE_LIMIT,
       snapshot: rateLimitResult,
       requestId,
@@ -157,7 +158,7 @@ ${context}`;
         error: "An error occurred processing your request. Please check that API keys are configured.",
       },
       500,
-      { "X-Request-Id": requestId }
+      responseHeaders
     );
   }
 }

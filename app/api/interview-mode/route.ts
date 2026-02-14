@@ -79,11 +79,12 @@ function sanitizeRecommendationUrl(url: string): string {
 
 export async function POST(req: Request) {
   const requestId = createRequestId();
+  let responseHeaders = new Headers({ "X-Request-Id": requestId });
   try {
     const ip = getRequestIp(req);
 
     const limit = rateLimit(`interview-mode:${ip}`, INTERVIEW_MODE_RATE_LIMIT);
-    const responseHeaders = buildApiResponseHeaders({
+    responseHeaders = buildApiResponseHeaders({
       config: INTERVIEW_MODE_RATE_LIMIT,
       snapshot: limit,
       requestId,
@@ -237,7 +238,7 @@ Write two short paragraphs:
           "Could not generate interview briefing. Please retry or use deterministic recommendations.",
       },
       500,
-      { "X-Request-Id": requestId }
+      responseHeaders
     );
   }
 }

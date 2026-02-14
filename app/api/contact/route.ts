@@ -23,12 +23,13 @@ const CONTACT_RATE_LIMIT = {
 
 export async function POST(req: Request) {
   const requestId = createRequestId();
+  let responseHeaders = new Headers({ "X-Request-Id": requestId });
   try {
     // Rate limiting
     const ip = getRequestIp(req);
 
     const rateLimitResult = rateLimit(`contact:${ip}`, CONTACT_RATE_LIMIT);
-    const responseHeaders = buildApiResponseHeaders({
+    responseHeaders = buildApiResponseHeaders({
       config: CONTACT_RATE_LIMIT,
       snapshot: rateLimitResult,
       requestId,
@@ -117,7 +118,7 @@ export async function POST(req: Request) {
     return jsonResponse(
       { error: "An error occurred. Please try again." },
       500,
-      { "X-Request-Id": requestId }
+      responseHeaders
     );
   }
 }
