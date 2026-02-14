@@ -158,6 +158,64 @@ test("parseJsonRequest returns configured message for invalid JSON payloads", as
   }
 });
 
+test("parseJsonRequest tolerates throwing option getters and uses defaults", async () => {
+  const schema = z.object({ value: z.string() });
+  const malformedReq = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: '{"value":',
+  });
+  const throwingOptions = {} as {
+    invalidJsonMessage?: string;
+    allowMissingContentType?: boolean;
+    maxChars?: number;
+  };
+  Object.defineProperty(throwingOptions, "invalidJsonMessage", {
+    configurable: true,
+    get() {
+      throw new Error("invalidJsonMessage getter failed");
+    },
+  });
+  Object.defineProperty(throwingOptions, "allowMissingContentType", {
+    configurable: true,
+    get() {
+      throw new Error("allowMissingContentType getter failed");
+    },
+  });
+  Object.defineProperty(throwingOptions, "maxChars", {
+    configurable: true,
+    get() {
+      throw new Error("maxChars getter failed");
+    },
+  });
+
+  const malformedResult = await parseJsonRequest(
+    malformedReq,
+    schema,
+    throwingOptions
+  );
+  assert.equal(malformedResult.success, false);
+  if (!malformedResult.success) {
+    assert.equal(malformedResult.response.status, 400);
+    const body = (await malformedResult.response.json()) as { error: string };
+    assert.equal(body.error, "Invalid JSON payload.");
+  }
+
+  const missingContentTypeReq = new Request("http://localhost/api/test", {
+    method: "POST",
+    body: new TextEncoder().encode('{"value":"ok"}'),
+  });
+  const missingContentTypeResult = await parseJsonRequest(
+    missingContentTypeReq,
+    schema,
+    throwingOptions
+  );
+  assert.equal(missingContentTypeResult.success, true);
+  if (missingContentTypeResult.success) {
+    assert.equal(missingContentTypeResult.data.value, "ok");
+  }
+});
+
 test("parseJsonRequest rejects declared oversized payload before parse", async () => {
   const schema = z.object({ value: z.string() });
   const req = new Request("http://localhost/api/test", {

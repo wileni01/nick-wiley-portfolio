@@ -36,6 +36,18 @@ interface ReadRequestBytesResult {
   tooLarge?: boolean;
 }
 
+function readParseOption<T>(
+  options: ParseJsonRequestOptions | undefined,
+  key: keyof ParseJsonRequestOptions
+): T | undefined {
+  if (!options) return undefined;
+  try {
+    return options[key] as T | undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 async function readRequestBytes(
   req: Request,
   maxBytes: number | null
@@ -179,25 +191,36 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
   schema: TSchema,
   options?: ParseJsonRequestOptions
 ): Promise<ParseJsonRequestResult<TSchema>> {
-  const invalidJsonMessage = options?.invalidJsonMessage ?? "Invalid JSON payload.";
+  const invalidJsonMessage =
+    readParseOption<string>(options, "invalidJsonMessage") ??
+    "Invalid JSON payload.";
   const invalidPayloadMessage =
-    options?.invalidPayloadMessage ?? "Invalid request payload.";
+    readParseOption<string>(options, "invalidPayloadMessage") ??
+    "Invalid request payload.";
   const invalidContentTypeMessage =
-    options?.invalidContentTypeMessage ?? "Content-Type must be application/json.";
+    readParseOption<string>(options, "invalidContentTypeMessage") ??
+    "Content-Type must be application/json.";
   const invalidContentLengthMessage =
-    options?.invalidContentLengthMessage ?? INVALID_CONTENT_LENGTH_ERROR;
-  const emptyBodyMessage = options?.emptyBodyMessage ?? "Request body is required.";
+    readParseOption<string>(options, "invalidContentLengthMessage") ??
+    INVALID_CONTENT_LENGTH_ERROR;
+  const emptyBodyMessage =
+    readParseOption<string>(options, "emptyBodyMessage") ??
+    "Request body is required.";
   const tooLargeMessage =
-    options?.tooLargeMessage ?? "Request payload is too large.";
-  const responseHeaders = options?.responseHeaders;
-  const allowMissingContentType = options?.allowMissingContentType ?? true;
-  const maxPayloadBytes = Number.isFinite(options?.maxBytes)
-    ? Math.max(1, Math.floor(options?.maxBytes ?? 0))
-    : Number.isFinite(options?.maxChars)
-      ? Math.max(1, Math.floor(options?.maxChars ?? 0))
+    readParseOption<string>(options, "tooLargeMessage") ??
+    "Request payload is too large.";
+  const responseHeaders = readParseOption<HeadersInit>(options, "responseHeaders");
+  const allowMissingContentType =
+    readParseOption<boolean>(options, "allowMissingContentType") ?? true;
+  const rawMaxBytes = readParseOption<number>(options, "maxBytes");
+  const rawMaxChars = readParseOption<number>(options, "maxChars");
+  const maxPayloadBytes = Number.isFinite(rawMaxBytes)
+    ? Math.max(1, Math.floor(rawMaxBytes ?? 0))
+    : Number.isFinite(rawMaxChars)
+      ? Math.max(1, Math.floor(rawMaxChars ?? 0))
       : null;
-  const maxChars = Number.isFinite(options?.maxChars)
-    ? Math.max(1, Math.floor(options?.maxChars ?? 0))
+  const maxChars = Number.isFinite(rawMaxChars)
+    ? Math.max(1, Math.floor(rawMaxChars ?? 0))
     : null;
   const declaredContentLength = parseDeclaredContentLength(
     req.headers.get("content-length")
