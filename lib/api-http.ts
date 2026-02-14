@@ -30,6 +30,64 @@ type ParseJsonRequestResult<TSchema extends z.ZodTypeAny> =
   | { success: true; data: z.infer<TSchema> }
   | { success: false; response: Response };
 
+interface ReadRequestBytesResult {
+  success: boolean;
+  bytes?: Uint8Array;
+  tooLarge?: boolean;
+}
+
+async function readRequestBytes(
+  req: Request,
+  maxBytes: number | null
+): Promise<ReadRequestBytesResult> {
+  const stream = req.body;
+  if (!stream) {
+    return { success: true, bytes: new Uint8Array(0) };
+  }
+
+  let reader: ReadableStreamDefaultReader<Uint8Array>;
+  try {
+    reader = stream.getReader();
+  } catch {
+    return { success: false };
+  }
+
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value || value.byteLength === 0) continue;
+      totalBytes += value.byteLength;
+      if (maxBytes !== null && totalBytes > maxBytes) {
+        await reader.cancel();
+        return { success: false, tooLarge: true };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { success: false };
+  } finally {
+    reader.releaseLock();
+  }
+
+  if (!chunks.length) {
+    return { success: true, bytes: new Uint8Array(0) };
+  }
+  if (chunks.length === 1) {
+    return { success: true, bytes: chunks[0] };
+  }
+
+  const merged = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    merged.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return { success: true, bytes: merged };
+}
+
 function parseDeclaredContentLength(headerValue: string | null): number | null {
   if (headerValue === null) return null;
   const normalized = headerValue.trim();
@@ -190,15 +248,20 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     }
   }
 
-  let rawBytes: Uint8Array;
-  try {
-    rawBytes = new Uint8Array(await req.arrayBuffer());
-  } catch {
+  const readResult = await readRequestBytes(req, maxPayloadBytes);
+  if (!readResult.success) {
+    if (readResult.tooLarge) {
+      return {
+        success: false,
+        response: jsonResponse({ error: tooLargeMessage }, 413, responseHeaders),
+      };
+    }
     return {
       success: false,
       response: jsonResponse({ error: invalidJsonMessage }, 400, responseHeaders),
     };
   }
+  const rawBytes = readResult.bytes ?? new Uint8Array(0);
   const rawTextBytesLength = rawBytes.byteLength;
   let rawText: string;
   try {
