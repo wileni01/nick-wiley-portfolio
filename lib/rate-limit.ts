@@ -24,14 +24,22 @@ function cleanupExpiredRateLimitEntries(now: number) {
   }
 }
 
-function trimRateLimitEntriesToCapacity() {
+function trimRateLimitEntriesToCapacity(now: number) {
   if (rateLimitMap.size <= RATE_LIMIT_MAX_ENTRIES) return;
+  for (const [key, entry] of rateLimitMap.entries()) {
+    if (now >= entry.resetTime) {
+      rateLimitMap.delete(key);
+    }
+  }
+  if (rateLimitMap.size <= RATE_LIMIT_MAX_ENTRIES) return;
+
   const overflowCount = rateLimitMap.size - RATE_LIMIT_MAX_ENTRIES;
-  const keysToEvict = rateLimitMap.keys();
-  for (let i = 0; i < overflowCount; i++) {
-    const nextKey = keysToEvict.next();
-    if (nextKey.done) break;
-    rateLimitMap.delete(nextKey.value);
+  const evictionCandidates = Array.from(rateLimitMap.entries())
+    .map(([key, entry]) => ({ key, resetTime: entry.resetTime }))
+    .sort((a, b) => a.resetTime - b.resetTime)
+    .slice(0, overflowCount);
+  for (const candidate of evictionCandidates) {
+    rateLimitMap.delete(candidate.key);
   }
 }
 
@@ -73,7 +81,7 @@ export function rateLimit(
       count: 1,
       resetTime: now + normalizedConfig.windowMs,
     });
-    trimRateLimitEntriesToCapacity();
+    trimRateLimitEntriesToCapacity(now);
     return {
       success: true,
       remaining: normalizedConfig.maxRequests - 1,
