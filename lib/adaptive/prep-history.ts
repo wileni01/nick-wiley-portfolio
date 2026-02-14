@@ -54,6 +54,43 @@ export function appendPrepHistoryEntry(
     .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 }
 
+export function arePrepHistoryEqual(
+  left: PrepSessionSnapshot[],
+  right: PrepSessionSnapshot[]
+): boolean {
+  if (left.length !== right.length) return false;
+  return left.every((entry, index) => {
+    const candidate = right[index];
+    if (!candidate) return false;
+    if (
+      entry.id !== candidate.id ||
+      entry.timestamp !== candidate.timestamp ||
+      entry.averageScore !== candidate.averageScore ||
+      entry.averageConfidence !== candidate.averageConfidence ||
+      entry.answerCount !== candidate.answerCount ||
+      entry.topThemes.length !== candidate.topThemes.length
+    ) {
+      return false;
+    }
+    return entry.topThemes.every((theme, themeIndex) => {
+      return theme === candidate.topThemes[themeIndex];
+    });
+  });
+}
+
+export function serializePrepHistory(
+  history: PrepSessionSnapshot[],
+  maxEntries: number = PREP_HISTORY_MAX_ENTRIES
+): string {
+  const boundedMaxEntries = Math.max(1, Math.floor(maxEntries));
+  const normalized = history
+    .map((entry) => normalizePrepHistoryEntry(entry))
+    .filter((entry): entry is PrepSessionSnapshot => entry !== null)
+    .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+    .slice(0, boundedMaxEntries);
+  return JSON.stringify(normalized);
+}
+
 function normalizePrepHistoryEntry(input: unknown): PrepSessionSnapshot | null {
   if (!input || typeof input !== "object") return null;
 

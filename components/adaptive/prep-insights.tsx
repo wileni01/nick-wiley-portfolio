@@ -7,6 +7,7 @@ import { useInterviewMode } from "./interview-mode-provider";
 import { useModeInterviewDate } from "./use-mode-interview-date";
 import { TimelineQuickFixActions } from "./timeline-quick-fix-actions";
 import {
+  arePrepHistoryEqual,
   getPrepHistoryStorageKey,
   parsePrepHistory,
   type PrepSessionSnapshot,
@@ -61,7 +62,7 @@ export function PrepInsights() {
 
     function loadHistory() {
       const parsed = parsePrepHistory(localStorage.getItem(activeStorageKey));
-      setHistory(parsed);
+      setHistory((prev) => (arePrepHistoryEqual(prev, parsed) ? prev : parsed));
     }
 
     loadHistory();
@@ -150,7 +151,9 @@ export function PrepInsights() {
       const checklistItems = getReadinessChecklist(activeCompanyId, activePersonaId);
       const readinessState = parseReadinessState(localStorage.getItem(readinessKey));
       const completion = getReadinessCompletion(checklistItems, readinessState);
-      setReadinessPct(completion.completionPct);
+      setReadinessPct((prev) =>
+        prev === completion.completionPct ? prev : completion.completionPct
+      );
     }
 
     refresh();

@@ -30,6 +30,7 @@ import {
   appendPrepHistoryEntry,
   getPrepHistoryStorageKey,
   parsePrepHistory,
+  serializePrepHistory,
   type PrepSessionSnapshot,
 } from "@/lib/adaptive/prep-history";
 import { getMockSessionStorageKey } from "@/lib/adaptive/storage-keys";
@@ -450,7 +451,7 @@ export function MockInterviewSession() {
         topThemes,
       };
       const nextHistory = appendPrepHistoryEntry(existing, entry);
-      localStorage.setItem(historyKey, JSON.stringify(nextHistory));
+      localStorage.setItem(historyKey, serializePrepHistory(nextHistory));
       window.dispatchEvent(
         new CustomEvent("adaptive-prep-history-updated", {
           detail: { key: historyKey },
