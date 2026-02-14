@@ -70,9 +70,9 @@ export async function POST(req: Request) {
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
   responseHeaders.set("X-Chat-Context-Source", "none");
-  responseHeaders.delete("X-Chat-Context-Fallback");
+  responseHeaders.set("X-Chat-Context-Fallback", "none");
   exceededHeaders.set("X-Chat-Context-Source", "none");
-  exceededHeaders.delete("X-Chat-Context-Fallback");
+  exceededHeaders.set("X-Chat-Context-Fallback", "none");
   try {
     if (!rateLimitResult.success) {
       return jsonResponse(
@@ -197,7 +197,7 @@ export async function POST(req: Request) {
     if (contextFallbackReason !== "none") {
       responseHeaders.set("X-Chat-Context-Fallback", contextFallbackReason);
     } else {
-      responseHeaders.delete("X-Chat-Context-Fallback");
+      responseHeaders.set("X-Chat-Context-Fallback", "none");
     }
 
     // System prompt with RAG context
