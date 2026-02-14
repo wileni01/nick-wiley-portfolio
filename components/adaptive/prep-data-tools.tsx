@@ -29,6 +29,17 @@ import { sanitizeFileToken, triggerDownload } from "@/lib/download";
 type StatusTone = "neutral" | "error" | "success";
 const CROSS_MODE_IMPORT_CONFIRM_MS = 10000;
 
+type PrepDataKeyName =
+  | "readiness"
+  | "history"
+  | "goals"
+  | "mock"
+  | "drills"
+  | "notes"
+  | "focusHistory"
+  | "launchpad"
+  | "interviewDate";
+
 export function PrepDataTools() {
   const { companyId, personaId, company, persona } = useInterviewMode();
   const activeModeKey = companyId && personaId ? `${companyId}/${personaId}` : null;
@@ -87,52 +98,71 @@ export function PrepDataTools() {
   };
   const maxBundleSizeKb = Math.round(PREP_DATA_BUNDLE_MAX_CHARS / 1024);
 
-  function emitRefreshEvents() {
-    window.dispatchEvent(
-      new CustomEvent("adaptive-readiness-updated", {
-        detail: { key: keys.readiness },
-      })
-    );
-    window.dispatchEvent(
-      new CustomEvent("adaptive-prep-history-updated", {
-        detail: { key: keys.history },
-      })
-    );
-    window.dispatchEvent(
-      new CustomEvent("adaptive-prep-goal-updated", {
-        detail: { key: keys.goals },
-      })
-    );
-    window.dispatchEvent(
-      new CustomEvent("adaptive-drill-state-updated", {
-        detail: { key: keys.drills },
-      })
-    );
-    window.dispatchEvent(
-      new CustomEvent("adaptive-mock-session-updated", {
-        detail: { key: keys.mock },
-      })
-    );
-    window.dispatchEvent(
-      new CustomEvent("adaptive-prep-notes-updated", {
-        detail: { key: keys.notes },
-      })
-    );
-    window.dispatchEvent(
-      new CustomEvent("adaptive-focus-history-updated", {
-        detail: { key: keys.focusHistory },
-      })
-    );
-    window.dispatchEvent(
-      new CustomEvent("adaptive-launchpad-updated", {
-        detail: { key: keys.launchpad },
-      })
-    );
-    window.dispatchEvent(
-      new CustomEvent("adaptive-interview-date-updated", {
-        detail: { key: keys.interviewDate },
-      })
-    );
+  function emitRefreshEvents(changed: Partial<Record<PrepDataKeyName, boolean>>) {
+    if (!Object.keys(changed).length) return;
+    if (changed.readiness) {
+      window.dispatchEvent(
+        new CustomEvent("adaptive-readiness-updated", {
+          detail: { key: keys.readiness },
+        })
+      );
+    }
+    if (changed.history) {
+      window.dispatchEvent(
+        new CustomEvent("adaptive-prep-history-updated", {
+          detail: { key: keys.history },
+        })
+      );
+    }
+    if (changed.goals) {
+      window.dispatchEvent(
+        new CustomEvent("adaptive-prep-goal-updated", {
+          detail: { key: keys.goals },
+        })
+      );
+    }
+    if (changed.drills) {
+      window.dispatchEvent(
+        new CustomEvent("adaptive-drill-state-updated", {
+          detail: { key: keys.drills },
+        })
+      );
+    }
+    if (changed.mock) {
+      window.dispatchEvent(
+        new CustomEvent("adaptive-mock-session-updated", {
+          detail: { key: keys.mock },
+        })
+      );
+    }
+    if (changed.notes) {
+      window.dispatchEvent(
+        new CustomEvent("adaptive-prep-notes-updated", {
+          detail: { key: keys.notes },
+        })
+      );
+    }
+    if (changed.focusHistory) {
+      window.dispatchEvent(
+        new CustomEvent("adaptive-focus-history-updated", {
+          detail: { key: keys.focusHistory },
+        })
+      );
+    }
+    if (changed.launchpad) {
+      window.dispatchEvent(
+        new CustomEvent("adaptive-launchpad-updated", {
+          detail: { key: keys.launchpad },
+        })
+      );
+    }
+    if (changed.interviewDate) {
+      window.dispatchEvent(
+        new CustomEvent("adaptive-interview-date-updated", {
+          detail: { key: keys.interviewDate },
+        })
+      );
+    }
   }
 
   function getBundleJson() {
@@ -203,8 +233,21 @@ export function PrepDataTools() {
       return;
     }
 
-    Object.values(keys).forEach((key) => localStorage.removeItem(key));
-    emitRefreshEvents();
+    const changed: Partial<Record<PrepDataKeyName, boolean>> = {};
+    (Object.entries(keys) as Array<[PrepDataKeyName, string]>).forEach(
+      ([name, key]) => {
+        if (localStorage.getItem(key) === null) return;
+        localStorage.removeItem(key);
+        changed[name] = true;
+      }
+    );
+    emitRefreshEvents(changed);
+    if (!Object.keys(changed).length) {
+      setTone("neutral");
+      setStatus("No prep data found to clear for this mode.");
+      setConfirmReset(false);
+      return;
+    }
     setTone("success");
     setStatus("Cleared prep data for this company/persona mode.");
     setConfirmReset(false);
@@ -219,36 +262,53 @@ export function PrepDataTools() {
   function applyImportedBundle(parsed: PrepDataBundle) {
     setPendingImport(null);
     setPendingImportTargetKey(null);
-    localStorage.setItem(keys.readiness, JSON.stringify(parsed.readinessState));
-    localStorage.setItem(keys.history, JSON.stringify(parsed.prepHistory));
-    localStorage.setItem(keys.goals, JSON.stringify(parsed.prepGoal));
-    localStorage.setItem(keys.drills, JSON.stringify(parsed.drillState));
-    localStorage.setItem(keys.notes, parsed.prepNotes);
-    localStorage.setItem(keys.focusHistory, JSON.stringify(parsed.focusHistory));
-    if (parsed.interviewDate) {
-      localStorage.setItem(keys.interviewDate, parsed.interviewDate);
-    } else {
-      localStorage.removeItem(keys.interviewDate);
+    const changed: Partial<Record<PrepDataKeyName, boolean>> = {};
+
+    function writeValue(name: PrepDataKeyName, nextValue: string | null) {
+      const key = keys[name];
+      const existing = localStorage.getItem(key);
+      if (nextValue === null) {
+        if (existing === null) return;
+        localStorage.removeItem(key);
+        changed[name] = true;
+        return;
+      }
+      if (existing === nextValue) return;
+      localStorage.setItem(key, nextValue);
+      changed[name] = true;
     }
-    localStorage.setItem(keys.launchpad, JSON.stringify(parsed.launchpadState));
-    if (parsed.mockSession) {
-      localStorage.setItem(keys.mock, JSON.stringify(parsed.mockSession));
-    } else {
-      localStorage.removeItem(keys.mock);
-    }
-    emitRefreshEvents();
+
+    writeValue("readiness", JSON.stringify(parsed.readinessState));
+    writeValue("history", JSON.stringify(parsed.prepHistory));
+    writeValue("goals", JSON.stringify(parsed.prepGoal));
+    writeValue("drills", JSON.stringify(parsed.drillState));
+    writeValue("notes", parsed.prepNotes);
+    writeValue("focusHistory", JSON.stringify(parsed.focusHistory));
+    writeValue("interviewDate", parsed.interviewDate);
+    writeValue("launchpad", JSON.stringify(parsed.launchpadState));
+    writeValue(
+      "mock",
+      parsed.mockSession ? JSON.stringify(parsed.mockSession) : null
+    );
+
+    emitRefreshEvents(changed);
+    const changedCount = Object.keys(changed).length;
 
     if (
       parsed.mode.companyId !== activeCompanyId ||
       parsed.mode.personaId !== activePersonaId
     ) {
       setTone("neutral");
-      setStatus(
-        `Imported bundle from ${parsed.mode.companyId}/${parsed.mode.personaId} into current mode.`
-      );
+      setStatus(changedCount
+        ? `Imported bundle from ${parsed.mode.companyId}/${parsed.mode.personaId} into current mode.`
+        : `Bundle from ${parsed.mode.companyId}/${parsed.mode.personaId} matched current mode data (no changes applied).`);
     } else {
-      setTone("success");
-      setStatus("Prep data imported successfully.");
+      setTone(changedCount ? "success" : "neutral");
+      setStatus(
+        changedCount
+          ? "Prep data imported successfully."
+          : "Prep data already matches this mode."
+      );
     }
   }
 
