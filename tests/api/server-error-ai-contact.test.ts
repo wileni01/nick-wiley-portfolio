@@ -404,6 +404,40 @@ test("server log helpers keep logging when detail getters throw", () => {
   assert.equal(serializedDetails.danger, "[unreadable]");
 });
 
+test("server log helpers emit unreadable marker when detail keys cannot be enumerated", () => {
+  const originalInfo = console.info;
+  const captured: Array<{ args: unknown[] }> = [];
+  console.info = (...args: unknown[]) => {
+    captured.push({ args });
+  };
+
+  const details = new Proxy({ safe: "ok" } as Record<string, unknown>, {
+    ownKeys() {
+      throw new Error("ownKeys failure");
+    },
+  });
+
+  try {
+    logServerInfo({
+      route: "api/chat",
+      requestId: "keys-failure",
+      message: "keys fallback",
+      details,
+    });
+  } finally {
+    console.info = originalInfo;
+  }
+
+  assert.equal(captured.length, 1);
+  const payload = captured[0]?.args[1] as {
+    details?: Record<string, unknown>;
+  };
+  assert.ok(payload.details);
+  const serializedDetails = payload.details as Record<string, unknown>;
+  assert.equal(Object.getPrototypeOf(serializedDetails), null);
+  assert.equal(serializedDetails._unreadable, "[unreadable]");
+});
+
 test("resolveAIProvider honors available keys and fallback behavior", () =>
   withEnv(
     {

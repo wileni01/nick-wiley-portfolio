@@ -20,6 +20,7 @@ const CIRCULAR_LOG_VALUE = "[circular]";
 const INVALID_DATE_LOG_VALUE = "[invalid-date]";
 const FUNCTION_LOG_VALUE = "[function]";
 const UNREADABLE_LOG_VALUE = "[unreadable]";
+const UNREADABLE_DETAILS_KEY = "_unreadable";
 const CONTROL_CHARS_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 const BIDI_OVERRIDE_PATTERN = /[\u202A-\u202E\u2066-\u2069]/g;
 
@@ -195,7 +196,9 @@ function sanitizeLogValue(
       try {
         keys = Object.keys(source).slice(0, LOG_DETAILS_MAX_KEYS);
       } catch {
-        return UNREADABLE_LOG_VALUE;
+        const unreadableDetails = Object.create(null) as Record<string, unknown>;
+        unreadableDetails[UNREADABLE_DETAILS_KEY] = UNREADABLE_LOG_VALUE;
+        return unreadableDetails;
       }
       const sanitizedObject = Object.create(null) as Record<string, unknown>;
       for (const key of keys) {
