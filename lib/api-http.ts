@@ -30,8 +30,13 @@ export function jsonResponse(
       responseHeaders.set(key, value);
     });
   }
+  const requestId = responseHeaders.get("X-Request-Id");
+  const payload =
+    status >= 400 && requestId && body.requestId === undefined
+      ? { ...body, requestId }
+      : body;
 
-  return new Response(JSON.stringify(body), {
+  return new Response(JSON.stringify(payload), {
     status,
     headers: responseHeaders,
   });
