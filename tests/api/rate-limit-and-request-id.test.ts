@@ -277,6 +277,7 @@ test("buildApiRequestContext sanitizes namespace and reuses same rate-limit buck
   assert.equal(second.rateLimitResult.remaining, 0);
   assert.ok(first.responseHeaders.get("X-Request-Id"));
   assert.ok(second.exceededHeaders.get("Retry-After"));
+  assert.equal(second.exceededHeaders.get("X-RateLimit-Remaining"), "0");
   assert.equal(
     second.rateLimitExceededResetInSeconds,
     Number(second.exceededHeaders.get("Retry-After"))
@@ -329,6 +330,7 @@ test("buildApiRequestContext falls back empty namespace values to api bucket", (
   assert.equal(second.rateLimitResult.success, false);
   assert.equal(second.rateLimitResult.remaining, 0);
   assert.ok(second.exceededHeaders.get("Retry-After"));
+  assert.equal(second.exceededHeaders.get("X-RateLimit-Remaining"), "0");
   assert.equal(
     second.rateLimitExceededResetInSeconds,
     Number(second.exceededHeaders.get("Retry-After"))
@@ -362,6 +364,7 @@ test("buildApiRequestContext truncates overlong namespace values consistently", 
   assert.equal(second.rateLimitResult.success, false);
   assert.equal(second.rateLimitResult.remaining, 0);
   assert.ok(second.exceededHeaders.get("Retry-After"));
+  assert.equal(second.exceededHeaders.get("X-RateLimit-Remaining"), "0");
   assert.equal(
     second.rateLimitExceededResetInSeconds,
     Number(second.exceededHeaders.get("X-RateLimit-Reset"))
