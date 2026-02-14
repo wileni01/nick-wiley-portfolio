@@ -5,6 +5,7 @@ export interface ParseJsonRequestOptions {
   invalidPayloadMessage?: string;
   maxChars?: number;
   tooLargeMessage?: string;
+  responseHeaders?: HeadersInit;
 }
 
 type ParseJsonRequestResult<TSchema extends z.ZodTypeAny> =
@@ -44,6 +45,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     options?.invalidPayloadMessage ?? "Invalid request payload.";
   const tooLargeMessage =
     options?.tooLargeMessage ?? "Request payload is too large.";
+  const responseHeaders = options?.responseHeaders;
   const maxChars = Number.isFinite(options?.maxChars)
     ? Math.max(1, Math.floor(options?.maxChars ?? 0))
     : null;
@@ -54,13 +56,13 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
   } catch {
     return {
       success: false,
-      response: jsonResponse({ error: invalidJsonMessage }, 400),
+      response: jsonResponse({ error: invalidJsonMessage }, 400, responseHeaders),
     };
   }
   if (maxChars !== null && rawText.length > maxChars) {
     return {
       success: false,
-      response: jsonResponse({ error: tooLargeMessage }, 413),
+      response: jsonResponse({ error: tooLargeMessage }, 413, responseHeaders),
     };
   }
 
@@ -70,7 +72,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
   } catch {
     return {
       success: false,
-      response: jsonResponse({ error: invalidJsonMessage }, 400),
+      response: jsonResponse({ error: invalidJsonMessage }, 400, responseHeaders),
     };
   }
 
@@ -78,7 +80,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
   if (!parsed.success) {
     return {
       success: false,
-      response: jsonResponse({ error: invalidPayloadMessage }, 400),
+      response: jsonResponse({ error: invalidPayloadMessage }, 400, responseHeaders),
     };
   }
 

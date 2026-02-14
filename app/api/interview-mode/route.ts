@@ -102,6 +102,7 @@ export async function POST(req: Request) {
       invalidPayloadMessage: "Invalid interview mode payload.",
       maxChars: 10000,
       tooLargeMessage: "Interview mode payload is too large.",
+      responseHeaders: rateLimitHeaders,
     });
     if (!parsed.success) {
       return parsed.response;

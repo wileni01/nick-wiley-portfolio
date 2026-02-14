@@ -53,6 +53,7 @@ export async function POST(req: Request) {
       invalidPayloadMessage: "Messages are required and must be valid chat entries.",
       maxChars: 120000,
       tooLargeMessage: "Chat payload is too large.",
+      responseHeaders: rateLimitHeaders,
     });
     if (!parsed.success) {
       return parsed.response;

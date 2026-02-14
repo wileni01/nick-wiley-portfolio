@@ -46,6 +46,7 @@ export async function POST(req: Request) {
       invalidPayloadMessage: "Please provide valid name, email, and message.",
       maxChars: 12000,
       tooLargeMessage: "Contact form payload is too large.",
+      responseHeaders: rateLimitHeaders,
     });
     if (!parsedBody.success) {
       return parsedBody.response;
@@ -69,7 +70,8 @@ export async function POST(req: Request) {
     if (!sanitized.name || !sanitized.email || !sanitized.message) {
       return jsonResponse(
         { error: "Name, email, and message are required." },
-        400
+        400,
+        rateLimitHeaders
       );
     }
 
