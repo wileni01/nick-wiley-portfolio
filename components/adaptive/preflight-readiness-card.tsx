@@ -20,11 +20,12 @@ import {
   getLaunchpadStorageKey,
   getPrepNotesStorageKey,
 } from "@/lib/adaptive/storage-keys";
+import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import { calculatePreflightScore } from "@/lib/adaptive/preflight";
 import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
 import {
+  getBooleanStateCoveragePercentage,
   parseBooleanStateRecord,
-  summarizeBooleanStateRecord,
 } from "@/lib/adaptive/boolean-state";
 
 export function PreflightReadinessCard() {
@@ -37,6 +38,17 @@ export function PreflightReadinessCard() {
   );
   const [launchpadPct, setLaunchpadPct] = useState(0);
   const [hasNotes, setHasNotes] = useState(false);
+  const launchpadResourceIds = useMemo(() => {
+    if (!companyId || !personaId) return [];
+    const recommendationBundle = getInterviewRecommendationBundle(
+      companyId,
+      personaId
+    );
+    if (!recommendationBundle) return [];
+    return recommendationBundle
+      .topRecommendations.slice(0, 5)
+      .map((recommendation) => recommendation.asset.id);
+  }, [companyId, personaId]);
 
   useEffect(() => {
     if (!companyId || !personaId) return;
@@ -67,7 +79,9 @@ export function PreflightReadinessCard() {
         setLaunchpadPct(0);
       } else {
         const parsed = parseBooleanStateRecord(launchpad);
-        setLaunchpadPct(summarizeBooleanStateRecord(parsed).percentage);
+        setLaunchpadPct(
+          getBooleanStateCoveragePercentage(launchpadResourceIds, parsed)
+        );
       }
 
       const notes = localStorage.getItem(keys.notes) ?? "";
@@ -115,7 +129,7 @@ export function PreflightReadinessCard() {
       window.removeEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
       window.removeEventListener("adaptive-prep-notes-updated", onNotesUpdate);
     };
-  }, [companyId, personaId]);
+  }, [companyId, launchpadResourceIds, personaId]);
 
   const preflight = useMemo(
     () =>

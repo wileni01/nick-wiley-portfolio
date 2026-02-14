@@ -40,8 +40,8 @@ import {
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { sanitizeFileToken, triggerDownload } from "@/lib/download";
 import {
+  getBooleanStateCoveragePercentage,
   parseBooleanStateRecord,
-  summarizeBooleanStateRecord,
 } from "@/lib/adaptive/boolean-state";
 
 export function PrepCockpitSummary() {
@@ -74,6 +74,15 @@ export function PrepCockpitSummary() {
     if (!companyId || !personaId) return null;
     return getInterviewRecommendationBundle(companyId, personaId);
   }, [companyId, personaId]);
+  const launchpadResourceIds = useMemo(
+    () =>
+      recommendationBundle
+        ? recommendationBundle.topRecommendations
+            .slice(0, 5)
+            .map((recommendation) => recommendation.asset.id)
+        : [],
+    [recommendationBundle]
+  );
 
   useEffect(() => {
     if (!companyId || !personaId) return;
@@ -107,7 +116,9 @@ export function PrepCockpitSummary() {
         setLaunchpadPct(0);
       } else {
         const parsed = parseBooleanStateRecord(rawLaunchpad);
-        setLaunchpadPct(summarizeBooleanStateRecord(parsed).percentage);
+        setLaunchpadPct(
+          getBooleanStateCoveragePercentage(launchpadResourceIds, parsed)
+        );
       }
     }
 
@@ -160,7 +171,7 @@ export function PrepCockpitSummary() {
       window.removeEventListener("adaptive-prep-notes-updated", onPrepNotesUpdate);
       window.removeEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
     };
-  }, [companyId, personaId]);
+  }, [companyId, launchpadResourceIds, personaId]);
 
   if (!companyId || !personaId || !company || !persona || !recommendationBundle) {
     return null;

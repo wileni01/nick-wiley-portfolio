@@ -16,12 +16,13 @@ import {
   getPrepHistoryStorageKey,
   parsePrepHistory,
 } from "@/lib/adaptive/prep-history";
+import { getInterviewRecommendationBundle } from "@/lib/adaptive/recommendations";
 import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
 import { buildPracticeReminders } from "@/lib/adaptive/practice-reminders";
 import { getInterviewDateSummary } from "@/lib/adaptive/interview-date";
 import {
+  getBooleanStateCoveragePercentage,
   parseBooleanStateRecord,
-  summarizeBooleanStateRecord,
 } from "@/lib/adaptive/boolean-state";
 
 function getPriorityBadge(priority: "high" | "medium" | "low") {
@@ -52,6 +53,17 @@ export function PracticeRemindersCard() {
   const [readinessPct, setReadinessPct] = useState(0);
   const [latestScore, setLatestScore] = useState<number | null>(null);
   const [launchpadPct, setLaunchpadPct] = useState(0);
+  const launchpadResourceIds = useMemo(() => {
+    if (!companyId || !personaId) return [];
+    const recommendationBundle = getInterviewRecommendationBundle(
+      companyId,
+      personaId
+    );
+    if (!recommendationBundle) return [];
+    return recommendationBundle
+      .topRecommendations.slice(0, 5)
+      .map((recommendation) => recommendation.asset.id);
+  }, [companyId, personaId]);
 
   useEffect(() => {
     if (!companyId || !personaId) return;
@@ -80,7 +92,9 @@ export function PracticeRemindersCard() {
         setLaunchpadPct(0);
       } else {
         const parsed = parseBooleanStateRecord(rawLaunchpad);
-        setLaunchpadPct(summarizeBooleanStateRecord(parsed).percentage);
+        setLaunchpadPct(
+          getBooleanStateCoveragePercentage(launchpadResourceIds, parsed)
+        );
       }
     }
 
@@ -119,7 +133,7 @@ export function PracticeRemindersCard() {
       );
       window.removeEventListener("adaptive-launchpad-updated", onLaunchpadUpdate);
     };
-  }, [companyId, personaId]);
+  }, [companyId, launchpadResourceIds, personaId]);
 
   const reminders = useMemo(
     () =>

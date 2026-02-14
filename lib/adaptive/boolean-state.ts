@@ -46,6 +46,15 @@ export function summarizeBooleanStateRecord(
   return { total, truthy, percentage };
 }
 
+export function getBooleanStateCoveragePercentage(
+  expectedKeys: string[],
+  state: Record<string, boolean>
+): number {
+  if (!expectedKeys.length) return 0;
+  const coveredCount = expectedKeys.filter((key) => Boolean(state[key])).length;
+  return Math.round((coveredCount / expectedKeys.length) * 100);
+}
+
 export function areBooleanStateRecordsEqual(
   left: Record<string, boolean>,
   right: Record<string, boolean>
