@@ -30,6 +30,7 @@ const CHAT_RATE_LIMIT = {
   windowMs: 3600000,
 } as const;
 const CHAT_RETRIEVAL_TIMEOUT_MS = 4500;
+const CHAT_RETRIEVAL_QUERY_MAX_CHARS = 600;
 const NO_CONTEXT_FALLBACK_NOTE =
   "No indexed portfolio context is currently available. Respond cautiously and suggest contacting Nick for unsupported details.";
 type ChatContextSource = "retrieval" | "fallback";
@@ -132,6 +133,7 @@ export async function POST(req: Request) {
       );
     }
     const query = lastUserMessage.content;
+    const retrievalQuery = query.slice(0, CHAT_RETRIEVAL_QUERY_MAX_CHARS);
 
     // Find relevant context from knowledge base (fallback safely if retrieval fails).
     let ragContext = "";
@@ -139,7 +141,10 @@ export async function POST(req: Request) {
     let contextFallbackReason: ChatContextFallbackReason = "none";
     try {
       ragContext = sanitizeInput(
-        await withTimeout(findRelevantContext(query), CHAT_RETRIEVAL_TIMEOUT_MS),
+        await withTimeout(
+          findRelevantContext(retrievalQuery),
+          CHAT_RETRIEVAL_TIMEOUT_MS
+        ),
         10000
       );
     } catch (error) {
@@ -168,6 +173,7 @@ export async function POST(req: Request) {
           "Context retrieval returned empty results; continuing with model-only response",
         details: {
           queryChars: query.length,
+          retrievalQueryChars: retrievalQuery.length,
         },
       });
     }
