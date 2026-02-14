@@ -395,6 +395,11 @@ test("chat rate-limited responses report fallback context source and reason", as
   assert.equal(rateLimitedResponse.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(rateLimitedResponse.headers.get("X-AI-Provider"), "none");
   assert.equal(rateLimitedResponse.headers.get("X-AI-Provider-Fallback"), "none");
+  const payload = await assertErrorPayloadRequestIdMatchesHeader(rateLimitedResponse);
+  assert.equal(payload.error, "Rate limit exceeded. Please try again later.");
+  const resetIn = Number(payload.resetIn);
+  assert.ok(Number.isInteger(resetIn));
+  assert.ok(resetIn >= 0);
 });
 
 test("chat content-type validation keeps invalid_payload fallback semantics", async () => {
@@ -413,6 +418,8 @@ test("chat content-type validation keeps invalid_payload fallback semantics", as
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(response.headers.get("X-AI-Provider"), "none");
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+  const payload = await assertErrorPayloadRequestIdMatchesHeader(response);
+  assert.equal(payload.error, "Chat requests must use application/json.");
 });
 
 test("chat multi-valued content-type keeps invalid_payload fallback semantics", async () => {
@@ -863,6 +870,11 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
   assert.equal(rateLimitedResponse.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(rateLimitedResponse.headers.get("X-AI-Provider"), "none");
   assert.equal(rateLimitedResponse.headers.get("X-AI-Provider-Fallback"), "none");
+  const payload = await assertErrorPayloadRequestIdMatchesHeader(rateLimitedResponse);
+  assert.equal(payload.error, "Rate limit exceeded. Please try again shortly.");
+  const resetIn = Number(payload.resetIn);
+  assert.ok(Number.isInteger(resetIn));
+  assert.ok(resetIn >= 0);
 });
 
 test("interview-mode content-type validation keeps invalid_payload narrative fallback semantics", async () => {
@@ -881,6 +893,8 @@ test("interview-mode content-type validation keeps invalid_payload narrative fal
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(response.headers.get("X-AI-Provider"), "none");
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+  const payload = await assertErrorPayloadRequestIdMatchesHeader(response);
+  assert.equal(payload.error, "Interview mode requests must use application/json.");
 });
 
 test("interview-mode multi-valued content-type keeps invalid_payload narrative fallback semantics", async () => {
@@ -1184,6 +1198,8 @@ test("contact content-type validation keeps explicit invalid_payload delivery re
   assert.equal(response.status, 415);
   assert.equal(response.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(response.headers.get("X-Contact-Delivery-Reason"), "invalid_payload");
+  const payload = await assertErrorPayloadRequestIdMatchesHeader(response);
+  assert.equal(payload.error, "Contact form requests must use application/json.");
 });
 
 test("contact multi-valued content-type keeps explicit invalid_payload delivery reason", async () => {
@@ -1400,7 +1416,7 @@ test("contact provider delivery failures emit provider_error telemetry", async (
 
 test("contact rate-limited responses emit rate_limited delivery reason", async () => {
   const ip = uniqueIp();
-  const payload = JSON.stringify({
+  const requestPayload = JSON.stringify({
     name: "Nick",
     email: "nick@example.com",
     subject: "Hello",
@@ -1411,7 +1427,7 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
     const response = await postContact(
       buildJsonRequest({
         url: "http://localhost/api/contact",
-        body: payload,
+        body: requestPayload,
         ip,
       })
     );
@@ -1420,7 +1436,7 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
   const rateLimitedResponse = await postContact(
     buildJsonRequest({
       url: "http://localhost/api/contact",
-      body: payload,
+      body: requestPayload,
       ip,
     })
   );
@@ -1436,4 +1452,8 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
     rateLimitedResponse.headers.get("X-Contact-Delivery-Reason"),
     "rate_limited"
   );
+  const errorPayload = await assertErrorPayloadRequestIdMatchesHeader(
+    rateLimitedResponse
+  );
+  assert.equal(errorPayload.error, "Too many submissions. Please try again later.");
 });
