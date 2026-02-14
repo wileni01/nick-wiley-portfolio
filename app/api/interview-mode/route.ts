@@ -170,7 +170,16 @@ Write two short paragraphs:
           aiNarrative = cleaned;
           narrativeSource = "ai";
         }
-      } catch {
+      } catch (error) {
+        logServerWarning({
+          route: "api/interview-mode",
+          requestId,
+          message: "AI narrative generation failed; falling back to deterministic narrative",
+          details: {
+            provider: executionProvider,
+            error,
+          },
+        });
         narrativeSource = "deterministic";
       }
     }
