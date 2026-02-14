@@ -1,6 +1,8 @@
 import { normalizeRateLimitConfig, type RateLimitConfig } from "@/lib/rate-limit";
 import { normalizeRequestId } from "@/lib/request-id";
 
+const MAX_RESET_IN_SECONDS = Number.MAX_SAFE_INTEGER;
+
 export interface RateLimitSnapshot {
   remaining: number;
   resetIn: number;
@@ -15,7 +17,7 @@ interface BuildApiResponseHeadersInput {
 
 export function normalizeResetInSeconds(resetInMs: number): number {
   if (!Number.isFinite(resetInMs)) return 0;
-  return Math.max(0, Math.ceil(resetInMs / 1000));
+  return Math.min(MAX_RESET_IN_SECONDS, Math.max(0, Math.ceil(resetInMs / 1000)));
 }
 
 function normalizeRemaining(

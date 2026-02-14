@@ -10,6 +10,8 @@ const rateLimitMap = new Map<string, RateLimitEntry>();
 const RATE_LIMIT_CLEANUP_INTERVAL_MS = 60000;
 const RATE_LIMIT_MAX_ENTRIES = 50000;
 const MIN_RATE_LIMIT_WINDOW_MS = 1000;
+const MAX_RATE_LIMIT_REQUESTS = Number.MAX_SAFE_INTEGER;
+const MAX_RATE_LIMIT_WINDOW_MS = Number.MAX_SAFE_INTEGER;
 const RATE_LIMIT_IDENTIFIER_MAX_CHARS = 160;
 const SAFE_IDENTIFIER_PATTERN = /[^a-zA-Z0-9:._-]/g;
 let lastCleanupAt = 0;
@@ -47,10 +49,16 @@ export function normalizeRateLimitConfig(
   config: RateLimitConfig
 ): { maxRequests: number; windowMs: number } {
   const maxRequests = Number.isFinite(config.maxRequests)
-    ? Math.max(1, Math.floor(config.maxRequests))
+    ? Math.min(
+        MAX_RATE_LIMIT_REQUESTS,
+        Math.max(1, Math.floor(config.maxRequests))
+      )
     : 50;
   const windowMs = Number.isFinite(config.windowMs)
-    ? Math.max(MIN_RATE_LIMIT_WINDOW_MS, Math.floor(config.windowMs))
+    ? Math.min(
+        MAX_RATE_LIMIT_WINDOW_MS,
+        Math.max(MIN_RATE_LIMIT_WINDOW_MS, Math.floor(config.windowMs))
+      )
     : 3600000;
   return { maxRequests, windowMs };
 }

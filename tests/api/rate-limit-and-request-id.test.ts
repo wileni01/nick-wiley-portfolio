@@ -126,6 +126,16 @@ test("normalizeRateLimitConfig applies finite/default/minimum guards", () => {
     normalizeRateLimitConfig({ maxRequests: Number.NaN, windowMs: Number.POSITIVE_INFINITY }),
     { maxRequests: 50, windowMs: 3600000 }
   );
+  assert.deepEqual(
+    normalizeRateLimitConfig({
+      maxRequests: Number.MAX_VALUE,
+      windowMs: Number.MAX_VALUE,
+    }),
+    {
+      maxRequests: Number.MAX_SAFE_INTEGER,
+      windowMs: Number.MAX_SAFE_INTEGER,
+    }
+  );
 });
 
 test("rateLimit normalizes identifiers so equivalent keys share limits", () => {
@@ -238,10 +248,15 @@ test("rate-limit reset normalization keeps bounded exceeded window floor", () =>
   assert.equal(normalizeResetInSeconds(-250), 0);
   assert.equal(normalizeResetInSeconds(1), 1);
   assert.equal(normalizeResetInSeconds(1500), 2);
+  assert.equal(normalizeResetInSeconds(Number.MAX_VALUE), Number.MAX_SAFE_INTEGER);
 
   assert.equal(normalizeExceededResetInSeconds(-250), 1);
   assert.equal(normalizeExceededResetInSeconds(Number.NaN), 1);
   assert.equal(normalizeExceededResetInSeconds(1900), 2);
+  assert.equal(
+    normalizeExceededResetInSeconds(Number.MAX_VALUE),
+    Number.MAX_SAFE_INTEGER
+  );
 });
 
 test("buildApiResponseHeaders sanitizes request id and normalizes exceeded retry metadata", () => {
