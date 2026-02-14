@@ -5,6 +5,8 @@ const LOG_REQUEST_ID_MAX_CHARS = 120;
 const LOG_DETAILS_MAX_KEYS = 20;
 const LOG_DETAILS_MAX_DEPTH = 2;
 const LOG_DETAILS_MAX_ARRAY_ITEMS = 20;
+const SAFE_LOG_ROUTE_PATTERN = /[^a-zA-Z0-9/_:-]/g;
+const SAFE_LOG_REQUEST_ID_PATTERN = /[^a-zA-Z0-9._:-]/g;
 const SENSITIVE_LOG_KEY_PATTERN =
   /(password|passphrase|secret|token|api[-_]?key|authorization|cookie|set-cookie)/i;
 const REDACTED_LOG_VALUE = "[redacted]";
@@ -26,12 +28,19 @@ function sanitizeLogString(input: string, maxChars: number): string {
 }
 
 function sanitizeRouteLabel(route: string): string {
-  const normalized = sanitizeLogString(route, LOG_ROUTE_MAX_CHARS);
+  const normalized = sanitizeLogString(route, LOG_ROUTE_MAX_CHARS).replace(
+    SAFE_LOG_ROUTE_PATTERN,
+    ""
+  );
   return normalized || "server";
 }
 
 function sanitizeRequestIdLabel(requestId: string): string {
-  return sanitizeLogString(requestId, LOG_REQUEST_ID_MAX_CHARS);
+  const normalized = sanitizeLogString(requestId, LOG_REQUEST_ID_MAX_CHARS).replace(
+    SAFE_LOG_REQUEST_ID_PATTERN,
+    ""
+  );
+  return normalized || "unknown-request";
 }
 
 export function serializeServerError(error: unknown): SerializedServerError {
