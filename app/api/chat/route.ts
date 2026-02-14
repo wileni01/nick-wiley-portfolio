@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { streamText } from "ai";
 import {
+  applyDefaultAIProviderHeaders,
   applyResolvedAIProviderHeaders,
   getModel,
   resolveAIProvider,
@@ -78,12 +79,8 @@ export async function POST(req: Request) {
     rateLimitResult,
     rateLimitExceededResetInSeconds,
   } = context;
-  responseHeaders.set("X-AI-Provider-Requested", "unspecified");
-  responseHeaders.set("X-AI-Provider", "none");
-  responseHeaders.set("X-AI-Provider-Fallback", "none");
-  exceededHeaders.set("X-AI-Provider-Requested", "unspecified");
-  exceededHeaders.set("X-AI-Provider", "none");
-  exceededHeaders.set("X-AI-Provider-Fallback", "none");
+  applyDefaultAIProviderHeaders(responseHeaders);
+  applyDefaultAIProviderHeaders(exceededHeaders);
   responseHeaders.set("X-Chat-Context-Source", "none");
   responseHeaders.set("X-Chat-Context-Fallback", "invalid_payload");
   exceededHeaders.set("X-Chat-Context-Source", "fallback");

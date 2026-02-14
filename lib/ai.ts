@@ -71,6 +71,13 @@ export function applyResolvedAIProviderHeaders(
   return headers;
 }
 
+export function applyDefaultAIProviderHeaders(headers: Headers): Headers {
+  headers.set("X-AI-Provider-Requested", "unspecified");
+  headers.set("X-AI-Provider", "none");
+  headers.set("X-AI-Provider-Fallback", "none");
+  return headers;
+}
+
 export function getModel(provider: AIProvider = "openai") {
   switch (provider) {
     case "openai":

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { generateText } from "ai";
 import {
+  applyDefaultAIProviderHeaders,
   applyResolvedAIProviderHeaders,
   getModel,
   resolveAIProvider,
@@ -113,12 +114,8 @@ export async function POST(req: Request) {
     rateLimitResult,
     rateLimitExceededResetInSeconds,
   } = context;
-  responseHeaders.set("X-AI-Provider-Requested", "unspecified");
-  responseHeaders.set("X-AI-Provider", "none");
-  responseHeaders.set("X-AI-Provider-Fallback", "none");
-  exceededHeaders.set("X-AI-Provider-Requested", "unspecified");
-  exceededHeaders.set("X-AI-Provider", "none");
-  exceededHeaders.set("X-AI-Provider-Fallback", "none");
+  applyDefaultAIProviderHeaders(responseHeaders);
+  applyDefaultAIProviderHeaders(exceededHeaders);
   responseHeaders.set("X-AI-Narrative-Source", "none");
   responseHeaders.set("X-AI-Narrative-Fallback", "invalid_payload");
   exceededHeaders.set("X-AI-Narrative-Source", "fallback");

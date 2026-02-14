@@ -8,6 +8,7 @@ import {
   serializeServerError,
 } from "../../lib/server-error";
 import {
+  applyDefaultAIProviderHeaders,
   applyResolvedAIProviderHeaders,
   resolveAIProvider,
 } from "../../lib/ai";
@@ -306,6 +307,13 @@ test("applyResolvedAIProviderHeaders always emits fallback header", () => {
   assert.equal(fallbackHeaders.get("X-AI-Provider-Requested"), "anthropic");
   assert.equal(fallbackHeaders.get("X-AI-Provider"), "openai");
   assert.equal(fallbackHeaders.get("X-AI-Provider-Fallback"), "1");
+});
+
+test("applyDefaultAIProviderHeaders seeds unspecified provider observability state", () => {
+  const headers = applyDefaultAIProviderHeaders(new Headers());
+  assert.equal(headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(headers.get("X-AI-Provider"), "none");
+  assert.equal(headers.get("X-AI-Provider-Fallback"), "none");
 });
 
 test("deliverContactSubmission skips delivery when provider config is invalid", async () =>
