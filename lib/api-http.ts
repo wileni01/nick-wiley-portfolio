@@ -4,6 +4,8 @@ const JSON_SERIALIZATION_FALLBACK_ERROR = "Internal response serialization error
 const INVALID_CONTENT_LENGTH_ERROR = "Invalid Content-Length header.";
 const JSON_MEDIA_TYPE_PATTERN = /^application\/json(?:\s*;|$)/i;
 const CONTENT_LENGTH_DIGITS_PATTERN = /^\d+$/;
+const REQUEST_ID_HEADER_MAX_CHARS = 120;
+const SAFE_REQUEST_ID_HEADER_PATTERN = /[^a-zA-Z0-9._:-]/g;
 
 export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
@@ -31,6 +33,14 @@ function parseDeclaredContentLength(headerValue: string | null): number | null {
   return parsed;
 }
 
+function normalizeRequestIdHeaderValue(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const bounded = value.trim().slice(0, REQUEST_ID_HEADER_MAX_CHARS);
+  if (!bounded) return null;
+  const sanitized = bounded.replace(SAFE_REQUEST_ID_HEADER_PATTERN, "");
+  return sanitized || null;
+}
+
 export function jsonResponse(
   body: Record<string, unknown>,
   status: number,
@@ -47,7 +57,14 @@ export function jsonResponse(
       responseHeaders.set(key, value);
     });
   }
-  const requestId = responseHeaders.get("X-Request-Id");
+  let requestId = responseHeaders.get("X-Request-Id");
+  if (!requestId) {
+    const bodyRequestId = normalizeRequestIdHeaderValue(body.requestId);
+    if (bodyRequestId) {
+      responseHeaders.set("X-Request-Id", bodyRequestId);
+      requestId = bodyRequestId;
+    }
+  }
   const payload =
     status >= 400 && requestId && body.requestId === undefined
       ? { ...body, requestId }
