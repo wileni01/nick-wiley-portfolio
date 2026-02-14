@@ -161,6 +161,15 @@ function assertRequestIdAndReturn(response: Response): string {
   return requestId!;
 }
 
+async function assertErrorPayloadRequestIdMatchesHeader(
+  response: Response
+): Promise<Record<string, unknown>> {
+  const headerRequestId = assertRequestIdAndReturn(response);
+  const payload = (await response.json()) as Record<string, unknown>;
+  assert.equal(payload.requestId, headerRequestId);
+  return payload;
+}
+
 function assertRateLimitRemainingDecremented(
   firstResponse: Response,
   secondResponse: Response
@@ -194,6 +203,22 @@ test("chat invalid payload path emits explicit invalid_payload telemetry headers
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(response.headers.get("X-AI-Provider"), "none");
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
+test("chat invalid payload error body includes requestId matching response header", async () => {
+  const response = await postChat(
+    buildJsonRequest({
+      url: "http://localhost/api/chat",
+      body: "{}",
+      ip: uniqueIp(),
+    })
+  );
+  assert.equal(response.status, 400);
+  const payload = await assertErrorPayloadRequestIdMatchesHeader(response);
+  assert.equal(
+    payload.error,
+    "Messages are required and must be valid chat entries."
+  );
 });
 
 test("chat repeated requests decrement rate-limit remaining consistently", async () => {
@@ -578,7 +603,7 @@ test("chat no-provider path emits fallback telemetry and explicit provider defau
       assert.equal(response.headers.get("X-AI-Provider"), "none");
       assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
 
-      const payload = (await response.json()) as { error: string };
+      const payload = await assertErrorPayloadRequestIdMatchesHeader(response);
       assert.equal(
         payload.error,
         "No AI provider key is configured. Set OPENAI_API_KEY or ANTHROPIC_API_KEY."
@@ -631,6 +656,19 @@ test("interview-mode invalid payload keeps invalid_payload narrative defaults", 
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(response.headers.get("X-AI-Provider"), "none");
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
+test("interview-mode invalid payload error body includes requestId matching response header", async () => {
+  const response = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: "{}",
+      ip: uniqueIp(),
+    })
+  );
+  assert.equal(response.status, 400);
+  const payload = await assertErrorPayloadRequestIdMatchesHeader(response);
+  assert.equal(payload.error, "Invalid interview mode payload.");
 });
 
 test("interview-mode repeated requests decrement rate-limit remaining consistently", async () => {
@@ -776,12 +814,14 @@ test("interview-mode valid mode returns deterministic payload with no-provider f
         narrativeSource: string;
         deterministicNarrative: string;
         recommendations: Array<{ url: string; reason: string }>;
+        requestId?: string;
       };
       assert.equal(payload.companyName, "KUNGFU.AI");
       assert.equal(payload.personaName, "Ron Green");
       assert.equal(payload.narrativeSource, "deterministic");
       assert.ok(payload.deterministicNarrative.length > 20);
       assert.ok(payload.recommendations.length > 0);
+      assert.equal("requestId" in payload, false);
       for (const recommendation of payload.recommendations) {
         assert.match(recommendation.url, /^(\/(?!\/)|https:\/\/)/);
         assert.ok(recommendation.reason.length > 0);
@@ -1019,6 +1059,13 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
   assert.equal(
     invalidPayloadResponse.headers.get("X-Contact-Delivery-Reason"),
     "invalid_payload"
+  );
+  const invalidPayloadBody = await assertErrorPayloadRequestIdMatchesHeader(
+    invalidPayloadResponse
+  );
+  assert.equal(
+    invalidPayloadBody.error,
+    "Please provide valid name, email, and message."
   );
 
   const emptyBodyResponse = await postContact(
@@ -1299,6 +1346,7 @@ test("contact valid submission without provider keeps provider_unconfigured deli
       const payload = (await response.json()) as { success: boolean; message: string };
       assert.equal(payload.success, true);
       assert.equal(payload.message, "Thank you! Your message has been received.");
+      assert.equal("requestId" in payload, false);
     }
   ));
 
@@ -1341,7 +1389,7 @@ test("contact provider delivery failures emit provider_error telemetry", async (
             response.headers.get("X-Contact-Delivery-Reason"),
             "provider_error"
           );
-          const payload = (await response.json()) as { error: string };
+          const payload = await assertErrorPayloadRequestIdMatchesHeader(response);
           assert.equal(
             payload.error,
             "Your message could not be delivered right now. Please try again shortly."
