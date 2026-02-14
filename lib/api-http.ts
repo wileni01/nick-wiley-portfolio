@@ -1,5 +1,6 @@
 import { z } from "zod";
 const UTF8_TEXT_ENCODER = new TextEncoder();
+const JSON_SERIALIZATION_FALLBACK_ERROR = "Internal response serialization error.";
 
 export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
@@ -38,8 +39,19 @@ export function jsonResponse(
     status >= 400 && requestId && body.requestId === undefined
       ? { ...body, requestId }
       : body;
+  let serializedPayload: string;
+  try {
+    serializedPayload = JSON.stringify(payload, (_key, value) =>
+      typeof value === "bigint" ? value.toString() : value
+    );
+  } catch {
+    serializedPayload = JSON.stringify({
+      error: JSON_SERIALIZATION_FALLBACK_ERROR,
+      ...(requestId ? { requestId } : {}),
+    });
+  }
 
-  return new Response(JSON.stringify(payload), {
+  return new Response(serializedPayload, {
     status,
     headers: responseHeaders,
   });
