@@ -23,11 +23,12 @@ export interface ApiRequestContext {
 }
 
 function readContextInputValue<T>(
-  input: { req: Request; rateLimitNamespace: string; rateLimitConfig: RateLimitConfig },
+  input: unknown,
   key: "req" | "rateLimitNamespace" | "rateLimitConfig"
 ): T | undefined {
+  if (!input || typeof input !== "object") return undefined;
   try {
-    return input[key] as T | undefined;
+    return (input as Record<string, unknown>)[key] as T | undefined;
   } catch {
     return undefined;
   }

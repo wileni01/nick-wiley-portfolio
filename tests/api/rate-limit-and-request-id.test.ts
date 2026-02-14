@@ -522,6 +522,23 @@ test("buildApiResponseHeaders tolerates unreadable input getters", () => {
   assert.equal(headers.get("X-Request-Id"), null);
 });
 
+test("buildApiResponseHeaders tolerates non-object inputs", () => {
+  const headers = buildApiResponseHeaders(
+    null as unknown as {
+      config: RateLimitConfig;
+      snapshot: { remaining: number; resetIn: number };
+      requestId?: string;
+      includeRetryAfter?: boolean;
+    }
+  );
+
+  assert.equal(headers.get("X-RateLimit-Limit"), "50");
+  assert.equal(headers.get("X-RateLimit-Remaining"), "0");
+  assert.equal(headers.get("X-RateLimit-Reset"), "0");
+  assert.equal(headers.get("Retry-After"), null);
+  assert.equal(headers.get("X-Request-Id"), null);
+});
+
 test("buildApiResponseHeaders omits invalid request-id values", () => {
   const headers = buildApiResponseHeaders({
     config: { maxRequests: 5, windowMs: 1000 },
@@ -810,4 +827,19 @@ test("buildApiRequestContext falls back namespace when coercion fails", () => {
   assert.equal(second.rateLimitResult.success, false);
   assert.equal(second.exceededHeaders.get("X-RateLimit-Limit"), "1");
   assert.equal(second.exceededHeaders.get("X-RateLimit-Remaining"), "0");
+});
+
+test("buildApiRequestContext tolerates non-object inputs", () => {
+  const context = buildApiRequestContext(
+    null as unknown as {
+      req: Request;
+      rateLimitNamespace: string;
+      rateLimitConfig: RateLimitConfig;
+    }
+  );
+
+  assert.equal(context.ip, "anonymous");
+  assert.equal(context.responseHeaders.get("X-RateLimit-Limit"), "50");
+  assert.equal(context.exceededHeaders.get("X-RateLimit-Limit"), "50");
+  assert.ok(context.requestId.length > 10);
 });

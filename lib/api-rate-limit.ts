@@ -30,11 +30,12 @@ function readNumericLike(
 }
 
 function readInputValue<T>(
-  input: BuildApiResponseHeadersInput,
+  input: unknown,
   key: keyof BuildApiResponseHeadersInput
 ): T | undefined {
+  if (!input || typeof input !== "object") return undefined;
   try {
-    return input[key] as T | undefined;
+    return (input as Record<string, unknown>)[key] as T | undefined;
   } catch {
     return undefined;
   }
