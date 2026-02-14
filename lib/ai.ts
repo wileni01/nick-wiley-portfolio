@@ -2,6 +2,7 @@ import { openai } from "@ai-sdk/openai";
 import { anthropic } from "@ai-sdk/anthropic";
 
 export type AIProvider = "openai" | "anthropic";
+const MIN_API_KEY_CHARS = 10;
 const FALLBACK_PROVIDER_BY_PREFERENCE: Record<AIProvider, AIProvider> = {
   openai: "anthropic",
   anthropic: "openai",
@@ -13,11 +14,18 @@ export interface ResolvedAIProvider {
   didFallback: boolean;
 }
 
+function getProviderApiKey(provider: AIProvider): string | null {
+  const rawValue =
+    provider === "anthropic"
+      ? process.env.ANTHROPIC_API_KEY
+      : process.env.OPENAI_API_KEY;
+  if (!rawValue) return null;
+  const normalized = rawValue.trim();
+  return normalized.length >= MIN_API_KEY_CHARS ? normalized : null;
+}
+
 export function hasProviderApiKey(provider: AIProvider): boolean {
-  if (provider === "anthropic") {
-    return Boolean(process.env.ANTHROPIC_API_KEY);
-  }
-  return Boolean(process.env.OPENAI_API_KEY);
+  return getProviderApiKey(provider) !== null;
 }
 
 export function resolveAIProvider(
