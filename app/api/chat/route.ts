@@ -29,6 +29,8 @@ const CHAT_RATE_LIMIT = {
   maxRequests: 50,
   windowMs: 3600000,
 } as const;
+const NO_CONTEXT_FALLBACK_NOTE =
+  "No indexed portfolio context is currently available. Respond cautiously and suggest contacting Nick for unsupported details.";
 
 export async function POST(req: Request) {
   const context = buildApiRequestContext({
@@ -104,9 +106,9 @@ export async function POST(req: Request) {
     const query = lastUserMessage.content;
 
     // Find relevant context from knowledge base (fallback safely if retrieval fails).
-    let context = "";
+    let ragContext = "";
     try {
-      context = sanitizeInput(await findRelevantContext(query), 10000);
+      ragContext = sanitizeInput(await findRelevantContext(query), 10000);
     } catch (error) {
       logServerWarning({
         route: "api/chat",
@@ -115,6 +117,7 @@ export async function POST(req: Request) {
         details: { error },
       });
     }
+    const effectiveContext = ragContext || NO_CONTEXT_FALLBACK_NOTE;
 
     // System prompt with RAG context
     const systemPrompt = `You are Nick Wiley's AI assistant on his professional portfolio website. You answer questions about Nick's professional experience, skills, projects, and background in a helpful, conversational, and professional tone. You speak in first person as if you are representing Nick directly.
@@ -128,7 +131,7 @@ IMPORTANT RULES:
 - If asked about salary expectations, availability, or personal questions, redirect to the contact page.
 
 NICK'S PROFESSIONAL CONTEXT:
-${context}`;
+${effectiveContext}`;
 
     const model = getModel(provider);
 
