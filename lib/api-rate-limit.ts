@@ -1,4 +1,4 @@
-import type { RateLimitConfig } from "@/lib/rate-limit";
+import { normalizeRateLimitConfig, type RateLimitConfig } from "@/lib/rate-limit";
 
 interface RateLimitSnapshot {
   remaining: number;
@@ -16,10 +16,15 @@ export function buildRateLimitHeaders(
   config: RateLimitConfig,
   snapshot: RateLimitSnapshot
 ): HeadersInit {
+  const normalizedConfig = normalizeRateLimitConfig(config);
   const resetInSeconds = Math.max(0, Math.ceil(snapshot.resetIn / 1000));
+  const boundedRemaining = Math.min(
+    normalizedConfig.maxRequests,
+    Math.max(0, snapshot.remaining)
+  );
   return {
-    "X-RateLimit-Limit": String(config.maxRequests),
-    "X-RateLimit-Remaining": String(Math.max(0, snapshot.remaining)),
+    "X-RateLimit-Limit": String(normalizedConfig.maxRequests),
+    "X-RateLimit-Remaining": String(boundedRemaining),
     "X-RateLimit-Reset": String(resetInSeconds),
   };
 }

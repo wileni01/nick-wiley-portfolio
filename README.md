@@ -171,7 +171,7 @@ lib/
 - **API IP normalization** — Server routes normalize `x-forwarded-for` (first valid token in chain), standardized `forwarded`, and `x-real-ip` headers (including port/zone-id stripping), then validate normalized literals as real IPs before rate-limit keying to reduce malformed or high-cardinality edge cases; rate-limit identifiers are additionally bounded/sanitized, with lazy + capacity-bounded in-memory limiter cleanup.
 - **Shared API JSON utilities** — Server routes reuse shared JSON request parsing/response helpers for consistent invalid-payload handling, including empty-body checks, JSON content-type enforcement, and payload-size guard responses with both content-length prechecks and UTF-8 post-read size validation.
 - **Shared API request context** — API routes reuse shared request context helpers for consistent request IDs, IP-based rate-limit keying, normalized rate-limit config usage, and response header construction.
-- **Rate-limit response metadata** — API routes include standard rate-limit headers (`X-RateLimit-*`, `Retry-After` on 429) plus `X-Request-Id` across success, validation-error, and fallback 5xx responses, and error payloads now echo request IDs for easier debugging.
+- **Rate-limit response metadata** — API routes include standard rate-limit headers (`X-RateLimit-*`, `Retry-After` on 429) plus `X-Request-Id` across success, validation-error, and fallback 5xx responses; header values are normalized/clamped from effective limiter config, and error payloads echo request IDs for easier debugging.
 - **Structured API error logs** — Server route failures now log request-correlated, normalized error payloads to simplify debugging without raw-object log noise.
 
 ## Adaptive Interview Mode
