@@ -346,6 +346,26 @@ test("applyResolvedAIProviderHeaders overrides default provider header state", (
   assert.equal(headers.get("X-AI-Provider-Fallback"), "1");
 });
 
+test("applyResolvedAIProviderHeaders clears stale provider values when none selected", () => {
+  const headers = new Headers({
+    "X-AI-Provider-Requested": "openai",
+    "X-AI-Provider": "openai",
+    "X-AI-Provider-Fallback": "1",
+    "X-Custom-Header": "keep",
+  });
+
+  applyResolvedAIProviderHeaders(headers, {
+    requested: "anthropic",
+    selected: null,
+    didFallback: false,
+  });
+
+  assert.equal(headers.get("X-Custom-Header"), "keep");
+  assert.equal(headers.get("X-AI-Provider-Requested"), "anthropic");
+  assert.equal(headers.get("X-AI-Provider"), "none");
+  assert.equal(headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("deliverContactSubmission skips delivery when provider config is invalid", async () =>
   withEnv(
     {
