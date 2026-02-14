@@ -5,6 +5,13 @@ const SAFE_IP_TOKEN_PATTERN = /[^a-fA-F0-9:.]/g;
 const FORWARDED_FOR_PATTERN = /for=(?:"?\[?([^\];",]+)\]?"?)/i;
 const BRACKETED_IP_PATTERN = /^\[([^[\]]+)\](?::\d+)?$/;
 const IPV4_WITH_PORT_PATTERN = /^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/;
+const DIRECT_IP_HEADER_CANDIDATES = [
+  "cf-connecting-ip",
+  "fly-client-ip",
+  "true-client-ip",
+  "x-client-ip",
+  "x-real-ip",
+] as const;
 
 function normalizeIpToken(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -33,6 +40,14 @@ function getForwardedHeaderIp(forwardedHeader: string | null): string | null {
   return null;
 }
 
+function getDirectHeaderIp(req: Request): string | null {
+  for (const headerName of DIRECT_IP_HEADER_CANDIDATES) {
+    const normalized = normalizeIpToken(req.headers.get(headerName));
+    if (normalized) return normalized;
+  }
+  return null;
+}
+
 export function getRequestIp(req: Request): string {
   const forwarded = req.headers.get("x-forwarded-for");
   if (forwarded) {
@@ -45,8 +60,8 @@ export function getRequestIp(req: Request): string {
   const standardizedForwardedIp = getForwardedHeaderIp(req.headers.get("forwarded"));
   if (standardizedForwardedIp) return standardizedForwardedIp;
 
-  const realIp = normalizeIpToken(req.headers.get("x-real-ip"));
-  if (realIp) return realIp;
+  const directHeaderIp = getDirectHeaderIp(req);
+  if (directHeaderIp) return directHeaderIp;
 
   return "anonymous";
 }
