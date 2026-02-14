@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { generateText } from "ai";
-import { getModel, hasProviderApiKey } from "@/lib/ai";
+import { getModel, resolveAIProvider } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import {
   buildApiResponseHeaders,
@@ -25,10 +25,6 @@ const requestSchema = z.object({
 const INTERVIEW_MODE_RATE_LIMIT = {
   maxRequests: 40,
   windowMs: 3600000,
-} as const;
-const FALLBACK_PROVIDER_BY_PREFERENCE = {
-  openai: "anthropic",
-  anthropic: "openai",
 } as const;
 
 const responseSchema = z.object({
@@ -119,15 +115,11 @@ export async function POST(req: Request) {
     }
 
     const { companyId, personaId, provider } = parsed.data;
-    const fallbackProvider = FALLBACK_PROVIDER_BY_PREFERENCE[provider];
-    const executionProvider = hasProviderApiKey(provider)
-      ? provider
-      : hasProviderApiKey(fallbackProvider)
-        ? fallbackProvider
-        : null;
+    const providerResolution = resolveAIProvider(provider);
+    const executionProvider = providerResolution.selected;
     if (executionProvider) {
       responseHeaders.set("X-AI-Provider", executionProvider);
-      if (executionProvider !== provider) {
+      if (providerResolution.didFallback) {
         responseHeaders.set("X-AI-Provider-Fallback", "1");
       }
     } else {

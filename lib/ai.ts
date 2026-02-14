@@ -2,12 +2,49 @@ import { openai } from "@ai-sdk/openai";
 import { anthropic } from "@ai-sdk/anthropic";
 
 export type AIProvider = "openai" | "anthropic";
+const FALLBACK_PROVIDER_BY_PREFERENCE: Record<AIProvider, AIProvider> = {
+  openai: "anthropic",
+  anthropic: "openai",
+};
+
+export interface ResolvedAIProvider {
+  requested: AIProvider;
+  selected: AIProvider | null;
+  didFallback: boolean;
+}
 
 export function hasProviderApiKey(provider: AIProvider): boolean {
   if (provider === "anthropic") {
     return Boolean(process.env.ANTHROPIC_API_KEY);
   }
   return Boolean(process.env.OPENAI_API_KEY);
+}
+
+export function resolveAIProvider(
+  requested: AIProvider
+): ResolvedAIProvider {
+  if (hasProviderApiKey(requested)) {
+    return {
+      requested,
+      selected: requested,
+      didFallback: false,
+    };
+  }
+
+  const fallbackProvider = FALLBACK_PROVIDER_BY_PREFERENCE[requested];
+  if (hasProviderApiKey(fallbackProvider)) {
+    return {
+      requested,
+      selected: fallbackProvider,
+      didFallback: true,
+    };
+  }
+
+  return {
+    requested,
+    selected: null,
+    didFallback: false,
+  };
 }
 
 export function getModel(provider: AIProvider = "openai") {

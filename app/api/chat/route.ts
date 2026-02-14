@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { streamText } from "ai";
-import { getModel, hasProviderApiKey, type AIProvider } from "@/lib/ai";
+import { getModel, resolveAIProvider } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import {
   buildApiResponseHeaders,
@@ -29,10 +29,6 @@ const CHAT_RATE_LIMIT = {
   maxRequests: 50,
   windowMs: 3600000,
 } as const;
-const FALLBACK_PROVIDER_BY_PREFERENCE: Record<AIProvider, AIProvider> = {
-  openai: "anthropic",
-  anthropic: "openai",
-};
 
 export async function POST(req: Request) {
   const requestId = createRequestId();
@@ -75,13 +71,8 @@ export async function POST(req: Request) {
       return parsed.response;
     }
 
-    const requestedProvider: AIProvider = parsed.data.provider;
-    const fallbackProvider = FALLBACK_PROVIDER_BY_PREFERENCE[requestedProvider];
-    const provider: AIProvider | null = hasProviderApiKey(requestedProvider)
-      ? requestedProvider
-      : hasProviderApiKey(fallbackProvider)
-        ? fallbackProvider
-        : null;
+    const providerResolution = resolveAIProvider(parsed.data.provider);
+    const provider = providerResolution.selected;
     if (!provider) {
       return jsonResponse(
         {
@@ -93,7 +84,7 @@ export async function POST(req: Request) {
       );
     }
     responseHeaders.set("X-AI-Provider", provider);
-    if (provider !== requestedProvider) {
+    if (providerResolution.didFallback) {
       responseHeaders.set("X-AI-Provider-Fallback", "1");
     }
 
