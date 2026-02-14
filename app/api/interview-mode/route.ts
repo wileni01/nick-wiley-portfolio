@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { generateText } from "ai";
 import { getModel, type AIProvider } from "@/lib/ai";
+import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { sanitizeInput } from "@/lib/utils";
@@ -65,13 +66,6 @@ function hasProviderKey(provider: AIProvider): boolean {
   return Boolean(process.env.OPENAI_API_KEY);
 }
 
-function jsonResponse(body: Record<string, unknown>, status: number) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
 function sanitizeRecommendationUrl(url: string): string {
   const normalized = url.trim().slice(0, 400);
   if (!normalized) return "/";
@@ -97,16 +91,11 @@ export async function POST(req: Request) {
       );
     }
 
-    let body: unknown;
-    try {
-      body = await req.json();
-    } catch {
-      return jsonResponse({ error: "Invalid JSON payload." }, 400);
-    }
-    const parsed = requestSchema.safeParse(body);
-
+    const parsed = await parseJsonRequest(req, requestSchema, {
+      invalidPayloadMessage: "Invalid interview mode payload.",
+    });
     if (!parsed.success) {
-      return jsonResponse({ error: "Invalid interview mode payload." }, 400);
+      return parsed.response;
     }
 
     const { companyId, personaId, provider } = parsed.data;

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { streamText } from "ai";
 import { getModel, type AIProvider } from "@/lib/ai";
+import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import { findRelevantContext } from "@/lib/embeddings";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
@@ -20,13 +21,6 @@ const chatRequestSchema = z.object({
     .min(1)
     .max(24),
 });
-
-function jsonResponse(body: Record<string, unknown>, status: number) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
 
 export async function POST(req: Request) {
   try {
@@ -48,19 +42,11 @@ export async function POST(req: Request) {
       );
     }
 
-    let rawBody: unknown;
-    try {
-      rawBody = await req.json();
-    } catch {
-      return jsonResponse({ error: "Invalid JSON payload." }, 400);
-    }
-    const parsed = chatRequestSchema.safeParse(rawBody);
-
+    const parsed = await parseJsonRequest(req, chatRequestSchema, {
+      invalidPayloadMessage: "Messages are required and must be valid chat entries.",
+    });
     if (!parsed.success) {
-      return jsonResponse(
-        { error: "Messages are required and must be valid chat entries." },
-        400
-      );
+      return parsed.response;
     }
 
     const provider: AIProvider = parsed.data.provider;

@@ -166,6 +166,7 @@ lib/
 - **Chat API hardening** — Chat requests use schema validation, provider allowlisting, bounded message windows, sanitized inputs/context, and rate limiting before model execution.
 - **Interview-mode API hardening** — Interview briefing requests/responses use schema validation, allowlisted IDs/providers, bounded/sanitized narrative fields, and deterministic fallback behavior.
 - **API IP normalization** — Server routes normalize forwarded IP headers before rate-limit keying to reduce malformed header edge cases.
+- **Shared API JSON utilities** — Server routes reuse shared JSON request parsing/response helpers for consistent invalid-payload handling.
 
 ## Adaptive Interview Mode
 

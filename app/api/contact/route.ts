@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { sanitizeInput } from "@/lib/utils";
@@ -10,13 +11,6 @@ const contactRequestSchema = z.object({
   message: z.string().trim().min(1).max(5000),
   honeypot: z.string().max(200).optional().default(""),
 });
-
-function jsonResponse(body: Record<string, unknown>, status: number) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
 
 export async function POST(req: Request) {
   try {
@@ -37,18 +31,11 @@ export async function POST(req: Request) {
       );
     }
 
-    let rawBody: unknown;
-    try {
-      rawBody = await req.json();
-    } catch {
-      return jsonResponse({ error: "Invalid JSON payload." }, 400);
-    }
-    const parsedBody = contactRequestSchema.safeParse(rawBody);
+    const parsedBody = await parseJsonRequest(req, contactRequestSchema, {
+      invalidPayloadMessage: "Please provide valid name, email, and message.",
+    });
     if (!parsedBody.success) {
-      return jsonResponse(
-        { error: "Please provide valid name, email, and message." },
-        400
-      );
+      return parsedBody.response;
     }
 
     const { name, email, subject, message, honeypot } = parsedBody.data;
