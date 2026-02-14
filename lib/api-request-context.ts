@@ -1,5 +1,9 @@
 import { buildApiResponseHeaders } from "@/lib/api-rate-limit";
-import { type RateLimitConfig, rateLimit } from "@/lib/rate-limit";
+import {
+  normalizeRateLimitConfig,
+  type RateLimitConfig,
+  rateLimit,
+} from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { createRequestId } from "@/lib/request-id";
 
@@ -18,17 +22,18 @@ export function buildApiRequestContext(input: {
 }): ApiRequestContext {
   const requestId = createRequestId();
   const ip = getRequestIp(input.req);
+  const normalizedRateLimitConfig = normalizeRateLimitConfig(input.rateLimitConfig);
   const rateLimitResult = rateLimit(
     `${input.rateLimitNamespace}:${ip}`,
-    input.rateLimitConfig
+    normalizedRateLimitConfig
   );
   const responseHeaders = buildApiResponseHeaders({
-    config: input.rateLimitConfig,
+    config: normalizedRateLimitConfig,
     snapshot: rateLimitResult,
     requestId,
   });
   const exceededHeaders = buildApiResponseHeaders({
-    config: input.rateLimitConfig,
+    config: normalizedRateLimitConfig,
     snapshot: rateLimitResult,
     requestId,
     includeRetryAfter: true,

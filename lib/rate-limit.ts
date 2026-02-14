@@ -33,7 +33,7 @@ function trimRateLimitEntriesToCapacity() {
   }
 }
 
-function normalizeRateLimitConfig(
+export function normalizeRateLimitConfig(
   config: RateLimitConfig
 ): { maxRequests: number; windowMs: number } {
   const maxRequests = Number.isFinite(config.maxRequests)
