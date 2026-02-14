@@ -39,6 +39,34 @@ function withEnv(
   }
 }
 
+function withGlobalValue<T extends keyof typeof globalThis>(
+  key: T,
+  value: (typeof globalThis)[T],
+  run: () => Promise<void> | void
+) {
+  const hadOwnProperty = Object.prototype.hasOwnProperty.call(globalThis, key);
+  const previous = globalThis[key];
+  (globalThis as Record<string, unknown>)[key as string] = value as unknown;
+  const restore = () => {
+    if (hadOwnProperty) {
+      (globalThis as Record<string, unknown>)[key as string] = previous as unknown;
+    } else {
+      delete (globalThis as Record<string, unknown>)[key as string];
+    }
+  };
+
+  try {
+    const result = run();
+    if (result instanceof Promise) {
+      return result.finally(restore);
+    }
+    restore();
+  } catch (error) {
+    restore();
+    throw error;
+  }
+}
+
 function buildJsonRequest(input: {
   url: string;
   body: string;
@@ -521,6 +549,52 @@ test("contact valid submission without provider keeps provider_unconfigured deli
       assert.equal(payload.success, true);
       assert.equal(payload.message, "Thank you! Your message has been received.");
     }
+  ));
+
+test("contact provider delivery failures emit provider_error telemetry", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: "re_test_key_123456789",
+      CONTACT_EMAIL: "owner@example.com",
+      CONTACT_FROM_EMAIL: "Portfolio Contact <onboarding@resend.dev>",
+      CONTACT_REPLY_TO_EMAIL: undefined,
+    },
+    () =>
+      withGlobalValue(
+        "fetch",
+        (async () =>
+          new Response('{"error":"provider unavailable"}', {
+            status: 503,
+            headers: { "content-type": "application/json" },
+          })) as typeof fetch,
+        async () => {
+          const response = await postContact(
+            buildJsonRequest({
+              url: "http://localhost/api/contact",
+              body: JSON.stringify({
+                name: "Nick Wiley",
+                email: "nick@example.com",
+                subject: "Interview follow-up",
+                message: "Would love to connect further.",
+                honeypot: "",
+              }),
+              ip: uniqueIp(),
+            })
+          );
+
+          assert.equal(response.status, 502);
+          assert.equal(response.headers.get("X-Contact-Delivery"), "error");
+          assert.equal(
+            response.headers.get("X-Contact-Delivery-Reason"),
+            "provider_error"
+          );
+          const payload = (await response.json()) as { error: string };
+          assert.equal(
+            payload.error,
+            "Your message could not be delivered right now. Please try again shortly."
+          );
+        }
+      )
   ));
 
 test("contact rate-limited responses emit rate_limited delivery reason", async () => {
