@@ -10,6 +10,9 @@ interface EmbeddedEntry {
 // In-memory vector store (sufficient for portfolio-scale data)
 let vectorStore: EmbeddedEntry[] = [];
 let isInitialized = false;
+let initializationPromise: Promise<void> | null = null;
+let lastInitializationFailureAt = 0;
+const VECTOR_INIT_RETRY_COOLDOWN_MS = 30000;
 
 function cosineSimilarity(a: number[], b: number[]): number {
   let dotProduct = 0;
@@ -25,22 +28,44 @@ function cosineSimilarity(a: number[], b: number[]): number {
 
 export async function initializeVectorStore(): Promise<void> {
   if (isInitialized) return;
+  const now = Date.now();
+  if (
+    lastInitializationFailureAt > 0 &&
+    now - lastInitializationFailureAt < VECTOR_INIT_RETRY_COOLDOWN_MS
+  ) {
+    throw new Error("Vector store initialization cooldown active.");
+  }
+  if (initializationPromise) {
+    return initializationPromise;
+  }
 
-  const model = getEmbeddingModel();
+  initializationPromise = (async () => {
+    const model = getEmbeddingModel();
 
-  // Embed all knowledge base entries
-  const embeddings = await Promise.all(
-    knowledgeBase.map(async (entry) => {
-      const { embedding } = await embed({
-        model,
-        value: entry.content,
-      });
-      return { entry, embedding };
-    })
-  );
+    // Embed all knowledge base entries
+    const embeddings = await Promise.all(
+      knowledgeBase.map(async (entry) => {
+        const { embedding } = await embed({
+          model,
+          value: entry.content,
+        });
+        return { entry, embedding };
+      })
+    );
 
-  vectorStore = embeddings;
-  isInitialized = true;
+    vectorStore = embeddings;
+    isInitialized = true;
+    lastInitializationFailureAt = 0;
+  })();
+
+  try {
+    await initializationPromise;
+  } catch (error) {
+    lastInitializationFailureAt = Date.now();
+    throw error;
+  } finally {
+    initializationPromise = null;
+  }
 }
 
 export async function findRelevantContext(
