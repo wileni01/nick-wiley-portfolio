@@ -15,6 +15,11 @@ export interface BooleanStateSummary {
 
 const DEFAULT_MAX_KEYS = 400;
 const DEFAULT_MAX_KEY_LENGTH = 120;
+const UNSAFE_BOOLEAN_STATE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+function isSafeBooleanStateKey(value: string): boolean {
+  return value.length > 0 && !UNSAFE_BOOLEAN_STATE_KEYS.has(value);
+}
 
 export function parseBooleanStateRecord(
   raw: string | null,
@@ -22,8 +27,9 @@ export function parseBooleanStateRecord(
 ): Record<string, boolean> {
   if (!raw) return {};
   try {
-    const parsed = JSON.parse(raw) as Record<string, unknown>;
-    const normalized: Record<string, boolean> = {};
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    const normalized = Object.create(null) as Record<string, boolean>;
     const maxKeys = Math.max(1, Math.floor(options?.maxKeys ?? DEFAULT_MAX_KEYS));
     const maxKeyLength = Math.max(
       1,
@@ -31,7 +37,7 @@ export function parseBooleanStateRecord(
     );
     for (const [key, value] of Object.entries(parsed).slice(0, maxKeys)) {
       const normalizedKey = String(key).trim().slice(0, maxKeyLength);
-      if (!normalizedKey) continue;
+      if (!isSafeBooleanStateKey(normalizedKey)) continue;
       normalized[normalizedKey] = Boolean(value);
     }
     return normalized;
@@ -73,14 +79,14 @@ export function serializeBooleanStateRecord(
   const normalizedEntries = Object.entries(state)
     .map(([key, value]) => [String(key).trim().slice(0, maxKeyLength), Boolean(value)] as const)
     .filter(([normalizedKey, normalizedValue]) => {
-      if (!normalizedKey) return false;
+      if (!isSafeBooleanStateKey(normalizedKey)) return false;
       if (truthyOnly && !normalizedValue) return false;
       return true;
     })
     .sort(([left], [right]) => left.localeCompare(right))
     .slice(0, maxKeys);
 
-  const normalized: Record<string, boolean> = {};
+  const normalized = Object.create(null) as Record<string, boolean>;
   normalizedEntries.forEach(([key, value]) => {
     normalized[key] = value;
   });
