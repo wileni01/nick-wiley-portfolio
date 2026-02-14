@@ -77,8 +77,19 @@ export function jsonResponse(
       requestId = bodyRequestId;
     }
   }
+  const payloadBase = { ...body };
+  if (Object.prototype.hasOwnProperty.call(payloadBase, "requestId")) {
+    const normalizedBodyRequestId = normalizeRequestId(payloadBase.requestId);
+    if (normalizedBodyRequestId) {
+      payloadBase.requestId = normalizedBodyRequestId;
+    } else {
+      delete payloadBase.requestId;
+    }
+  }
   const payload =
-    requestedStatus >= 400 && requestId ? { ...body, requestId } : body;
+    requestedStatus >= 400 && requestId
+      ? { ...payloadBase, requestId }
+      : payloadBase;
   let serializedPayload: string;
   let responseStatus = requestedStatus;
   try {
