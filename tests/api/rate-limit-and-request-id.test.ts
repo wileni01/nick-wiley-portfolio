@@ -154,6 +154,40 @@ test("rateLimit normalizes identifiers so equivalent keys share limits", () => {
   assert.ok(second.resetIn >= 0);
 });
 
+test("rateLimit safely coerces non-string identifiers before normalization", () => {
+  const config = { maxRequests: 1, windowMs: 1000 };
+  const uniqueToken = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const objectIdentifier = {
+    toString() {
+      return `NAMESPACE:${uniqueToken}:198.51.100.78?!`;
+    },
+  };
+  const normalizedIdentifier = `namespace:${uniqueToken}:198.51.100.78`;
+
+  const first = rateLimit(objectIdentifier, config);
+  const second = rateLimit(normalizedIdentifier, config);
+
+  assert.equal(first.success, true);
+  assert.equal(first.remaining, 0);
+  assert.equal(second.success, false);
+  assert.equal(second.remaining, 0);
+});
+
+test("rateLimit does not throw when identifier coercion fails", () => {
+  const config = { maxRequests: 5, windowMs: 1000 };
+  const badIdentifier = {
+    toString() {
+      throw new Error("coercion failed");
+    },
+  };
+
+  assert.doesNotThrow(() => rateLimit(badIdentifier, config));
+  const result = rateLimit(badIdentifier, config);
+  assert.equal(typeof result.success, "boolean");
+  assert.ok(Number.isInteger(result.remaining));
+  assert.ok(result.resetIn >= 0);
+});
+
 test("rateLimit resets at inclusive window boundary and reports rolling reset times", () => {
   const originalNow = Date.now;
   let now = 1_700_000_000_000;

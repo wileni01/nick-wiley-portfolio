@@ -68,8 +68,18 @@ export interface RateLimitConfig {
   windowMs: number;
 }
 
-function normalizeRateLimitIdentifier(identifier: string): string {
-  const bounded = identifier.slice(0, RATE_LIMIT_IDENTIFIER_MAX_CHARS);
+function normalizeRateLimitIdentifier(identifier: unknown): string {
+  let rawIdentifier = "";
+  if (typeof identifier === "string") {
+    rawIdentifier = identifier;
+  } else {
+    try {
+      rawIdentifier = String(identifier ?? "");
+    } catch {
+      rawIdentifier = "";
+    }
+  }
+  const bounded = rawIdentifier.slice(0, RATE_LIMIT_IDENTIFIER_MAX_CHARS);
   const sanitized = bounded.replace(SAFE_IDENTIFIER_PATTERN, "");
   return sanitized ? sanitized.toLowerCase() : "anonymous";
 }
@@ -85,7 +95,7 @@ function getSafeWindowMs(windowMs: number, now: number): number {
 }
 
 export function rateLimit(
-  identifier: string,
+  identifier: unknown,
   config: RateLimitConfig = { maxRequests: 50, windowMs: 3600000 }
 ): { success: boolean; remaining: number; resetIn: number } {
   const now = Date.now();
