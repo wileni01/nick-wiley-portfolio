@@ -296,6 +296,51 @@ test("server log helpers keep prototype-safe detail objects for special keys", (
   assert.equal(serializedDetails.safe, "ok");
 });
 
+test("server log helpers sanitize and dedupe unsafe detail keys before redaction", () => {
+  const originalInfo = console.info;
+  const captured: Array<{ args: unknown[] }> = [];
+  console.info = (...args: unknown[]) => {
+    captured.push({ args });
+  };
+
+  const longKey = "x".repeat(120);
+  const details: Record<string, unknown> = {
+    " api\u202Ekey ": "secret-value",
+    "tok\u0000en": "hidden-token",
+    "normal key": "value",
+    "***": "fallback-key-value",
+    " key ": "collision-value",
+    [longKey]: "long-key-value",
+  };
+
+  try {
+    logServerInfo({
+      route: "api/chat",
+      requestId: "safe-keys",
+      message: "sanitize keys",
+      details,
+    });
+  } finally {
+    console.info = originalInfo;
+  }
+
+  assert.equal(captured.length, 1);
+  const payload = captured[0]?.args[1] as {
+    details?: Record<string, unknown>;
+  };
+  assert.ok(payload.details);
+  const serializedDetails = payload.details as Record<string, unknown>;
+  assert.equal(serializedDetails.apikey, "[redacted]");
+  assert.equal(serializedDetails.token, "[redacted]");
+  assert.equal(serializedDetails.normalkey, "value");
+  assert.equal(serializedDetails.key, "fallback-key-value");
+  assert.equal(serializedDetails.key_1, "collision-value");
+  assert.equal(serializedDetails["x".repeat(80)], "long-key-value");
+  assert.equal(Object.prototype.hasOwnProperty.call(serializedDetails, " api\u202Ekey "), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(serializedDetails, "tok\u0000en"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(serializedDetails, longKey), false);
+});
+
 test("resolveAIProvider honors available keys and fallback behavior", () =>
   withEnv(
     {

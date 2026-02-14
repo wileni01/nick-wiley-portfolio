@@ -7,8 +7,10 @@ const LOG_REQUEST_ID_MAX_CHARS = 120;
 const LOG_DETAILS_MAX_KEYS = 20;
 const LOG_DETAILS_MAX_DEPTH = 2;
 const LOG_DETAILS_MAX_ARRAY_ITEMS = 20;
+const LOG_DETAILS_KEY_MAX_CHARS = 80;
 const SAFE_LOG_ROUTE_PATTERN = /[^a-zA-Z0-9/_:-]/g;
 const SAFE_LOG_REQUEST_ID_PATTERN = /[^a-zA-Z0-9._:-]/g;
+const SAFE_LOG_DETAILS_KEY_PATTERN = /[^a-zA-Z0-9._:-]/g;
 const SENSITIVE_LOG_KEY_PATTERN =
   /(password|passphrase|secret|token|api[-_]?key|authorization|cookie|set-cookie)/i;
 const REDACTED_LOG_VALUE = "[redacted]";
@@ -81,6 +83,33 @@ interface ServerInfoLogInput extends ServerLogBaseInput {
   message: string;
 }
 
+function sanitizeDetailKey(key: string): string {
+  const normalized = sanitizeLogString(key, LOG_DETAILS_KEY_MAX_CHARS).replace(
+    SAFE_LOG_DETAILS_KEY_PATTERN,
+    ""
+  );
+  return normalized || "key";
+}
+
+function getUniqueDetailKey(
+  target: Record<string, unknown>,
+  baseKey: string
+): string {
+  if (!Object.prototype.hasOwnProperty.call(target, baseKey)) return baseKey;
+  for (let suffix = 1; suffix <= LOG_DETAILS_MAX_KEYS; suffix += 1) {
+    const suffixToken = `_${suffix}`;
+    const boundedBase = baseKey.slice(
+      0,
+      Math.max(1, LOG_DETAILS_KEY_MAX_CHARS - suffixToken.length)
+    );
+    const candidate = `${boundedBase}${suffixToken}`;
+    if (!Object.prototype.hasOwnProperty.call(target, candidate)) {
+      return candidate;
+    }
+  }
+  return `${baseKey.slice(0, Math.max(1, LOG_DETAILS_KEY_MAX_CHARS - 4))}_dup`;
+}
+
 function sanitizeLogValue(
   value: unknown,
   depth: number,
@@ -134,7 +163,11 @@ function sanitizeLogValue(
       );
       const sanitizedObject = Object.create(null) as Record<string, unknown>;
       for (const [key, nestedValue] of entries) {
-        sanitizedObject[key] = SENSITIVE_LOG_KEY_PATTERN.test(key)
+        const sanitizedKey = getUniqueDetailKey(
+          sanitizedObject,
+          sanitizeDetailKey(key)
+        );
+        sanitizedObject[sanitizedKey] = SENSITIVE_LOG_KEY_PATTERN.test(sanitizedKey)
           ? REDACTED_LOG_VALUE
           : sanitizeLogValue(nestedValue, depth + 1, seen);
       }
