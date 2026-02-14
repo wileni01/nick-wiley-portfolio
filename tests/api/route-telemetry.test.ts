@@ -93,6 +93,11 @@ function buildJsonRequest(input: {
 
 let ipCounter = 0;
 const SAFE_REQUEST_ID_HEADER_PATTERN = /^[A-Za-z0-9._:-]{1,120}$/;
+const EXPECTED_RATE_LIMIT_LIMITS = {
+  chat: 50,
+  interviewMode: 40,
+  contact: 5,
+} as const;
 
 function uniqueIp() {
   ipCounter += 1;
@@ -136,6 +141,13 @@ function assertRateLimitLimitHeaderEquals(response: Response, expected: number) 
   const limitHeader = response.headers.get("X-RateLimit-Limit");
   assert.notEqual(limitHeader, null);
   assert.equal(Number(limitHeader), expected);
+}
+
+function assertRouteRateLimitLimitHeader(
+  response: Response,
+  route: keyof typeof EXPECTED_RATE_LIMIT_LIMITS
+) {
+  assertRateLimitLimitHeaderEquals(response, EXPECTED_RATE_LIMIT_LIMITS[route]);
 }
 
 function assertRetryAfterHeader(response: Response) {
@@ -226,7 +238,7 @@ test("chat invalid payload path emits explicit invalid_payload telemetry headers
   assert.equal(response.status, 400);
   assertStandardJsonSecurityHeaders(response);
   assertStandardRateLimitHeaders(response);
-  assertRateLimitLimitHeaderEquals(response, 50);
+  assertRouteRateLimitLimitHeader(response, "chat");
   assert.equal(response.headers.get("X-Chat-Context-Source"), "none");
   assert.equal(response.headers.get("X-Chat-Context-Fallback"), "invalid_payload");
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
@@ -414,7 +426,7 @@ test("chat rate-limited responses report fallback context source and reason", as
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
   assertExhaustedRateLimitHeaders(rateLimitedResponse);
-  assertRateLimitLimitHeaderEquals(rateLimitedResponse, 50);
+  assertRouteRateLimitLimitHeader(rateLimitedResponse, "chat");
   assert.equal(rateLimitedResponse.headers.get("X-Chat-Context-Source"), "fallback");
   assert.equal(
     rateLimitedResponse.headers.get("X-Chat-Context-Fallback"),
@@ -630,7 +642,7 @@ test("chat no-provider path emits fallback telemetry and explicit provider defau
       assert.equal(response.status, 503);
       assertStandardJsonSecurityHeaders(response);
       assertStandardRateLimitHeaders(response);
-      assertRateLimitLimitHeaderEquals(response, 50);
+      assertRouteRateLimitLimitHeader(response, "chat");
       assert.equal(response.headers.get("X-Chat-Context-Source"), "fallback");
       assert.equal(response.headers.get("X-Chat-Context-Fallback"), "no_provider");
       assert.equal(response.headers.get("X-AI-Provider-Requested"), "openai");
@@ -687,7 +699,7 @@ test("interview-mode invalid payload keeps invalid_payload narrative defaults", 
   assert.equal(response.status, 400);
   assertStandardJsonSecurityHeaders(response);
   assertStandardRateLimitHeaders(response);
-  assertRateLimitLimitHeaderEquals(response, 40);
+  assertRouteRateLimitLimitHeader(response, "interviewMode");
   assert.equal(response.headers.get("X-AI-Narrative-Source"), "none");
   assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_payload");
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
@@ -839,7 +851,7 @@ test("interview-mode valid mode returns deterministic payload with no-provider f
       assert.equal(response.status, 200);
       assertStandardJsonSecurityHeaders(response);
       assertStandardRateLimitHeaders(response);
-      assertRateLimitLimitHeaderEquals(response, 40);
+      assertRouteRateLimitLimitHeader(response, "interviewMode");
       assert.equal(response.headers.get("X-AI-Provider-Requested"), "openai");
       assert.equal(response.headers.get("X-AI-Provider"), "none");
       assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
@@ -889,7 +901,7 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
   assertExhaustedRateLimitHeaders(rateLimitedResponse);
-  assertRateLimitLimitHeaderEquals(rateLimitedResponse, 40);
+  assertRouteRateLimitLimitHeader(rateLimitedResponse, "interviewMode");
   assert.equal(rateLimitedResponse.headers.get("X-AI-Narrative-Source"), "fallback");
   assert.equal(
     rateLimitedResponse.headers.get("X-AI-Narrative-Fallback"),
@@ -1095,7 +1107,7 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
   assert.equal(invalidPayloadResponse.status, 400);
   assertStandardJsonSecurityHeaders(invalidPayloadResponse);
   assertStandardRateLimitHeaders(invalidPayloadResponse);
-  assertRateLimitLimitHeaderEquals(invalidPayloadResponse, 5);
+  assertRouteRateLimitLimitHeader(invalidPayloadResponse, "contact");
   assert.equal(invalidPayloadResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     invalidPayloadResponse.headers.get("X-Contact-Delivery-Reason"),
@@ -1388,7 +1400,7 @@ test("contact valid submission without provider keeps provider_unconfigured deli
       assert.equal(response.status, 200);
       assertStandardJsonSecurityHeaders(response);
       assertStandardRateLimitHeaders(response);
-      assertRateLimitLimitHeaderEquals(response, 5);
+      assertRouteRateLimitLimitHeader(response, "contact");
       assert.equal(response.headers.get("X-Contact-Delivery"), "skipped");
       assert.equal(
         response.headers.get("X-Contact-Delivery-Reason"),
@@ -1479,7 +1491,7 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
   assert.equal(rateLimitedResponse.status, 429);
   assertStandardJsonSecurityHeaders(rateLimitedResponse);
   assertExhaustedRateLimitHeaders(rateLimitedResponse);
-  assertRateLimitLimitHeaderEquals(rateLimitedResponse, 5);
+  assertRouteRateLimitLimitHeader(rateLimitedResponse, "contact");
   assert.equal(rateLimitedResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     rateLimitedResponse.headers.get("X-Contact-Delivery-Reason"),
