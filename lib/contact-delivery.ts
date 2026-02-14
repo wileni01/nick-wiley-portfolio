@@ -61,7 +61,10 @@ function redactEmails(value: string): string {
 }
 
 function isAbortLikeError(error: unknown): boolean {
-  return error instanceof Error && error.name === "AbortError";
+  return (
+    error instanceof Error &&
+    (error.name === "AbortError" || error.name === "TimeoutError")
+  );
 }
 
 function getContactDeliveryConfig() {

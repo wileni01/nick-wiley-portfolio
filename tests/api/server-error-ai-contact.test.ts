@@ -333,7 +333,7 @@ test("deliverContactSubmission normalizes fallback sender and omits invalid repl
     }
   ));
 
-test("deliverContactSubmission classifies abort-like fetch failures as timeout", async () =>
+test("deliverContactSubmission classifies abort-like and timeout errors as timeout", async () =>
   withEnv(
     {
       RESEND_API_KEY: "resend-api-key-12345",
@@ -341,27 +341,29 @@ test("deliverContactSubmission classifies abort-like fetch failures as timeout",
       CONTACT_FROM_EMAIL: undefined,
     },
     async () => {
-      const originalFetch = globalThis.fetch;
-      globalThis.fetch = (async () => {
-        const abortError = new Error("request aborted");
-        abortError.name = "AbortError";
-        throw abortError;
-      }) as typeof fetch;
+      for (const errorName of ["AbortError", "TimeoutError"] as const) {
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = (async () => {
+          const timeoutError = new Error(`request failed: ${errorName}`);
+          timeoutError.name = errorName;
+          throw timeoutError;
+        }) as typeof fetch;
 
-      try {
-        const result = await deliverContactSubmission({
-          name: "Nick",
-          email: "nick@example.com",
-          subject: "hello",
-          message: "world",
-        });
-        assert.equal(result.attempted, true);
-        assert.equal(result.delivered, false);
-        assert.ok(
-          result.error?.includes("Resend request timed out after 8000ms")
-        );
-      } finally {
-        globalThis.fetch = originalFetch;
+        try {
+          const result = await deliverContactSubmission({
+            name: "Nick",
+            email: "nick@example.com",
+            subject: "hello",
+            message: "world",
+          });
+          assert.equal(result.attempted, true);
+          assert.equal(result.delivered, false);
+          assert.ok(
+            result.error?.includes("Resend request timed out after 8000ms")
+          );
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
       }
     }
   ));
