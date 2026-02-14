@@ -134,6 +134,12 @@ function assertRetryAfterHeader(response: Response) {
   assert.ok(retryAfter >= 1);
 }
 
+function assertStandardJsonSecurityHeaders(response: Response) {
+  assert.equal(response.headers.get("Content-Type"), "application/json; charset=utf-8");
+  assert.equal(response.headers.get("Cache-Control"), "no-store");
+  assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
+}
+
 test("chat invalid payload path emits explicit invalid_payload telemetry headers", async () => {
   const response = await postChat(
     buildJsonRequest({
@@ -144,6 +150,7 @@ test("chat invalid payload path emits explicit invalid_payload telemetry headers
   );
 
   assert.equal(response.status, 400);
+  assertStandardJsonSecurityHeaders(response);
   assertStandardRateLimitHeaders(response);
   assert.equal(response.headers.get("X-Chat-Context-Source"), "none");
   assert.equal(response.headers.get("X-Chat-Context-Fallback"), "invalid_payload");
@@ -230,6 +237,7 @@ test("chat rate-limited responses report fallback context source and reason", as
     })
   );
   assert.equal(rateLimitedResponse.status, 429);
+  assertStandardJsonSecurityHeaders(rateLimitedResponse);
   assertStandardRateLimitHeaders(rateLimitedResponse);
   assertRetryAfterHeader(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-Chat-Context-Source"), "fallback");
@@ -490,6 +498,7 @@ test("interview-mode invalid payload keeps invalid_payload narrative defaults", 
   );
 
   assert.equal(response.status, 400);
+  assertStandardJsonSecurityHeaders(response);
   assertStandardRateLimitHeaders(response);
   assert.equal(response.headers.get("X-AI-Narrative-Source"), "none");
   assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_payload");
@@ -590,6 +599,7 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
     })
   );
   assert.equal(rateLimitedResponse.status, 429);
+  assertStandardJsonSecurityHeaders(rateLimitedResponse);
   assertStandardRateLimitHeaders(rateLimitedResponse);
   assertRetryAfterHeader(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-AI-Narrative-Source"), "fallback");
@@ -790,6 +800,7 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
     })
   );
   assert.equal(invalidPayloadResponse.status, 400);
+  assertStandardJsonSecurityHeaders(invalidPayloadResponse);
   assertStandardRateLimitHeaders(invalidPayloadResponse);
   assert.equal(invalidPayloadResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
@@ -1066,6 +1077,7 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
     })
   );
   assert.equal(rateLimitedResponse.status, 429);
+  assertStandardJsonSecurityHeaders(rateLimitedResponse);
   assertStandardRateLimitHeaders(rateLimitedResponse);
   assertRetryAfterHeader(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-Contact-Delivery"), "skipped");
