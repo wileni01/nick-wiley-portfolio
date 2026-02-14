@@ -18,6 +18,8 @@ const LOG_ERROR_BODY_MAX_CHARS = 500;
 const MIN_RESEND_API_KEY_CHARS = 10;
 const EMAIL_VALUE_MAX_CHARS = 320;
 const SUBJECT_VALUE_MAX_CHARS = 200;
+const CONTROL_CHARS_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+const BIDI_OVERRIDE_PATTERN = /[\u202A-\u202E\u2066-\u2069]/g;
 const EMAIL_REDACTION_PATTERN =
   /[A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63}/gi;
 const SIMPLE_EMAIL_PATTERN =
@@ -26,14 +28,17 @@ const FORMATTED_EMAIL_PATTERN =
   /^([^<>\r\n]{1,120})<\s*([A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63})\s*>$/i;
 
 function sanitizeInlineValue(value: string): string {
-  return value.replace(/[\r\n\t]/g, " ").trim().slice(0, EMAIL_VALUE_MAX_CHARS);
+  return value
+    .replace(CONTROL_CHARS_PATTERN, "")
+    .replace(BIDI_OVERRIDE_PATTERN, "")
+    .replace(/[\r\n\t]/g, " ")
+    .trim()
+    .slice(0, EMAIL_VALUE_MAX_CHARS);
 }
 
 function normalizeSubject(value: string): string {
-  const normalized = value
-    .replace(/[\r\n\t]/g, " ")
+  const normalized = sanitizeInlineValue(value)
     .replace(/\s+/g, " ")
-    .trim()
     .slice(0, SUBJECT_VALUE_MAX_CHARS);
   return normalized || "New message";
 }

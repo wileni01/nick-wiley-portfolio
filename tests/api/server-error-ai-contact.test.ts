@@ -496,7 +496,7 @@ test("deliverContactSubmission sanitizes outgoing payload and redacts provider e
     {
       RESEND_API_KEY: "resend-api-key-12345",
       CONTACT_EMAIL: "team@example.com",
-      CONTACT_FROM_EMAIL: "Display\r\nName <from@example.com>",
+      CONTACT_FROM_EMAIL: "Display\u202E\r\nName <from@example.com>",
     },
     async () => {
       const originalFetch = globalThis.fetch;
@@ -513,7 +513,7 @@ test("deliverContactSubmission sanitizes outgoing payload and redacts provider e
         const success = await deliverContactSubmission({
           name: "Nick",
           email: "nick@example.com",
-          subject: "Hello\r\nWorld",
+          subject: "Hello\u202E\r\nWorld\u0000",
           message: "Testing",
         });
         assert.equal(success.attempted, true);
