@@ -12,6 +12,7 @@ import {
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { createRequestId } from "@/lib/request-id";
+import { serializeServerError } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 import {
   buildDeterministicNarrative,
@@ -218,7 +219,10 @@ Write two short paragraphs:
     };
     const validatedResponse = responseSchema.safeParse(response);
     if (!validatedResponse.success) {
-      console.error("Interview mode response validation error:", validatedResponse.error);
+      console.error("Interview mode response validation error:", {
+        requestId,
+        error: validatedResponse.error.issues.slice(0, 5),
+      });
       return jsonResponse(
         {
           error:
@@ -231,7 +235,10 @@ Write two short paragraphs:
 
     return jsonResponse(validatedResponse.data, 200, responseHeaders);
   } catch (error) {
-    console.error("Interview mode API error:", error);
+    console.error("Interview mode API error:", {
+      requestId,
+      error: serializeServerError(error),
+    });
     return jsonResponse(
       {
         error:

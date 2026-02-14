@@ -7,6 +7,7 @@ import { deliverContactSubmission } from "@/lib/contact-delivery";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { createRequestId } from "@/lib/request-id";
+import { serializeServerError } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 
 const contactRequestSchema = z.object({
@@ -94,7 +95,10 @@ export async function POST(req: Request) {
 
     const delivery = await deliverContactSubmission(sanitized);
     if (delivery.attempted && !delivery.delivered) {
-      console.error("Contact form delivery error:", delivery.error);
+      console.error("Contact form delivery error:", {
+        requestId,
+        deliveryError: delivery.error ?? "unknown delivery error",
+      });
       return jsonResponse(
         {
           error:
@@ -114,7 +118,10 @@ export async function POST(req: Request) {
       responseHeaders
     );
   } catch (error) {
-    console.error("Contact form error:", error);
+    console.error("Contact form error:", {
+      requestId,
+      error: serializeServerError(error),
+    });
     return jsonResponse(
       { error: "An error occurred. Please try again." },
       500,

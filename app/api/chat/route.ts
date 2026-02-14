@@ -13,6 +13,7 @@ import { findRelevantContext } from "@/lib/embeddings";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { createRequestId } from "@/lib/request-id";
+import { serializeServerError } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 
 export const maxDuration = 30;
@@ -152,7 +153,10 @@ ${context}`;
       },
     });
   } catch (error) {
-    console.error("Chat API error:", error);
+    console.error("Chat API error:", {
+      requestId,
+      error: serializeServerError(error),
+    });
     return jsonResponse(
       {
         error: "An error occurred processing your request. Please check that API keys are configured.",
