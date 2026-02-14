@@ -451,6 +451,18 @@ test("getRequestIp falls back to standardized forwarded and direct headers", () 
   assert.equal(getRequestIp(directReq), "198.51.100.22");
 });
 
+test("getRequestIp skips invalid forwarded segments until first valid entry", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": "unknown",
+      forwarded:
+        "for=invalid-host;proto=https,for=\"[2001:db8::7%eth0]:443\";proto=http",
+    },
+  });
+
+  assert.equal(getRequestIp(req), "2001:db8::7");
+});
+
 test("getRequestIp returns anonymous when no valid headers exist", () => {
   const req = new Request("http://localhost/api/test", {
     headers: {
@@ -491,4 +503,14 @@ test("getRequestIp continues through direct proxy candidates until first valid v
   });
 
   assert.equal(getRequestIp(req), "2001:db8::44");
+});
+
+test("getRequestIp normalizes x-forwarded-for bracketed ipv6 zone and port values", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": "unknown, [2001:db8::55%eth0]:9443, 198.51.100.60",
+    },
+  });
+
+  assert.equal(getRequestIp(req), "2001:db8::55");
 });
