@@ -117,3 +117,29 @@ test("google calendar event links include prep checkpoints and interview slot", 
   });
   assert.equal(directUrl, interviewEvent?.url);
 });
+
+test("calendar checkpoints are filtered to on-or-after today", () => {
+  const today = new Date();
+  const isoToday = `${today.getUTCFullYear()}-${String(today.getUTCMonth() + 1).padStart(2, "0")}-${String(today.getUTCDate()).padStart(2, "0")}`;
+
+  const events = buildInterviewGoogleCalendarEvents({
+    companyName: "KUNGFU.AI",
+    personaName: "Ron Green",
+    interviewDate: isoToday,
+  });
+
+  assert.deepEqual(
+    events.map((event) => event.id),
+    ["interview"]
+  );
+  assert.ok(events[0]?.url.includes("dates="));
+
+  const ics = buildInterviewPrepCalendarIcs({
+    companyName: "KUNGFU.AI",
+    personaName: "Ron Green",
+    interviewDate: isoToday,
+  });
+  const eventMatches = ics.match(/BEGIN:VEVENT/g) ?? [];
+  assert.equal(eventMatches.length, 1);
+  assert.ok(ics.includes("Interview — KUNGFU.AI (Ron Green)"));
+});
