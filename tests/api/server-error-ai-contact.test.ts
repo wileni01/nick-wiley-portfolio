@@ -462,6 +462,35 @@ test("deliverContactSubmission skips delivery when provider config is invalid", 
     }
   ));
 
+test("deliverContactSubmission skips delivery when API key is shorter than minimum length", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: "short",
+      CONTACT_EMAIL: "team@example.com",
+      CONTACT_FROM_EMAIL: "Portfolio Contact <from@example.com>",
+    },
+    async () => {
+      const originalFetch = globalThis.fetch;
+      let fetchCalled = false;
+      globalThis.fetch = (async () => {
+        fetchCalled = true;
+        return new Response("", { status: 200 });
+      }) as typeof fetch;
+      try {
+        const result = await deliverContactSubmission({
+          name: "A",
+          email: "a@example.com",
+          subject: "hello",
+          message: "world",
+        });
+        assert.equal(fetchCalled, false);
+        assert.deepEqual(result, { attempted: false, delivered: false });
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    }
+  ));
+
 test("deliverContactSubmission sanitizes outgoing payload and redacts provider errors", async () =>
   withEnv(
     {

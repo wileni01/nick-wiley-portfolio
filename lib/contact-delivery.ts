@@ -15,6 +15,7 @@ const RESEND_API_URL = "https://api.resend.com/emails";
 const CONTACT_DELIVERY_TIMEOUT_MS = 8000;
 const DEFAULT_CONTACT_FROM = "Portfolio Contact <onboarding@resend.dev>";
 const LOG_ERROR_BODY_MAX_CHARS = 500;
+const MIN_RESEND_API_KEY_CHARS = 10;
 const EMAIL_VALUE_MAX_CHARS = 320;
 const SUBJECT_VALUE_MAX_CHARS = 200;
 const EMAIL_REDACTION_PATTERN =
@@ -73,7 +74,14 @@ function getContactDeliveryConfig() {
   const fromEmail = normalizeFromAddress(
     process.env.CONTACT_FROM_EMAIL?.trim() || DEFAULT_CONTACT_FROM
   );
-  if (!apiKey || !toEmail || !isSimpleEmail(toEmail)) return null;
+  if (
+    !apiKey ||
+    apiKey.length < MIN_RESEND_API_KEY_CHARS ||
+    !toEmail ||
+    !isSimpleEmail(toEmail)
+  ) {
+    return null;
+  }
   return { apiKey, toEmail, fromEmail };
 }
 
