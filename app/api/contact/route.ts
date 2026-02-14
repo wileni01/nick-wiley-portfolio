@@ -64,6 +64,11 @@ export async function POST(req: Request) {
     // Honeypot check — if filled, it's a bot
     if (honeypot) {
       responseHeaders.set("X-Contact-Delivery-Reason", "honeypot");
+      logServerInfo({
+        route: "api/contact",
+        requestId,
+        message: "Contact honeypot triggered; submission treated as bot",
+      });
       // Return success to not tip off bots
       return jsonResponse({ success: true }, 200, responseHeaders);
     }
