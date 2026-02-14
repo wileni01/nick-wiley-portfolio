@@ -51,6 +51,17 @@ const STORAGE_KEYS = {
   focusNote: "adaptive.focusNote",
 } as const;
 
+function syncStorageValue(key: string, value: string | null) {
+  const existing = localStorage.getItem(key);
+  if (value === null) {
+    if (existing === null) return;
+    localStorage.removeItem(key);
+    return;
+  }
+  if (existing === value) return;
+  localStorage.setItem(key, value);
+}
+
 export function InterviewModeProvider({ children }: { children: ReactNode }) {
   const [companyId, setCompanyIdState] = useState<CompanyId | null>(null);
   const [personaId, setPersonaIdState] = useState<string | null>(null);
@@ -116,24 +127,12 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
+    const normalizedFocus = focusNote.trim();
 
-    if (companyId) {
-      localStorage.setItem(STORAGE_KEYS.companyId, companyId);
-    } else {
-      localStorage.removeItem(STORAGE_KEYS.companyId);
-    }
-
-    if (personaId) {
-      localStorage.setItem(STORAGE_KEYS.personaId, personaId);
-    } else {
-      localStorage.removeItem(STORAGE_KEYS.personaId);
-    }
-    localStorage.setItem(STORAGE_KEYS.provider, provider);
-    if (focusNote.trim()) {
-      localStorage.setItem(STORAGE_KEYS.focusNote, focusNote.trim());
-    } else {
-      localStorage.removeItem(STORAGE_KEYS.focusNote);
-    }
+    syncStorageValue(STORAGE_KEYS.companyId, companyId);
+    syncStorageValue(STORAGE_KEYS.personaId, personaId);
+    syncStorageValue(STORAGE_KEYS.provider, provider);
+    syncStorageValue(STORAGE_KEYS.focusNote, normalizedFocus || null);
 
     const params = new URLSearchParams(window.location.search);
     if (companyId) {
@@ -160,8 +159,8 @@ export function InterviewModeProvider({ children }: { children: ReactNode }) {
       params.delete("date");
     }
     params.set("provider", provider);
-    if (focusNote.trim()) {
-      params.set("focus", focusNote.trim());
+    if (normalizedFocus) {
+      params.set("focus", normalizedFocus);
     } else {
       params.delete("focus");
     }
