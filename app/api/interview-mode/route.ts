@@ -2,6 +2,7 @@ import { z } from "zod";
 import { generateText } from "ai";
 import { getModel, type AIProvider } from "@/lib/ai";
 import { rateLimit } from "@/lib/rate-limit";
+import { getRequestIp } from "@/lib/request-ip";
 import { sanitizeInput } from "@/lib/utils";
 import {
   buildDeterministicNarrative,
@@ -26,10 +27,7 @@ function hasProviderKey(provider: AIProvider): boolean {
 
 export async function POST(req: Request) {
   try {
-    const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.headers.get("x-real-ip") ||
-      "anonymous";
+    const ip = getRequestIp(req);
 
     const limit = rateLimit(`interview-mode:${ip}`, {
       maxRequests: 40,

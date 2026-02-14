@@ -3,6 +3,7 @@ import { streamText } from "ai";
 import { getModel, type AIProvider } from "@/lib/ai";
 import { findRelevantContext } from "@/lib/embeddings";
 import { rateLimit } from "@/lib/rate-limit";
+import { getRequestIp } from "@/lib/request-ip";
 import { sanitizeInput } from "@/lib/utils";
 
 export const maxDuration = 30;
@@ -30,10 +31,7 @@ function jsonResponse(body: Record<string, unknown>, status: number) {
 export async function POST(req: Request) {
   try {
     // Rate limiting
-    const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0] ||
-      req.headers.get("x-real-ip") ||
-      "anonymous";
+    const ip = getRequestIp(req);
 
     const rateLimitResult = rateLimit(`chat:${ip}`, {
       maxRequests: 50,
