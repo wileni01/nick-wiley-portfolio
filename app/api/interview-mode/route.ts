@@ -82,7 +82,9 @@ function sanitizeRecommendationUrl(url: string): string {
   }
   try {
     const parsed = new URL(normalized);
-    return parsed.protocol === "https:" ? parsed.toString().slice(0, 400) : "/";
+    if (parsed.protocol !== "https:") return "/";
+    if (parsed.username || parsed.password) return "/";
+    return parsed.toString().slice(0, 400);
   } catch {
     return "/";
   }
