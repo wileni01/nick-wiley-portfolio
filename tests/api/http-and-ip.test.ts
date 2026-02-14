@@ -221,3 +221,19 @@ test("getRequestIp returns anonymous when no valid headers exist", () => {
   });
   assert.equal(getRequestIp(req), "anonymous");
 });
+
+test("getRequestIp falls back through direct proxy header candidates", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": "unknown",
+      forwarded: "for=invalid-hostname",
+      "cf-connecting-ip": "invalid",
+      "fly-client-ip": "\"198.51.100.30:443\"",
+      "true-client-ip": "198.51.100.31",
+      "x-client-ip": "198.51.100.32",
+      "x-real-ip": "198.51.100.33",
+    },
+  });
+
+  assert.equal(getRequestIp(req), "198.51.100.30");
+});
