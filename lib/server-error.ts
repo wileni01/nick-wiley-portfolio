@@ -13,6 +13,8 @@ const SAFE_LOG_REQUEST_ID_PATTERN = /[^a-zA-Z0-9._:-]/g;
 const SAFE_LOG_DETAILS_KEY_PATTERN = /[^a-zA-Z0-9._:-]/g;
 const SENSITIVE_LOG_KEY_PATTERN =
   /(password|passphrase|secret|token|api[-_]?key|authorization|cookie|set-cookie)/i;
+const COMPACT_SENSITIVE_LOG_KEY_PATTERN =
+  /(password|passphrase|secret|token|apikey|authorization|cookie|setcookie)/i;
 const REDACTED_LOG_VALUE = "[redacted]";
 const CIRCULAR_LOG_VALUE = "[circular]";
 const INVALID_DATE_LOG_VALUE = "[invalid-date]";
@@ -110,6 +112,21 @@ function getUniqueDetailKey(
   return `${baseKey.slice(0, Math.max(1, LOG_DETAILS_KEY_MAX_CHARS - 4))}_dup`;
 }
 
+function isSensitiveLogKey(rawKey: string, normalizedKey: string): boolean {
+  const compactRawKey = sanitizeLogString(rawKey, LOG_DETAILS_KEY_MAX_CHARS)
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  const compactNormalizedKey = normalizedKey
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  return (
+    SENSITIVE_LOG_KEY_PATTERN.test(rawKey) ||
+    SENSITIVE_LOG_KEY_PATTERN.test(normalizedKey) ||
+    COMPACT_SENSITIVE_LOG_KEY_PATTERN.test(compactRawKey) ||
+    COMPACT_SENSITIVE_LOG_KEY_PATTERN.test(compactNormalizedKey)
+  );
+}
+
 function sanitizeLogValue(
   value: unknown,
   depth: number,
@@ -167,7 +184,7 @@ function sanitizeLogValue(
           sanitizedObject,
           sanitizeDetailKey(key)
         );
-        sanitizedObject[sanitizedKey] = SENSITIVE_LOG_KEY_PATTERN.test(sanitizedKey)
+        sanitizedObject[sanitizedKey] = isSensitiveLogKey(key, sanitizedKey)
           ? REDACTED_LOG_VALUE
           : sanitizeLogValue(nestedValue, depth + 1, seen);
       }

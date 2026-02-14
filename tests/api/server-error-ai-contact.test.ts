@@ -306,6 +306,7 @@ test("server log helpers sanitize and dedupe unsafe detail keys before redaction
   const longKey = "x".repeat(120);
   const details: Record<string, unknown> = {
     " api\u202Ekey ": "secret-value",
+    "a p i key": "spaced-secret",
     "tok\u0000en": "hidden-token",
     "normal key": "value",
     "***": "fallback-key-value",
@@ -331,6 +332,7 @@ test("server log helpers sanitize and dedupe unsafe detail keys before redaction
   assert.ok(payload.details);
   const serializedDetails = payload.details as Record<string, unknown>;
   assert.equal(serializedDetails.apikey, "[redacted]");
+  assert.equal(serializedDetails.apikey_1, "[redacted]");
   assert.equal(serializedDetails.token, "[redacted]");
   assert.equal(serializedDetails.normalkey, "value");
   assert.equal(serializedDetails.key, "fallback-key-value");
