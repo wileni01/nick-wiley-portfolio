@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
   responseHeaders.set("X-Contact-Delivery", "skipped");
-  responseHeaders.set("X-Contact-Delivery-Reason", "none");
+  responseHeaders.set("X-Contact-Delivery-Reason", "invalid_payload");
   exceededHeaders.set("X-Contact-Delivery", "skipped");
   exceededHeaders.set("X-Contact-Delivery-Reason", "rate_limited");
   try {
