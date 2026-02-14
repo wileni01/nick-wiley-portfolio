@@ -81,9 +81,8 @@ export async function POST(req: Request) {
     // Log metadata only (avoid full user-message content in logs).
     console.log("Contact form submission received:", {
       requestId,
-      fromName: sanitized.name,
       fromEmail: redactEmail(sanitized.email),
-      subject: sanitized.subject || "(none)",
+      subjectChars: sanitized.subject.length,
       messageChars: sanitized.message.length,
     });
 
