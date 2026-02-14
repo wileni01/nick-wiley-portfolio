@@ -3,6 +3,8 @@ import { z } from "zod";
 export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
   invalidPayloadMessage?: string;
+  maxChars?: number;
+  tooLargeMessage?: string;
 }
 
 type ParseJsonRequestResult<TSchema extends z.ZodTypeAny> =
@@ -24,10 +26,31 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
   const invalidJsonMessage = options?.invalidJsonMessage ?? "Invalid JSON payload.";
   const invalidPayloadMessage =
     options?.invalidPayloadMessage ?? "Invalid request payload.";
+  const tooLargeMessage =
+    options?.tooLargeMessage ?? "Request payload is too large.";
+  const maxChars = Number.isFinite(options?.maxChars)
+    ? Math.max(1, Math.floor(options?.maxChars ?? 0))
+    : null;
+
+  let rawText: string;
+  try {
+    rawText = await req.text();
+  } catch {
+    return {
+      success: false,
+      response: jsonResponse({ error: invalidJsonMessage }, 400),
+    };
+  }
+  if (maxChars !== null && rawText.length > maxChars) {
+    return {
+      success: false,
+      response: jsonResponse({ error: tooLargeMessage }, 413),
+    };
+  }
 
   let rawBody: unknown;
   try {
-    rawBody = await req.json();
+    rawBody = JSON.parse(rawText) as unknown;
   } catch {
     return {
       success: false,
