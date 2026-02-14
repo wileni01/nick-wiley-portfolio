@@ -432,6 +432,39 @@ test("deliverContactSubmission truncates oversized provider errors and redacts e
     }
   ));
 
+test("deliverContactSubmission redacts emails embedded within contiguous provider error text", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: "resend-api-key-12345",
+      CONTACT_EMAIL: "team@example.com",
+      CONTACT_FROM_EMAIL: undefined,
+    },
+    async () => {
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = (async () =>
+        new Response("prefixperson@example.comsuffix", {
+          status: 500,
+          headers: { "content-type": "text/plain" },
+        })) as typeof fetch;
+
+      try {
+        const result = await deliverContactSubmission({
+          name: "Nick",
+          email: "nick@example.com",
+          subject: "hello",
+          message: "world",
+        });
+        assert.equal(result.attempted, true);
+        assert.equal(result.delivered, false);
+        assert.ok(result.error?.startsWith("Resend delivery failed (500): "));
+        assert.equal(result.error?.includes("person@example.com"), false);
+        assert.ok(result.error?.includes("***@example.com"));
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    }
+  ));
+
 test("deliverContactSubmission normalizes fallback sender and omits invalid reply-to", async () =>
   withEnv(
     {

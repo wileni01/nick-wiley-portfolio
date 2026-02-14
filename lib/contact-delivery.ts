@@ -18,7 +18,7 @@ const LOG_ERROR_BODY_MAX_CHARS = 500;
 const EMAIL_VALUE_MAX_CHARS = 320;
 const SUBJECT_VALUE_MAX_CHARS = 200;
 const EMAIL_REDACTION_PATTERN =
-  /\b[A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63}\b/gi;
+  /[A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63}/gi;
 const SIMPLE_EMAIL_PATTERN =
   /^[A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63}$/i;
 const FORMATTED_EMAIL_PATTERN =
