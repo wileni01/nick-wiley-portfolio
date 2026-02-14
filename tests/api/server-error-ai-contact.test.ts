@@ -176,6 +176,7 @@ test("server log helpers bound nested detail depth, key count, and array length"
   details.nanValue = Number.NaN;
   details.infinityValue = Number.POSITIVE_INFINITY;
   details.negativeInfinityValue = Number.NEGATIVE_INFINITY;
+  details.handler = () => "ok";
   details.timestamp = new Date("2024-01-01T00:00:00.000Z");
   details.invalidTimestamp = new Date("invalid");
   details.list = Array.from({ length: 25 }, (_, index) => ({
@@ -216,6 +217,7 @@ test("server log helpers bound nested detail depth, key count, and array length"
   assert.equal(serializedDetails.nanValue, "NaN");
   assert.equal(serializedDetails.infinityValue, "Infinity");
   assert.equal(serializedDetails.negativeInfinityValue, "-Infinity");
+  assert.equal(serializedDetails.handler, "[function]");
   assert.equal(serializedDetails.timestamp, "2024-01-01T00:00:00.000Z");
   assert.equal(serializedDetails.invalidTimestamp, "[invalid-date]");
 

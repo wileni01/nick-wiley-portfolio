@@ -18,6 +18,7 @@ const COMPACT_SENSITIVE_LOG_KEY_PATTERN =
 const REDACTED_LOG_VALUE = "[redacted]";
 const CIRCULAR_LOG_VALUE = "[circular]";
 const INVALID_DATE_LOG_VALUE = "[invalid-date]";
+const FUNCTION_LOG_VALUE = "[function]";
 const CONTROL_CHARS_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 const BIDI_OVERRIDE_PATTERN = /[\u202A-\u202E\u2066-\u2069]/g;
 
@@ -141,6 +142,9 @@ function sanitizeLogValue(
   }
   if (typeof value === "boolean") {
     return value;
+  }
+  if (typeof value === "function") {
+    return FUNCTION_LOG_VALUE;
   }
   if (typeof value === "bigint") {
     return value.toString();
