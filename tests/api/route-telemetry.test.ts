@@ -250,6 +250,53 @@ function assertRateLimitRemainingDecremented(
   assert.equal(secondRemaining, firstRemaining - 1);
 }
 
+test("configured per-route limit headers persist on content-type validation rejections", async () => {
+  const chatResponse = await postChat(
+    buildJsonRequest({
+      url: "http://localhost/api/chat",
+      body: "{}",
+      ip: uniqueIp(),
+      contentType: "text/plain",
+    })
+  );
+  assert.equal(chatResponse.status, 415);
+  assertStandardJsonSecurityHeaders(chatResponse);
+  assertChatRateLimitHeaders(chatResponse);
+  assert.equal(chatResponse.headers.get("X-Chat-Context-Fallback"), "invalid_payload");
+
+  const interviewResponse = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: "{}",
+      ip: uniqueIp(),
+      contentType: "text/plain",
+    })
+  );
+  assert.equal(interviewResponse.status, 415);
+  assertStandardJsonSecurityHeaders(interviewResponse);
+  assertInterviewModeRateLimitHeaders(interviewResponse);
+  assert.equal(
+    interviewResponse.headers.get("X-AI-Narrative-Fallback"),
+    "invalid_payload"
+  );
+
+  const contactResponse = await postContact(
+    buildJsonRequest({
+      url: "http://localhost/api/contact",
+      body: "{}",
+      ip: uniqueIp(),
+      contentType: "text/plain",
+    })
+  );
+  assert.equal(contactResponse.status, 415);
+  assertStandardJsonSecurityHeaders(contactResponse);
+  assertContactRateLimitHeaders(contactResponse);
+  assert.equal(
+    contactResponse.headers.get("X-Contact-Delivery-Reason"),
+    "invalid_payload"
+  );
+});
+
 test("chat invalid payload path emits explicit invalid_payload telemetry headers", async () => {
   const response = await postChat(
     buildJsonRequest({
