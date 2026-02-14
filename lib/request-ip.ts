@@ -1,7 +1,7 @@
 import { isIP } from "node:net";
 
 const IP_TOKEN_MAX_CHARS = 80;
-const SAFE_IP_TOKEN_PATTERN = /[^a-fA-F0-9:.]/g;
+const SAFE_IP_TOKEN_PATTERN = /^[a-fA-F0-9:.]+$/;
 const FORWARDED_FOR_PATTERN = /for=(?:"?\[?([^\];",]+)\]?"?)/i;
 const BRACKETED_IP_PATTERN = /^\[([^[\]]+)\](?::\d+)?$/;
 const IPV4_WITH_PORT_PATTERN = /^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/;
@@ -22,10 +22,9 @@ function normalizeIpToken(value: string | null | undefined): string | null {
   const ipv4WithPortMatch = withoutBrackets.match(IPV4_WITH_PORT_PATTERN);
   const withoutPort = ipv4WithPortMatch ? ipv4WithPortMatch[1] : withoutBrackets;
   const withoutZoneId = withoutPort.split("%")[0] ?? withoutPort;
-  const bounded = withoutZoneId.slice(0, IP_TOKEN_MAX_CHARS);
-  const sanitized = bounded.replace(SAFE_IP_TOKEN_PATTERN, "");
-  if (!sanitized) return null;
-  const normalized = sanitized.toLowerCase();
+  if (withoutZoneId.length > IP_TOKEN_MAX_CHARS) return null;
+  if (!SAFE_IP_TOKEN_PATTERN.test(withoutZoneId)) return null;
+  const normalized = withoutZoneId.toLowerCase();
   return isIP(normalized) > 0 ? normalized : null;
 }
 
