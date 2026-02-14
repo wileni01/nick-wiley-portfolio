@@ -26,7 +26,13 @@ const INTERVIEW_MODE_RATE_LIMIT = {
   maxRequests: 40,
   windowMs: 3600000,
 } as const;
-type NarrativeFallbackReason = "none" | "no_provider" | "generation_error" | "empty_ai_output";
+const AI_NARRATIVE_TIMEOUT_MS = 9000;
+type NarrativeFallbackReason =
+  | "none"
+  | "no_provider"
+  | "generation_error"
+  | "generation_timeout"
+  | "empty_ai_output";
 
 const responseSchema = z.object({
   mode: z.object({
@@ -72,6 +78,11 @@ function sanitizeRecommendationUrl(url: string): string {
   const normalized = url.trim().slice(0, 400);
   if (!normalized) return "/";
   return /^(\/|https:\/\/)/i.test(normalized) ? normalized : "/";
+}
+
+function isAbortLikeError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  return error.name === "AbortError" || error.name === "TimeoutError";
 }
 
 export async function POST(req: Request) {
@@ -137,6 +148,8 @@ export async function POST(req: Request) {
       : "no_provider";
 
     if (executionProvider) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), AI_NARRATIVE_TIMEOUT_MS);
       try {
         const topRecommendations = bundle.topRecommendations
           .slice(0, 4)
@@ -148,6 +161,7 @@ export async function POST(req: Request) {
 
         const { text } = await generateText({
           model: getModel(executionProvider),
+          abortSignal: controller.signal,
           temperature: 0.2,
           maxTokens: 320,
           system: `You are generating a focused interviewer briefing for Nick Wiley's portfolio.
@@ -187,17 +201,22 @@ Write two short paragraphs:
           });
         }
       } catch (error) {
-        narrativeFallbackReason = "generation_error";
+        narrativeFallbackReason = isAbortLikeError(error)
+          ? "generation_timeout"
+          : "generation_error";
         logServerWarning({
           route: "api/interview-mode",
           requestId,
           message: "AI narrative generation failed; falling back to deterministic narrative",
           details: {
             provider: executionProvider,
+            fallbackReason: narrativeFallbackReason,
             error,
           },
         });
         narrativeSource = "deterministic";
+      } finally {
+        clearTimeout(timeoutId);
       }
     }
     responseHeaders.set("X-AI-Narrative-Source", narrativeSource);
