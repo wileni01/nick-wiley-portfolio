@@ -31,6 +31,8 @@ export async function POST(req: Request) {
     rateLimitConfig: CONTACT_RATE_LIMIT,
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
+  responseHeaders.set("X-Contact-Delivery", "skipped");
+  exceededHeaders.set("X-Contact-Delivery", "skipped");
   try {
     if (!rateLimitResult.success) {
       return jsonResponse(
@@ -59,7 +61,6 @@ export async function POST(req: Request) {
 
     // Honeypot check — if filled, it's a bot
     if (honeypot) {
-      responseHeaders.set("X-Contact-Delivery", "skipped");
       // Return success to not tip off bots
       return jsonResponse({ success: true }, 200, responseHeaders);
     }
@@ -127,6 +128,7 @@ export async function POST(req: Request) {
       responseHeaders
     );
   } catch (error) {
+    responseHeaders.set("X-Contact-Delivery", "error");
     logServerError({
       route: "api/contact",
       requestId,
