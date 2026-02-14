@@ -1,4 +1,11 @@
 const FALLBACK_RANDOM_TOKEN_CHARS = 24;
+const FALLBACK_COUNTER_MODULO = 36 ** 4;
+let requestIdFallbackCounter = 0;
+
+function getFallbackCounterToken(): string {
+  requestIdFallbackCounter = (requestIdFallbackCounter + 1) % FALLBACK_COUNTER_MODULO;
+  return requestIdFallbackCounter.toString(36).padStart(4, "0");
+}
 
 function createFallbackRandomToken(): string {
   try {
@@ -23,5 +30,5 @@ export function createRequestId(): string {
     // Fall back to timestamp + random token.
   }
 
-  return `${Date.now().toString(36)}-${createFallbackRandomToken()}`;
+  return `${Date.now().toString(36)}-${getFallbackCounterToken()}-${createFallbackRandomToken()}`;
 }
