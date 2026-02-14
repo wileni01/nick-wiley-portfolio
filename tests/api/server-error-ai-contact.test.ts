@@ -331,6 +331,19 @@ test("applyDefaultAIProviderHeaders resets prior provider header values", () => 
   assert.equal(headers.get("X-AI-Provider-Fallback"), "none");
 });
 
+test("applyDefaultAIProviderHeaders preserves unrelated headers", () => {
+  const headers = new Headers({
+    "X-Custom-Header": "keep-me",
+  });
+
+  applyDefaultAIProviderHeaders(headers);
+
+  assert.equal(headers.get("X-Custom-Header"), "keep-me");
+  assert.equal(headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(headers.get("X-AI-Provider"), "none");
+  assert.equal(headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("applyResolvedAIProviderHeaders overrides default provider header state", () => {
   const headers = new Headers({ "X-Custom-Header": "keep" });
   applyDefaultAIProviderHeaders(headers);
