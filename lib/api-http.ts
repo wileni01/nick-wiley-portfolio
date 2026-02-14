@@ -1,10 +1,12 @@
 import { z } from "zod";
+const UTF8_TEXT_ENCODER = new TextEncoder();
 
 export interface ParseJsonRequestOptions {
   invalidJsonMessage?: string;
   invalidPayloadMessage?: string;
   invalidContentTypeMessage?: string;
   emptyBodyMessage?: string;
+  maxBytes?: number;
   maxChars?: number;
   tooLargeMessage?: string;
   responseHeaders?: HeadersInit;
@@ -58,6 +60,11 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     options?.tooLargeMessage ?? "Request payload is too large.";
   const responseHeaders = options?.responseHeaders;
   const allowMissingContentType = options?.allowMissingContentType ?? true;
+  const maxPayloadBytes = Number.isFinite(options?.maxBytes)
+    ? Math.max(1, Math.floor(options?.maxBytes ?? 0))
+    : Number.isFinite(options?.maxChars)
+      ? Math.max(1, Math.floor(options?.maxChars ?? 0))
+      : null;
   const maxChars = Number.isFinite(options?.maxChars)
     ? Math.max(1, Math.floor(options?.maxChars ?? 0))
     : null;
@@ -83,7 +90,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
       ),
     };
   }
-  if (maxChars !== null) {
+  if (maxPayloadBytes !== null) {
     const contentLengthHeader = req.headers.get("content-length");
     const declaredContentLength = contentLengthHeader
       ? Number(contentLengthHeader)
@@ -91,7 +98,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     if (
       declaredContentLength !== null &&
       Number.isFinite(declaredContentLength) &&
-      declaredContentLength > maxChars
+      declaredContentLength > maxPayloadBytes
     ) {
       return {
         success: false,
@@ -116,6 +123,12 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     };
   }
   if (maxChars !== null && rawText.length > maxChars) {
+    return {
+      success: false,
+      response: jsonResponse({ error: tooLargeMessage }, 413, responseHeaders),
+    };
+  }
+  if (maxPayloadBytes !== null && UTF8_TEXT_ENCODER.encode(rawText).length > maxPayloadBytes) {
     return {
       success: false,
       response: jsonResponse({ error: tooLargeMessage }, 413, responseHeaders),
