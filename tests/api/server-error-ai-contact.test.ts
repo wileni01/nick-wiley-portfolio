@@ -637,6 +637,57 @@ test("deliverContactSubmission truncates oversized provider errors and redacts e
     }
   ));
 
+test("deliverContactSubmission stops reading oversized provider streams after cap", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: "resend-api-key-12345",
+      CONTACT_EMAIL: "team@example.com",
+      CONTACT_FROM_EMAIL: undefined,
+    },
+    async () => {
+      const originalFetch = globalThis.fetch;
+      let pullCount = 0;
+      let cancelCalled = false;
+      const oversizedChunk = `${"x".repeat(2100)} person@example.com ${"y".repeat(600)}`;
+      const stream = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          pullCount += 1;
+          if (pullCount === 1) {
+            controller.enqueue(new Uint8Array(Buffer.from(oversizedChunk)));
+            return;
+          }
+          throw new Error("provider stream should have been cancelled");
+        },
+        cancel() {
+          cancelCalled = true;
+        },
+      });
+      globalThis.fetch = (async () =>
+        new Response(stream, {
+          status: 502,
+          headers: { "content-type": "text/plain" },
+        })) as typeof fetch;
+
+      try {
+        const result = await deliverContactSubmission({
+          name: "Nick",
+          email: "nick@example.com",
+          subject: "hello",
+          message: "world",
+        });
+        assert.equal(result.attempted, true);
+        assert.equal(result.delivered, false);
+        assert.ok(result.error?.startsWith("Resend delivery failed (502): "));
+        assert.equal(result.error?.includes("person@example.com"), false);
+        assert.ok((result.error?.length ?? 0) <= "Resend delivery failed (502): ".length + 500);
+        assert.ok(pullCount <= 2);
+        assert.equal(cancelCalled, true);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    }
+  ));
+
 test("deliverContactSubmission redacts emails embedded within contiguous provider error text", async () =>
   withEnv(
     {
