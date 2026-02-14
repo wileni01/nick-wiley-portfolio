@@ -356,6 +356,43 @@ test("rate-limit header builders clamp malformed snapshot values", () => {
   assert.equal(boundedExceededResetHeaders.get("Retry-After"), "2");
 });
 
+test("rate-limit header builders tolerate snapshot getter failures", () => {
+  const throwingSnapshot = {} as { remaining: number; resetIn: number };
+  Object.defineProperty(throwingSnapshot, "remaining", {
+    configurable: true,
+    get() {
+      throw new Error("remaining getter failed");
+    },
+  });
+  Object.defineProperty(throwingSnapshot, "resetIn", {
+    configurable: true,
+    get() {
+      throw new Error("resetIn getter failed");
+    },
+  });
+
+  const headers = new Headers(
+    buildRateLimitHeaders(
+      { maxRequests: 5, windowMs: 1000 },
+      throwingSnapshot as unknown as { remaining: number; resetIn: number }
+    )
+  );
+  assert.equal(headers.get("X-RateLimit-Limit"), "5");
+  assert.equal(headers.get("X-RateLimit-Remaining"), "0");
+  assert.equal(headers.get("X-RateLimit-Reset"), "0");
+
+  const exceededHeaders = new Headers(
+    buildRateLimitExceededHeaders(
+      { maxRequests: 5, windowMs: 1000 },
+      throwingSnapshot as unknown as { remaining: number; resetIn: number }
+    )
+  );
+  assert.equal(exceededHeaders.get("X-RateLimit-Limit"), "5");
+  assert.equal(exceededHeaders.get("X-RateLimit-Remaining"), "0");
+  assert.equal(exceededHeaders.get("X-RateLimit-Reset"), "1");
+  assert.equal(exceededHeaders.get("Retry-After"), "1");
+});
+
 test("rate-limit reset normalization keeps bounded exceeded window floor", () => {
   assert.equal(normalizeResetInSeconds(Number.NaN), 0);
   assert.equal(normalizeResetInSeconds(Number.POSITIVE_INFINITY), 0);
@@ -386,6 +423,54 @@ test("buildApiResponseHeaders sanitizes request id and normalizes exceeded retry
   assert.equal(headers.get("X-RateLimit-Remaining"), "0");
   assert.equal(headers.get("X-RateLimit-Reset"), "1");
   assert.equal(headers.get("Retry-After"), "1");
+});
+
+test("buildApiResponseHeaders tolerates unreadable input getters", () => {
+  const throwingInput = {} as {
+    config: RateLimitConfig;
+    snapshot: { remaining: number; resetIn: number };
+    requestId?: string;
+    includeRetryAfter?: boolean;
+  };
+  Object.defineProperty(throwingInput, "config", {
+    configurable: true,
+    get() {
+      throw new Error("config getter failed");
+    },
+  });
+  Object.defineProperty(throwingInput, "snapshot", {
+    configurable: true,
+    get() {
+      throw new Error("snapshot getter failed");
+    },
+  });
+  Object.defineProperty(throwingInput, "requestId", {
+    configurable: true,
+    get() {
+      throw new Error("requestId getter failed");
+    },
+  });
+  Object.defineProperty(throwingInput, "includeRetryAfter", {
+    configurable: true,
+    get() {
+      throw new Error("includeRetryAfter getter failed");
+    },
+  });
+
+  const headers = buildApiResponseHeaders(
+    throwingInput as unknown as {
+      config: RateLimitConfig;
+      snapshot: { remaining: number; resetIn: number };
+      requestId?: string;
+      includeRetryAfter?: boolean;
+    }
+  );
+
+  assert.equal(headers.get("X-RateLimit-Limit"), "50");
+  assert.equal(headers.get("X-RateLimit-Remaining"), "0");
+  assert.equal(headers.get("X-RateLimit-Reset"), "0");
+  assert.equal(headers.get("Retry-After"), null);
+  assert.equal(headers.get("X-Request-Id"), null);
 });
 
 test("buildApiResponseHeaders omits invalid request-id values", () => {

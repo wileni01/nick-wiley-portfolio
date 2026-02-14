@@ -11,8 +11,33 @@ export interface RateLimitSnapshot {
 interface BuildApiResponseHeadersInput {
   config: RateLimitConfig;
   snapshot: RateLimitSnapshot;
-  requestId?: string;
+  requestId?: unknown;
   includeRetryAfter?: boolean;
+}
+
+function readNumericLike(
+  source: unknown,
+  key: string,
+  fallback: number
+): number {
+  let value: unknown;
+  try {
+    value = (source as Record<string, unknown> | null | undefined)?.[key];
+  } catch {
+    return fallback;
+  }
+  return typeof value === "number" ? value : fallback;
+}
+
+function readInputValue<T>(
+  input: BuildApiResponseHeadersInput,
+  key: keyof BuildApiResponseHeadersInput
+): T | undefined {
+  try {
+    return input[key] as T | undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export function normalizeResetInSeconds(resetInMs: number): number {
@@ -37,11 +62,13 @@ export function buildRateLimitHeaders(
   snapshot: RateLimitSnapshot
 ): HeadersInit {
   const normalizedConfig = normalizeRateLimitConfig(config);
-  const resetInSeconds = normalizeResetInSeconds(snapshot.resetIn);
+  const snapshotResetIn = readNumericLike(snapshot, "resetIn", 0);
+  const resetInSeconds = normalizeResetInSeconds(snapshotResetIn);
   const maxResetInSeconds = normalizeResetInSeconds(normalizedConfig.windowMs);
   const boundedResetInSeconds = Math.min(maxResetInSeconds, resetInSeconds);
+  const snapshotRemaining = readNumericLike(snapshot, "remaining", 0);
   const boundedRemaining = normalizeRemaining(
-    snapshot.remaining,
+    snapshotRemaining,
     normalizedConfig.maxRequests
   );
   return {
@@ -56,14 +83,15 @@ export function buildRateLimitExceededHeaders(
   snapshot: RateLimitSnapshot
 ): HeadersInit {
   const normalizedConfig = normalizeRateLimitConfig(config);
+  const snapshotResetIn = readNumericLike(snapshot, "resetIn", 0);
   const maxResetInSeconds = normalizeResetInSeconds(normalizedConfig.windowMs);
   const retryAfterSeconds = Math.min(
     maxResetInSeconds,
-    normalizeExceededResetInSeconds(snapshot.resetIn)
+    normalizeExceededResetInSeconds(snapshotResetIn)
   );
   const exhaustedHeaders = buildRateLimitHeaders(normalizedConfig, {
-    ...snapshot,
     remaining: 0,
+    resetIn: snapshotResetIn,
   });
   return {
     ...exhaustedHeaders,
@@ -75,13 +103,23 @@ export function buildRateLimitExceededHeaders(
 export function buildApiResponseHeaders(
   input: BuildApiResponseHeadersInput
 ): Headers {
-  const headers = new Headers(
-    input.includeRetryAfter
-      ? buildRateLimitExceededHeaders(input.config, input.snapshot)
-      : buildRateLimitHeaders(input.config, input.snapshot)
+  const config =
+    readInputValue<RateLimitConfig>(input, "config") ??
+    ({} as RateLimitConfig);
+  const snapshot =
+    readInputValue<RateLimitSnapshot>(input, "snapshot") ??
+    ({ remaining: 0, resetIn: 0 } as RateLimitSnapshot);
+  const includeRetryAfter = Boolean(
+    readInputValue<unknown>(input, "includeRetryAfter")
   );
-  if (input.requestId) {
-    const requestId = normalizeRequestId(input.requestId);
+  const headers = new Headers(
+    includeRetryAfter
+      ? buildRateLimitExceededHeaders(config, snapshot)
+      : buildRateLimitHeaders(config, snapshot)
+  );
+  const requestIdValue = readInputValue<unknown>(input, "requestId");
+  if (requestIdValue) {
+    const requestId = normalizeRequestId(requestIdValue);
     if (requestId) {
       headers.set("X-Request-Id", requestId);
     }
