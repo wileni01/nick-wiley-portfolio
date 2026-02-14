@@ -10,8 +10,10 @@ import { ModeHealthPill } from "./mode-health-pill";
 import { InterviewCountdownPill } from "./interview-countdown-pill";
 import {
   addFocusHistoryEntry,
+  areFocusHistoryEqual,
   getFocusHistoryStorageKey,
   parseFocusHistory,
+  serializeFocusHistory,
 } from "@/lib/adaptive/focus-history";
 import {
   getInterviewDateSummary,
@@ -55,7 +57,10 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
     }
     const key = getFocusHistoryStorageKey(companyId, personaId);
     function refresh() {
-      setFocusHistory(parseFocusHistory(localStorage.getItem(key)));
+      const parsed = parseFocusHistory(localStorage.getItem(key));
+      setFocusHistory((prev) =>
+        areFocusHistoryEqual(prev, parsed) ? prev : parsed
+      );
     }
 
     refresh();
@@ -117,12 +122,21 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
   function saveCurrentFocusNote() {
     if (!companyId || !personaId || !focusNote.trim()) return;
     const key = getFocusHistoryStorageKey(companyId, personaId);
+    const existing = parseFocusHistory(localStorage.getItem(key));
     const nextHistory = addFocusHistoryEntry(
-      parseFocusHistory(localStorage.getItem(key)),
+      existing,
       focusNote
     );
-    localStorage.setItem(key, JSON.stringify(nextHistory));
-    setFocusHistory(nextHistory);
+    if (areFocusHistoryEqual(existing, nextHistory)) {
+      setFocusHistory((prev) =>
+        areFocusHistoryEqual(prev, nextHistory) ? prev : nextHistory
+      );
+      return;
+    }
+    localStorage.setItem(key, serializeFocusHistory(nextHistory));
+    setFocusHistory((prev) =>
+      areFocusHistoryEqual(prev, nextHistory) ? prev : nextHistory
+    );
     window.dispatchEvent(
       new CustomEvent("adaptive-focus-history-updated", { detail: { key } })
     );
@@ -131,8 +145,9 @@ export function InterviewModeSelector({ mobile = false }: InterviewModeSelectorP
   function clearFocusHistory() {
     if (!companyId || !personaId) return;
     const key = getFocusHistoryStorageKey(companyId, personaId);
+    if (localStorage.getItem(key) === null && !focusHistory.length) return;
     localStorage.removeItem(key);
-    setFocusHistory([]);
+    setFocusHistory((prev) => (prev.length ? [] : prev));
     window.dispatchEvent(
       new CustomEvent("adaptive-focus-history-updated", { detail: { key } })
     );

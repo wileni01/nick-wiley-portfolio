@@ -34,3 +34,17 @@ export function addFocusHistoryEntry(history: string[], entry: string): string[]
   ];
   return deduped.slice(0, FOCUS_HISTORY_MAX_ENTRIES);
 }
+
+export function areFocusHistoryEqual(left: string[], right: string[]): boolean {
+  if (left.length !== right.length) return false;
+  return left.every((value, index) => value === right[index]);
+}
+
+export function serializeFocusHistory(history: string[]): string {
+  return JSON.stringify(
+    history
+      .map((item) => item.trim().slice(0, FOCUS_HISTORY_ENTRY_MAX_CHARS))
+      .filter(Boolean)
+      .slice(0, FOCUS_HISTORY_MAX_ENTRIES)
+  );
+}
