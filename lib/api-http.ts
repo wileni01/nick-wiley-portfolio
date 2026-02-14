@@ -57,18 +57,20 @@ export function jsonResponse(
       responseHeaders.set(key, value);
     });
   }
-  let requestId = responseHeaders.get("X-Request-Id");
-  if (!requestId) {
+  let requestId = normalizeRequestIdHeaderValue(
+    responseHeaders.get("X-Request-Id")
+  );
+  if (requestId) {
+    responseHeaders.set("X-Request-Id", requestId);
+  } else {
+    responseHeaders.delete("X-Request-Id");
     const bodyRequestId = normalizeRequestIdHeaderValue(body.requestId);
     if (bodyRequestId) {
       responseHeaders.set("X-Request-Id", bodyRequestId);
       requestId = bodyRequestId;
     }
   }
-  const payload =
-    status >= 400 && requestId && body.requestId === undefined
-      ? { ...body, requestId }
-      : body;
+  const payload = status >= 400 && requestId ? { ...body, requestId } : body;
   let serializedPayload: string;
   let responseStatus = status;
   try {
