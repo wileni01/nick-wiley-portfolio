@@ -746,6 +746,16 @@ test("getRequestIp normalizes x-forwarded-for bracketed ipv6 zone and port value
   assert.equal(getRequestIp(req), "2001:db8::55");
 });
 
+test("getRequestIp rejects IPv4 zone-id tokens and falls through to next valid value", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": "198.51.100.80%eth0, 198.51.100.81",
+    },
+  });
+
+  assert.equal(getRequestIp(req), "198.51.100.81");
+});
+
 test("getRequestIp rejects malformed bracketed tokens with trailing junk", () => {
   const req = new Request("http://localhost/api/test", {
     headers: {
@@ -769,4 +779,17 @@ test("getRequestIp skips malformed direct header tokens with trailing junk", () 
   });
 
   assert.equal(getRequestIp(req), "198.51.100.72");
+});
+
+test("getRequestIp rejects overlong direct-header IP tokens and falls through", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": "unknown",
+      forwarded: "for=invalid-hostname",
+      "cf-connecting-ip": `2001:db8::${"a".repeat(80)}`,
+      "fly-client-ip": "198.51.100.73",
+    },
+  });
+
+  assert.equal(getRequestIp(req), "198.51.100.73");
 });

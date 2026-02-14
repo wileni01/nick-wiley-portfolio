@@ -21,7 +21,15 @@ function normalizeIpToken(value: string | null | undefined): string | null {
   const withoutBrackets = bracketedMatch ? bracketedMatch[1] : trimmed;
   const ipv4WithPortMatch = withoutBrackets.match(IPV4_WITH_PORT_PATTERN);
   const withoutPort = ipv4WithPortMatch ? ipv4WithPortMatch[1] : withoutBrackets;
-  const withoutZoneId = withoutPort.split("%")[0] ?? withoutPort;
+  const zoneSeparatorIndex = withoutPort.indexOf("%");
+  if (zoneSeparatorIndex !== -1 && !withoutPort.includes(":")) {
+    return null;
+  }
+  const withoutZoneId =
+    zoneSeparatorIndex === -1
+      ? withoutPort
+      : withoutPort.slice(0, zoneSeparatorIndex);
+  if (!withoutZoneId) return null;
   if (withoutZoneId.length > IP_TOKEN_MAX_CHARS) return null;
   if (!SAFE_IP_TOKEN_PATTERN.test(withoutZoneId)) return null;
   const normalized = withoutZoneId.toLowerCase();
