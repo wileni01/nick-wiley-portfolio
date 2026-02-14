@@ -35,6 +35,8 @@ export function setInterviewDateForMode(
   if (!normalized) return null;
   if (typeof window === "undefined") return null;
   const key = getInterviewDateStorageKey(companyId, personaId);
+  const existing = parseInterviewDate(window.localStorage.getItem(key));
+  if (existing === normalized) return key;
   window.localStorage.setItem(key, normalized);
   window.dispatchEvent(
     new CustomEvent("adaptive-interview-date-updated", { detail: { key } })
@@ -48,6 +50,7 @@ export function clearInterviewDateForMode(
 ): string | null {
   if (typeof window === "undefined") return null;
   const key = getInterviewDateStorageKey(companyId, personaId);
+  if (window.localStorage.getItem(key) === null) return key;
   window.localStorage.removeItem(key);
   window.dispatchEvent(
     new CustomEvent("adaptive-interview-date-updated", { detail: { key } })
