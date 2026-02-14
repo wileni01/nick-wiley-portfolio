@@ -173,6 +173,9 @@ test("server log helpers bound nested detail depth, key count, and array length"
 
   const details: Record<string, unknown> = {};
   details.big = 123n;
+  details.nanValue = Number.NaN;
+  details.infinityValue = Number.POSITIVE_INFINITY;
+  details.negativeInfinityValue = Number.NEGATIVE_INFINITY;
   details.timestamp = new Date("2024-01-01T00:00:00.000Z");
   details.invalidTimestamp = new Date("invalid");
   details.list = Array.from({ length: 25 }, (_, index) => ({
@@ -210,6 +213,9 @@ test("server log helpers bound nested detail depth, key count, and array length"
   assert.equal(Object.keys(serializedDetails).length, 20);
   assert.equal("overflow17" in serializedDetails, false);
   assert.equal(serializedDetails.big, "123");
+  assert.equal(serializedDetails.nanValue, "NaN");
+  assert.equal(serializedDetails.infinityValue, "Infinity");
+  assert.equal(serializedDetails.negativeInfinityValue, "-Infinity");
   assert.equal(serializedDetails.timestamp, "2024-01-01T00:00:00.000Z");
   assert.equal(serializedDetails.invalidTimestamp, "[invalid-date]");
 
