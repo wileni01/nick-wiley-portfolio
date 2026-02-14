@@ -62,16 +62,12 @@ export function applyResolvedAIProviderHeaders(
   headers.set("X-AI-Provider-Requested", resolution.requested);
   if (resolution.selected) {
     headers.set("X-AI-Provider", resolution.selected);
-    if (resolution.didFallback) {
-      headers.set("X-AI-Provider-Fallback", "1");
-    } else {
-      headers.delete("X-AI-Provider-Fallback");
-    }
+    headers.set("X-AI-Provider-Fallback", resolution.didFallback ? "1" : "none");
     return headers;
   }
 
   headers.set("X-AI-Provider", "none");
-  headers.delete("X-AI-Provider-Fallback");
+  headers.set("X-AI-Provider-Fallback", "none");
   return headers;
 }
 

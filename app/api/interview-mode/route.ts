@@ -107,6 +107,12 @@ export async function POST(req: Request) {
     rateLimitConfig: INTERVIEW_MODE_RATE_LIMIT,
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
+  responseHeaders.set("X-AI-Provider-Requested", "unspecified");
+  responseHeaders.set("X-AI-Provider", "none");
+  responseHeaders.set("X-AI-Provider-Fallback", "none");
+  exceededHeaders.set("X-AI-Provider-Requested", "unspecified");
+  exceededHeaders.set("X-AI-Provider", "none");
+  exceededHeaders.set("X-AI-Provider-Fallback", "none");
   responseHeaders.set("X-AI-Narrative-Source", "none");
   responseHeaders.set("X-AI-Narrative-Fallback", "invalid_payload");
   exceededHeaders.set("X-AI-Narrative-Source", "fallback");

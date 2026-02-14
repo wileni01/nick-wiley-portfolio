@@ -72,6 +72,12 @@ export async function POST(req: Request) {
     rateLimitConfig: CHAT_RATE_LIMIT,
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
+  responseHeaders.set("X-AI-Provider-Requested", "unspecified");
+  responseHeaders.set("X-AI-Provider", "none");
+  responseHeaders.set("X-AI-Provider-Fallback", "none");
+  exceededHeaders.set("X-AI-Provider-Requested", "unspecified");
+  exceededHeaders.set("X-AI-Provider", "none");
+  exceededHeaders.set("X-AI-Provider-Fallback", "none");
   responseHeaders.set("X-Chat-Context-Source", "none");
   responseHeaders.set("X-Chat-Context-Fallback", "invalid_payload");
   exceededHeaders.set("X-Chat-Context-Source", "fallback");
