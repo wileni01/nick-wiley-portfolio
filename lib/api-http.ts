@@ -97,6 +97,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
   const maxChars = Number.isFinite(options?.maxChars)
     ? Math.max(1, Math.floor(options?.maxChars ?? 0))
     : null;
+  let declaredContentLength: number | null = null;
   const contentType = req.headers.get("content-type");
   if (contentType) {
     const normalizedContentType = contentType.trim();
@@ -121,9 +122,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     };
   }
   if (maxPayloadBytes !== null) {
-    const declaredContentLength = parseDeclaredContentLength(
-      req.headers.get("content-length")
-    );
+    declaredContentLength = parseDeclaredContentLength(req.headers.get("content-length"));
     if (
       declaredContentLength !== null &&
       (!Number.isFinite(declaredContentLength) || declaredContentLength < 0)
@@ -157,6 +156,21 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
       response: jsonResponse({ error: invalidJsonMessage }, 400, responseHeaders),
     };
   }
+  const rawTextBytesLength = UTF8_TEXT_ENCODER.encode(rawText).length;
+  if (
+    declaredContentLength !== null &&
+    Number.isFinite(declaredContentLength) &&
+    declaredContentLength !== rawTextBytesLength
+  ) {
+    return {
+      success: false,
+      response: jsonResponse(
+        { error: invalidContentLengthMessage },
+        400,
+        responseHeaders
+      ),
+    };
+  }
   if (!rawText.trim()) {
     return {
       success: false,
@@ -169,7 +183,7 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
       response: jsonResponse({ error: tooLargeMessage }, 413, responseHeaders),
     };
   }
-  if (maxPayloadBytes !== null && UTF8_TEXT_ENCODER.encode(rawText).length > maxPayloadBytes) {
+  if (maxPayloadBytes !== null && rawTextBytesLength > maxPayloadBytes) {
     return {
       success: false,
       response: jsonResponse({ error: tooLargeMessage }, 413, responseHeaders),
