@@ -135,6 +135,10 @@ export async function POST(req: Request) {
     const { companyId, personaId, provider } = parsed.data;
     const providerResolution = resolveAIProvider(provider);
     applyResolvedAIProviderHeaders(responseHeaders, providerResolution);
+    responseHeaders.set(
+      "X-AI-Narrative-Fallback",
+      providerResolution.selected ? "none" : "no_provider"
+    );
     const executionProvider = providerResolution.selected;
     const contextNote = sanitizeInput(parsed.data.contextNote ?? "", 300);
 
