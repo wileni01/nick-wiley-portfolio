@@ -59,6 +59,7 @@ export async function POST(req: Request) {
 
     // Honeypot check — if filled, it's a bot
     if (honeypot) {
+      responseHeaders.set("X-Contact-Delivery", "skipped");
       // Return success to not tip off bots
       return jsonResponse({ success: true }, 200, responseHeaders);
     }
@@ -91,6 +92,13 @@ export async function POST(req: Request) {
     });
 
     const delivery = await deliverContactSubmission(sanitized);
+    if (!delivery.attempted) {
+      responseHeaders.set("X-Contact-Delivery", "skipped");
+    } else if (delivery.delivered) {
+      responseHeaders.set("X-Contact-Delivery", "delivered");
+    } else {
+      responseHeaders.set("X-Contact-Delivery", "error");
+    }
     if (delivery.attempted && !delivery.delivered) {
       logServerWarning({
         route: "api/contact",
