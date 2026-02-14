@@ -32,7 +32,9 @@ export async function POST(req: Request) {
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
   responseHeaders.set("X-Contact-Delivery", "skipped");
+  responseHeaders.set("X-Contact-Delivery-Reason", "none");
   exceededHeaders.set("X-Contact-Delivery", "skipped");
+  exceededHeaders.set("X-Contact-Delivery-Reason", "rate_limited");
   try {
     if (!rateLimitResult.success) {
       return jsonResponse(
@@ -61,6 +63,7 @@ export async function POST(req: Request) {
 
     // Honeypot check — if filled, it's a bot
     if (honeypot) {
+      responseHeaders.set("X-Contact-Delivery-Reason", "honeypot");
       // Return success to not tip off bots
       return jsonResponse({ success: true }, 200, responseHeaders);
     }
@@ -95,6 +98,7 @@ export async function POST(req: Request) {
     const delivery = await deliverContactSubmission(sanitized);
     if (!delivery.attempted) {
       responseHeaders.set("X-Contact-Delivery", "skipped");
+      responseHeaders.set("X-Contact-Delivery-Reason", "provider_unconfigured");
       logServerInfo({
         route: "api/contact",
         requestId,
@@ -102,8 +106,10 @@ export async function POST(req: Request) {
       });
     } else if (delivery.delivered) {
       responseHeaders.set("X-Contact-Delivery", "delivered");
+      responseHeaders.set("X-Contact-Delivery-Reason", "none");
     } else {
       responseHeaders.set("X-Contact-Delivery", "error");
+      responseHeaders.set("X-Contact-Delivery-Reason", "provider_error");
     }
     if (delivery.attempted && !delivery.delivered) {
       logServerWarning({
@@ -134,6 +140,7 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     responseHeaders.set("X-Contact-Delivery", "error");
+    responseHeaders.set("X-Contact-Delivery-Reason", "internal_error");
     logServerError({
       route: "api/contact",
       requestId,
