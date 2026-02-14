@@ -56,6 +56,41 @@ test("rateLimit normalizes identifiers so equivalent keys share limits", () => {
   assert.ok(second.resetIn >= 0);
 });
 
+test("rateLimit resets at inclusive window boundary and reports rolling reset times", () => {
+  const originalNow = Date.now;
+  let now = 1_700_000_000_000;
+  Date.now = () => now;
+
+  try {
+    const identifier = `boundary:${Math.random().toString(36).slice(2)}`;
+    const config = { maxRequests: 2, windowMs: 1000 };
+
+    const first = rateLimit(identifier, config);
+    assert.equal(first.success, true);
+    assert.equal(first.remaining, 1);
+    assert.equal(first.resetIn, 1000);
+
+    const second = rateLimit(identifier, config);
+    assert.equal(second.success, true);
+    assert.equal(second.remaining, 0);
+    assert.equal(second.resetIn, 1000);
+
+    now += 250;
+    const third = rateLimit(identifier, config);
+    assert.equal(third.success, false);
+    assert.equal(third.remaining, 0);
+    assert.equal(third.resetIn, 750);
+
+    now += 750;
+    const resetAtBoundary = rateLimit(identifier, config);
+    assert.equal(resetAtBoundary.success, true);
+    assert.equal(resetAtBoundary.remaining, 1);
+    assert.equal(resetAtBoundary.resetIn, 1000);
+  } finally {
+    Date.now = originalNow;
+  }
+});
+
 test("rate-limit header builders clamp malformed snapshot values", () => {
   const headers = new Headers(
     buildRateLimitHeaders(
