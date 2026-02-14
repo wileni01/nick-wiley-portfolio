@@ -333,6 +333,27 @@ test("parseJsonRequest accepts BOM payload when content-length matches raw bytes
   }
 });
 
+test("parseJsonRequest rejects BOM payload when declared length matches decoded text bytes only", async () => {
+  const schema = z.object({ value: z.string() });
+  const body = '\uFEFF{"value":"ok"}';
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "content-length": "14",
+    },
+    body,
+  });
+
+  const result = await parseJsonRequest(req, schema);
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 400);
+    const payload = (await result.response.json()) as { error: string };
+    assert.equal(payload.error, "Invalid Content-Length header.");
+  }
+});
+
 test("parseJsonRequest error responses preserve responseHeaders with normalized request-id", async () => {
   const schema = z.object({ value: z.string() });
   const req = new Request("http://localhost/api/test", {
@@ -353,6 +374,29 @@ test("parseJsonRequest error responses preserve responseHeaders with normalized 
     assert.equal(result.response.status, 415);
     assert.equal(result.response.headers.get("X-Request-Id"), "reqid");
     assert.equal(result.response.headers.get("X-Debug-Token"), "debug-1");
+  }
+});
+
+test("parseJsonRequest drops invalid response-header request id values", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    body: '{"value":"ok"}',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    allowMissingContentType: false,
+    responseHeaders: {
+      "x-request-id": " ### ",
+      "x-debug-token": "debug-2",
+    },
+  });
+
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 415);
+    assert.equal(result.response.headers.get("X-Request-Id"), null);
+    assert.equal(result.response.headers.get("X-Debug-Token"), "debug-2");
   }
 });
 
