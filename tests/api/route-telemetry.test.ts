@@ -358,6 +358,8 @@ test("chat provider headers reflect configured fallback provider selection", asy
         response.headers.get("X-Chat-Context-Fallback"),
         "invalid_payload"
       );
+      const payload = await assertErrorPayloadRequestIdMatchesHeader(response);
+      assert.equal(payload.error, "Messages are empty after sanitization.");
     }
   ));
 
@@ -643,6 +645,8 @@ test("interview-mode invalid mode path reports invalid_mode fallback", async () 
       assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_mode");
       assert.equal(response.headers.get("X-AI-Provider"), "none");
       assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+      const payload = await assertErrorPayloadRequestIdMatchesHeader(response);
+      assert.equal(payload.error, "Unknown company or interviewer persona.");
     }
   ));
 
@@ -1128,11 +1132,19 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
     })
   );
   assert.equal(honeypotResponse.status, 200);
+  assertStandardJsonSecurityHeaders(honeypotResponse);
+  assertStandardRateLimitHeaders(honeypotResponse);
   assert.equal(honeypotResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     honeypotResponse.headers.get("X-Contact-Delivery-Reason"),
     "honeypot"
   );
+  const honeypotPayload = (await honeypotResponse.json()) as {
+    success: boolean;
+    requestId?: string;
+  };
+  assert.equal(honeypotPayload.success, true);
+  assert.equal("requestId" in honeypotPayload, false);
 });
 
 test("contact repeated requests decrement rate-limit remaining consistently", async () => {
