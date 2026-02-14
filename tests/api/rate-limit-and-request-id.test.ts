@@ -320,6 +320,32 @@ test("buildApiRequestContext falls back to anonymous IP when proxy headers are i
   assert.ok(context.responseHeaders.get("X-Request-Id"));
 });
 
+test("buildApiRequestContext response headers mirror non-exceeded snapshot state", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": "198.51.100.201",
+    },
+  });
+  const context = buildApiRequestContext({
+    req,
+    rateLimitNamespace: "chat",
+    rateLimitConfig: { maxRequests: 3, windowMs: 60_000 },
+  });
+
+  assert.equal(context.rateLimitResult.success, true);
+  assert.equal(context.rateLimitResult.remaining, 2);
+  assert.equal(context.responseHeaders.get("X-RateLimit-Limit"), "3");
+  assert.equal(
+    context.responseHeaders.get("X-RateLimit-Remaining"),
+    String(context.rateLimitResult.remaining)
+  );
+  assert.equal(
+    context.responseHeaders.get("X-RateLimit-Reset"),
+    String(Math.ceil(context.rateLimitResult.resetIn / 1000))
+  );
+  assert.equal(context.responseHeaders.get("Retry-After"), null);
+});
+
 test("buildApiRequestContext falls back empty namespace values to api bucket", () => {
   const ip = `198.51.100.${(Date.now() % 200) + 20}`;
   const req = new Request("http://localhost/api/test", {
