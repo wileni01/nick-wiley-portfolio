@@ -36,6 +36,7 @@ const NO_CONTEXT_FALLBACK_NOTE =
 type ChatContextSource = "none" | "retrieval" | "fallback";
 type ChatContextFallbackReason =
   | "none"
+  | "invalid_payload"
   | "no_provider"
   | "rate_limited"
   | "retrieval_error"
@@ -71,7 +72,7 @@ export async function POST(req: Request) {
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
   responseHeaders.set("X-Chat-Context-Source", "none");
-  responseHeaders.set("X-Chat-Context-Fallback", "none");
+  responseHeaders.set("X-Chat-Context-Fallback", "invalid_payload");
   exceededHeaders.set("X-Chat-Context-Source", "fallback");
   exceededHeaders.set("X-Chat-Context-Fallback", "rate_limited");
   try {
@@ -98,6 +99,7 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return parsed.response;
     }
+    responseHeaders.set("X-Chat-Context-Fallback", "none");
 
     const providerResolution = resolveAIProvider(parsed.data.provider);
     applyResolvedAIProviderHeaders(responseHeaders, providerResolution);
