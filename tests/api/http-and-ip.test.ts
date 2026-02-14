@@ -244,6 +244,42 @@ test("parseJsonRequest enforces maxBytes when body exceeds limit after read", as
   }
 });
 
+test("parseJsonRequest stops reading stream bodies once maxBytes is exceeded", async () => {
+  const schema = z.object({ value: z.string() });
+  let pullCount = 0;
+  const stream = new ReadableStream<Uint8Array>({
+    pull(controller) {
+      pullCount += 1;
+      if (pullCount === 1) {
+        controller.enqueue(
+          new Uint8Array(Buffer.from('{"value":"abcdefghijklmnopqrstuvwxyz"}'))
+        );
+        return;
+      }
+      throw new Error("stream should have been cancelled after byte limit");
+    },
+  });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: stream,
+    duplex: "half",
+  } as RequestInit);
+
+  const result = await parseJsonRequest(req, schema, {
+    maxBytes: 18,
+    tooLargeMessage: "Byte limit exceeded.",
+  });
+
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 413);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Byte limit exceeded.");
+  }
+  assert.equal(pullCount, 1);
+});
+
 test("parseJsonRequest rejects non-safe integer content-length header values", async () => {
   const schema = z.object({ value: z.string() });
   const req = new Request("http://localhost/api/test", {
@@ -308,6 +344,34 @@ test("parseJsonRequest returns invalid-json response when request body cannot be
     assert.equal(result.response.status, 400);
     const body = (await result.response.json()) as { error: string };
     assert.equal(body.error, "Request body could not be read.");
+  }
+});
+
+test("parseJsonRequest returns invalid-json response when stream body read fails", async () => {
+  const schema = z.object({ value: z.string() });
+  const stream = new ReadableStream<Uint8Array>({
+    pull() {
+      throw new Error("stream read failure");
+    },
+  });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: stream,
+    duplex: "half",
+  } as RequestInit);
+
+  const result = await parseJsonRequest(req, schema, {
+    invalidJsonMessage: "Request body stream failed.",
+  });
+
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 400);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Request body stream failed.");
   }
 });
 
