@@ -367,3 +367,38 @@ test("deliverContactSubmission classifies abort-like and timeout errors as timeo
       }
     }
   ));
+
+test("deliverContactSubmission redacts emails in thrown request errors", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: "resend-api-key-12345",
+      CONTACT_EMAIL: "team@example.com",
+      CONTACT_FROM_EMAIL: undefined,
+    },
+    async () => {
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = (async () => {
+        throw new Error(
+          "network failure for person@example.com and teammate@test.io"
+        );
+      }) as typeof fetch;
+
+      try {
+        const result = await deliverContactSubmission({
+          name: "Nick",
+          email: "nick@example.com",
+          subject: "hello",
+          message: "world",
+        });
+        assert.equal(result.attempted, true);
+        assert.equal(result.delivered, false);
+        assert.ok(result.error?.startsWith("Resend request error:"));
+        assert.ok(result.error?.includes("pe***@example.com"));
+        assert.ok(result.error?.includes("te***@test.io"));
+        assert.equal(result.error?.includes("person@example.com"), false);
+        assert.equal(result.error?.includes("teammate@test.io"), false);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    }
+  ));
