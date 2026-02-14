@@ -14,6 +14,17 @@ export interface ContactDeliveryResult {
 const RESEND_API_URL = "https://api.resend.com/emails";
 const CONTACT_DELIVERY_TIMEOUT_MS = 8000;
 const DEFAULT_CONTACT_FROM = "Portfolio Contact <onboarding@resend.dev>";
+const LOG_ERROR_BODY_MAX_CHARS = 500;
+const EMAIL_REDACTION_PATTERN =
+  /\b[A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63}\b/gi;
+
+function redactEmails(value: string): string {
+  return value.replace(EMAIL_REDACTION_PATTERN, (email) => {
+    const [localPart, domain = ""] = email.split("@");
+    const visiblePrefix = localPart.slice(0, Math.min(2, localPart.length));
+    return `${visiblePrefix}***@${domain}`;
+  });
+}
 
 function getContactDeliveryConfig() {
   const apiKey = process.env.RESEND_API_KEY?.trim();
@@ -61,7 +72,9 @@ export async function deliverContactSubmission(
     });
 
     if (!response.ok) {
-      const errorBody = (await response.text()).slice(0, 500);
+      const errorBody = redactEmails(
+        (await response.text()).slice(0, LOG_ERROR_BODY_MAX_CHARS)
+      );
       return {
         attempted: true,
         delivered: false,
@@ -72,7 +85,7 @@ export async function deliverContactSubmission(
     return { attempted: true, delivered: true };
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "unknown delivery error";
+      error instanceof Error ? redactEmails(error.message) : "unknown delivery error";
     return {
       attempted: true,
       delivered: false,
