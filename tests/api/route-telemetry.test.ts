@@ -226,6 +226,7 @@ test("chat invalid payload path emits explicit invalid_payload telemetry headers
   assert.equal(response.status, 400);
   assertStandardJsonSecurityHeaders(response);
   assertStandardRateLimitHeaders(response);
+  assertRateLimitLimitHeaderEquals(response, 50);
   assert.equal(response.headers.get("X-Chat-Context-Source"), "none");
   assert.equal(response.headers.get("X-Chat-Context-Fallback"), "invalid_payload");
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
@@ -685,6 +686,7 @@ test("interview-mode invalid payload keeps invalid_payload narrative defaults", 
   assert.equal(response.status, 400);
   assertStandardJsonSecurityHeaders(response);
   assertStandardRateLimitHeaders(response);
+  assertRateLimitLimitHeaderEquals(response, 40);
   assert.equal(response.headers.get("X-AI-Narrative-Source"), "none");
   assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_payload");
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
@@ -1091,6 +1093,7 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
   assert.equal(invalidPayloadResponse.status, 400);
   assertStandardJsonSecurityHeaders(invalidPayloadResponse);
   assertStandardRateLimitHeaders(invalidPayloadResponse);
+  assertRateLimitLimitHeaderEquals(invalidPayloadResponse, 5);
   assert.equal(invalidPayloadResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     invalidPayloadResponse.headers.get("X-Contact-Delivery-Reason"),
