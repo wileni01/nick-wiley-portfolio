@@ -20,7 +20,11 @@ function createFallbackRandomToken(): string {
     // Ignore and fallback to Math.random token path.
   }
 
-  return Math.random().toString(36).slice(2, 2 + FALLBACK_RANDOM_TOKEN_CHARS);
+  let token = "";
+  while (token.length < FALLBACK_RANDOM_TOKEN_CHARS) {
+    token += Math.random().toString(36).slice(2);
+  }
+  return token.slice(0, FALLBACK_RANDOM_TOKEN_CHARS);
 }
 
 export function normalizeRequestId(
