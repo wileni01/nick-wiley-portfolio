@@ -11,7 +11,10 @@ import {
   getReadinessStorageKey,
   parseReadinessState,
 } from "@/lib/adaptive/readiness-checklist";
-import { areBooleanStateRecordsEqual } from "@/lib/adaptive/boolean-state";
+import {
+  areBooleanStateRecordsEqual,
+  serializeBooleanStateRecord,
+} from "@/lib/adaptive/boolean-state";
 
 export function InterviewReadinessChecklist() {
   const { companyId, personaId } = useInterviewMode();
@@ -66,7 +69,10 @@ export function InterviewReadinessChecklist() {
   useEffect(() => {
     if (!companyId || !personaId || !checklistItems.length) return;
     const storageKey = getReadinessStorageKey(companyId, personaId);
-    if (!Object.keys(checked).length) {
+    const serialized = serializeBooleanStateRecord(checked, {
+      truthyOnly: true,
+    });
+    if (serialized === "{}") {
       if (localStorage.getItem(storageKey) === null) return;
       localStorage.removeItem(storageKey);
       window.dispatchEvent(
@@ -75,7 +81,6 @@ export function InterviewReadinessChecklist() {
       return;
     }
 
-    const serialized = JSON.stringify(checked);
     if (localStorage.getItem(storageKey) === serialized) return;
     localStorage.setItem(storageKey, serialized);
     window.dispatchEvent(

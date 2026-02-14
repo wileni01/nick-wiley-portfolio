@@ -16,7 +16,10 @@ import {
 } from "@/lib/adaptive/readiness-checklist";
 import { getLaunchpadStorageKey } from "@/lib/adaptive/storage-keys";
 import { openExternalUrl } from "@/lib/external-link";
-import { parseBooleanStateRecord } from "@/lib/adaptive/boolean-state";
+import {
+  parseBooleanStateRecord,
+  serializeBooleanStateRecord,
+} from "@/lib/adaptive/boolean-state";
 
 interface ResourceGap {
   id: string;
@@ -110,8 +113,12 @@ export function ReadinessGapPanel() {
   function markResourceOpened(resourceId: string) {
     const key = getLaunchpadStorageKey(activeCompanyId, activePersonaId);
     const state = parseBooleanStateRecord(localStorage.getItem(key));
+    if (state[resourceId]) return;
     state[resourceId] = true;
-    localStorage.setItem(key, JSON.stringify(state));
+    localStorage.setItem(
+      key,
+      serializeBooleanStateRecord(state, { truthyOnly: true })
+    );
     window.dispatchEvent(
       new CustomEvent("adaptive-launchpad-updated", { detail: { key } })
     );

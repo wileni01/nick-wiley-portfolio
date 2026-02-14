@@ -11,6 +11,7 @@ import { getDrillStateStorageKey } from "@/lib/adaptive/storage-keys";
 import {
   areBooleanStateRecordsEqual,
   parseBooleanStateRecord,
+  serializeBooleanStateRecord,
 } from "@/lib/adaptive/boolean-state";
 
 export function TargetedDrills() {
@@ -101,7 +102,8 @@ export function TargetedDrills() {
     const activeCompanyId = companyId;
     const activePersonaId = personaId;
     const key = getDrillStateStorageKey(activeCompanyId, activePersonaId);
-    if (!Object.keys(checked).length) {
+    const serialized = serializeBooleanStateRecord(checked, { truthyOnly: true });
+    if (serialized === "{}") {
       if (localStorage.getItem(key) === null) return;
       localStorage.removeItem(key);
       window.dispatchEvent(
@@ -109,7 +111,6 @@ export function TargetedDrills() {
       );
       return;
     }
-    const serialized = JSON.stringify(checked);
     if (localStorage.getItem(key) === serialized) return;
     localStorage.setItem(key, serialized);
     window.dispatchEvent(

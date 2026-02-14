@@ -1,4 +1,5 @@
 import type { CompanyId } from "./types";
+import { parseBooleanStateRecord } from "./boolean-state";
 
 export interface ReadinessChecklistItem {
   id: string;
@@ -138,19 +139,10 @@ export function getReadinessStorageKey(
 }
 
 export function parseReadinessState(raw: string | null): ReadinessState {
-  if (!raw) return {};
-  try {
-    const parsed = JSON.parse(raw) as Record<string, unknown>;
-    const normalized: ReadinessState = {};
-    for (const [key, value] of Object.entries(parsed).slice(0, READINESS_STATE_MAX_KEYS)) {
-      const normalizedKey = String(key).trim().slice(0, READINESS_STATE_KEY_MAX_CHARS);
-      if (!normalizedKey) continue;
-      normalized[normalizedKey] = Boolean(value);
-    }
-    return normalized;
-  } catch {
-    return {};
-  }
+  return parseBooleanStateRecord(raw, {
+    maxKeys: READINESS_STATE_MAX_KEYS,
+    maxKeyLength: READINESS_STATE_KEY_MAX_CHARS,
+  });
 }
 
 export function getReadinessCompletion(

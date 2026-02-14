@@ -3,6 +3,10 @@ export interface ParseBooleanStateOptions {
   maxKeyLength?: number;
 }
 
+export interface SerializeBooleanStateOptions extends ParseBooleanStateOptions {
+  truthyOnly?: boolean;
+}
+
 export interface BooleanStateSummary {
   total: number;
   truthy: number;
@@ -53,6 +57,35 @@ export function getBooleanStateCoveragePercentage(
   if (!expectedKeys.length) return 0;
   const coveredCount = expectedKeys.filter((key) => Boolean(state[key])).length;
   return Math.round((coveredCount / expectedKeys.length) * 100);
+}
+
+export function serializeBooleanStateRecord(
+  state: Record<string, boolean>,
+  options?: SerializeBooleanStateOptions
+): string {
+  const maxKeys = Math.max(1, Math.floor(options?.maxKeys ?? DEFAULT_MAX_KEYS));
+  const maxKeyLength = Math.max(
+    1,
+    Math.floor(options?.maxKeyLength ?? DEFAULT_MAX_KEY_LENGTH)
+  );
+  const truthyOnly = options?.truthyOnly ?? false;
+
+  const normalizedEntries = Object.entries(state)
+    .map(([key, value]) => [String(key).trim().slice(0, maxKeyLength), Boolean(value)] as const)
+    .filter(([normalizedKey, normalizedValue]) => {
+      if (!normalizedKey) return false;
+      if (truthyOnly && !normalizedValue) return false;
+      return true;
+    })
+    .sort(([left], [right]) => left.localeCompare(right))
+    .slice(0, maxKeys);
+
+  const normalized: Record<string, boolean> = {};
+  normalizedEntries.forEach(([key, value]) => {
+    normalized[key] = value;
+  });
+
+  return JSON.stringify(normalized);
 }
 
 export function areBooleanStateRecordsEqual(

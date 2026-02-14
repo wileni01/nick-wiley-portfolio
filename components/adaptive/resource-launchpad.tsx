@@ -16,6 +16,7 @@ import {
 import {
   areBooleanStateRecordsEqual,
   parseBooleanStateRecord,
+  serializeBooleanStateRecord,
 } from "@/lib/adaptive/boolean-state";
 
 export function ResourceLaunchpad() {
@@ -74,7 +75,15 @@ export function ResourceLaunchpad() {
   useEffect(() => {
     if (!companyId || !personaId) return;
     const key = getLaunchpadStorageKey(companyId, personaId);
-    const serialized = JSON.stringify(opened);
+    const serialized = serializeBooleanStateRecord(opened, { truthyOnly: true });
+    if (serialized === "{}") {
+      if (localStorage.getItem(key) === null) return;
+      localStorage.removeItem(key);
+      window.dispatchEvent(
+        new CustomEvent("adaptive-launchpad-updated", { detail: { key } })
+      );
+      return;
+    }
     if (localStorage.getItem(key) === serialized) return;
     localStorage.setItem(key, serialized);
     window.dispatchEvent(
@@ -93,7 +102,7 @@ export function ResourceLaunchpad() {
   );
 
   function markOpened(resourceId: string) {
-    setOpened((prev) => ({ ...prev, [resourceId]: true }));
+    setOpened((prev) => (prev[resourceId] ? prev : { ...prev, [resourceId]: true }));
   }
 
   function openResource(resourceId: string, url: string) {
@@ -136,6 +145,11 @@ export function ResourceLaunchpad() {
   }
 
   function resetLaunchpad() {
+    if (!Object.keys(opened).length && localStorage.getItem(
+      getLaunchpadStorageKey(activeCompanyId, activePersonaId)
+    ) === null) {
+      return;
+    }
     setOpened({});
     const key = getLaunchpadStorageKey(activeCompanyId, activePersonaId);
     localStorage.removeItem(key);
