@@ -105,7 +105,7 @@ export async function POST(req: Request) {
   responseHeaders.set("X-AI-Narrative-Source", "deterministic");
   responseHeaders.set("X-AI-Narrative-Fallback", "none");
   exceededHeaders.set("X-AI-Narrative-Source", "deterministic");
-  exceededHeaders.set("X-AI-Narrative-Fallback", "none");
+  exceededHeaders.set("X-AI-Narrative-Fallback", "rate_limited");
   try {
     if (!rateLimitResult.success) {
       return jsonResponse(
