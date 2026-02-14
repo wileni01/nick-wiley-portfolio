@@ -85,7 +85,6 @@ export async function POST(req: Request) {
       fromEmail: redactEmail(sanitized.email),
       subject: sanitized.subject || "(none)",
       messageChars: sanitized.message.length,
-      messagePreview: sanitized.message.slice(0, 120),
     });
 
     const delivery = await deliverContactSubmission(sanitized);
