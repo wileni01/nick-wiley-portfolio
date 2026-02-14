@@ -8,6 +8,7 @@ import {
 } from "@/lib/api-rate-limit";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
+import { createRequestId } from "@/lib/request-id";
 import { sanitizeInput } from "@/lib/utils";
 import {
   buildDeterministicNarrative,
@@ -81,20 +82,27 @@ function sanitizeRecommendationUrl(url: string): string {
 }
 
 export async function POST(req: Request) {
+  const requestId = createRequestId();
   try {
     const ip = getRequestIp(req);
 
     const limit = rateLimit(`interview-mode:${ip}`, INTERVIEW_MODE_RATE_LIMIT);
     const rateLimitHeaders = buildRateLimitHeaders(INTERVIEW_MODE_RATE_LIMIT, limit);
+    const responseHeaders = new Headers(rateLimitHeaders);
+    responseHeaders.set("X-Request-Id", requestId);
 
     if (!limit.success) {
+      const exceededHeaders = new Headers(
+        buildRateLimitExceededHeaders(INTERVIEW_MODE_RATE_LIMIT, limit)
+      );
+      exceededHeaders.set("X-Request-Id", requestId);
       return jsonResponse(
         {
           error: "Rate limit exceeded. Please try again shortly.",
           resetIn: Math.ceil(limit.resetIn / 1000),
         },
         429,
-        buildRateLimitExceededHeaders(INTERVIEW_MODE_RATE_LIMIT, limit)
+        exceededHeaders
       );
     }
 
@@ -102,7 +110,7 @@ export async function POST(req: Request) {
       invalidPayloadMessage: "Invalid interview mode payload.",
       maxChars: 10000,
       tooLargeMessage: "Interview mode payload is too large.",
-      responseHeaders: rateLimitHeaders,
+      responseHeaders,
     });
     if (!parsed.success) {
       return parsed.response;
@@ -119,7 +127,7 @@ export async function POST(req: Request) {
       return jsonResponse(
         { error: "Unknown company or interviewer persona." },
         400,
-        rateLimitHeaders
+        responseHeaders
       );
     }
 
@@ -210,11 +218,11 @@ Write two short paragraphs:
             "Could not build interview briefing response. Please retry with deterministic recommendations.",
         },
         500,
-        rateLimitHeaders
+        responseHeaders
       );
     }
 
-    return jsonResponse(validatedResponse.data, 200, rateLimitHeaders);
+    return jsonResponse(validatedResponse.data, 200, responseHeaders);
   } catch (error) {
     console.error("Interview mode API error:", error);
     return jsonResponse(
@@ -222,7 +230,8 @@ Write two short paragraphs:
         error:
           "Could not generate interview briefing. Please retry or use deterministic recommendations.",
       },
-      500
+      500,
+      { "X-Request-Id": requestId }
     );
   }
 }

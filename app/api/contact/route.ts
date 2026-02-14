@@ -7,6 +7,7 @@ import {
 import { deliverContactSubmission } from "@/lib/contact-delivery";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
+import { createRequestId } from "@/lib/request-id";
 import { sanitizeInput } from "@/lib/utils";
 
 const contactRequestSchema = z.object({
@@ -22,6 +23,7 @@ const CONTACT_RATE_LIMIT = {
 } as const;
 
 export async function POST(req: Request) {
+  const requestId = createRequestId();
   try {
     // Rate limiting
     const ip = getRequestIp(req);
@@ -31,14 +33,20 @@ export async function POST(req: Request) {
       CONTACT_RATE_LIMIT,
       rateLimitResult
     );
+    const responseHeaders = new Headers(rateLimitHeaders);
+    responseHeaders.set("X-Request-Id", requestId);
 
     if (!rateLimitResult.success) {
+      const exceededHeaders = new Headers(
+        buildRateLimitExceededHeaders(CONTACT_RATE_LIMIT, rateLimitResult)
+      );
+      exceededHeaders.set("X-Request-Id", requestId);
       return jsonResponse(
         {
           error: "Too many submissions. Please try again later.",
         },
         429,
-        buildRateLimitExceededHeaders(CONTACT_RATE_LIMIT, rateLimitResult)
+        exceededHeaders
       );
     }
 
@@ -46,7 +54,7 @@ export async function POST(req: Request) {
       invalidPayloadMessage: "Please provide valid name, email, and message.",
       maxChars: 12000,
       tooLargeMessage: "Contact form payload is too large.",
-      responseHeaders: rateLimitHeaders,
+      responseHeaders,
     });
     if (!parsedBody.success) {
       return parsedBody.response;
@@ -57,7 +65,7 @@ export async function POST(req: Request) {
     // Honeypot check — if filled, it's a bot
     if (honeypot) {
       // Return success to not tip off bots
-      return jsonResponse({ success: true }, 200, rateLimitHeaders);
+      return jsonResponse({ success: true }, 200, responseHeaders);
     }
 
     // Sanitize inputs
@@ -71,7 +79,7 @@ export async function POST(req: Request) {
       return jsonResponse(
         { error: "Name, email, and message are required." },
         400,
-        rateLimitHeaders
+        responseHeaders
       );
     }
 
@@ -91,7 +99,7 @@ export async function POST(req: Request) {
             "Your message could not be delivered right now. Please try again shortly.",
         },
         502,
-        rateLimitHeaders
+        responseHeaders
       );
     }
 
@@ -101,10 +109,14 @@ export async function POST(req: Request) {
         message: "Thank you! Your message has been received.",
       },
       200,
-      rateLimitHeaders
+      responseHeaders
     );
   } catch (error) {
     console.error("Contact form error:", error);
-    return jsonResponse({ error: "An error occurred. Please try again." }, 500);
+    return jsonResponse(
+      { error: "An error occurred. Please try again." },
+      500,
+      { "X-Request-Id": requestId }
+    );
   }
 }

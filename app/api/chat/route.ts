@@ -9,6 +9,7 @@ import {
 import { findRelevantContext } from "@/lib/embeddings";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
+import { createRequestId } from "@/lib/request-id";
 import { sanitizeInput } from "@/lib/utils";
 
 export const maxDuration = 30;
@@ -31,21 +32,28 @@ const CHAT_RATE_LIMIT = {
 } as const;
 
 export async function POST(req: Request) {
+  const requestId = createRequestId();
   try {
     // Rate limiting
     const ip = getRequestIp(req);
 
     const rateLimitResult = rateLimit(`chat:${ip}`, CHAT_RATE_LIMIT);
     const rateLimitHeaders = buildRateLimitHeaders(CHAT_RATE_LIMIT, rateLimitResult);
+    const responseHeaders = new Headers(rateLimitHeaders);
+    responseHeaders.set("X-Request-Id", requestId);
 
     if (!rateLimitResult.success) {
+      const exceededHeaders = new Headers(
+        buildRateLimitExceededHeaders(CHAT_RATE_LIMIT, rateLimitResult)
+      );
+      exceededHeaders.set("X-Request-Id", requestId);
       return jsonResponse(
         {
           error: "Rate limit exceeded. Please try again later.",
           resetIn: Math.ceil(rateLimitResult.resetIn / 1000),
         },
         429,
-        buildRateLimitExceededHeaders(CHAT_RATE_LIMIT, rateLimitResult)
+        exceededHeaders
       );
     }
 
@@ -53,7 +61,7 @@ export async function POST(req: Request) {
       invalidPayloadMessage: "Messages are required and must be valid chat entries.",
       maxChars: 120000,
       tooLargeMessage: "Chat payload is too large.",
-      responseHeaders: rateLimitHeaders,
+      responseHeaders,
     });
     if (!parsed.success) {
       return parsed.response;
@@ -71,7 +79,7 @@ export async function POST(req: Request) {
       return jsonResponse(
         { error: "Messages are empty after sanitization." },
         400,
-        rateLimitHeaders
+        responseHeaders
       );
     }
 
@@ -83,7 +91,7 @@ export async function POST(req: Request) {
       return jsonResponse(
         { error: "A user message is required to generate a response." },
         400,
-        rateLimitHeaders
+        responseHeaders
       );
     }
 
@@ -116,7 +124,7 @@ ${context}`;
 
     return result.toDataStreamResponse({
       headers: {
-        ...rateLimitHeaders,
+        ...Object.fromEntries(responseHeaders.entries()),
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
       },
@@ -127,7 +135,8 @@ ${context}`;
       {
         error: "An error occurred processing your request. Please check that API keys are configured.",
       },
-      500
+      500,
+      { "X-Request-Id": requestId }
     );
   }
 }
