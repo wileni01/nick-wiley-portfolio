@@ -136,7 +136,22 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
   const maxChars = Number.isFinite(options?.maxChars)
     ? Math.max(1, Math.floor(options?.maxChars ?? 0))
     : null;
-  let declaredContentLength: number | null = null;
+  const declaredContentLength = parseDeclaredContentLength(
+    req.headers.get("content-length")
+  );
+  if (
+    declaredContentLength !== null &&
+    (!Number.isFinite(declaredContentLength) || declaredContentLength < 0)
+  ) {
+    return {
+      success: false,
+      response: jsonResponse(
+        { error: invalidContentLengthMessage },
+        400,
+        responseHeaders
+      ),
+    };
+  }
   const contentType = req.headers.get("content-type");
   if (contentType) {
     const normalizedContentType = contentType.trim();
@@ -164,20 +179,6 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
     };
   }
   if (maxPayloadBytes !== null) {
-    declaredContentLength = parseDeclaredContentLength(req.headers.get("content-length"));
-    if (
-      declaredContentLength !== null &&
-      (!Number.isFinite(declaredContentLength) || declaredContentLength < 0)
-    ) {
-      return {
-        success: false,
-        response: jsonResponse(
-          { error: invalidContentLengthMessage },
-          400,
-          responseHeaders
-        ),
-      };
-    }
     if (
       declaredContentLength !== null &&
       declaredContentLength > maxPayloadBytes
