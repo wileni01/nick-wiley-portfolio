@@ -1,4 +1,6 @@
 import { normalizeRateLimitConfig, type RateLimitConfig } from "@/lib/rate-limit";
+const REQUEST_ID_HEADER_MAX_CHARS = 120;
+const SAFE_REQUEST_ID_HEADER_PATTERN = /[^a-zA-Z0-9._:-]/g;
 
 interface RateLimitSnapshot {
   remaining: number;
@@ -10,6 +12,13 @@ interface BuildApiResponseHeadersInput {
   snapshot: RateLimitSnapshot;
   requestId?: string;
   includeRetryAfter?: boolean;
+}
+
+function normalizeRequestIdForHeader(value: string): string | null {
+  const bounded = value.trim().slice(0, REQUEST_ID_HEADER_MAX_CHARS);
+  if (!bounded) return null;
+  const sanitized = bounded.replace(SAFE_REQUEST_ID_HEADER_PATTERN, "");
+  return sanitized || null;
 }
 
 function normalizeResetInSeconds(resetInMs: number): number {
@@ -62,7 +71,10 @@ export function buildApiResponseHeaders(
       : buildRateLimitHeaders(input.config, input.snapshot)
   );
   if (input.requestId) {
-    headers.set("X-Request-Id", input.requestId);
+    const requestId = normalizeRequestIdForHeader(input.requestId);
+    if (requestId) {
+      headers.set("X-Request-Id", requestId);
+    }
   }
   return headers;
 }
