@@ -295,3 +295,73 @@ test("deliverContactSubmission sanitizes outgoing payload and redacts provider e
       }
     }
   ));
+
+test("deliverContactSubmission normalizes fallback sender and omits invalid reply-to", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: "resend-api-key-12345",
+      CONTACT_EMAIL: "team@example.com",
+      CONTACT_FROM_EMAIL: "invalid from header",
+    },
+    async () => {
+      const originalFetch = globalThis.fetch;
+      let capturedBody: Record<string, unknown> | null = null;
+      globalThis.fetch = (async (_url: string | URL | Request, init?: RequestInit) => {
+        capturedBody = JSON.parse(String(init?.body ?? "{}")) as Record<string, unknown>;
+        return new Response("", { status: 200 });
+      }) as typeof fetch;
+
+      try {
+        const result = await deliverContactSubmission({
+          name: "Nick",
+          email: "not-an-email",
+          subject: "   ",
+          message: "Test",
+        });
+        assert.equal(result.attempted, true);
+        assert.equal(result.delivered, true);
+        assert.ok(capturedBody);
+        assert.equal(
+          capturedBody?.from,
+          "Portfolio Contact <onboarding@resend.dev>"
+        );
+        assert.equal(capturedBody?.subject, "Portfolio Contact: New message");
+        assert.equal("reply_to" in (capturedBody ?? {}), false);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    }
+  ));
+
+test("deliverContactSubmission classifies abort-like fetch failures as timeout", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: "resend-api-key-12345",
+      CONTACT_EMAIL: "team@example.com",
+      CONTACT_FROM_EMAIL: undefined,
+    },
+    async () => {
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = (async () => {
+        const abortError = new Error("request aborted");
+        abortError.name = "AbortError";
+        throw abortError;
+      }) as typeof fetch;
+
+      try {
+        const result = await deliverContactSubmission({
+          name: "Nick",
+          email: "nick@example.com",
+          subject: "hello",
+          message: "world",
+        });
+        assert.equal(result.attempted, true);
+        assert.equal(result.delivered, false);
+        assert.ok(
+          result.error?.includes("Resend request timed out after 8000ms")
+        );
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    }
+  ));
