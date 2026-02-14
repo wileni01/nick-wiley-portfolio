@@ -19,6 +19,9 @@ npm start
 
 # Lint
 npm run lint
+
+# Run automated recommendation tests
+npm test
 ```
 
 The dev server runs at [http://localhost:3000](http://localhost:3000).
@@ -173,6 +176,7 @@ lib/
 - **Shared API request context** — API routes reuse shared request context helpers for consistent request IDs (UUID with robust full-length random-token + monotonic-counter fallback plus shared normalization), sanitized namespace + IP-based rate-limit keying, normalized rate-limit config usage, and response header construction.
 - **Rate-limit response metadata** — API routes include standard rate-limit headers (`X-RateLimit-*`, `Retry-After` on 429) plus `X-Request-Id` across success, validation-error, and fallback 5xx responses; limiter snapshots are normalized to non-negative reset windows, response header values are normalized/clamped (including finite-value guards) from effective limiter config, and request-id header values are bounded/sanitized for safer observability correlation.
 - **Structured API logs** — Server routes log request-correlated, normalized warning/error (and selected metadata-info) payloads with bounded/redacted/cycle-safe detail serialization and control-char-safe + allowlisted route/request-id/message normalization to simplify debugging without raw-object or secret leakage noise.
+- **Deterministic recommendation tests** — `npm test` runs Node-based TypeScript tests that verify adaptive recommendation determinism, ranking bounds/sorting/diversity guarantees, safe internal URL outputs, and deterministic narrative fallbacks for invalid mode selections.
 
 ## Adaptive Interview Mode
 
