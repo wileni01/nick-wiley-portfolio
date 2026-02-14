@@ -26,6 +26,7 @@ const INTERVIEW_MODE_RATE_LIMIT = {
   maxRequests: 40,
   windowMs: 3600000,
 } as const;
+type NarrativeFallbackReason = "none" | "no_provider" | "generation_error" | "empty_ai_output";
 
 const responseSchema = z.object({
   mode: z.object({
@@ -131,6 +132,9 @@ export async function POST(req: Request) {
 
     let aiNarrative: string | undefined;
     let narrativeSource: "deterministic" | "ai" = "deterministic";
+    let narrativeFallbackReason: NarrativeFallbackReason = executionProvider
+      ? "none"
+      : "no_provider";
 
     if (executionProvider) {
       try {
@@ -169,8 +173,21 @@ Write two short paragraphs:
         if (cleaned) {
           aiNarrative = cleaned;
           narrativeSource = "ai";
+          narrativeFallbackReason = "none";
+        } else {
+          narrativeFallbackReason = "empty_ai_output";
+          logServerWarning({
+            route: "api/interview-mode",
+            requestId,
+            message:
+              "AI narrative generation returned empty content; falling back to deterministic narrative",
+            details: {
+              provider: executionProvider,
+            },
+          });
         }
       } catch (error) {
+        narrativeFallbackReason = "generation_error";
         logServerWarning({
           route: "api/interview-mode",
           requestId,
@@ -184,6 +201,11 @@ Write two short paragraphs:
       }
     }
     responseHeaders.set("X-AI-Narrative-Source", narrativeSource);
+    if (narrativeFallbackReason !== "none") {
+      responseHeaders.set("X-AI-Narrative-Fallback", narrativeFallbackReason);
+    } else {
+      responseHeaders.delete("X-AI-Narrative-Fallback");
+    }
 
     const response: InterviewModeResponse = {
       mode: { companyId, personaId },
