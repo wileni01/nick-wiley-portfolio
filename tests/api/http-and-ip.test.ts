@@ -405,6 +405,22 @@ test("jsonResponse promotes success status to 500 on serialization failure", asy
   assert.equal(body.requestId, "reqid");
 });
 
+test("jsonResponse preserves error status on serialization failure", async () => {
+  const circular = {} as Record<string, unknown>;
+  circular.self = circular;
+
+  const response = jsonResponse(
+    { error: "invalid payload", circular, requestId: " request-id " },
+    422
+  );
+
+  assert.equal(response.status, 422);
+  assert.equal(response.headers.get("X-Request-Id"), "request-id");
+  const body = (await response.json()) as { error: string; requestId?: string };
+  assert.equal(body.error, "Internal response serialization error.");
+  assert.equal(body.requestId, "request-id");
+});
+
 test("getRequestIp prefers first valid x-forwarded-for token", () => {
   const req = new Request("http://localhost/api/test", {
     headers: {
