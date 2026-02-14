@@ -81,6 +81,22 @@ export async function parseJsonRequest<TSchema extends z.ZodTypeAny>(
       ),
     };
   }
+  if (maxChars !== null) {
+    const contentLengthHeader = req.headers.get("content-length");
+    const declaredContentLength = contentLengthHeader
+      ? Number(contentLengthHeader)
+      : null;
+    if (
+      declaredContentLength !== null &&
+      Number.isFinite(declaredContentLength) &&
+      declaredContentLength > maxChars
+    ) {
+      return {
+        success: false,
+        response: jsonResponse({ error: tooLargeMessage }, 413, responseHeaders),
+      };
+    }
+  }
 
   let rawText: string;
   try {
