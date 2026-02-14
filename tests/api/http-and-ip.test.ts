@@ -549,6 +549,49 @@ test("parseJsonRequest drops invalid response-header request id values", async (
   }
 });
 
+test("parseJsonRequest tolerates malformed responseHeaders objects", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    body: '{"value":"ok"}',
+  });
+  const malformedHeaders = Object.create(null) as Record<string, unknown>;
+  Object.defineProperty(malformedHeaders, "x-request-id", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return " req id ";
+    },
+  });
+  Object.defineProperty(malformedHeaders, "x-debug-token", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      throw new Error("x-debug-token getter failed");
+    },
+  });
+  Object.defineProperty(malformedHeaders, "x-safe-value", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return 42;
+    },
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    allowMissingContentType: false,
+    responseHeaders: malformedHeaders as HeadersInit,
+  });
+
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 415);
+    assert.equal(result.response.headers.get("X-Request-Id"), "reqid");
+    assert.equal(result.response.headers.get("X-Safe-Value"), "42");
+    assert.equal(result.response.headers.get("X-Debug-Token"), null);
+  }
+});
+
 test("parseJsonRequest error responses enforce immutable JSON security headers", async () => {
   const schema = z.object({ value: z.string() });
   const req = new Request("http://localhost/api/test", {
@@ -592,6 +635,59 @@ test("jsonResponse enforces immutable JSON security headers", () => {
   assert.equal(response.headers.get("Content-Type"), "application/json; charset=utf-8");
   assert.equal(response.headers.get("Cache-Control"), "no-store");
   assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
+});
+
+test("jsonResponse tolerates malformed custom header entries", async () => {
+  const malformedHeaders = Object.create(null) as Record<string, unknown>;
+  Object.defineProperty(malformedHeaders, "x-request-id", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return " req id ";
+    },
+  });
+  Object.defineProperty(malformedHeaders, "x-numeric", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return 123;
+    },
+  });
+  Object.defineProperty(malformedHeaders, "x-throwing-value", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return {
+        toString() {
+          throw new Error("toString failed");
+        },
+      };
+    },
+  });
+  Object.defineProperty(malformedHeaders, "x-throwing-getter", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      throw new Error("x-throwing-getter failed");
+    },
+  });
+
+  const response = jsonResponse(
+    {
+      error: "invalid request",
+      requestId: "body id",
+    },
+    400,
+    malformedHeaders as HeadersInit
+  );
+
+  assert.equal(response.status, 400);
+  assert.equal(response.headers.get("X-Request-Id"), "reqid");
+  assert.equal(response.headers.get("X-Numeric"), "123");
+  assert.equal(response.headers.get("X-Throwing-Value"), null);
+  assert.equal(response.headers.get("X-Throwing-Getter"), null);
+  const body = (await response.json()) as { requestId?: string };
+  assert.equal(body.requestId, "reqid");
 });
 
 test("jsonResponse normalizes request-id and backfills it on error responses", async () => {

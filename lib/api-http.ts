@@ -36,6 +36,80 @@ interface ReadRequestBytesResult {
   tooLarge?: boolean;
 }
 
+function toHeaderValueString(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "string") return value;
+  try {
+    return String(value);
+  } catch {
+    return null;
+  }
+}
+
+function setCustomHeaderSafely(
+  target: Headers,
+  key: unknown,
+  value: unknown
+): void {
+  if (typeof key !== "string") return;
+  const normalizedValue = toHeaderValueString(value);
+  if (normalizedValue === null) return;
+  try {
+    target.set(key, normalizedValue);
+  } catch {
+    // Ignore malformed header names/values.
+  }
+}
+
+function applyCustomHeadersSafely(
+  target: Headers,
+  headers: HeadersInit | undefined
+): void {
+  if (!headers) return;
+
+  let iteratorFactory: (() => Iterator<unknown>) | undefined;
+  try {
+    iteratorFactory = (
+      headers as { [Symbol.iterator]?: (() => Iterator<unknown>) | undefined }
+    )[Symbol.iterator];
+  } catch {
+    iteratorFactory = undefined;
+  }
+  if (typeof iteratorFactory === "function") {
+    try {
+      for (const entry of headers as Iterable<unknown>) {
+        let key: unknown;
+        let value: unknown;
+        try {
+          [key, value] = entry as [unknown, unknown];
+        } catch {
+          continue;
+        }
+        setCustomHeaderSafely(target, key, value);
+      }
+      return;
+    } catch {
+      // Fall through to object-style parsing.
+    }
+  }
+
+  let keys: string[];
+  try {
+    keys = Object.keys(headers as object);
+  } catch {
+    return;
+  }
+  for (const key of keys) {
+    let value: unknown;
+    try {
+      value = (headers as Record<string, unknown>)[key];
+    } catch {
+      continue;
+    }
+    setCustomHeaderSafely(target, key, value);
+  }
+}
+
 function readParseOption<T>(
   options: ParseJsonRequestOptions | undefined,
   key: keyof ParseJsonRequestOptions
@@ -132,12 +206,7 @@ export function jsonResponse(
     "Cache-Control": DEFAULT_CACHE_CONTROL,
     "X-Content-Type-Options": DEFAULT_CONTENT_TYPE_OPTIONS,
   });
-  if (headers) {
-    const customHeaders = new Headers(headers);
-    customHeaders.forEach((value, key) => {
-      responseHeaders.set(key, value);
-    });
-  }
+  applyCustomHeadersSafely(responseHeaders, headers);
   responseHeaders.set("Content-Type", DEFAULT_JSON_CONTENT_TYPE);
   responseHeaders.set("Cache-Control", DEFAULT_CACHE_CONTROL);
   responseHeaders.set("X-Content-Type-Options", DEFAULT_CONTENT_TYPE_OPTIONS);
