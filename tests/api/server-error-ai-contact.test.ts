@@ -219,9 +219,8 @@ test("server log helpers bound nested detail depth, key count, and array length"
   assert.equal(list[0], "[object]");
 
   const nested = serializedDetails.nested as Record<string, unknown>;
-  assert.deepEqual(nested, {
-    child: "[object]",
-  });
+  assert.equal(Object.getPrototypeOf(nested), null);
+  assert.equal(nested.child, "[object]");
 });
 
 test("server log helpers fall back route/request labels and omit non-object details", () => {
@@ -254,6 +253,47 @@ test("server log helpers fall back route/request labels and omit non-object deta
   assert.equal(payload.message.startsWith("prefix"), true);
   assert.equal(payload.message.length, 240);
   assert.equal("details" in payload, false);
+});
+
+test("server log helpers keep prototype-safe detail objects for special keys", () => {
+  const originalInfo = console.info;
+  const captured: Array<{ args: unknown[] }> = [];
+  console.info = (...args: unknown[]) => {
+    captured.push({ args });
+  };
+
+  const details: Record<string, unknown> = {};
+  Object.defineProperty(details, "__proto__", {
+    value: { polluted: "yes" },
+    enumerable: true,
+    configurable: true,
+  });
+  details.safe = "ok";
+
+  try {
+    logServerInfo({
+      route: "api/chat",
+      requestId: "proto-safe",
+      message: "prototype safety",
+      details,
+    });
+  } finally {
+    console.info = originalInfo;
+  }
+
+  assert.equal(({} as { polluted?: string }).polluted, undefined);
+  assert.equal(captured.length, 1);
+  const payload = captured[0]?.args[1] as {
+    details?: Record<string, unknown>;
+  };
+  assert.ok(payload.details);
+  const serializedDetails = payload.details as Record<string, unknown>;
+  assert.equal(Object.getPrototypeOf(serializedDetails), null);
+  assert.equal(Object.prototype.hasOwnProperty.call(serializedDetails, "__proto__"), true);
+  const protoPayload = serializedDetails["__proto__"] as Record<string, unknown>;
+  assert.equal(Object.getPrototypeOf(protoPayload), null);
+  assert.equal(protoPayload.polluted, "yes");
+  assert.equal(serializedDetails.safe, "ok");
 });
 
 test("resolveAIProvider honors available keys and fallback behavior", () =>

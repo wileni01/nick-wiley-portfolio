@@ -132,7 +132,7 @@ function sanitizeLogValue(
         0,
         LOG_DETAILS_MAX_KEYS
       );
-      const sanitizedObject: Record<string, unknown> = {};
+      const sanitizedObject = Object.create(null) as Record<string, unknown>;
       for (const [key, nestedValue] of entries) {
         sanitizedObject[key] = SENSITIVE_LOG_KEY_PATTERN.test(key)
           ? REDACTED_LOG_VALUE
