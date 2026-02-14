@@ -277,6 +277,24 @@ test("chat missing content-type keeps invalid_payload fallback semantics", async
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
 });
 
+test("chat non-numeric content-length keeps invalid_payload fallback semantics", async () => {
+  const response = await postChat(
+    buildJsonRequest({
+      url: "http://localhost/api/chat",
+      body: "{}",
+      ip: uniqueIp(),
+      contentLength: "abc",
+    })
+  );
+
+  assert.equal(response.status, 400);
+  assert.equal(response.headers.get("X-Chat-Context-Source"), "none");
+  assert.equal(response.headers.get("X-Chat-Context-Fallback"), "invalid_payload");
+  assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(response.headers.get("X-AI-Provider"), "none");
+  assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("chat invalid content-length keeps invalid_payload fallback semantics", async () => {
   const response = await postChat(
     buildJsonRequest({
@@ -580,6 +598,24 @@ test("interview-mode missing content-type keeps invalid_payload narrative fallba
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
 });
 
+test("interview-mode non-numeric content-length keeps invalid_payload narrative fallback semantics", async () => {
+  const response = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: "{}",
+      ip: uniqueIp(),
+      contentLength: "abc",
+    })
+  );
+
+  assert.equal(response.status, 400);
+  assert.equal(response.headers.get("X-AI-Narrative-Source"), "none");
+  assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_payload");
+  assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(response.headers.get("X-AI-Provider"), "none");
+  assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("interview-mode invalid content-length keeps invalid_payload narrative fallback semantics", async () => {
   const response = await postInterviewMode(
     buildJsonRequest({
@@ -721,6 +757,20 @@ test("contact missing content-type keeps explicit invalid_payload delivery reaso
     })
   );
   assert.equal(response.status, 415);
+  assert.equal(response.headers.get("X-Contact-Delivery"), "skipped");
+  assert.equal(response.headers.get("X-Contact-Delivery-Reason"), "invalid_payload");
+});
+
+test("contact non-numeric content-length keeps explicit invalid_payload delivery reason", async () => {
+  const response = await postContact(
+    buildJsonRequest({
+      url: "http://localhost/api/contact",
+      body: "{}",
+      ip: uniqueIp(),
+      contentLength: "abc",
+    })
+  );
+  assert.equal(response.status, 400);
   assert.equal(response.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(response.headers.get("X-Contact-Delivery-Reason"), "invalid_payload");
 });
