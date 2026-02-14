@@ -15,8 +15,32 @@ const RESEND_API_URL = "https://api.resend.com/emails";
 const CONTACT_DELIVERY_TIMEOUT_MS = 8000;
 const DEFAULT_CONTACT_FROM = "Portfolio Contact <onboarding@resend.dev>";
 const LOG_ERROR_BODY_MAX_CHARS = 500;
+const EMAIL_VALUE_MAX_CHARS = 320;
 const EMAIL_REDACTION_PATTERN =
   /\b[A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63}\b/gi;
+const SIMPLE_EMAIL_PATTERN =
+  /^[A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63}$/i;
+const FORMATTED_EMAIL_PATTERN =
+  /^([^<>\r\n]{1,120})<\s*([A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63})\s*>$/i;
+
+function sanitizeInlineValue(value: string): string {
+  return value.replace(/[\r\n\t]/g, " ").trim().slice(0, EMAIL_VALUE_MAX_CHARS);
+}
+
+function isSimpleEmail(value: string): boolean {
+  return SIMPLE_EMAIL_PATTERN.test(value);
+}
+
+function normalizeFromAddress(value: string): string {
+  const sanitized = sanitizeInlineValue(value);
+  if (isSimpleEmail(sanitized)) return sanitized;
+  const formattedMatch = sanitized.match(FORMATTED_EMAIL_PATTERN);
+  if (!formattedMatch) return DEFAULT_CONTACT_FROM;
+  const displayName = sanitizeInlineValue(formattedMatch[1] ?? "").slice(0, 120);
+  const email = sanitizeInlineValue(formattedMatch[2] ?? "");
+  if (!displayName || !isSimpleEmail(email)) return DEFAULT_CONTACT_FROM;
+  return `${displayName} <${email}>`;
+}
 
 function redactEmails(value: string): string {
   return value.replace(EMAIL_REDACTION_PATTERN, (email) => {
@@ -28,9 +52,11 @@ function redactEmails(value: string): string {
 
 function getContactDeliveryConfig() {
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  const toEmail = process.env.CONTACT_EMAIL?.trim();
-  const fromEmail = process.env.CONTACT_FROM_EMAIL?.trim() || DEFAULT_CONTACT_FROM;
-  if (!apiKey || !toEmail) return null;
+  const toEmail = sanitizeInlineValue(process.env.CONTACT_EMAIL ?? "");
+  const fromEmail = normalizeFromAddress(
+    process.env.CONTACT_FROM_EMAIL?.trim() || DEFAULT_CONTACT_FROM
+  );
+  if (!apiKey || !toEmail || !isSimpleEmail(toEmail)) return null;
   return { apiKey, toEmail, fromEmail };
 }
 
