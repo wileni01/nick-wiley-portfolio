@@ -159,6 +159,25 @@ test("chat invalid payload path emits explicit invalid_payload telemetry headers
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
 });
 
+test("chat malformed JSON keeps invalid_payload fallback semantics", async () => {
+  const response = await postChat(
+    buildJsonRequest({
+      url: "http://localhost/api/chat",
+      body: '{"messages":[{"role":"user","content":"hello"}',
+      ip: uniqueIp(),
+    })
+  );
+
+  assert.equal(response.status, 400);
+  assertStandardJsonSecurityHeaders(response);
+  assertStandardRateLimitHeaders(response);
+  assert.equal(response.headers.get("X-Chat-Context-Source"), "none");
+  assert.equal(response.headers.get("X-Chat-Context-Fallback"), "invalid_payload");
+  assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(response.headers.get("X-AI-Provider"), "none");
+  assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("chat post-sanitization empty messages keep invalid_payload fallback reason", async () =>
   withEnv(
     {
@@ -507,6 +526,25 @@ test("interview-mode invalid payload keeps invalid_payload narrative defaults", 
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
 });
 
+test("interview-mode malformed JSON keeps invalid_payload narrative defaults", async () => {
+  const response = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: '{"companyId":"kungfu-ai","personaId":"kungfu-cto"',
+      ip: uniqueIp(),
+    })
+  );
+
+  assert.equal(response.status, 400);
+  assertStandardJsonSecurityHeaders(response);
+  assertStandardRateLimitHeaders(response);
+  assert.equal(response.headers.get("X-AI-Narrative-Source"), "none");
+  assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_payload");
+  assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
+  assert.equal(response.headers.get("X-AI-Provider"), "none");
+  assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
 test("interview-mode provider fallback headers are explicit on deterministic error paths", async () =>
   withEnv(
     {
@@ -805,6 +843,22 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
   assert.equal(invalidPayloadResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     invalidPayloadResponse.headers.get("X-Contact-Delivery-Reason"),
+    "invalid_payload"
+  );
+
+  const malformedJsonResponse = await postContact(
+    buildJsonRequest({
+      url: "http://localhost/api/contact",
+      body: '{"name":"Nick","email":"nick@example.com"',
+      ip: uniqueIp(),
+    })
+  );
+  assert.equal(malformedJsonResponse.status, 400);
+  assertStandardJsonSecurityHeaders(malformedJsonResponse);
+  assertStandardRateLimitHeaders(malformedJsonResponse);
+  assert.equal(malformedJsonResponse.headers.get("X-Contact-Delivery"), "skipped");
+  assert.equal(
+    malformedJsonResponse.headers.get("X-Contact-Delivery-Reason"),
     "invalid_payload"
   );
 
