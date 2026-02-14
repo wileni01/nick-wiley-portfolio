@@ -1476,4 +1476,11 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
     rateLimitedResponse
   );
   assert.equal(errorPayload.error, "Too many submissions. Please try again later.");
+  const resetIn = Number(errorPayload.resetIn);
+  assert.ok(Number.isInteger(resetIn));
+  assert.ok(resetIn >= 0);
+  const resetHeader = Number(rateLimitedResponse.headers.get("X-RateLimit-Reset"));
+  const retryAfterHeader = Number(rateLimitedResponse.headers.get("Retry-After"));
+  assert.equal(resetIn, resetHeader);
+  assert.equal(resetIn, retryAfterHeader);
 });

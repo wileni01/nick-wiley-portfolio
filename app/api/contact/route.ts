@@ -40,6 +40,7 @@ export async function POST(req: Request) {
       return jsonResponse(
         {
           error: "Too many submissions. Please try again later.",
+          resetIn: Math.ceil(rateLimitResult.resetIn / 1000),
         },
         429,
         exceededHeaders
