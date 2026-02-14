@@ -3,6 +3,18 @@ const SAFE_IP_TOKEN_PATTERN = /[^a-fA-F0-9:.]/g;
 const FORWARDED_FOR_PATTERN = /for=(?:"?\[?([^\];",]+)\]?"?)/i;
 const BRACKETED_IP_PATTERN = /^\[([^[\]]+)\](?::\d+)?$/;
 const IPV4_WITH_PORT_PATTERN = /^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/;
+const IPV4_PATTERN = /^\d{1,3}(?:\.\d{1,3}){3}$/;
+
+function isLikelyIpToken(token: string): boolean {
+  if (IPV4_PATTERN.test(token)) {
+    return token.split(".").every((part) => {
+      if (!/^\d{1,3}$/.test(part)) return false;
+      const value = Number(part);
+      return Number.isInteger(value) && value >= 0 && value <= 255;
+    });
+  }
+  return token.includes(":");
+}
 
 function normalizeIpToken(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -15,7 +27,9 @@ function normalizeIpToken(value: string | null | undefined): string | null {
   const withoutZoneId = withoutPort.split("%")[0] ?? withoutPort;
   const bounded = withoutZoneId.slice(0, IP_TOKEN_MAX_CHARS);
   const sanitized = bounded.replace(SAFE_IP_TOKEN_PATTERN, "");
-  return sanitized ? sanitized.toLowerCase() : null;
+  if (!sanitized) return null;
+  const normalized = sanitized.toLowerCase();
+  return isLikelyIpToken(normalized) ? normalized : null;
 }
 
 function getForwardedHeaderIp(forwardedHeader: string | null): string | null {
