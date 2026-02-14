@@ -218,6 +218,51 @@ test("interview-mode provider fallback headers are explicit on deterministic err
     }
   ));
 
+test("interview-mode valid mode returns deterministic payload with no-provider fallback headers", async () =>
+  withEnv(
+    {
+      OPENAI_API_KEY: undefined,
+      ANTHROPIC_API_KEY: undefined,
+    },
+    async () => {
+      const response = await postInterviewMode(
+        buildJsonRequest({
+          url: "http://localhost/api/interview-mode",
+          body: JSON.stringify({
+            companyId: "kungfu-ai",
+            personaId: "kungfu-cto",
+            provider: "openai",
+          }),
+          ip: uniqueIp(),
+        })
+      );
+
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get("X-AI-Provider-Requested"), "openai");
+      assert.equal(response.headers.get("X-AI-Provider"), "none");
+      assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+      assert.equal(response.headers.get("X-AI-Narrative-Source"), "deterministic");
+      assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "no_provider");
+
+      const payload = (await response.json()) as {
+        companyName: string;
+        personaName: string;
+        narrativeSource: string;
+        deterministicNarrative: string;
+        recommendations: Array<{ url: string; reason: string }>;
+      };
+      assert.equal(payload.companyName, "KUNGFU.AI");
+      assert.equal(payload.personaName, "Ron Green");
+      assert.equal(payload.narrativeSource, "deterministic");
+      assert.ok(payload.deterministicNarrative.length > 20);
+      assert.ok(payload.recommendations.length > 0);
+      for (const recommendation of payload.recommendations) {
+        assert.match(recommendation.url, /^(\/(?!\/)|https:\/\/)/);
+        assert.ok(recommendation.reason.length > 0);
+      }
+    }
+  ));
+
 test("interview-mode rate-limited responses emit rate_limited narrative fallback", async () => {
   const ip = uniqueIp();
   for (let index = 0; index < 40; index++) {
