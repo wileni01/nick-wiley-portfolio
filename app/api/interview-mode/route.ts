@@ -100,6 +100,10 @@ export async function POST(req: Request) {
     rateLimitConfig: INTERVIEW_MODE_RATE_LIMIT,
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
+  responseHeaders.set("X-AI-Narrative-Source", "deterministic");
+  exceededHeaders.set("X-AI-Narrative-Source", "deterministic");
+  responseHeaders.delete("X-AI-Narrative-Fallback");
+  exceededHeaders.delete("X-AI-Narrative-Fallback");
   try {
     if (!rateLimitResult.success) {
       return jsonResponse(
