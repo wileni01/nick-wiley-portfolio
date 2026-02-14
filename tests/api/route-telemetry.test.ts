@@ -153,6 +153,22 @@ function assertRequestIdAndReturn(response: Response): string {
   return requestId!;
 }
 
+function assertRateLimitRemainingDecremented(
+  firstResponse: Response,
+  secondResponse: Response
+) {
+  const firstLimit = Number(firstResponse.headers.get("X-RateLimit-Limit"));
+  const secondLimit = Number(secondResponse.headers.get("X-RateLimit-Limit"));
+  const firstRemaining = Number(firstResponse.headers.get("X-RateLimit-Remaining"));
+  const secondRemaining = Number(secondResponse.headers.get("X-RateLimit-Remaining"));
+  assert.ok(Number.isInteger(firstLimit));
+  assert.ok(Number.isInteger(secondLimit));
+  assert.equal(firstLimit, secondLimit);
+  assert.ok(Number.isInteger(firstRemaining));
+  assert.ok(Number.isInteger(secondRemaining));
+  assert.equal(secondRemaining, firstRemaining - 1);
+}
+
 test("chat invalid payload path emits explicit invalid_payload telemetry headers", async () => {
   const response = await postChat(
     buildJsonRequest({
@@ -170,6 +186,30 @@ test("chat invalid payload path emits explicit invalid_payload telemetry headers
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(response.headers.get("X-AI-Provider"), "none");
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
+test("chat repeated requests decrement rate-limit remaining consistently", async () => {
+  const ip = uniqueIp();
+  const firstResponse = await postChat(
+    buildJsonRequest({
+      url: "http://localhost/api/chat",
+      body: "{}",
+      ip,
+    })
+  );
+  const secondResponse = await postChat(
+    buildJsonRequest({
+      url: "http://localhost/api/chat",
+      body: "{}",
+      ip,
+    })
+  );
+
+  assert.equal(firstResponse.status, 400);
+  assert.equal(secondResponse.status, 400);
+  assertStandardRateLimitHeaders(firstResponse);
+  assertStandardRateLimitHeaders(secondResponse);
+  assertRateLimitRemainingDecremented(firstResponse, secondResponse);
 });
 
 test("chat generates unique request ids across repeated requests", async () => {
@@ -582,6 +622,30 @@ test("interview-mode invalid payload keeps invalid_payload narrative defaults", 
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
   assert.equal(response.headers.get("X-AI-Provider"), "none");
   assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+});
+
+test("interview-mode repeated requests decrement rate-limit remaining consistently", async () => {
+  const ip = uniqueIp();
+  const firstResponse = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: "{}",
+      ip,
+    })
+  );
+  const secondResponse = await postInterviewMode(
+    buildJsonRequest({
+      url: "http://localhost/api/interview-mode",
+      body: "{}",
+      ip,
+    })
+  );
+
+  assert.equal(firstResponse.status, 400);
+  assert.equal(secondResponse.status, 400);
+  assertStandardRateLimitHeaders(firstResponse);
+  assertStandardRateLimitHeaders(secondResponse);
+  assertRateLimitRemainingDecremented(firstResponse, secondResponse);
 });
 
 test("interview-mode generates unique request ids across repeated requests", async () => {
@@ -998,6 +1062,30 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
     honeypotResponse.headers.get("X-Contact-Delivery-Reason"),
     "honeypot"
   );
+});
+
+test("contact repeated requests decrement rate-limit remaining consistently", async () => {
+  const ip = uniqueIp();
+  const firstResponse = await postContact(
+    buildJsonRequest({
+      url: "http://localhost/api/contact",
+      body: "{}",
+      ip,
+    })
+  );
+  const secondResponse = await postContact(
+    buildJsonRequest({
+      url: "http://localhost/api/contact",
+      body: "{}",
+      ip,
+    })
+  );
+
+  assert.equal(firstResponse.status, 400);
+  assert.equal(secondResponse.status, 400);
+  assertStandardRateLimitHeaders(firstResponse);
+  assertStandardRateLimitHeaders(secondResponse);
+  assertRateLimitRemainingDecremented(firstResponse, secondResponse);
 });
 
 test("contact generates unique request ids across repeated requests", async () => {
