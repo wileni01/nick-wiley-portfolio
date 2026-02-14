@@ -174,6 +174,7 @@ test("server log helpers bound nested detail depth, key count, and array length"
   const details: Record<string, unknown> = {};
   details.big = 123n;
   details.timestamp = new Date("2024-01-01T00:00:00.000Z");
+  details.invalidTimestamp = new Date("invalid");
   details.list = Array.from({ length: 25 }, (_, index) => ({
     item: index,
     nested: { tooDeep: true },
@@ -210,6 +211,7 @@ test("server log helpers bound nested detail depth, key count, and array length"
   assert.equal("overflow17" in serializedDetails, false);
   assert.equal(serializedDetails.big, "123");
   assert.equal(serializedDetails.timestamp, "2024-01-01T00:00:00.000Z");
+  assert.equal(serializedDetails.invalidTimestamp, "[invalid-date]");
 
   const list = serializedDetails.list as unknown[];
   assert.ok(Array.isArray(list));

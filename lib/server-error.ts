@@ -13,6 +13,7 @@ const SENSITIVE_LOG_KEY_PATTERN =
   /(password|passphrase|secret|token|api[-_]?key|authorization|cookie|set-cookie)/i;
 const REDACTED_LOG_VALUE = "[redacted]";
 const CIRCULAR_LOG_VALUE = "[circular]";
+const INVALID_DATE_LOG_VALUE = "[invalid-date]";
 const CONTROL_CHARS_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 const BIDI_OVERRIDE_PATTERN = /[\u202A-\u202E\u2066-\u2069]/g;
 
@@ -96,7 +97,12 @@ function sanitizeLogValue(
     return value.toString();
   }
   if (value instanceof Date) {
-    return value.toISOString();
+    if (!Number.isFinite(value.getTime())) return INVALID_DATE_LOG_VALUE;
+    try {
+      return value.toISOString();
+    } catch {
+      return INVALID_DATE_LOG_VALUE;
+    }
   }
   if (value instanceof Error) {
     return serializeServerError(value);
