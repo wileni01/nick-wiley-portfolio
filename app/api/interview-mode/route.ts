@@ -52,7 +52,7 @@ const responseSchema = z.object({
         url: z
           .string()
           .max(400)
-          .regex(/^(\/|https:\/\/)/i),
+          .regex(/^(\/(?!\/)|https:\/\/)/i),
         kind: z.enum(["work", "writing", "project", "resume", "page"]),
         reason: z.string().min(1).max(400),
       })
@@ -65,7 +65,7 @@ const responseSchema = z.object({
         url: z
           .string()
           .max(400)
-          .regex(/^(\/|https:\/\/)/i),
+          .regex(/^(\/(?!\/)|https:\/\/)/i),
         kind: z.enum(["work", "writing", "project", "resume", "page"]),
         reason: z.string().min(1).max(400),
       })
@@ -77,7 +77,15 @@ const responseSchema = z.object({
 function sanitizeRecommendationUrl(url: string): string {
   const normalized = url.trim().slice(0, 400);
   if (!normalized) return "/";
-  return /^(\/|https:\/\/)/i.test(normalized) ? normalized : "/";
+  if (normalized.startsWith("/") && !normalized.startsWith("//")) {
+    return normalized;
+  }
+  try {
+    const parsed = new URL(normalized);
+    return parsed.protocol === "https:" ? parsed.toString().slice(0, 400) : "/";
+  } catch {
+    return "/";
+  }
 }
 
 function isAbortLikeError(error: unknown): boolean {
