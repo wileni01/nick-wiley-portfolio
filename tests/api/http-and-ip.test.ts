@@ -68,6 +68,66 @@ test("parseJsonRequest rejects invalid content-length mismatch", async () => {
   }
 });
 
+test("parseJsonRequest rejects missing content-type when required", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    body: '{"value":"ok"}',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    allowMissingContentType: false,
+  });
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 415);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Content-Type must be application/json.");
+  }
+});
+
+test("parseJsonRequest rejects empty body with configured message", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: "   ",
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    emptyBodyMessage: "Body required for request.",
+  });
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 400);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Body required for request.");
+  }
+});
+
+test("parseJsonRequest rejects declared oversized payload before parse", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "content-length": "5000",
+    },
+    body: '{"value":"ok"}',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    maxBytes: 100,
+    tooLargeMessage: "Payload too large for parser.",
+  });
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 413);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Payload too large for parser.");
+  }
+});
+
 test("jsonResponse enforces immutable JSON security headers", () => {
   const response = jsonResponse(
     { ok: true },
@@ -104,6 +164,22 @@ test("jsonResponse normalizes request-id and backfills it on error responses", a
 test("jsonResponse normalizes invalid status values to 500", () => {
   const response = jsonResponse({ ok: true }, 999);
   assert.equal(response.status, 500);
+});
+
+test("jsonResponse promotes success status to 500 on serialization failure", async () => {
+  const circular = {} as Record<string, unknown>;
+  circular.self = circular;
+
+  const response = jsonResponse(
+    { ok: true, circular, requestId: " req\r\nid " },
+    200
+  );
+
+  assert.equal(response.status, 500);
+  assert.equal(response.headers.get("X-Request-Id"), "reqid");
+  const body = (await response.json()) as { error: string; requestId?: string };
+  assert.equal(body.error, "Internal response serialization error.");
+  assert.equal(body.requestId, "reqid");
 });
 
 test("getRequestIp prefers first valid x-forwarded-for token", () => {
