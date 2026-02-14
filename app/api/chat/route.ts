@@ -97,6 +97,14 @@ export async function POST(req: Request) {
     applyResolvedAIProviderHeaders(responseHeaders, providerResolution);
     const provider = providerResolution.selected;
     if (!provider) {
+      logServerInfo({
+        route: "api/chat",
+        requestId,
+        message: "No AI provider configured for chat request",
+        details: {
+          requestedProvider: providerResolution.requested,
+        },
+      });
       return jsonResponse(
         {
           error:
