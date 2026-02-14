@@ -2,6 +2,10 @@ import { z } from "zod";
 import { generateText } from "ai";
 import { getModel, type AIProvider } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
+import {
+  buildRateLimitExceededHeaders,
+  buildRateLimitHeaders,
+} from "@/lib/api-rate-limit";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { sanitizeInput } from "@/lib/utils";
@@ -18,6 +22,10 @@ const requestSchema = z.object({
   provider: z.enum(["openai", "anthropic"]).default("openai"),
   contextNote: z.string().max(400).optional(),
 });
+const INTERVIEW_MODE_RATE_LIMIT = {
+  maxRequests: 40,
+  windowMs: 3600000,
+} as const;
 
 const responseSchema = z.object({
   mode: z.object({
@@ -76,10 +84,8 @@ export async function POST(req: Request) {
   try {
     const ip = getRequestIp(req);
 
-    const limit = rateLimit(`interview-mode:${ip}`, {
-      maxRequests: 40,
-      windowMs: 3600000,
-    });
+    const limit = rateLimit(`interview-mode:${ip}`, INTERVIEW_MODE_RATE_LIMIT);
+    const rateLimitHeaders = buildRateLimitHeaders(INTERVIEW_MODE_RATE_LIMIT, limit);
 
     if (!limit.success) {
       return jsonResponse(
@@ -87,7 +93,8 @@ export async function POST(req: Request) {
           error: "Rate limit exceeded. Please try again shortly.",
           resetIn: Math.ceil(limit.resetIn / 1000),
         },
-        429
+        429,
+        buildRateLimitExceededHeaders(INTERVIEW_MODE_RATE_LIMIT, limit)
       );
     }
 
@@ -108,7 +115,11 @@ export async function POST(req: Request) {
     const bundle = getInterviewRecommendationBundle(companyId, personaId);
 
     if (!company || !persona || !bundle) {
-      return jsonResponse({ error: "Unknown company or interviewer persona." }, 400);
+      return jsonResponse(
+        { error: "Unknown company or interviewer persona." },
+        400,
+        rateLimitHeaders
+      );
     }
 
     const deterministicNarrative = sanitizeInput(
@@ -197,11 +208,12 @@ Write two short paragraphs:
           error:
             "Could not build interview briefing response. Please retry with deterministic recommendations.",
         },
-        500
+        500,
+        rateLimitHeaders
       );
     }
 
-    return jsonResponse(validatedResponse.data, 200);
+    return jsonResponse(validatedResponse.data, 200, rateLimitHeaders);
   } catch (error) {
     console.error("Interview mode API error:", error);
     return jsonResponse(

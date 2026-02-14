@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
+import {
+  buildRateLimitExceededHeaders,
+  buildRateLimitHeaders,
+} from "@/lib/api-rate-limit";
 import { deliverContactSubmission } from "@/lib/contact-delivery";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
@@ -12,23 +16,29 @@ const contactRequestSchema = z.object({
   message: z.string().trim().min(1).max(5000),
   honeypot: z.string().max(200).optional().default(""),
 });
+const CONTACT_RATE_LIMIT = {
+  maxRequests: 5,
+  windowMs: 3600000,
+} as const;
 
 export async function POST(req: Request) {
   try {
     // Rate limiting
     const ip = getRequestIp(req);
 
-    const rateLimitResult = rateLimit(`contact:${ip}`, {
-      maxRequests: 5,
-      windowMs: 3600000, // 5 per hour
-    });
+    const rateLimitResult = rateLimit(`contact:${ip}`, CONTACT_RATE_LIMIT);
+    const rateLimitHeaders = buildRateLimitHeaders(
+      CONTACT_RATE_LIMIT,
+      rateLimitResult
+    );
 
     if (!rateLimitResult.success) {
       return jsonResponse(
         {
           error: "Too many submissions. Please try again later.",
         },
-        429
+        429,
+        buildRateLimitExceededHeaders(CONTACT_RATE_LIMIT, rateLimitResult)
       );
     }
 
@@ -46,7 +56,7 @@ export async function POST(req: Request) {
     // Honeypot check — if filled, it's a bot
     if (honeypot) {
       // Return success to not tip off bots
-      return jsonResponse({ success: true }, 200);
+      return jsonResponse({ success: true }, 200, rateLimitHeaders);
     }
 
     // Sanitize inputs
@@ -78,7 +88,8 @@ export async function POST(req: Request) {
           error:
             "Your message could not be delivered right now. Please try again shortly.",
         },
-        502
+        502,
+        rateLimitHeaders
       );
     }
 
@@ -87,7 +98,8 @@ export async function POST(req: Request) {
         success: true,
         message: "Thank you! Your message has been received.",
       },
-      200
+      200,
+      rateLimitHeaders
     );
   } catch (error) {
     console.error("Contact form error:", error);

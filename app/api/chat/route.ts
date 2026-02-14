@@ -2,6 +2,10 @@ import { z } from "zod";
 import { streamText } from "ai";
 import { getModel, type AIProvider } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
+import {
+  buildRateLimitExceededHeaders,
+  buildRateLimitHeaders,
+} from "@/lib/api-rate-limit";
 import { findRelevantContext } from "@/lib/embeddings";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
@@ -21,16 +25,18 @@ const chatRequestSchema = z.object({
     .min(1)
     .max(24),
 });
+const CHAT_RATE_LIMIT = {
+  maxRequests: 50,
+  windowMs: 3600000,
+} as const;
 
 export async function POST(req: Request) {
   try {
     // Rate limiting
     const ip = getRequestIp(req);
 
-    const rateLimitResult = rateLimit(`chat:${ip}`, {
-      maxRequests: 50,
-      windowMs: 3600000, // 1 hour
-    });
+    const rateLimitResult = rateLimit(`chat:${ip}`, CHAT_RATE_LIMIT);
+    const rateLimitHeaders = buildRateLimitHeaders(CHAT_RATE_LIMIT, rateLimitResult);
 
     if (!rateLimitResult.success) {
       return jsonResponse(
@@ -38,7 +44,8 @@ export async function POST(req: Request) {
           error: "Rate limit exceeded. Please try again later.",
           resetIn: Math.ceil(rateLimitResult.resetIn / 1000),
         },
-        429
+        429,
+        buildRateLimitExceededHeaders(CHAT_RATE_LIMIT, rateLimitResult)
       );
     }
 
@@ -62,7 +69,8 @@ export async function POST(req: Request) {
     if (!messages.length) {
       return jsonResponse(
         { error: "Messages are empty after sanitization." },
-        400
+        400,
+        rateLimitHeaders
       );
     }
 
@@ -73,7 +81,8 @@ export async function POST(req: Request) {
     if (!query) {
       return jsonResponse(
         { error: "A user message is required to generate a response." },
-        400
+        400,
+        rateLimitHeaders
       );
     }
 
@@ -104,7 +113,13 @@ ${context}`;
       maxTokens: 500,
     });
 
-    return result.toDataStreamResponse();
+    return result.toDataStreamResponse({
+      headers: {
+        ...rateLimitHeaders,
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
   } catch (error) {
     console.error("Chat API error:", error);
     return jsonResponse(

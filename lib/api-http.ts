@@ -11,10 +11,26 @@ type ParseJsonRequestResult<TSchema extends z.ZodTypeAny> =
   | { success: true; data: z.infer<TSchema> }
   | { success: false; response: Response };
 
-export function jsonResponse(body: Record<string, unknown>, status: number): Response {
+export function jsonResponse(
+  body: Record<string, unknown>,
+  status: number,
+  headers?: HeadersInit
+): Response {
+  const responseHeaders = new Headers({
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+  });
+  if (headers) {
+    const customHeaders = new Headers(headers);
+    customHeaders.forEach((value, key) => {
+      responseHeaders.set(key, value);
+    });
+  }
+
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: responseHeaders,
   });
 }
 
