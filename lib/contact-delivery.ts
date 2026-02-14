@@ -60,6 +60,10 @@ function redactEmails(value: string): string {
   });
 }
 
+function isAbortLikeError(error: unknown): boolean {
+  return error instanceof Error && error.name === "AbortError";
+}
+
 function getContactDeliveryConfig() {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const toEmail = sanitizeInlineValue(process.env.CONTACT_EMAIL ?? "");
@@ -122,8 +126,11 @@ export async function deliverContactSubmission(
 
     return { attempted: true, delivered: true };
   } catch (error) {
-    const message =
-      error instanceof Error ? redactEmails(error.message) : "unknown delivery error";
+    const message = isAbortLikeError(error)
+      ? `Resend request timed out after ${CONTACT_DELIVERY_TIMEOUT_MS}ms`
+      : error instanceof Error
+        ? redactEmails(error.message)
+        : "unknown delivery error";
     return {
       attempted: true,
       delivered: false,
