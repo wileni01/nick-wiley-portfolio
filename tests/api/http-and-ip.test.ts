@@ -460,3 +460,19 @@ test("getRequestIp falls back through direct proxy header candidates", () => {
 
   assert.equal(getRequestIp(req), "198.51.100.30");
 });
+
+test("getRequestIp continues through direct proxy candidates until first valid value", () => {
+  const req = new Request("http://localhost/api/test", {
+    headers: {
+      "x-forwarded-for": "unknown",
+      forwarded: "for=invalid-hostname",
+      "cf-connecting-ip": "bad-token",
+      "fly-client-ip": "unknown",
+      "true-client-ip": "[2001:db8::44]:443",
+      "x-client-ip": "198.51.100.41",
+      "x-real-ip": "198.51.100.42",
+    },
+  });
+
+  assert.equal(getRequestIp(req), "2001:db8::44");
+});
