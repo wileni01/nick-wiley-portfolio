@@ -92,12 +92,46 @@ function buildJsonRequest(input: {
 }
 
 let ipCounter = 0;
+const SAFE_REQUEST_ID_HEADER_PATTERN = /^[A-Za-z0-9._:-]{1,120}$/;
 
 function uniqueIp() {
   ipCounter += 1;
   const thirdOctet = Math.floor(ipCounter / 200) % 200;
   const fourthOctet = (ipCounter % 200) + 20;
   return `198.51.${thirdOctet}.${fourthOctet}`;
+}
+
+function assertStandardRateLimitHeaders(response: Response) {
+  const limitHeader = response.headers.get("X-RateLimit-Limit");
+  const remainingHeader = response.headers.get("X-RateLimit-Remaining");
+  const resetHeader = response.headers.get("X-RateLimit-Reset");
+  const requestIdHeader = response.headers.get("X-Request-Id");
+
+  assert.notEqual(limitHeader, null);
+  assert.notEqual(remainingHeader, null);
+  assert.notEqual(resetHeader, null);
+  assert.notEqual(requestIdHeader, null);
+  assert.match(requestIdHeader!, SAFE_REQUEST_ID_HEADER_PATTERN);
+
+  const limit = Number(limitHeader);
+  const remaining = Number(remainingHeader);
+  const reset = Number(resetHeader);
+
+  assert.ok(Number.isInteger(limit));
+  assert.ok(limit > 0);
+  assert.ok(Number.isInteger(remaining));
+  assert.ok(remaining >= 0);
+  assert.ok(remaining <= limit);
+  assert.ok(Number.isInteger(reset));
+  assert.ok(reset >= 0);
+}
+
+function assertRetryAfterHeader(response: Response) {
+  const retryAfterHeader = response.headers.get("Retry-After");
+  assert.notEqual(retryAfterHeader, null);
+  const retryAfter = Number(retryAfterHeader);
+  assert.ok(Number.isInteger(retryAfter));
+  assert.ok(retryAfter >= 1);
 }
 
 test("chat invalid payload path emits explicit invalid_payload telemetry headers", async () => {
@@ -110,6 +144,7 @@ test("chat invalid payload path emits explicit invalid_payload telemetry headers
   );
 
   assert.equal(response.status, 400);
+  assertStandardRateLimitHeaders(response);
   assert.equal(response.headers.get("X-Chat-Context-Source"), "none");
   assert.equal(response.headers.get("X-Chat-Context-Fallback"), "invalid_payload");
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
@@ -195,6 +230,8 @@ test("chat rate-limited responses report fallback context source and reason", as
     })
   );
   assert.equal(rateLimitedResponse.status, 429);
+  assertStandardRateLimitHeaders(rateLimitedResponse);
+  assertRetryAfterHeader(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-Chat-Context-Source"), "fallback");
   assert.equal(
     rateLimitedResponse.headers.get("X-Chat-Context-Fallback"),
@@ -453,6 +490,7 @@ test("interview-mode invalid payload keeps invalid_payload narrative defaults", 
   );
 
   assert.equal(response.status, 400);
+  assertStandardRateLimitHeaders(response);
   assert.equal(response.headers.get("X-AI-Narrative-Source"), "none");
   assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_payload");
   assert.equal(response.headers.get("X-AI-Provider-Requested"), "unspecified");
@@ -552,6 +590,8 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
     })
   );
   assert.equal(rateLimitedResponse.status, 429);
+  assertStandardRateLimitHeaders(rateLimitedResponse);
+  assertRetryAfterHeader(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-AI-Narrative-Source"), "fallback");
   assert.equal(
     rateLimitedResponse.headers.get("X-AI-Narrative-Fallback"),
@@ -750,6 +790,7 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
     })
   );
   assert.equal(invalidPayloadResponse.status, 400);
+  assertStandardRateLimitHeaders(invalidPayloadResponse);
   assert.equal(invalidPayloadResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     invalidPayloadResponse.headers.get("X-Contact-Delivery-Reason"),
@@ -1025,6 +1066,8 @@ test("contact rate-limited responses emit rate_limited delivery reason", async (
     })
   );
   assert.equal(rateLimitedResponse.status, 429);
+  assertStandardRateLimitHeaders(rateLimitedResponse);
+  assertRetryAfterHeader(rateLimitedResponse);
   assert.equal(rateLimitedResponse.headers.get("X-Contact-Delivery"), "skipped");
   assert.equal(
     rateLimitedResponse.headers.get("X-Contact-Delivery-Reason"),
