@@ -30,6 +30,7 @@ const AI_NARRATIVE_TIMEOUT_MS = 9000;
 type NarrativeFallbackReason =
   | "none"
   | "invalid_payload"
+  | "invalid_mode"
   | "rate_limited"
   | "no_provider"
   | "generation_error"
@@ -145,6 +146,8 @@ export async function POST(req: Request) {
     const bundle = getInterviewRecommendationBundle(companyId, personaId);
 
     if (!company || !persona || !bundle) {
+      responseHeaders.set("X-AI-Narrative-Source", "fallback");
+      responseHeaders.set("X-AI-Narrative-Fallback", "invalid_mode");
       return jsonResponse(
         { error: "Unknown company or interviewer persona." },
         400,
