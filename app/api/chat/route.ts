@@ -37,6 +37,7 @@ type ChatContextSource = "none" | "retrieval" | "fallback";
 type ChatContextFallbackReason =
   | "none"
   | "no_provider"
+  | "rate_limited"
   | "retrieval_error"
   | "retrieval_timeout"
   | "empty_context";
@@ -71,8 +72,8 @@ export async function POST(req: Request) {
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
   responseHeaders.set("X-Chat-Context-Source", "none");
   responseHeaders.set("X-Chat-Context-Fallback", "none");
-  exceededHeaders.set("X-Chat-Context-Source", "none");
-  exceededHeaders.set("X-Chat-Context-Fallback", "none");
+  exceededHeaders.set("X-Chat-Context-Source", "fallback");
+  exceededHeaders.set("X-Chat-Context-Fallback", "rate_limited");
   try {
     if (!rateLimitResult.success) {
       return jsonResponse(
