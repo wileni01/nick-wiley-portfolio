@@ -33,7 +33,7 @@ const CHAT_RETRIEVAL_TIMEOUT_MS = 4500;
 const CHAT_RETRIEVAL_QUERY_MAX_CHARS = 600;
 const NO_CONTEXT_FALLBACK_NOTE =
   "No indexed portfolio context is currently available. Respond cautiously and suggest contacting Nick for unsupported details.";
-type ChatContextSource = "retrieval" | "fallback";
+type ChatContextSource = "none" | "retrieval" | "fallback";
 type ChatContextFallbackReason =
   | "none"
   | "no_provider"
@@ -69,6 +69,10 @@ export async function POST(req: Request) {
     rateLimitConfig: CHAT_RATE_LIMIT,
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
+  responseHeaders.set("X-Chat-Context-Source", "none");
+  responseHeaders.delete("X-Chat-Context-Fallback");
+  exceededHeaders.set("X-Chat-Context-Source", "none");
+  exceededHeaders.delete("X-Chat-Context-Fallback");
   try {
     if (!rateLimitResult.success) {
       return jsonResponse(
