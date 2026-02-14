@@ -31,6 +31,9 @@ Environment variables (optional):
 - `NEXT_PUBLIC_SITE_URL` — Your production URL (defaults to `https://nickwiley.dev`)
 - `OPENAI_API_KEY` — Enables the AI chat API route
 - `ANTHROPIC_API_KEY` — Alternative AI provider for the chat route
+- `RESEND_API_KEY` — Enables contact-form email delivery via Resend
+- `CONTACT_EMAIL` — Destination inbox for contact-form submissions
+- `CONTACT_FROM_EMAIL` — Optional sender identity for Resend (defaults to onboarding sender)
 
 ## Where to Edit Content
 
@@ -162,7 +165,7 @@ lib/
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support, and live status announcements for adaptive copy/download actions.
-- **Contact API hardening** — Contact submissions use schema validation, honeypot filtering, rate limiting, and input sanitization before processing.
+- **Contact API hardening** — Contact submissions use schema validation, honeypot filtering, rate limiting, input sanitization, and optional Resend delivery with failure handling.
 - **Chat API hardening** — Chat requests use schema validation, provider allowlisting, bounded message windows, sanitized inputs/context, and rate limiting before model execution.
 - **Interview-mode API hardening** — Interview briefing requests/responses use schema validation, allowlisted IDs/providers, bounded/sanitized narrative fields, and deterministic fallback behavior.
 - **API IP normalization** — Server routes normalize forwarded IP headers before rate-limit keying to reduce malformed header edge cases, with lazy in-memory rate-limit cleanup.
@@ -212,3 +215,4 @@ The following notes document where content uses sanitized, approximated, or plac
 - Projects page items marked "Code available on request" or "Available on request" — Add links if/when repos are shared.
 - The testimonial quote on the home page uses a short excerpt. Nick should verify this is the preferred quote from the recommendation letter.
 - The chat API route (`/api/chat`) requires `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` environment variables to function.
+- Contact-form email delivery from `/api/contact` requires `RESEND_API_KEY` + `CONTACT_EMAIL` (and optionally `CONTACT_FROM_EMAIL`).

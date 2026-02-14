@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
+import { deliverContactSubmission } from "@/lib/contact-delivery";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { sanitizeInput } from "@/lib/utils";
@@ -69,14 +70,17 @@ export async function POST(req: Request) {
     console.log(`Message: ${sanitized.message}`);
     console.log("===================================");
 
-    // TODO: Integrate with Resend or SendGrid for email delivery
-    // Example with Resend:
-    // await resend.emails.send({
-    //   from: 'portfolio@nickwiley.dev',
-    //   to: process.env.CONTACT_EMAIL,
-    //   subject: `Portfolio Contact: ${sanitized.subject}`,
-    //   text: `From: ${sanitized.name} (${sanitized.email})\n\n${sanitized.message}`,
-    // });
+    const delivery = await deliverContactSubmission(sanitized);
+    if (delivery.attempted && !delivery.delivered) {
+      console.error("Contact form delivery error:", delivery.error);
+      return jsonResponse(
+        {
+          error:
+            "Your message could not be delivered right now. Please try again shortly.",
+        },
+        502
+      );
+    }
 
     return jsonResponse(
       {
