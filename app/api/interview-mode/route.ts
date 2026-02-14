@@ -3,8 +3,7 @@ import { generateText } from "ai";
 import { getModel, hasProviderApiKey } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import {
-  buildRateLimitExceededHeaders,
-  buildRateLimitHeaders,
+  buildApiResponseHeaders,
 } from "@/lib/api-rate-limit";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
@@ -84,22 +83,25 @@ export async function POST(req: Request) {
     const ip = getRequestIp(req);
 
     const limit = rateLimit(`interview-mode:${ip}`, INTERVIEW_MODE_RATE_LIMIT);
-    const rateLimitHeaders = buildRateLimitHeaders(INTERVIEW_MODE_RATE_LIMIT, limit);
-    const responseHeaders = new Headers(rateLimitHeaders);
-    responseHeaders.set("X-Request-Id", requestId);
+    const responseHeaders = buildApiResponseHeaders({
+      config: INTERVIEW_MODE_RATE_LIMIT,
+      snapshot: limit,
+      requestId,
+    });
 
     if (!limit.success) {
-      const exceededHeaders = new Headers(
-        buildRateLimitExceededHeaders(INTERVIEW_MODE_RATE_LIMIT, limit)
-      );
-      exceededHeaders.set("X-Request-Id", requestId);
       return jsonResponse(
         {
           error: "Rate limit exceeded. Please try again shortly.",
           resetIn: Math.ceil(limit.resetIn / 1000),
         },
         429,
-        exceededHeaders
+        buildApiResponseHeaders({
+          config: INTERVIEW_MODE_RATE_LIMIT,
+          snapshot: limit,
+          requestId,
+          includeRetryAfter: true,
+        })
       );
     }
 

@@ -5,6 +5,13 @@ interface RateLimitSnapshot {
   resetIn: number;
 }
 
+interface BuildApiResponseHeadersInput {
+  config: RateLimitConfig;
+  snapshot: RateLimitSnapshot;
+  requestId?: string;
+  includeRetryAfter?: boolean;
+}
+
 export function buildRateLimitHeaders(
   config: RateLimitConfig,
   snapshot: RateLimitSnapshot
@@ -25,4 +32,18 @@ export function buildRateLimitExceededHeaders(
     ...buildRateLimitHeaders(config, snapshot),
     "Retry-After": String(Math.max(1, Math.ceil(snapshot.resetIn / 1000))),
   };
+}
+
+export function buildApiResponseHeaders(
+  input: BuildApiResponseHeadersInput
+): Headers {
+  const headers = new Headers(
+    input.includeRetryAfter
+      ? buildRateLimitExceededHeaders(input.config, input.snapshot)
+      : buildRateLimitHeaders(input.config, input.snapshot)
+  );
+  if (input.requestId) {
+    headers.set("X-Request-Id", input.requestId);
+  }
+  return headers;
 }

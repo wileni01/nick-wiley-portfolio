@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import {
-  buildRateLimitExceededHeaders,
-  buildRateLimitHeaders,
+  buildApiResponseHeaders,
 } from "@/lib/api-rate-limit";
 import { deliverContactSubmission } from "@/lib/contact-delivery";
 import { rateLimit } from "@/lib/rate-limit";
@@ -29,24 +28,24 @@ export async function POST(req: Request) {
     const ip = getRequestIp(req);
 
     const rateLimitResult = rateLimit(`contact:${ip}`, CONTACT_RATE_LIMIT);
-    const rateLimitHeaders = buildRateLimitHeaders(
-      CONTACT_RATE_LIMIT,
-      rateLimitResult
-    );
-    const responseHeaders = new Headers(rateLimitHeaders);
-    responseHeaders.set("X-Request-Id", requestId);
+    const responseHeaders = buildApiResponseHeaders({
+      config: CONTACT_RATE_LIMIT,
+      snapshot: rateLimitResult,
+      requestId,
+    });
 
     if (!rateLimitResult.success) {
-      const exceededHeaders = new Headers(
-        buildRateLimitExceededHeaders(CONTACT_RATE_LIMIT, rateLimitResult)
-      );
-      exceededHeaders.set("X-Request-Id", requestId);
       return jsonResponse(
         {
           error: "Too many submissions. Please try again later.",
         },
         429,
-        exceededHeaders
+        buildApiResponseHeaders({
+          config: CONTACT_RATE_LIMIT,
+          snapshot: rateLimitResult,
+          requestId,
+          includeRetryAfter: true,
+        })
       );
     }
 

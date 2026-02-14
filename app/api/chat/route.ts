@@ -3,8 +3,7 @@ import { streamText } from "ai";
 import { getModel, hasProviderApiKey, type AIProvider } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import {
-  buildRateLimitExceededHeaders,
-  buildRateLimitHeaders,
+  buildApiResponseHeaders,
 } from "@/lib/api-rate-limit";
 import { findRelevantContext } from "@/lib/embeddings";
 import { rateLimit } from "@/lib/rate-limit";
@@ -42,22 +41,25 @@ export async function POST(req: Request) {
     const ip = getRequestIp(req);
 
     const rateLimitResult = rateLimit(`chat:${ip}`, CHAT_RATE_LIMIT);
-    const rateLimitHeaders = buildRateLimitHeaders(CHAT_RATE_LIMIT, rateLimitResult);
-    const responseHeaders = new Headers(rateLimitHeaders);
-    responseHeaders.set("X-Request-Id", requestId);
+    const responseHeaders = buildApiResponseHeaders({
+      config: CHAT_RATE_LIMIT,
+      snapshot: rateLimitResult,
+      requestId,
+    });
 
     if (!rateLimitResult.success) {
-      const exceededHeaders = new Headers(
-        buildRateLimitExceededHeaders(CHAT_RATE_LIMIT, rateLimitResult)
-      );
-      exceededHeaders.set("X-Request-Id", requestId);
       return jsonResponse(
         {
           error: "Rate limit exceeded. Please try again later.",
           resetIn: Math.ceil(rateLimitResult.resetIn / 1000),
         },
         429,
-        exceededHeaders
+        buildApiResponseHeaders({
+          config: CHAT_RATE_LIMIT,
+          snapshot: rateLimitResult,
+          requestId,
+          includeRetryAfter: true,
+        })
       );
     }
 
