@@ -1,5 +1,7 @@
 const ERROR_MESSAGE_MAX_CHARS = 1200;
 const LOG_MESSAGE_MAX_CHARS = 240;
+const LOG_ROUTE_MAX_CHARS = 80;
+const LOG_REQUEST_ID_MAX_CHARS = 120;
 const LOG_DETAILS_MAX_KEYS = 20;
 const LOG_DETAILS_MAX_DEPTH = 2;
 const LOG_DETAILS_MAX_ARRAY_ITEMS = 20;
@@ -7,23 +9,42 @@ const SENSITIVE_LOG_KEY_PATTERN =
   /(password|passphrase|secret|token|api[-_]?key|authorization|cookie|set-cookie)/i;
 const REDACTED_LOG_VALUE = "[redacted]";
 const CIRCULAR_LOG_VALUE = "[circular]";
+const CONTROL_CHARS_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+const BIDI_OVERRIDE_PATTERN = /[\u202A-\u202E\u2066-\u2069]/g;
 
 export interface SerializedServerError {
   name: string;
   message: string;
 }
 
+function sanitizeLogString(input: string, maxChars: number): string {
+  return input
+    .replace(CONTROL_CHARS_PATTERN, "")
+    .replace(BIDI_OVERRIDE_PATTERN, "")
+    .trim()
+    .slice(0, maxChars);
+}
+
+function sanitizeRouteLabel(route: string): string {
+  const normalized = sanitizeLogString(route, LOG_ROUTE_MAX_CHARS);
+  return normalized || "server";
+}
+
+function sanitizeRequestIdLabel(requestId: string): string {
+  return sanitizeLogString(requestId, LOG_REQUEST_ID_MAX_CHARS);
+}
+
 export function serializeServerError(error: unknown): SerializedServerError {
   if (error instanceof Error) {
     return {
-      name: error.name || "Error",
-      message: error.message.slice(0, ERROR_MESSAGE_MAX_CHARS),
+      name: sanitizeLogString(error.name || "Error", LOG_MESSAGE_MAX_CHARS),
+      message: sanitizeLogString(error.message, ERROR_MESSAGE_MAX_CHARS),
     };
   }
 
   return {
     name: "UnknownError",
-    message: String(error).slice(0, ERROR_MESSAGE_MAX_CHARS),
+    message: sanitizeLogString(String(error), ERROR_MESSAGE_MAX_CHARS),
   };
 }
 
@@ -48,7 +69,7 @@ function sanitizeLogValue(
 ): unknown {
   if (value === null || value === undefined) return value;
   if (typeof value === "string") {
-    return value.slice(0, ERROR_MESSAGE_MAX_CHARS);
+    return sanitizeLogString(value, ERROR_MESSAGE_MAX_CHARS);
   }
   if (typeof value === "number" || typeof value === "boolean") {
     return value;
@@ -98,7 +119,7 @@ function sanitizeLogValue(
       seen.delete(value);
     }
   }
-  return String(value).slice(0, ERROR_MESSAGE_MAX_CHARS);
+  return sanitizeLogString(String(value), ERROR_MESSAGE_MAX_CHARS);
 }
 
 function sanitizeLogDetails(details?: Record<string, unknown>): Record<string, unknown> | undefined {
@@ -112,8 +133,9 @@ function sanitizeLogDetails(details?: Record<string, unknown>): Record<string, u
 
 export function logServerError(input: ServerErrorLogInput) {
   const sanitizedDetails = sanitizeLogDetails(input.details);
-  console.error(`${input.route} error`, {
-    requestId: input.requestId,
+  const route = sanitizeRouteLabel(input.route);
+  console.error(`${route} error`, {
+    requestId: sanitizeRequestIdLabel(input.requestId),
     error: serializeServerError(input.error),
     ...(sanitizedDetails ? { details: sanitizedDetails } : {}),
   });
@@ -121,9 +143,10 @@ export function logServerError(input: ServerErrorLogInput) {
 
 export function logServerWarning(input: ServerWarningLogInput) {
   const sanitizedDetails = sanitizeLogDetails(input.details);
-  console.warn(`${input.route} warning`, {
-    requestId: input.requestId,
-    message: input.message.slice(0, LOG_MESSAGE_MAX_CHARS),
+  const route = sanitizeRouteLabel(input.route);
+  console.warn(`${route} warning`, {
+    requestId: sanitizeRequestIdLabel(input.requestId),
+    message: sanitizeLogString(input.message, LOG_MESSAGE_MAX_CHARS),
     ...(sanitizedDetails ? { details: sanitizedDetails } : {}),
   });
 }
