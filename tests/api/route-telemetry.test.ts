@@ -486,6 +486,8 @@ test("chat no-provider path emits fallback telemetry and explicit provider defau
       );
 
       assert.equal(response.status, 503);
+      assertStandardJsonSecurityHeaders(response);
+      assertStandardRateLimitHeaders(response);
       assert.equal(response.headers.get("X-Chat-Context-Source"), "fallback");
       assert.equal(response.headers.get("X-Chat-Context-Fallback"), "no_provider");
       assert.equal(response.headers.get("X-AI-Provider-Requested"), "openai");
@@ -519,6 +521,8 @@ test("interview-mode invalid mode path reports invalid_mode fallback", async () 
         })
       );
       assert.equal(response.status, 400);
+      assertStandardJsonSecurityHeaders(response);
+      assertStandardRateLimitHeaders(response);
       assert.equal(response.headers.get("X-AI-Narrative-Source"), "fallback");
       assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_mode");
       assert.equal(response.headers.get("X-AI-Provider"), "none");
@@ -630,6 +634,8 @@ test("interview-mode valid mode returns deterministic payload with no-provider f
       );
 
       assert.equal(response.status, 200);
+      assertStandardJsonSecurityHeaders(response);
+      assertStandardRateLimitHeaders(response);
       assert.equal(response.headers.get("X-AI-Provider-Requested"), "openai");
       assert.equal(response.headers.get("X-AI-Provider"), "none");
       assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
@@ -1100,6 +1106,8 @@ test("contact valid submission without provider keeps provider_unconfigured deli
       );
 
       assert.equal(response.status, 200);
+      assertStandardJsonSecurityHeaders(response);
+      assertStandardRateLimitHeaders(response);
       assert.equal(response.headers.get("X-Contact-Delivery"), "skipped");
       assert.equal(
         response.headers.get("X-Contact-Delivery-Reason"),
@@ -1144,6 +1152,8 @@ test("contact provider delivery failures emit provider_error telemetry", async (
           );
 
           assert.equal(response.status, 502);
+          assertStandardJsonSecurityHeaders(response);
+          assertStandardRateLimitHeaders(response);
           assert.equal(response.headers.get("X-Contact-Delivery"), "error");
           assert.equal(
             response.headers.get("X-Contact-Delivery-Reason"),
