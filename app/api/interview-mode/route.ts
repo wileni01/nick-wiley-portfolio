@@ -29,6 +29,8 @@ const INTERVIEW_MODE_RATE_LIMIT = {
 const AI_NARRATIVE_TIMEOUT_MS = 9000;
 type NarrativeFallbackReason =
   | "none"
+  | "invalid_payload"
+  | "rate_limited"
   | "no_provider"
   | "generation_error"
   | "generation_timeout"
@@ -102,9 +104,9 @@ export async function POST(req: Request) {
     rateLimitConfig: INTERVIEW_MODE_RATE_LIMIT,
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
-  responseHeaders.set("X-AI-Narrative-Source", "deterministic");
-  responseHeaders.set("X-AI-Narrative-Fallback", "none");
-  exceededHeaders.set("X-AI-Narrative-Source", "deterministic");
+  responseHeaders.set("X-AI-Narrative-Source", "none");
+  responseHeaders.set("X-AI-Narrative-Fallback", "invalid_payload");
+  exceededHeaders.set("X-AI-Narrative-Source", "none");
   exceededHeaders.set("X-AI-Narrative-Fallback", "rate_limited");
   try {
     if (!rateLimitResult.success) {
@@ -135,10 +137,6 @@ export async function POST(req: Request) {
     const { companyId, personaId, provider } = parsed.data;
     const providerResolution = resolveAIProvider(provider);
     applyResolvedAIProviderHeaders(responseHeaders, providerResolution);
-    responseHeaders.set(
-      "X-AI-Narrative-Fallback",
-      providerResolution.selected ? "none" : "no_provider"
-    );
     const executionProvider = providerResolution.selected;
     const contextNote = sanitizeInput(parsed.data.contextNote ?? "", 300);
 
@@ -157,6 +155,11 @@ export async function POST(req: Request) {
     const deterministicNarrative = sanitizeInput(
       buildDeterministicNarrative(companyId, personaId),
       1200
+    );
+    responseHeaders.set("X-AI-Narrative-Source", "deterministic");
+    responseHeaders.set(
+      "X-AI-Narrative-Fallback",
+      executionProvider ? "none" : "no_provider"
     );
 
     let aiNarrative: string | undefined;
