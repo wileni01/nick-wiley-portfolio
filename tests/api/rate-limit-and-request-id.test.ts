@@ -14,6 +14,9 @@ test("normalizeRequestId bounds and sanitizes unsafe values", () => {
   assert.equal(normalizeRequestId("  abc\r\n<script>  "), "abcscript");
   assert.equal(normalizeRequestId("x".repeat(300)).length, 120);
   assert.equal(normalizeRequestId("x".repeat(300), 12), "x".repeat(12));
+  assert.equal(normalizeRequestId("abc", Number.NaN), "abc");
+  assert.equal(normalizeRequestId("abcdef", 0), "a");
+  assert.equal(normalizeRequestId("abcdef", -10), "a");
   assert.equal(normalizeRequestId("###"), null);
   assert.equal(normalizeRequestId(123), null);
 });
