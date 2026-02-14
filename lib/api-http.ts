@@ -3,7 +3,8 @@ import { normalizeRequestId } from "@/lib/request-id";
 const UTF8_TEXT_ENCODER = new TextEncoder();
 const JSON_SERIALIZATION_FALLBACK_ERROR = "Internal response serialization error.";
 const INVALID_CONTENT_LENGTH_ERROR = "Invalid Content-Length header.";
-const JSON_MEDIA_TYPE_PATTERN = /^application\/json(?:\s*;|$)/i;
+const JSON_MEDIA_TYPE_PATTERN =
+  /^(?:application\/json|application\/[a-z0-9!#$&^_.+-]+\+json)(?:\s*;|$)/i;
 const CONTENT_LENGTH_DIGITS_PATTERN = /^\d+$/;
 const DEFAULT_JSON_CONTENT_TYPE = "application/json; charset=utf-8";
 const DEFAULT_CACHE_CONTROL = "no-store";
