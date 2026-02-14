@@ -402,6 +402,10 @@ test("chat rate-limited responses report fallback context source and reason", as
   const resetIn = Number(payload.resetIn);
   assert.ok(Number.isInteger(resetIn));
   assert.ok(resetIn >= 0);
+  const resetHeader = Number(rateLimitedResponse.headers.get("X-RateLimit-Reset"));
+  const retryAfterHeader = Number(rateLimitedResponse.headers.get("Retry-After"));
+  assert.equal(resetIn, resetHeader);
+  assert.equal(resetIn, retryAfterHeader);
 });
 
 test("chat content-type validation keeps invalid_payload fallback semantics", async () => {
@@ -879,6 +883,10 @@ test("interview-mode rate-limited responses emit rate_limited narrative fallback
   const resetIn = Number(payload.resetIn);
   assert.ok(Number.isInteger(resetIn));
   assert.ok(resetIn >= 0);
+  const resetHeader = Number(rateLimitedResponse.headers.get("X-RateLimit-Reset"));
+  const retryAfterHeader = Number(rateLimitedResponse.headers.get("Retry-After"));
+  assert.equal(resetIn, resetHeader);
+  assert.equal(resetIn, retryAfterHeader);
 });
 
 test("interview-mode content-type validation keeps invalid_payload narrative fallback semantics", async () => {
