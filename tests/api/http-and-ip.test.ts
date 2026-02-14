@@ -247,6 +247,7 @@ test("parseJsonRequest enforces maxBytes when body exceeds limit after read", as
 test("parseJsonRequest stops reading stream bodies once maxBytes is exceeded", async () => {
   const schema = z.object({ value: z.string() });
   let pullCount = 0;
+  let cancelCalled = false;
   const stream = new ReadableStream<Uint8Array>({
     pull(controller) {
       pullCount += 1;
@@ -257,6 +258,9 @@ test("parseJsonRequest stops reading stream bodies once maxBytes is exceeded", a
         return;
       }
       throw new Error("stream should have been cancelled after byte limit");
+    },
+    cancel() {
+      cancelCalled = true;
     },
   });
   const req = new Request("http://localhost/api/test", {
@@ -278,6 +282,7 @@ test("parseJsonRequest stops reading stream bodies once maxBytes is exceeded", a
     assert.equal(body.error, "Byte limit exceeded.");
   }
   assert.equal(pullCount, 1);
+  assert.equal(cancelCalled, true);
 });
 
 test("parseJsonRequest rejects non-safe integer content-length header values", async () => {

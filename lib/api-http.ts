@@ -67,6 +67,11 @@ async function readRequestBytes(
       chunks.push(value);
     }
   } catch {
+    try {
+      await reader.cancel();
+    } catch {
+      // Ignore cancellation failures.
+    }
     return { success: false };
   } finally {
     reader.releaseLock();
