@@ -791,3 +791,40 @@ test("deliverContactSubmission uses unknown-error fallback when provider returns
       }
     }
   ));
+
+test("deliverContactSubmission uses unknown-error fallback when provider body read fails", async () =>
+  withEnv(
+    {
+      RESEND_API_KEY: "resend-api-key-12345",
+      CONTACT_EMAIL: "team@example.com",
+      CONTACT_FROM_EMAIL: undefined,
+    },
+    async () => {
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = (async () =>
+        ({
+          ok: false,
+          status: 502,
+          text: async () => {
+            throw new Error("provider body stream failed for person@example.com");
+          },
+        }) as Response) as typeof fetch;
+
+      try {
+        const result = await deliverContactSubmission({
+          name: "Nick",
+          email: "nick@example.com",
+          subject: "hello",
+          message: "world",
+        });
+        assert.equal(result.attempted, true);
+        assert.equal(result.delivered, false);
+        assert.equal(
+          result.error,
+          "Resend delivery failed (502): unknown error"
+        );
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    }
+  ));

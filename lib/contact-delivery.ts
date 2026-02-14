@@ -66,6 +66,14 @@ function redactEmails(value: string): string {
   });
 }
 
+async function readResponseTextSafely(response: Response): Promise<string> {
+  try {
+    return await response.text();
+  } catch {
+    return "";
+  }
+}
+
 function isAbortLikeError(error: unknown): boolean {
   return (
     error instanceof Error &&
@@ -131,7 +139,7 @@ export async function deliverContactSubmission(
 
     if (!response.ok) {
       const errorBody = redactEmails(
-        (await response.text()).slice(0, LOG_ERROR_BODY_MAX_CHARS)
+        (await readResponseTextSafely(response)).slice(0, LOG_ERROR_BODY_MAX_CHARS)
       );
       return {
         attempted: true,
