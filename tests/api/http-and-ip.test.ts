@@ -139,6 +139,25 @@ test("parseJsonRequest rejects empty body with configured message", async () => 
   }
 });
 
+test("parseJsonRequest returns configured message for invalid JSON payloads", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: '{"value":',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    invalidJsonMessage: "JSON body could not be parsed.",
+  });
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 400);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "JSON body could not be parsed.");
+  }
+});
+
 test("parseJsonRequest rejects declared oversized payload before parse", async () => {
   const schema = z.object({ value: z.string() });
   const req = new Request("http://localhost/api/test", {
@@ -159,6 +178,46 @@ test("parseJsonRequest rejects declared oversized payload before parse", async (
     assert.equal(result.response.status, 413);
     const body = (await result.response.json()) as { error: string };
     assert.equal(body.error, "Payload too large for parser.");
+  }
+});
+
+test("parseJsonRequest enforces maxChars on parsed text length", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: '{"value":"abcdefghijklmnopqrstuvwxyz"}',
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    maxChars: 10,
+    tooLargeMessage: "Character limit exceeded.",
+  });
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 413);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Character limit exceeded.");
+  }
+});
+
+test("parseJsonRequest enforces maxBytes when body exceeds limit after read", async () => {
+  const schema = z.object({ value: z.string() });
+  const req = new Request("http://localhost/api/test", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: new Uint8Array(Buffer.from('{"value":"abcdefghijklmnopqrstuvwxyz"}')),
+  });
+
+  const result = await parseJsonRequest(req, schema, {
+    maxBytes: 18,
+    tooLargeMessage: "Byte limit exceeded.",
+  });
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.equal(result.response.status, 413);
+    const body = (await result.response.json()) as { error: string };
+    assert.equal(body.error, "Byte limit exceeded.");
   }
 });
 
@@ -215,6 +274,37 @@ test("jsonResponse normalizes request-id and backfills it on error responses", a
   const body = (await response.json()) as { error: string; requestId?: string };
   assert.equal(body.error, "bad request");
   assert.equal(body.requestId, "badidscript");
+});
+
+test("jsonResponse uses normalized request-id header over body on error responses", async () => {
+  const response = jsonResponse(
+    {
+      error: "bad request",
+      requestId: " body-id ",
+    },
+    400,
+    {
+      "x-request-id": " header id ",
+    }
+  );
+
+  assert.equal(response.status, 400);
+  assert.equal(response.headers.get("X-Request-Id"), "headerid");
+  const body = (await response.json()) as { requestId?: string };
+  assert.equal(body.requestId, "headerid");
+});
+
+test("jsonResponse drops invalid request-id from successful payloads", async () => {
+  const response = jsonResponse(
+    { ok: true, requestId: "   " },
+    200
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("X-Request-Id"), null);
+  const body = (await response.json()) as { ok: boolean; requestId?: string };
+  assert.equal(body.ok, true);
+  assert.equal(Object.prototype.hasOwnProperty.call(body, "requestId"), false);
 });
 
 test("jsonResponse normalizes invalid status values to 500", () => {

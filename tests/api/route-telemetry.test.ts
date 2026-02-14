@@ -59,9 +59,13 @@ function buildJsonRequest(input: {
   });
 }
 
+let ipCounter = 0;
+
 function uniqueIp() {
-  const octet = Math.floor(Math.random() * 200) + 20;
-  return `198.51.100.${octet}`;
+  ipCounter += 1;
+  const thirdOctet = Math.floor(ipCounter / 200) % 200;
+  const fourthOctet = (ipCounter % 200) + 20;
+  return `198.51.${thirdOctet}.${fourthOctet}`;
 }
 
 test("chat invalid payload path emits explicit invalid_payload telemetry headers", async () => {
