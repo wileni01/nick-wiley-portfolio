@@ -59,6 +59,19 @@ test("serializeServerError normalizes unknown and Error inputs", () => {
   });
 });
 
+test("serializeServerError handles unknown values with throwing toString", () => {
+  const badValue = {
+    toString() {
+      throw new Error("toString failed");
+    },
+  };
+
+  assert.deepEqual(serializeServerError(badValue), {
+    name: "UnknownError",
+    message: "[unreadable]",
+  });
+});
+
 test("serializeServerError strips control/bidi chars and enforces length bounds", () => {
   const oversizedMessage = `\u0000\u202E${"m".repeat(1400)}`;
   const error = new Error(oversizedMessage);
@@ -349,6 +362,46 @@ test("server log helpers sanitize and dedupe unsafe detail keys before redaction
   assert.equal(Object.prototype.hasOwnProperty.call(serializedDetails, " api\u202Ekey "), false);
   assert.equal(Object.prototype.hasOwnProperty.call(serializedDetails, "tok\u0000en"), false);
   assert.equal(Object.prototype.hasOwnProperty.call(serializedDetails, longKey), false);
+});
+
+test("server log helpers keep logging when detail getters throw", () => {
+  const originalInfo = console.info;
+  const captured: Array<{ args: unknown[] }> = [];
+  console.info = (...args: unknown[]) => {
+    captured.push({ args });
+  };
+
+  const details = {} as Record<string, unknown>;
+  Object.defineProperty(details, "safe", {
+    enumerable: true,
+    value: "ok",
+  });
+  Object.defineProperty(details, "danger", {
+    enumerable: true,
+    get() {
+      throw new Error("getter failure");
+    },
+  });
+
+  try {
+    logServerInfo({
+      route: "api/chat",
+      requestId: "getter-safety",
+      message: "getter fallback",
+      details,
+    });
+  } finally {
+    console.info = originalInfo;
+  }
+
+  assert.equal(captured.length, 1);
+  const payload = captured[0]?.args[1] as {
+    details?: Record<string, unknown>;
+  };
+  assert.ok(payload.details);
+  const serializedDetails = payload.details as Record<string, unknown>;
+  assert.equal(serializedDetails.safe, "ok");
+  assert.equal(serializedDetails.danger, "[unreadable]");
 });
 
 test("resolveAIProvider honors available keys and fallback behavior", () =>

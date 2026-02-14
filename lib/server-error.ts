@@ -19,6 +19,7 @@ const REDACTED_LOG_VALUE = "[redacted]";
 const CIRCULAR_LOG_VALUE = "[circular]";
 const INVALID_DATE_LOG_VALUE = "[invalid-date]";
 const FUNCTION_LOG_VALUE = "[function]";
+const UNREADABLE_LOG_VALUE = "[unreadable]";
 const CONTROL_CHARS_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 const BIDI_OVERRIDE_PATTERN = /[\u202A-\u202E\u2066-\u2069]/g;
 
@@ -33,6 +34,14 @@ function sanitizeLogString(input: string, maxChars: number): string {
     .replace(BIDI_OVERRIDE_PATTERN, "")
     .trim()
     .slice(0, maxChars);
+}
+
+function toSafeString(value: unknown): string {
+  try {
+    return String(value);
+  } catch {
+    return UNREADABLE_LOG_VALUE;
+  }
 }
 
 function sanitizeRouteLabel(route: string): string {
@@ -64,7 +73,7 @@ export function serializeServerError(error: unknown): SerializedServerError {
 
   return {
     name: "UnknownError",
-    message: sanitizeLogString(String(error), ERROR_MESSAGE_MAX_CHARS),
+    message: sanitizeLogString(toSafeString(error), ERROR_MESSAGE_MAX_CHARS),
   };
 }
 
@@ -181,12 +190,21 @@ function sanitizeLogValue(
     }
     seen.add(value);
     try {
-      const entries = Object.entries(value as Record<string, unknown>).slice(
-        0,
-        LOG_DETAILS_MAX_KEYS
-      );
+      const source = value as Record<string, unknown>;
+      let keys: string[] = [];
+      try {
+        keys = Object.keys(source).slice(0, LOG_DETAILS_MAX_KEYS);
+      } catch {
+        return UNREADABLE_LOG_VALUE;
+      }
       const sanitizedObject = Object.create(null) as Record<string, unknown>;
-      for (const [key, nestedValue] of entries) {
+      for (const key of keys) {
+        let nestedValue: unknown = UNREADABLE_LOG_VALUE;
+        try {
+          nestedValue = source[key];
+        } catch {
+          nestedValue = UNREADABLE_LOG_VALUE;
+        }
         const sanitizedKey = getUniqueDetailKey(
           sanitizedObject,
           sanitizeDetailKey(key)
@@ -200,7 +218,7 @@ function sanitizeLogValue(
       seen.delete(value);
     }
   }
-  return sanitizeLogString(String(value), ERROR_MESSAGE_MAX_CHARS);
+  return sanitizeLogString(toSafeString(value), ERROR_MESSAGE_MAX_CHARS);
 }
 
 function sanitizeLogDetails(details?: Record<string, unknown>): Record<string, unknown> | undefined {
