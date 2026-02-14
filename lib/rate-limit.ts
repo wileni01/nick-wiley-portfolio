@@ -66,6 +66,11 @@ function normalizeRateLimitIdentifier(identifier: string): string {
   return sanitized ? sanitized.toLowerCase() : "anonymous";
 }
 
+function getResetInMs(now: number, resetTime: number): number {
+  if (!Number.isFinite(resetTime)) return 0;
+  return Math.max(0, Math.ceil(resetTime - now));
+}
+
 export function rateLimit(
   identifier: string,
   config: RateLimitConfig = { maxRequests: 50, windowMs: 3600000 }
@@ -93,7 +98,7 @@ export function rateLimit(
     return {
       success: false,
       remaining: 0,
-      resetIn: entry.resetTime - now,
+      resetIn: getResetInMs(now, entry.resetTime),
     };
   }
 
@@ -101,6 +106,6 @@ export function rateLimit(
   return {
     success: true,
     remaining: normalizedConfig.maxRequests - entry.count,
-    resetIn: entry.resetTime - now,
+    resetIn: getResetInMs(now, entry.resetTime),
   };
 }
