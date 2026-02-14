@@ -1,7 +1,7 @@
 import { normalizeRateLimitConfig, type RateLimitConfig } from "@/lib/rate-limit";
 import { normalizeRequestId } from "@/lib/request-id";
 
-interface RateLimitSnapshot {
+export interface RateLimitSnapshot {
   remaining: number;
   resetIn: number;
 }
@@ -13,7 +13,7 @@ interface BuildApiResponseHeadersInput {
   includeRetryAfter?: boolean;
 }
 
-function normalizeResetInSeconds(resetInMs: number): number {
+export function normalizeResetInSeconds(resetInMs: number): number {
   if (!Number.isFinite(resetInMs)) return 0;
   return Math.max(0, Math.ceil(resetInMs / 1000));
 }
@@ -24,6 +24,12 @@ function normalizeRemaining(
 ): number {
   if (!Number.isFinite(remaining)) return 0;
   return Math.min(maxRequests, Math.max(0, Math.floor(remaining)));
+}
+
+export function normalizeExceededResetInSeconds(
+  snapshot: RateLimitSnapshot
+): number {
+  return Math.max(1, normalizeResetInSeconds(snapshot.resetIn));
 }
 
 export function buildRateLimitHeaders(
@@ -47,7 +53,7 @@ export function buildRateLimitExceededHeaders(
   config: RateLimitConfig,
   snapshot: RateLimitSnapshot
 ): HeadersInit {
-  const retryAfterSeconds = Math.max(1, normalizeResetInSeconds(snapshot.resetIn));
+  const retryAfterSeconds = normalizeExceededResetInSeconds(snapshot);
   return {
     ...buildRateLimitHeaders(config, snapshot),
     "X-RateLimit-Reset": String(retryAfterSeconds),

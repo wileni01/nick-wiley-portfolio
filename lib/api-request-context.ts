@@ -1,4 +1,7 @@
-import { buildApiResponseHeaders } from "@/lib/api-rate-limit";
+import {
+  buildApiResponseHeaders,
+  normalizeExceededResetInSeconds,
+} from "@/lib/api-rate-limit";
 import {
   normalizeRateLimitConfig,
   type RateLimitConfig,
@@ -25,18 +28,6 @@ function normalizeRateLimitNamespace(value: string): string {
   return sanitized ? sanitized.toLowerCase() : "api";
 }
 
-function parseExceededResetSeconds(headers: Headers): number {
-  const retryAfter = Number(headers.get("Retry-After"));
-  if (Number.isInteger(retryAfter) && retryAfter >= 1) {
-    return retryAfter;
-  }
-  const resetIn = Number(headers.get("X-RateLimit-Reset"));
-  if (Number.isInteger(resetIn) && resetIn >= 1) {
-    return resetIn;
-  }
-  return 1;
-}
-
 export function buildApiRequestContext(input: {
   req: Request;
   rateLimitNamespace: string;
@@ -58,7 +49,9 @@ export function buildApiRequestContext(input: {
     requestId,
     includeRetryAfter: true,
   });
-  const rateLimitExceededResetInSeconds = parseExceededResetSeconds(exceededHeaders);
+  const rateLimitExceededResetInSeconds = normalizeExceededResetInSeconds(
+    rateLimitResult
+  );
 
   return {
     requestId,

@@ -5,6 +5,8 @@ import {
   buildApiResponseHeaders,
   buildRateLimitExceededHeaders,
   buildRateLimitHeaders,
+  normalizeExceededResetInSeconds,
+  normalizeResetInSeconds,
 } from "../../lib/api-rate-limit";
 import { buildApiRequestContext } from "../../lib/api-request-context";
 import { normalizeRateLimitConfig, rateLimit } from "../../lib/rate-limit";
@@ -198,6 +200,27 @@ test("rate-limit header builders clamp malformed snapshot values", () => {
   assert.equal(exceededHeaders.get("X-RateLimit-Remaining"), "0");
   assert.equal(exceededHeaders.get("X-RateLimit-Reset"), "1");
   assert.equal(exceededHeaders.get("Retry-After"), "1");
+});
+
+test("rate-limit reset normalization keeps bounded exceeded window floor", () => {
+  assert.equal(normalizeResetInSeconds(Number.NaN), 0);
+  assert.equal(normalizeResetInSeconds(Number.POSITIVE_INFINITY), 0);
+  assert.equal(normalizeResetInSeconds(-250), 0);
+  assert.equal(normalizeResetInSeconds(1), 1);
+  assert.equal(normalizeResetInSeconds(1500), 2);
+
+  assert.equal(
+    normalizeExceededResetInSeconds({ remaining: 0, resetIn: -250 }),
+    1
+  );
+  assert.equal(
+    normalizeExceededResetInSeconds({ remaining: 0, resetIn: Number.NaN }),
+    1
+  );
+  assert.equal(
+    normalizeExceededResetInSeconds({ remaining: 0, resetIn: 1900 }),
+    2
+  );
 });
 
 test("buildApiResponseHeaders sanitizes request id and include retry metadata", () => {
