@@ -103,9 +103,9 @@ export async function POST(req: Request) {
   });
   const { requestId, responseHeaders, exceededHeaders, rateLimitResult } = context;
   responseHeaders.set("X-AI-Narrative-Source", "deterministic");
+  responseHeaders.set("X-AI-Narrative-Fallback", "none");
   exceededHeaders.set("X-AI-Narrative-Source", "deterministic");
-  responseHeaders.delete("X-AI-Narrative-Fallback");
-  exceededHeaders.delete("X-AI-Narrative-Fallback");
+  exceededHeaders.set("X-AI-Narrative-Fallback", "none");
   try {
     if (!rateLimitResult.success) {
       return jsonResponse(
@@ -247,7 +247,7 @@ Write two short paragraphs:
     if (narrativeFallbackReason !== "none") {
       responseHeaders.set("X-AI-Narrative-Fallback", narrativeFallbackReason);
     } else {
-      responseHeaders.delete("X-AI-Narrative-Fallback");
+      responseHeaders.set("X-AI-Narrative-Fallback", "none");
     }
 
     const response: InterviewModeResponse = {
