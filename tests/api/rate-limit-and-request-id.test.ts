@@ -251,6 +251,20 @@ test("buildApiResponseHeaders omits invalid request-id values", () => {
   assert.equal(headers.get("X-RateLimit-Remaining"), "4");
 });
 
+test("buildApiResponseHeaders preserves remaining on non-exceeded responses", () => {
+  const headers = buildApiResponseHeaders({
+    config: { maxRequests: 5, windowMs: 1000 },
+    snapshot: { remaining: 3, resetIn: 500 },
+    requestId: "safe-request-id",
+  });
+
+  assert.equal(headers.get("X-Request-Id"), "safe-request-id");
+  assert.equal(headers.get("X-RateLimit-Limit"), "5");
+  assert.equal(headers.get("X-RateLimit-Remaining"), "3");
+  assert.equal(headers.get("X-RateLimit-Reset"), "1");
+  assert.equal(headers.get("Retry-After"), null);
+});
+
 test("buildApiRequestContext sanitizes namespace and reuses same rate-limit bucket", () => {
   const requestIp = "198.51.100.140";
   const req = new Request("http://localhost/api/test", {
