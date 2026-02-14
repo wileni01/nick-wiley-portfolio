@@ -109,6 +109,35 @@ test("chat post-sanitization empty messages keep invalid_payload fallback reason
     }
   ));
 
+test("chat provider headers reflect configured fallback provider selection", async () =>
+  withEnv(
+    {
+      OPENAI_API_KEY: "openai-test-key-12345",
+      ANTHROPIC_API_KEY: undefined,
+    },
+    async () => {
+      const response = await postChat(
+        buildJsonRequest({
+          url: "http://localhost/api/chat",
+          body: JSON.stringify({
+            provider: "anthropic",
+            messages: [{ role: "user", content: "<>" }],
+          }),
+          ip: uniqueIp(),
+        })
+      );
+
+      assert.equal(response.status, 400);
+      assert.equal(response.headers.get("X-AI-Provider-Requested"), "anthropic");
+      assert.equal(response.headers.get("X-AI-Provider"), "openai");
+      assert.equal(response.headers.get("X-AI-Provider-Fallback"), "1");
+      assert.equal(
+        response.headers.get("X-Chat-Context-Fallback"),
+        "invalid_payload"
+      );
+    }
+  ));
+
 test("chat rate-limited responses report fallback context source and reason", async () => {
   const ip = uniqueIp();
   for (let index = 0; index < 50; index++) {
@@ -159,6 +188,33 @@ test("interview-mode invalid mode path reports invalid_mode fallback", async () 
       assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_mode");
       assert.equal(response.headers.get("X-AI-Provider"), "none");
       assert.equal(response.headers.get("X-AI-Provider-Fallback"), "none");
+    }
+  ));
+
+test("interview-mode provider fallback headers are explicit on deterministic error paths", async () =>
+  withEnv(
+    {
+      OPENAI_API_KEY: "openai-test-key-12345",
+      ANTHROPIC_API_KEY: undefined,
+    },
+    async () => {
+      const response = await postInterviewMode(
+        buildJsonRequest({
+          url: "http://localhost/api/interview-mode",
+          body: JSON.stringify({
+            companyId: "kungfu-ai",
+            personaId: "unknown-persona",
+            provider: "anthropic",
+          }),
+          ip: uniqueIp(),
+        })
+      );
+      assert.equal(response.status, 400);
+      assert.equal(response.headers.get("X-AI-Provider-Requested"), "anthropic");
+      assert.equal(response.headers.get("X-AI-Provider"), "openai");
+      assert.equal(response.headers.get("X-AI-Provider-Fallback"), "1");
+      assert.equal(response.headers.get("X-AI-Narrative-Source"), "fallback");
+      assert.equal(response.headers.get("X-AI-Narrative-Fallback"), "invalid_mode");
     }
   ));
 
@@ -223,6 +279,20 @@ test("contact invalid payload and honeypot paths emit explicit delivery reasons"
     honeypotResponse.headers.get("X-Contact-Delivery-Reason"),
     "honeypot"
   );
+});
+
+test("contact content-type validation keeps explicit invalid_payload delivery reason", async () => {
+  const response = await postContact(
+    buildJsonRequest({
+      url: "http://localhost/api/contact",
+      body: "{}",
+      ip: uniqueIp(),
+      contentType: "text/plain",
+    })
+  );
+  assert.equal(response.status, 415);
+  assert.equal(response.headers.get("X-Contact-Delivery"), "skipped");
+  assert.equal(response.headers.get("X-Contact-Delivery-Reason"), "invalid_payload");
 });
 
 test("contact rate-limited responses emit rate_limited delivery reason", async () => {
