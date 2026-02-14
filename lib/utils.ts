@@ -21,11 +21,14 @@ export function slugify(text: string): string {
     .trim();
 }
 
-export function sanitizeInput(input: string): string {
+export function sanitizeInput(input: string, maxChars: number = 2000): string {
+  const safeMaxChars = Number.isFinite(maxChars)
+    ? Math.max(1, Math.floor(maxChars))
+    : 2000;
   return input
     .replace(/[<>]/g, "")
     .replace(/javascript:/gi, "")
     .replace(/on\w+=/gi, "")
     .trim()
-    .slice(0, 2000);
+    .slice(0, safeMaxChars);
 }
