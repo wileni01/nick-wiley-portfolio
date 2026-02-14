@@ -86,13 +86,10 @@ function applyCustomHeadersSafely(
   if (typeof iteratorFactory === "function") {
     try {
       for (const entry of headers as Iterable<unknown>) {
-        let key: unknown;
-        let value: unknown;
-        try {
-          [key, value] = entry as [unknown, unknown];
-        } catch {
+        if (!Array.isArray(entry) || entry.length < 2) {
           continue;
         }
+        const [key, value] = entry as [unknown, unknown];
         setCustomHeaderSafely(target, key, value);
       }
       return;

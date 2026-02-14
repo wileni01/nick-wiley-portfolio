@@ -755,6 +755,32 @@ test("jsonResponse skips object-key fallback for broken tuple-array headers", ()
   assert.equal(response.headers.get("X-Request-Id"), "body-id");
 });
 
+test("jsonResponse ignores malformed iterable header entries", () => {
+  const iterableHeaders = {
+    *[Symbol.iterator](): IterableIterator<unknown> {
+      yield ["x-valid-first", "first"];
+      yield "x-malformed-header-entry";
+      yield ["x-valid-second", "second"];
+      yield ["x-invalid-value", { toString: () => "ok-value" }];
+      yield ["x-throwing-value", { toString: () => { throw new Error("boom"); } }];
+    },
+  };
+
+  const response = jsonResponse(
+    { error: "invalid request", requestId: "id-123" },
+    400,
+    iterableHeaders as unknown as HeadersInit
+  );
+
+  assert.equal(response.status, 400);
+  assert.equal(response.headers.get("X-Valid-First"), "first");
+  assert.equal(response.headers.get("X-Valid-Second"), "second");
+  assert.equal(response.headers.get("X-Invalid-Value"), "ok-value");
+  assert.equal(response.headers.get("X-Malformed-Header-Entry"), null);
+  assert.equal(response.headers.get("X-Throwing-Value"), null);
+  assert.equal(response.headers.get("X-Request-Id"), "id-123");
+});
+
 test("jsonResponse normalizes request-id and backfills it on error responses", async () => {
   const response = jsonResponse(
     {
