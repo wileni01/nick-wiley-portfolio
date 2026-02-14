@@ -94,14 +94,14 @@ export async function POST(req: Request) {
     const lastUserMessage = [...messages].reverse().find(
       (message) => message.role === "user"
     );
-    const query = lastUserMessage?.content ?? messages[messages.length - 1]?.content;
-    if (!query) {
+    if (!lastUserMessage?.content) {
       return jsonResponse(
-        { error: "A user message is required to generate a response." },
+        { error: "At least one user message is required to generate a response." },
         400,
         responseHeaders
       );
     }
+    const query = lastUserMessage.content;
 
     // Find relevant context from knowledge base
     const context = sanitizeInput(await findRelevantContext(query), 10000);
