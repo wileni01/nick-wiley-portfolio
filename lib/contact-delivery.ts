@@ -27,13 +27,16 @@ const SIMPLE_EMAIL_PATTERN =
 const FORMATTED_EMAIL_PATTERN =
   /^([^<>\r\n]{1,120})<\s*([A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63})\s*>$/i;
 
-function sanitizeInlineValue(value: string): string {
+function sanitizeInlineValue(
+  value: string,
+  maxChars: number = EMAIL_VALUE_MAX_CHARS
+): string {
   return value
     .replace(CONTROL_CHARS_PATTERN, "")
     .replace(BIDI_OVERRIDE_PATTERN, "")
     .replace(/[\r\n\t]/g, " ")
     .trim()
-    .slice(0, EMAIL_VALUE_MAX_CHARS);
+    .slice(0, maxChars);
 }
 
 function normalizeSubject(value: string): string {
@@ -138,8 +141,9 @@ export async function deliverContactSubmission(
     });
 
     if (!response.ok) {
-      const errorBody = redactEmails(
-        (await readResponseTextSafely(response)).slice(0, LOG_ERROR_BODY_MAX_CHARS)
+      const errorBody = sanitizeInlineValue(
+        redactEmails((await readResponseTextSafely(response))),
+        LOG_ERROR_BODY_MAX_CHARS
       );
       return {
         attempted: true,
@@ -153,7 +157,10 @@ export async function deliverContactSubmission(
     const message = isAbortLikeError(error)
       ? `Resend request timed out after ${CONTACT_DELIVERY_TIMEOUT_MS}ms`
       : error instanceof Error
-        ? redactEmails(error.message)
+        ? sanitizeInlineValue(
+            redactEmails(error.message),
+            LOG_ERROR_BODY_MAX_CHARS
+          ) || "unknown delivery error"
         : "unknown delivery error";
     return {
       attempted: true,

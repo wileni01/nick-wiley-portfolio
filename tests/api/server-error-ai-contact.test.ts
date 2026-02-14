@@ -506,7 +506,7 @@ test("deliverContactSubmission sanitizes outgoing payload and redacts provider e
         if (fetchCalls.length === 1) {
           return new Response("", { status: 200 });
         }
-        return new Response("failed for user@example.com", { status: 500 });
+        return new Response("failed\nfor user@example.com\u202E\u0000", { status: 500 });
       }) as typeof fetch;
 
       try {
@@ -546,8 +546,12 @@ test("deliverContactSubmission sanitizes outgoing payload and redacts provider e
         assert.equal(failure.attempted, true);
         assert.equal(failure.delivered, false);
         assert.ok(failure.error?.includes("Resend delivery failed (500):"));
+        assert.ok(failure.error?.includes("failed for us***@example.com"));
         assert.ok(failure.error?.includes("us***@example.com"));
         assert.equal(failure.error?.includes("user@example.com"), false);
+        assert.equal(failure.error?.includes("\n"), false);
+        assert.equal(failure.error?.includes("\u202E"), false);
+        assert.equal(failure.error?.includes("\u0000"), false);
       } finally {
         globalThis.fetch = originalFetch;
       }
@@ -700,10 +704,9 @@ test("deliverContactSubmission redacts emails in thrown request errors", async (
     },
     async () => {
       const originalFetch = globalThis.fetch;
+      const oversizedError = `network\nfailure\u202E for person@example.com and teammate@test.io ${"x".repeat(900)}`;
       globalThis.fetch = (async () => {
-        throw new Error(
-          "network failure for person@example.com and teammate@test.io"
-        );
+        throw new Error(oversizedError);
       }) as typeof fetch;
 
       try {
@@ -720,6 +723,9 @@ test("deliverContactSubmission redacts emails in thrown request errors", async (
         assert.ok(result.error?.includes("te***@test.io"));
         assert.equal(result.error?.includes("person@example.com"), false);
         assert.equal(result.error?.includes("teammate@test.io"), false);
+        assert.equal(result.error?.includes("\n"), false);
+        assert.equal(result.error?.includes("\u202E"), false);
+        assert.ok((result.error?.length ?? 0) <= "Resend request error: ".length + 500);
       } finally {
         globalThis.fetch = originalFetch;
       }
