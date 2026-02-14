@@ -16,6 +16,7 @@ const CONTACT_DELIVERY_TIMEOUT_MS = 8000;
 const DEFAULT_CONTACT_FROM = "Portfolio Contact <onboarding@resend.dev>";
 const LOG_ERROR_BODY_MAX_CHARS = 500;
 const EMAIL_VALUE_MAX_CHARS = 320;
+const SUBJECT_VALUE_MAX_CHARS = 200;
 const EMAIL_REDACTION_PATTERN =
   /\b[A-Z0-9._%+-]{1,64}@[A-Z0-9.-]{1,253}\.[A-Z]{2,63}\b/gi;
 const SIMPLE_EMAIL_PATTERN =
@@ -25,6 +26,15 @@ const FORMATTED_EMAIL_PATTERN =
 
 function sanitizeInlineValue(value: string): string {
   return value.replace(/[\r\n\t]/g, " ").trim().slice(0, EMAIL_VALUE_MAX_CHARS);
+}
+
+function normalizeSubject(value: string): string {
+  const normalized = value
+    .replace(/[\r\n\t]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, SUBJECT_VALUE_MAX_CHARS);
+  return normalized || "New message";
 }
 
 function isSimpleEmail(value: string): boolean {
@@ -80,6 +90,8 @@ export async function deliverContactSubmission(
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), CONTACT_DELIVERY_TIMEOUT_MS);
+  const safeReplyTo = sanitizeInlineValue(submission.email);
+  const safeSubject = normalizeSubject(submission.subject);
   try {
     const response = await fetch(RESEND_API_URL, {
       method: "POST",
@@ -90,8 +102,8 @@ export async function deliverContactSubmission(
       body: JSON.stringify({
         from: config.fromEmail,
         to: [config.toEmail],
-        subject: `Portfolio Contact: ${submission.subject || "New message"}`,
-        reply_to: submission.email,
+        subject: `Portfolio Contact: ${safeSubject}`,
+        ...(isSimpleEmail(safeReplyTo) ? { reply_to: safeReplyTo } : {}),
         text: buildEmailText(submission),
       }),
       signal: controller.signal,
