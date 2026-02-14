@@ -36,6 +36,7 @@ const NO_CONTEXT_FALLBACK_NOTE =
 type ChatContextSource = "retrieval" | "fallback";
 type ChatContextFallbackReason =
   | "none"
+  | "no_provider"
   | "retrieval_error"
   | "retrieval_timeout"
   | "empty_context";
@@ -97,6 +98,8 @@ export async function POST(req: Request) {
     applyResolvedAIProviderHeaders(responseHeaders, providerResolution);
     const provider = providerResolution.selected;
     if (!provider) {
+      responseHeaders.set("X-Chat-Context-Source", "fallback");
+      responseHeaders.set("X-Chat-Context-Fallback", "no_provider");
       logServerInfo({
         route: "api/chat",
         requestId,
