@@ -44,6 +44,11 @@ import {
   parseBooleanStateRecord,
 } from "@/lib/adaptive/boolean-state";
 
+function areStringArraysEqual(left: string[], right: string[]): boolean {
+  if (left.length !== right.length) return false;
+  return left.every((value, index) => value === right[index]);
+}
+
 export function PrepCockpitSummary() {
   const { companyId, personaId, focusNote, company, persona } = useInterviewMode();
   const { interviewDate } = useModeInterviewDate({ companyId, personaId });
@@ -98,27 +103,47 @@ export function PrepCockpitSummary() {
       const checklistItems = getReadinessChecklist(activeCompanyId, activePersonaId);
       const readinessState = parseReadinessState(localStorage.getItem(readinessKey));
       const completion = getReadinessCompletion(checklistItems, readinessState);
-      setChecklistCompletion({
+      const nextChecklistCompletion = {
         completedCount: completion.completedCount,
         completionPct: completion.completionPct,
         total: checklistItems.length,
-      });
+      };
+      setChecklistCompletion((prev) =>
+        prev.completedCount === nextChecklistCompletion.completedCount &&
+        prev.completionPct === nextChecklistCompletion.completionPct &&
+        prev.total === nextChecklistCompletion.total
+          ? prev
+          : nextChecklistCompletion
+      );
 
       const history = parsePrepHistory(localStorage.getItem(historyKey));
-      setLatestScore(history[0]?.averageScore ?? null);
-      setLatestConfidence(history[0]?.averageConfidence ?? null);
-      setLatestSessionTimestamp(history[0]?.timestamp ?? null);
-      setLatestThemes(history[0]?.topThemes ?? []);
-      setPrepNotes((localStorage.getItem(notesKey) ?? "").slice(0, 1200));
+      const nextLatestScore = history[0]?.averageScore ?? null;
+      const nextLatestConfidence = history[0]?.averageConfidence ?? null;
+      const nextLatestSessionTimestamp = history[0]?.timestamp ?? null;
+      const nextLatestThemes = history[0]?.topThemes ?? [];
+      const nextPrepNotes = (localStorage.getItem(notesKey) ?? "").slice(0, 1200);
+      setLatestScore((prev) => (prev === nextLatestScore ? prev : nextLatestScore));
+      setLatestConfidence((prev) =>
+        prev === nextLatestConfidence ? prev : nextLatestConfidence
+      );
+      setLatestSessionTimestamp((prev) =>
+        prev === nextLatestSessionTimestamp ? prev : nextLatestSessionTimestamp
+      );
+      setLatestThemes((prev) =>
+        areStringArraysEqual(prev, nextLatestThemes) ? prev : nextLatestThemes
+      );
+      setPrepNotes((prev) => (prev === nextPrepNotes ? prev : nextPrepNotes));
 
       const rawLaunchpad = localStorage.getItem(launchpadKey);
       if (!rawLaunchpad) {
-        setLaunchpadPct(0);
+        setLaunchpadPct((prev) => (prev === 0 ? prev : 0));
       } else {
         const parsed = parseBooleanStateRecord(rawLaunchpad);
-        setLaunchpadPct(
-          getBooleanStateCoveragePercentage(launchpadResourceIds, parsed)
+        const coveragePct = getBooleanStateCoveragePercentage(
+          launchpadResourceIds,
+          parsed
         );
+        setLaunchpadPct((prev) => (prev === coveragePct ? prev : coveragePct));
       }
     }
 

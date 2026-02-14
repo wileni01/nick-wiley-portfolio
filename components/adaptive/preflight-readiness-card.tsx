@@ -68,24 +68,35 @@ export function PreflightReadinessCard() {
         localStorage.getItem(keys.readiness)
       );
       const readiness = getReadinessCompletion(checklistItems, readinessState);
-      setReadinessPct(readiness.completionPct);
+      setReadinessPct((prev) =>
+        prev === readiness.completionPct ? prev : readiness.completionPct
+      );
 
       const history = parsePrepHistory(localStorage.getItem(keys.history));
-      setLatestScore(history[0]?.averageScore ?? null);
-      setLatestSessionTimestamp(history[0]?.timestamp ?? null);
+      const nextLatestScore = history[0]?.averageScore ?? null;
+      const nextLatestSessionTimestamp = history[0]?.timestamp ?? null;
+      setLatestScore((prev) =>
+        prev === nextLatestScore ? prev : nextLatestScore
+      );
+      setLatestSessionTimestamp((prev) =>
+        prev === nextLatestSessionTimestamp ? prev : nextLatestSessionTimestamp
+      );
 
       const launchpad = localStorage.getItem(keys.launchpad);
       if (!launchpad) {
-        setLaunchpadPct(0);
+        setLaunchpadPct((prev) => (prev === 0 ? prev : 0));
       } else {
         const parsed = parseBooleanStateRecord(launchpad);
-        setLaunchpadPct(
-          getBooleanStateCoveragePercentage(launchpadResourceIds, parsed)
+        const coveragePct = getBooleanStateCoveragePercentage(
+          launchpadResourceIds,
+          parsed
         );
+        setLaunchpadPct((prev) => (prev === coveragePct ? prev : coveragePct));
       }
 
       const notes = localStorage.getItem(keys.notes) ?? "";
-      setHasNotes(Boolean(notes.trim()));
+      const nextHasNotes = Boolean(notes.trim());
+      setHasNotes((prev) => (prev === nextHasNotes ? prev : nextHasNotes));
     }
 
     refresh();

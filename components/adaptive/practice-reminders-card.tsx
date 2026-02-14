@@ -82,19 +82,26 @@ export function PracticeRemindersCard() {
         localStorage.getItem(keys.readiness)
       );
       const readiness = getReadinessCompletion(checklistItems, readinessState);
-      setReadinessPct(readiness.completionPct);
+      setReadinessPct((prev) =>
+        prev === readiness.completionPct ? prev : readiness.completionPct
+      );
 
       const history = parsePrepHistory(localStorage.getItem(keys.history));
-      setLatestScore(history[0]?.averageScore ?? null);
+      const nextLatestScore = history[0]?.averageScore ?? null;
+      setLatestScore((prev) =>
+        prev === nextLatestScore ? prev : nextLatestScore
+      );
 
       const rawLaunchpad = localStorage.getItem(keys.launchpad);
       if (!rawLaunchpad) {
-        setLaunchpadPct(0);
+        setLaunchpadPct((prev) => (prev === 0 ? prev : 0));
       } else {
         const parsed = parseBooleanStateRecord(rawLaunchpad);
-        setLaunchpadPct(
-          getBooleanStateCoveragePercentage(launchpadResourceIds, parsed)
+        const coveragePct = getBooleanStateCoveragePercentage(
+          launchpadResourceIds,
+          parsed
         );
+        setLaunchpadPct((prev) => (prev === coveragePct ? prev : coveragePct));
       }
     }
 

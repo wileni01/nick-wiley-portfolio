@@ -134,7 +134,7 @@ lib/
 - **Timeline status banner** — Adaptive briefing surfaces a prominent timeline risk banner for missing/stale/imminent interview windows, with quick remediation and jump-to-section actions.
 - **Mode health status** — Indicator is risk-coded ("On track", "Building", "Needs reps", "Urgent", "Set date", "Date passed") based on readiness, performance, and interview-date timeline context.
 - **Preflight readiness score** — Weighted 0–100 score combining checklist progress, mock results, recommendation-scoped launchpad coverage, prep context, session recency, and interview-date urgency (with stale/missing-date timeline flags, resilient launchpad-state parsing, and quick date reset actions).
-- **Practice reminders** — Auto-generated next-step reminders (with due-by guidance) based on readiness, score, launchpad coverage, and interview-date proximity (including one-click prompts to set/reset date context).
+- **Practice reminders** — Auto-generated next-step reminders (with due-by guidance) based on readiness, score, launchpad coverage, and interview-date proximity (including one-click prompts to set/reset date context), with loop-safe metric refresh updates.
 - **Readiness gap panel** — Surfaces outstanding checklist and unopened resource gaps with direct remediation actions.
 - **Mock interviewer script** — Role-specific practice questions with answer strategies and direct links to recommended portfolio artifacts.
 - **Mock script export** — Copy/download persona-specific interviewer scripts as Markdown for offline rehearsal.
@@ -146,7 +146,7 @@ lib/
 - **Readiness checklist** — Persona-aware prep checklist with local progress tracking, completion percentage, and loop-safe cross-panel synchronization.
 - **Prep insights dashboard** — Tracks the latest 20 session results, latest/best scores, trend, recurring coaching themes, interview pacing status, and one-click timeline quick-fix actions per company/persona, with loop-safe history/readiness refresh updates.
 - **Confidence calibration** — Mock sessions capture self-rated confidence and compare it with performance trends.
-- **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, top resources, and inline timeline quick-fix actions when date context is missing/stale.
+- **Prep cockpit summary** — One-click snapshot of persona goal, readiness progress, latest mock score, top resources, and inline timeline quick-fix actions when date context is missing/stale, with loop-safe metric refresh updates.
 - **Prep brief export** — Generate a reusable Markdown prep brief (copy or download) for the exact company/persona mode, including pacing guidance and calendar shortcuts.
 - **Mode comparison panel** — Side-by-side view of current vs alternate company mode with top resources and one-click switching.
 - **Resource launchpad** — Track and open top recommended artifacts with per-mode completion progress, validated single/bulk open actions, pop-up blocker feedback, resilient key-sanitized local-state parsing, truthy-only normalized state persistence, accurate progress updates after bulk opens, and loop-safe cross-panel sync events.
