@@ -207,6 +207,38 @@ test("server log helpers bound nested detail depth, key count, and array length"
   });
 });
 
+test("server log helpers fall back route/request labels and omit non-object details", () => {
+  const originalWarn = console.warn;
+  const captured: Array<{ args: unknown[] }> = [];
+  console.warn = (...args: unknown[]) => {
+    captured.push({ args });
+  };
+
+  const longWarning = `prefix\u0000\u202E${"x".repeat(320)}`;
+  try {
+    logServerWarning({
+      route: "\u0000 ### *** ",
+      requestId: "\u0000 *** ",
+      message: longWarning,
+      details: [] as unknown as Record<string, unknown>,
+    });
+  } finally {
+    console.warn = originalWarn;
+  }
+
+  assert.equal(captured.length, 1);
+  assert.equal(captured[0]?.args[0], "server warning");
+  const payload = captured[0]?.args[1] as {
+    requestId: string;
+    message: string;
+    details?: unknown;
+  };
+  assert.equal(payload.requestId, "unknown-request");
+  assert.equal(payload.message.startsWith("prefix"), true);
+  assert.equal(payload.message.length, 240);
+  assert.equal("details" in payload, false);
+});
+
 test("resolveAIProvider honors available keys and fallback behavior", () =>
   withEnv(
     {
