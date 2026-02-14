@@ -31,6 +31,8 @@ const CHAT_RATE_LIMIT = {
 } as const;
 const NO_CONTEXT_FALLBACK_NOTE =
   "No indexed portfolio context is currently available. Respond cautiously and suggest contacting Nick for unsupported details.";
+type ChatContextSource = "retrieval" | "fallback";
+type ChatContextFallbackReason = "none" | "retrieval_error" | "empty_context";
 
 export async function POST(req: Request) {
   const context = buildApiRequestContext({
@@ -107,6 +109,8 @@ export async function POST(req: Request) {
 
     // Find relevant context from knowledge base (fallback safely if retrieval fails).
     let ragContext = "";
+    let contextSource: ChatContextSource = "retrieval";
+    let contextFallbackReason: ChatContextFallbackReason = "none";
     try {
       ragContext = sanitizeInput(await findRelevantContext(query), 10000);
     } catch (error) {
@@ -116,8 +120,20 @@ export async function POST(req: Request) {
         message: "Context retrieval failed; continuing with model-only response",
         details: { error },
       });
+      contextSource = "fallback";
+      contextFallbackReason = "retrieval_error";
+    }
+    if (!ragContext && contextSource !== "fallback") {
+      contextSource = "fallback";
+      contextFallbackReason = "empty_context";
     }
     const effectiveContext = ragContext || NO_CONTEXT_FALLBACK_NOTE;
+    responseHeaders.set("X-Chat-Context-Source", contextSource);
+    if (contextFallbackReason !== "none") {
+      responseHeaders.set("X-Chat-Context-Fallback", contextFallbackReason);
+    } else {
+      responseHeaders.delete("X-Chat-Context-Fallback");
+    }
 
     // System prompt with RAG context
     const systemPrompt = `You are Nick Wiley's AI assistant on his professional portfolio website. You answer questions about Nick's professional experience, skills, projects, and background in a helpful, conversational, and professional tone. You speak in first person as if you are representing Nick directly.
