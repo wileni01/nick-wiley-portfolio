@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { streamText } from "ai";
-import { getModel, type AIProvider } from "@/lib/ai";
+import { getModel, hasProviderApiKey, type AIProvider } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import {
   buildRateLimitExceededHeaders,
@@ -30,6 +30,10 @@ const CHAT_RATE_LIMIT = {
   maxRequests: 50,
   windowMs: 3600000,
 } as const;
+const FALLBACK_PROVIDER_BY_PREFERENCE: Record<AIProvider, AIProvider> = {
+  openai: "anthropic",
+  anthropic: "openai",
+};
 
 export async function POST(req: Request) {
   const requestId = createRequestId();
@@ -67,7 +71,28 @@ export async function POST(req: Request) {
       return parsed.response;
     }
 
-    const provider: AIProvider = parsed.data.provider;
+    const requestedProvider: AIProvider = parsed.data.provider;
+    const fallbackProvider = FALLBACK_PROVIDER_BY_PREFERENCE[requestedProvider];
+    const provider: AIProvider | null = hasProviderApiKey(requestedProvider)
+      ? requestedProvider
+      : hasProviderApiKey(fallbackProvider)
+        ? fallbackProvider
+        : null;
+    if (!provider) {
+      return jsonResponse(
+        {
+          error:
+            "No AI provider key is configured. Set OPENAI_API_KEY or ANTHROPIC_API_KEY.",
+        },
+        503,
+        responseHeaders
+      );
+    }
+    responseHeaders.set("X-AI-Provider", provider);
+    if (provider !== requestedProvider) {
+      responseHeaders.set("X-AI-Provider-Fallback", "1");
+    }
+
     const messages = parsed.data.messages
       .map((message) => ({
         role: message.role,

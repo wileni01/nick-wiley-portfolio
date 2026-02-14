@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { generateText } from "ai";
-import { getModel, type AIProvider } from "@/lib/ai";
+import { getModel, hasProviderApiKey } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import {
   buildRateLimitExceededHeaders,
@@ -68,13 +68,6 @@ const responseSchema = z.object({
   talkingPoints: z.array(z.string().min(1).max(400)).max(8),
 });
 
-function hasProviderKey(provider: AIProvider): boolean {
-  if (provider === "anthropic") {
-    return Boolean(process.env.ANTHROPIC_API_KEY);
-  }
-  return Boolean(process.env.OPENAI_API_KEY);
-}
-
 function sanitizeRecommendationUrl(url: string): string {
   const normalized = url.trim().slice(0, 400);
   if (!normalized) return "/";
@@ -139,7 +132,7 @@ export async function POST(req: Request) {
     let aiNarrative: string | undefined;
     let narrativeSource: "deterministic" | "ai" = "deterministic";
 
-    if (hasProviderKey(provider)) {
+    if (hasProviderApiKey(provider)) {
       try {
         const topRecommendations = bundle.topRecommendations
           .slice(0, 4)

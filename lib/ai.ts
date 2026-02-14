@@ -3,6 +3,13 @@ import { anthropic } from "@ai-sdk/anthropic";
 
 export type AIProvider = "openai" | "anthropic";
 
+export function hasProviderApiKey(provider: AIProvider): boolean {
+  if (provider === "anthropic") {
+    return Boolean(process.env.ANTHROPIC_API_KEY);
+  }
+  return Boolean(process.env.OPENAI_API_KEY);
+}
+
 export function getModel(provider: AIProvider = "openai") {
   switch (provider) {
     case "openai":
