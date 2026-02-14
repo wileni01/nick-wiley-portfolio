@@ -166,8 +166,8 @@ lib/
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support, and live status announcements for adaptive copy/download actions.
 - **Contact API hardening** — Contact submissions use schema validation, honeypot filtering, rate limiting, input sanitization, and optional Resend delivery with failure handling.
-- **Chat API hardening** — Chat requests use schema validation, provider allowlisting, bounded message windows, sanitized inputs/context, rate limiting, and shared automatic provider fallback when only one API key is configured.
-- **Interview-mode API hardening** — Interview briefing requests/responses use schema validation, allowlisted IDs/providers, bounded/sanitized narrative fields, shared provider fallback routing when available, and deterministic fallback behavior.
+- **Chat API hardening** — Chat requests use schema validation, provider allowlisting, bounded message windows, sanitized inputs/context, rate limiting, and shared automatic provider fallback when only one API key is configured, with provider-request/selection headers for observability.
+- **Interview-mode API hardening** — Interview briefing requests/responses use schema validation, allowlisted IDs/providers, bounded/sanitized narrative fields, shared provider fallback routing when available, deterministic fallback behavior, and provider-request/selection headers.
 - **API IP normalization** — Server routes normalize forwarded IP headers before rate-limit keying to reduce malformed header edge cases, with lazy in-memory rate-limit cleanup.
 - **Shared API JSON utilities** — Server routes reuse shared JSON request parsing/response helpers for consistent invalid-payload handling, including JSON content-type enforcement and payload-size guard responses.
 - **Rate-limit response metadata** — API routes include standard rate-limit headers (`X-RateLimit-*`, `Retry-After` on 429) plus `X-Request-Id` across success and validation-error responses, and error payloads now echo request IDs for easier debugging.

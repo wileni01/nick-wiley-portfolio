@@ -47,6 +47,26 @@ export function resolveAIProvider(
   };
 }
 
+export function applyResolvedAIProviderHeaders(
+  headers: Headers,
+  resolution: ResolvedAIProvider
+): Headers {
+  headers.set("X-AI-Provider-Requested", resolution.requested);
+  if (resolution.selected) {
+    headers.set("X-AI-Provider", resolution.selected);
+    if (resolution.didFallback) {
+      headers.set("X-AI-Provider-Fallback", "1");
+    } else {
+      headers.delete("X-AI-Provider-Fallback");
+    }
+    return headers;
+  }
+
+  headers.set("X-AI-Provider", "none");
+  headers.delete("X-AI-Provider-Fallback");
+  return headers;
+}
+
 export function getModel(provider: AIProvider = "openai") {
   switch (provider) {
     case "openai":

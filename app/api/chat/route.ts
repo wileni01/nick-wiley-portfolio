@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { streamText } from "ai";
-import { getModel, resolveAIProvider } from "@/lib/ai";
+import {
+  applyResolvedAIProviderHeaders,
+  getModel,
+  resolveAIProvider,
+} from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import {
   buildApiResponseHeaders,
@@ -72,6 +76,7 @@ export async function POST(req: Request) {
     }
 
     const providerResolution = resolveAIProvider(parsed.data.provider);
+    applyResolvedAIProviderHeaders(responseHeaders, providerResolution);
     const provider = providerResolution.selected;
     if (!provider) {
       return jsonResponse(
@@ -82,10 +87,6 @@ export async function POST(req: Request) {
         503,
         responseHeaders
       );
-    }
-    responseHeaders.set("X-AI-Provider", provider);
-    if (providerResolution.didFallback) {
-      responseHeaders.set("X-AI-Provider-Fallback", "1");
     }
 
     const messages = parsed.data.messages

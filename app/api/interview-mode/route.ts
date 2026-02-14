@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { generateText } from "ai";
-import { getModel, resolveAIProvider } from "@/lib/ai";
+import {
+  applyResolvedAIProviderHeaders,
+  getModel,
+  resolveAIProvider,
+} from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import {
   buildApiResponseHeaders,
@@ -116,15 +120,8 @@ export async function POST(req: Request) {
 
     const { companyId, personaId, provider } = parsed.data;
     const providerResolution = resolveAIProvider(provider);
+    applyResolvedAIProviderHeaders(responseHeaders, providerResolution);
     const executionProvider = providerResolution.selected;
-    if (executionProvider) {
-      responseHeaders.set("X-AI-Provider", executionProvider);
-      if (providerResolution.didFallback) {
-        responseHeaders.set("X-AI-Provider-Fallback", "1");
-      }
-    } else {
-      responseHeaders.set("X-AI-Provider", "none");
-    }
     const contextNote = sanitizeInput(parsed.data.contextNote ?? "", 300);
 
     const company = getCompanyProfileById(companyId);
