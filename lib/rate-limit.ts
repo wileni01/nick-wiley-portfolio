@@ -12,6 +12,8 @@ const RATE_LIMIT_MAX_ENTRIES = 50000;
 const MIN_RATE_LIMIT_WINDOW_MS = 1000;
 const MAX_RATE_LIMIT_REQUESTS = Number.MAX_SAFE_INTEGER;
 const MAX_RATE_LIMIT_WINDOW_MS = Number.MAX_SAFE_INTEGER;
+const DEFAULT_RATE_LIMIT_MAX_REQUESTS = 50;
+const DEFAULT_RATE_LIMIT_WINDOW_MS = 3600000;
 const RATE_LIMIT_IDENTIFIER_MAX_CHARS = 160;
 const SAFE_IDENTIFIER_PATTERN = /[^a-zA-Z0-9:._-]/g;
 let lastCleanupAt = 0;
@@ -45,21 +47,37 @@ function trimRateLimitEntriesToCapacity(now: number) {
   }
 }
 
+function readRateLimitConfigValue(
+  config: RateLimitConfig,
+  key: "maxRequests" | "windowMs"
+): number | null {
+  let value: unknown;
+  try {
+    value = (config as Record<string, unknown> | null | undefined)?.[key];
+  } catch {
+    return null;
+  }
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  return value;
+}
+
 export function normalizeRateLimitConfig(
   config: RateLimitConfig
 ): { maxRequests: number; windowMs: number } {
-  const maxRequests = Number.isFinite(config.maxRequests)
+  const rawMaxRequests = readRateLimitConfigValue(config, "maxRequests");
+  const rawWindowMs = readRateLimitConfigValue(config, "windowMs");
+  const maxRequests = rawMaxRequests !== null
     ? Math.min(
         MAX_RATE_LIMIT_REQUESTS,
-        Math.max(1, Math.floor(config.maxRequests))
+        Math.max(1, Math.floor(rawMaxRequests))
       )
-    : 50;
-  const windowMs = Number.isFinite(config.windowMs)
+    : DEFAULT_RATE_LIMIT_MAX_REQUESTS;
+  const windowMs = rawWindowMs !== null
     ? Math.min(
         MAX_RATE_LIMIT_WINDOW_MS,
-        Math.max(MIN_RATE_LIMIT_WINDOW_MS, Math.floor(config.windowMs))
+        Math.max(MIN_RATE_LIMIT_WINDOW_MS, Math.floor(rawWindowMs))
       )
-    : 3600000;
+    : DEFAULT_RATE_LIMIT_WINDOW_MS;
   return { maxRequests, windowMs };
 }
 
@@ -96,7 +114,10 @@ function getSafeWindowMs(windowMs: number, now: number): number {
 
 export function rateLimit(
   identifier: unknown,
-  config: RateLimitConfig = { maxRequests: 50, windowMs: 3600000 }
+  config: RateLimitConfig = {
+    maxRequests: DEFAULT_RATE_LIMIT_MAX_REQUESTS,
+    windowMs: DEFAULT_RATE_LIMIT_WINDOW_MS,
+  }
 ): { success: boolean; remaining: number; resetIn: number } {
   const now = Date.now();
   cleanupExpiredRateLimitEntries(now);

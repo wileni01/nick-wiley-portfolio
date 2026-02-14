@@ -9,7 +9,11 @@ import {
   normalizeResetInSeconds,
 } from "../../lib/api-rate-limit";
 import { buildApiRequestContext } from "../../lib/api-request-context";
-import { normalizeRateLimitConfig, rateLimit } from "../../lib/rate-limit";
+import {
+  normalizeRateLimitConfig,
+  rateLimit,
+  type RateLimitConfig,
+} from "../../lib/rate-limit";
 import { createRequestId, normalizeRequestId } from "../../lib/request-id";
 
 test("normalizeRequestId bounds and sanitizes unsafe values", () => {
@@ -138,6 +142,27 @@ test("normalizeRateLimitConfig applies finite/default/minimum guards", () => {
   );
 });
 
+test("normalizeRateLimitConfig tolerates unreadable config values", () => {
+  const throwingConfig = {} as RateLimitConfig;
+  Object.defineProperty(throwingConfig, "maxRequests", {
+    configurable: true,
+    get() {
+      throw new Error("maxRequests getter failed");
+    },
+  });
+  Object.defineProperty(throwingConfig, "windowMs", {
+    configurable: true,
+    get() {
+      throw new Error("windowMs getter failed");
+    },
+  });
+
+  assert.deepEqual(normalizeRateLimitConfig(throwingConfig), {
+    maxRequests: 50,
+    windowMs: 3600000,
+  });
+});
+
 test("rateLimit normalizes identifiers so equivalent keys share limits", () => {
   const config = { maxRequests: 1, windowMs: 1000 };
   const uniqueToken = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -186,6 +211,29 @@ test("rateLimit does not throw when identifier coercion fails", () => {
   assert.equal(typeof result.success, "boolean");
   assert.ok(Number.isInteger(result.remaining));
   assert.ok(result.resetIn >= 0);
+});
+
+test("rateLimit does not throw when config access fails", () => {
+  const identifier = `bad-config:${Math.random().toString(36).slice(2)}`;
+  const throwingConfig = {} as RateLimitConfig;
+  Object.defineProperty(throwingConfig, "maxRequests", {
+    configurable: true,
+    get() {
+      throw new Error("maxRequests getter failed");
+    },
+  });
+  Object.defineProperty(throwingConfig, "windowMs", {
+    configurable: true,
+    get() {
+      throw new Error("windowMs getter failed");
+    },
+  });
+
+  assert.doesNotThrow(() => rateLimit(identifier, throwingConfig));
+  const result = rateLimit(`${identifier}:second`, throwingConfig);
+  assert.equal(result.success, true);
+  assert.equal(result.remaining, 49);
+  assert.equal(result.resetIn, 3600000);
 });
 
 test("rateLimit resets at inclusive window boundary and reports rolling reset times", () => {
