@@ -10,6 +10,8 @@ const rateLimitMap = new Map<string, RateLimitEntry>();
 const RATE_LIMIT_CLEANUP_INTERVAL_MS = 60000;
 const RATE_LIMIT_MAX_ENTRIES = 50000;
 const MIN_RATE_LIMIT_WINDOW_MS = 1000;
+const RATE_LIMIT_IDENTIFIER_MAX_CHARS = 160;
+const SAFE_IDENTIFIER_PATTERN = /[^a-zA-Z0-9:._-]/g;
 let lastCleanupAt = 0;
 
 function cleanupExpiredRateLimitEntries(now: number) {
@@ -50,17 +52,24 @@ export interface RateLimitConfig {
   windowMs: number;
 }
 
+function normalizeRateLimitIdentifier(identifier: string): string {
+  const bounded = identifier.slice(0, RATE_LIMIT_IDENTIFIER_MAX_CHARS);
+  const sanitized = bounded.replace(SAFE_IDENTIFIER_PATTERN, "");
+  return sanitized ? sanitized.toLowerCase() : "anonymous";
+}
+
 export function rateLimit(
   identifier: string,
   config: RateLimitConfig = { maxRequests: 50, windowMs: 3600000 }
 ): { success: boolean; remaining: number; resetIn: number } {
   const now = Date.now();
   cleanupExpiredRateLimitEntries(now);
+  const normalizedIdentifier = normalizeRateLimitIdentifier(identifier);
   const normalizedConfig = normalizeRateLimitConfig(config);
-  const entry = rateLimitMap.get(identifier);
+  const entry = rateLimitMap.get(normalizedIdentifier);
 
   if (!entry || now > entry.resetTime) {
-    rateLimitMap.set(identifier, {
+    rateLimitMap.set(normalizedIdentifier, {
       count: 1,
       resetTime: now + normalizedConfig.windowMs,
     });
