@@ -40,11 +40,13 @@ export function jsonResponse(
       ? { ...body, requestId }
       : body;
   let serializedPayload: string;
+  let responseStatus = status;
   try {
     serializedPayload = JSON.stringify(payload, (_key, value) =>
       typeof value === "bigint" ? value.toString() : value
     );
   } catch {
+    responseStatus = status >= 400 ? status : 500;
     serializedPayload = JSON.stringify({
       error: JSON_SERIALIZATION_FALLBACK_ERROR,
       ...(requestId ? { requestId } : {}),
@@ -52,7 +54,7 @@ export function jsonResponse(
   }
 
   return new Response(serializedPayload, {
-    status,
+    status: responseStatus,
     headers: responseHeaders,
   });
 }
