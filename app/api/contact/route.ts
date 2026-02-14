@@ -95,6 +95,11 @@ export async function POST(req: Request) {
     const delivery = await deliverContactSubmission(sanitized);
     if (!delivery.attempted) {
       responseHeaders.set("X-Contact-Delivery", "skipped");
+      logServerInfo({
+        route: "api/contact",
+        requestId,
+        message: "Contact delivery skipped; delivery provider not configured",
+      });
     } else if (delivery.delivered) {
       responseHeaders.set("X-Contact-Delivery", "delivered");
     } else {
