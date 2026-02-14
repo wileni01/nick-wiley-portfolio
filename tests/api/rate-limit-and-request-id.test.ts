@@ -196,6 +196,7 @@ test("rate-limit header builders clamp malformed snapshot values", () => {
     )
   );
   assert.equal(exceededHeaders.get("X-RateLimit-Remaining"), "0");
+  assert.equal(exceededHeaders.get("X-RateLimit-Reset"), "1");
   assert.equal(exceededHeaders.get("Retry-After"), "1");
 });
 
