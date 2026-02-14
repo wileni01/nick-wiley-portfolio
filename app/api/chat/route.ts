@@ -8,7 +8,7 @@ import {
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import { buildApiRequestContext } from "@/lib/api-request-context";
 import { findRelevantContext } from "@/lib/embeddings";
-import { logServerError, logServerWarning } from "@/lib/server-error";
+import { logServerError, logServerInfo, logServerWarning } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 
 export const maxDuration = 30;
@@ -161,6 +161,15 @@ export async function POST(req: Request) {
     if (!ragContext && contextSource !== "fallback") {
       contextSource = "fallback";
       contextFallbackReason = "empty_context";
+      logServerInfo({
+        route: "api/chat",
+        requestId,
+        message:
+          "Context retrieval returned empty results; continuing with model-only response",
+        details: {
+          queryChars: query.length,
+        },
+      });
     }
     const effectiveContext = ragContext || NO_CONTEXT_FALLBACK_NOTE;
     responseHeaders.set("X-Chat-Context-Source", contextSource);

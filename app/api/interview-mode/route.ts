@@ -7,7 +7,7 @@ import {
 } from "@/lib/ai";
 import { jsonResponse, parseJsonRequest } from "@/lib/api-http";
 import { buildApiRequestContext } from "@/lib/api-request-context";
-import { logServerError, logServerWarning } from "@/lib/server-error";
+import { logServerError, logServerInfo, logServerWarning } from "@/lib/server-error";
 import { sanitizeInput } from "@/lib/utils";
 import {
   buildDeterministicNarrative,
@@ -146,6 +146,16 @@ export async function POST(req: Request) {
     let narrativeFallbackReason: NarrativeFallbackReason = executionProvider
       ? "none"
       : "no_provider";
+    if (!executionProvider) {
+      logServerInfo({
+        route: "api/interview-mode",
+        requestId,
+        message: "No AI provider available; using deterministic narrative",
+        details: {
+          requestedProvider: providerResolution.requested,
+        },
+      });
+    }
 
     if (executionProvider) {
       const controller = new AbortController();
