@@ -29,10 +29,36 @@ const CHAT_RATE_LIMIT = {
   maxRequests: 50,
   windowMs: 3600000,
 } as const;
+const CHAT_RETRIEVAL_TIMEOUT_MS = 4500;
 const NO_CONTEXT_FALLBACK_NOTE =
   "No indexed portfolio context is currently available. Respond cautiously and suggest contacting Nick for unsupported details.";
 type ChatContextSource = "retrieval" | "fallback";
-type ChatContextFallbackReason = "none" | "retrieval_error" | "empty_context";
+type ChatContextFallbackReason =
+  | "none"
+  | "retrieval_error"
+  | "retrieval_timeout"
+  | "empty_context";
+
+class RetrievalTimeoutError extends Error {
+  constructor() {
+    super("Context retrieval timed out.");
+    this.name = "RetrievalTimeoutError";
+  }
+}
+
+async function withTimeout<T>(input: Promise<T>, timeoutMs: number): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      input,
+      new Promise<T>((_, reject) => {
+        timeoutId = setTimeout(() => reject(new RetrievalTimeoutError()), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
 
 export async function POST(req: Request) {
   const context = buildApiRequestContext({
@@ -112,16 +138,25 @@ export async function POST(req: Request) {
     let contextSource: ChatContextSource = "retrieval";
     let contextFallbackReason: ChatContextFallbackReason = "none";
     try {
-      ragContext = sanitizeInput(await findRelevantContext(query), 10000);
+      ragContext = sanitizeInput(
+        await withTimeout(findRelevantContext(query), CHAT_RETRIEVAL_TIMEOUT_MS),
+        10000
+      );
     } catch (error) {
+      contextFallbackReason =
+        error instanceof RetrievalTimeoutError
+          ? "retrieval_timeout"
+          : "retrieval_error";
       logServerWarning({
         route: "api/chat",
         requestId,
-        message: "Context retrieval failed; continuing with model-only response",
-        details: { error },
+        message:
+          contextFallbackReason === "retrieval_timeout"
+            ? "Context retrieval timed out; continuing with model-only response"
+            : "Context retrieval failed; continuing with model-only response",
+        details: { error, fallbackReason: contextFallbackReason },
       });
       contextSource = "fallback";
-      contextFallbackReason = "retrieval_error";
     }
     if (!ragContext && contextSource !== "fallback") {
       contextSource = "fallback";
