@@ -10,6 +10,7 @@ export const caseStudySchema = z.object({
   stack: z.array(z.string()),
   tags: z.array(z.string()),
   featured: z.boolean().default(false),
+  image: z.string().optional(),
   executiveSummary: z.string(),
   builderSummary: z.string(),
 });

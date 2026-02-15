@@ -25,6 +25,7 @@ const staticSearchItems: SearchItem[] = [
   { title: "Building adoption: Study halls", url: "/work/enablement-study-halls", type: "work", summary: "Enablement programs that made analytics usable" },
   { title: "VisiTime AR Tour System", url: "/work/visitime-ar", type: "work", summary: "Geospatial storytelling and AR visitor experience" },
   { title: "Recovery oversight with GIS (RATB)", url: "/work/ratb-gis-oversight", type: "work", summary: "Geospatial analysis for Recovery Act oversight" },
+  { title: "Scott Search: Gamified decision support for contact recovery", url: "/work/lli-scott-search", type: "work", summary: "Gamified CRM contact recovery with Apollo.io enrichment and GPT-4 lead scoring" },
   // Writing
   { title: "Human-in-the-loop isn't a compromise. It's the point.", url: "/writing/human-in-the-loop", type: "writing", summary: "Why keeping humans in control is the goal, not a concession" },
   { title: "From dashboards to decisions", url: "/writing/from-dashboards-to-decisions", type: "writing", summary: "What analytics is actually for" },

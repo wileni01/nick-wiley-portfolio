@@ -1,36 +1,50 @@
 # Project Screenshots
 
-## Naming Convention
+## Current Inventory
 
-Each project image is referenced by its slug. Place your screenshot files here using these exact filenames:
+### Personal / Client Projects
 
 | Project | Filename | Status |
 |---------|----------|--------|
-| GettysburgLeadership.com | `gettysburg-leadership.png` | **Captured** |
-| LLI Email Data Miner | `lli-email-miner.png` | **Captured** |
-| LLI Golden Record | `lli-golden-record.png` | **Captured** |
-| NickAntir | `nickantir.png` | **Captured** |
-| NickWChat | `nickwchat.png` | **Needs replacement** — current is API error state |
-| AI Resume Generator | `resume-generator.png` | **Captured** |
-| G15 Modes Console | `g15-modes.png` | **Captured** |
-| MTW2 QoL Installer | `mtw2-installer.png` | **Needs screenshot** — using SVG placeholder |
-| Valley of Vines | `valley-of-vines.png` | **Needs screenshot** — using SVG placeholder |
+| GettysburgLeadership.com | `gettysburg-leadership.png` | **Ready** |
+| LLI Email Data Miner | `lli-email-miner.png` | **Ready** |
+| LLI Golden Record | `lli-golden-record.png` | **Ready** |
+| NickAntir | `nickantir.png` | **Ready** |
+| AI Resume Generator | `resume-generator.png` | **Ready** |
+| G15 Modes Console | `g15-modes.png` | **Ready** |
+| VisiTime AR | `visitime.png` | **Ready** |
+| Portfolio Home | `portfolio-home.png` | **Ready** |
+| NickWChat | — | **Needs screenshot** — using `placeholder-nickwchat.svg` |
+| MTW2 QoL Installer | — | **Needs screenshot** — using `placeholder-mtw2.svg` |
+| Valley of Vines | — | **Needs screenshot** — using `placeholder-valley-of-vines.svg` |
 
-### Government Project Templates
+### Government / Federal Projects
 
-All government templates use a shared placeholder. When you add real screenshots, use:
+| Project | Filename | Status |
+|---------|----------|--------|
+| NSF Panel Wizard | `Panel-wized.png` | **Ready** |
+| NSF Proposal Classification | `optuna-classification.png` | **Ready** |
+| NSF RoboRA | `robo-ra.png` | **Ready** |
+| NSF ADCC | `scott-search.png` | **Ready** |
+| NSF Telemetry | `telemetry.png` | **Ready** |
+| NSF Researcher Lineage | `researchher-lineage.png` | **Ready** |
+| USDA Organic Analytics | `usda-organic.png` | **Ready** |
+| RATB GIS Oversight | `recovery-oversight.png` | **Ready** |
+| USPS International Ops | — | **Needs screenshot** — using `placeholder-gov.svg` |
+| Census Data Analytics | — | **Needs screenshot** — using `placeholder-gov.svg` |
+| LLI Digital Transformation | — | **Needs screenshot** — using `placeholder-gov.svg` |
+| LLI America at 250 | — | **Needs screenshot** — using `placeholder-gov.svg` |
+| LLI Email Marketing | — | **Needs screenshot** — using `placeholder-gov.svg` |
+| LLI Intern Mentorship | — | **Needs screenshot** — using `placeholder-gov.svg` |
+| Enablement Study Halls | — | **Needs screenshot** — using `placeholder-gov.svg` |
 
-| Project | Filename |
-|---------|----------|
-| USPS Project | `usps-project.png` |
-| Census Project | `census-project.png` |
-| USDA Project 1 | `usda-project-1.png` |
-| USDA Project 2 | `usda-project-2.png` |
-| NSF Project 1 | `nsf-project-1.png` |
-| NSF Project 2 | `nsf-project-2.png` |
-| NSF Project 3 | `nsf-project-3.png` |
-| NSF Project 4 | `nsf-project-4.png` |
-| NSF Project 5 | `nsf-project-5.png` |
+### Root Public Assets
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `favicon.ico` | `public/favicon.ico` | Browser tab icon |
+| `icon.png` | `public/icon.png` | PWA / app icon |
+| `og-image.png` | `public/og-image.png` | Open Graph social preview image |
 
 ## Image Specs
 
@@ -42,10 +56,9 @@ All government templates use a shared placeholder. When you add real screenshots
 ## How to Replace Placeholders
 
 1. Take your screenshot (1920x1080 recommended)
-2. Name it according to the table above
-3. Drop it in this folder (`public/images/projects/`)
-4. The portfolio will automatically pick it up — no code changes needed
-5. Delete the corresponding `placeholder-*.svg` if you've replaced it with a real PNG
+2. Drop it in this folder (`public/images/projects/`)
+3. Update the `image` path in `lib/projects.ts` and/or the MDX frontmatter in `content/work/`
+4. Delete the corresponding `placeholder-*.svg` if you've replaced it with a real PNG
 
 ## SVG Placeholders
 

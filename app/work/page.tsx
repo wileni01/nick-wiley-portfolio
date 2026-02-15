@@ -34,6 +34,7 @@ export default function WorkPage() {
             stack: s.stack,
             tags: s.tags,
             featured: s.featured,
+            image: s.image,
             executiveSummary: s.executiveSummary,
             builderSummary: s.builderSummary,
           }))}

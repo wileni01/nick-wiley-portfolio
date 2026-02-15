@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -136,38 +137,62 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {featured.map((study) => (
-              <Link
-                key={study.slug}
-                href={`/work/${study.slug}`}
-                className="group block"
-              >
-                <Card className="h-full hover:border-primary/30 hover:shadow-md transition-all duration-200">
-                  <CardContent className="pt-6 space-y-3">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {study.client}
-                    </p>
-                    <h3 className="text-base font-semibold leading-snug group-hover:text-primary transition-colors">
-                      {study.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {study.executiveSummary}
-                    </p>
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {study.tags.slice(0, 3).map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="muted"
-                          className="text-[10px]"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
+            {featured.map((study) => {
+              const hasImage =
+                study.image && !study.image.includes("placeholder");
+              return (
+                <Link
+                  key={study.slug}
+                  href={`/work/${study.slug}`}
+                  className="group block"
+                >
+                  <Card className="h-full hover:border-primary/30 hover:shadow-md transition-all duration-200 overflow-hidden">
+                    {/* Thumbnail */}
+                    <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+                      {hasImage ? (
+                        <Image
+                          src={study.image!}
+                          alt={study.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted to-muted/60">
+                          <span className="text-xs font-medium text-muted-foreground/60 uppercase tracking-widest">
+                            {study.client}
+                          </span>
+                        </div>
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
                     </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+
+                    <CardContent className="pt-5 space-y-3">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        {study.client}
+                      </p>
+                      <h3 className="text-base font-semibold leading-snug group-hover:text-primary transition-colors">
+                        {study.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                        {study.executiveSummary}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {study.tags.slice(0, 3).map((tag) => (
+                          <Badge
+                            key={tag}
+                            variant="muted"
+                            className="text-[10px]"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

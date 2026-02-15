@@ -39,12 +39,12 @@ Value: sk-ant-... (your Anthropic API key)
 
 ```
 CONTACT_EMAIL
-Value: your-email@example.com
+Value: wileni01@gmail.com
 ```
 
 ```
 NEXT_PUBLIC_SITE_URL
-Value: https://nick-wiley-portfolio.vercel.app (or your custom domain)
+Value: https://www.nickwiley.ai
 ```
 
 > **Note:** Environment variables in Vercel are:
@@ -78,7 +78,7 @@ Visit your Vercel URL and test:
 ### If You Have a Domain:
 1. In Vercel → Your Project → **Settings** → **Domains**
 2. Click **"Add"**
-3. Enter your domain (e.g., `nickwiley.dev`)
+3. Enter your domain: `www.nickwiley.ai` (and `nickwiley.ai` for redirect)
 4. Vercel gives you DNS instructions
 5. Update DNS at your registrar:
    - **A Record:** `76.76.21.21`
@@ -92,18 +92,15 @@ Visit your Vercel URL and test:
 - **Cloudflare** — $9-12/year (at-cost pricing)
 - **Google Domains** (now Squarespace)
 
-**Domain suggestions:**
-- `nickwiley.dev` (developer-focused)
-- `nickwiley.com` (professional)
-- `nickwiley.io` (tech-focused)
-- `nickwileytech.com`
+**Your domain:**
+- `nickwiley.ai` (already purchased)
 
 ## Step 5: Update Environment Variable
 
 After custom domain is set:
 1. Vercel → Settings → Environment Variables
 2. Edit `NEXT_PUBLIC_SITE_URL`
-3. Change to `https://your-domain.com`
+3. Change to `https://www.nickwiley.ai`
 4. Redeploy (or wait for next git push)
 
 ## What Happens After First Deploy?

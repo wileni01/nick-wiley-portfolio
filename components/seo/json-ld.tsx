@@ -1,5 +1,5 @@
 export function PersonJsonLd() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://nickwiley.dev";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.nickwiley.ai";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -55,7 +55,7 @@ export function PersonJsonLd() {
 }
 
 export function WebsiteJsonLd() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://nickwiley.dev";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.nickwiley.ai";
 
   const jsonLd = {
     "@context": "https://schema.org",

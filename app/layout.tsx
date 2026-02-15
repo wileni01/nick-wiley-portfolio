@@ -47,6 +47,13 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Nicholas A. Wiley" }],
   creator: "Nicholas A. Wiley",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: "/icon.png",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",

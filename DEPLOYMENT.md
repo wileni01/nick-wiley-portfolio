@@ -31,8 +31,8 @@ OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
 
 # Optional
-CONTACT_EMAIL=your-email@example.com
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
+CONTACT_EMAIL=wileni01@gmail.com
+NEXT_PUBLIC_SITE_URL=https://www.nickwiley.ai
 ```
 
 ## GitHub Setup
@@ -67,8 +67,8 @@ In Vercel Dashboard → Settings → Environment Variables:
 ```
 OPENAI_API_KEY = sk-...
 ANTHROPIC_API_KEY = sk-ant-...
-CONTACT_EMAIL = your-email@example.com
-NEXT_PUBLIC_SITE_URL = https://your-domain.vercel.app
+CONTACT_EMAIL = wileni01@gmail.com
+NEXT_PUBLIC_SITE_URL = https://www.nickwiley.ai
 ```
 
 ### 3. Deploy
@@ -79,10 +79,10 @@ NEXT_PUBLIC_SITE_URL = https://your-domain.vercel.app
 
 ### 4. Custom Domain (Optional)
 
-1. Buy domain (Namecheap, Google Domains, etc.)
-2. In Vercel → Domains → Add your domain
-3. Update DNS records as instructed
-4. Update `NEXT_PUBLIC_SITE_URL` env var
+1. Domain: `nickwiley.ai` (already purchased)
+2. In Vercel → Domains → Add `www.nickwiley.ai` and `nickwiley.ai`
+3. Update DNS records as instructed by Vercel
+4. Set `NEXT_PUBLIC_SITE_URL` = `https://www.nickwiley.ai`
 
 ## Post-Deployment
 

@@ -3,7 +3,7 @@ import { getCaseStudySlugs } from "@/lib/mdx";
 import { getWritingPostSlugs } from "@/lib/mdx";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://nickwiley.dev";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.nickwiley.ai";
 
   const staticPages = [
     { url: baseUrl, lastModified: new Date(), priority: 1.0 },

@@ -28,7 +28,7 @@ The dev server runs at [http://localhost:3000](http://localhost:3000).
 This project is **Vercel-ready**. Push to your repository and connect it to Vercel — the build will work out of the box.
 
 Environment variables (optional):
-- `NEXT_PUBLIC_SITE_URL` — Your production URL (defaults to `https://nickwiley.dev`)
+- `NEXT_PUBLIC_SITE_URL` — Your production URL (defaults to `https://www.nickwiley.ai`)
 - `OPENAI_API_KEY` — Enables the AI chat API route
 - `ANTHROPIC_API_KEY` — Alternative AI provider for the chat route
 

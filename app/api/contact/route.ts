@@ -111,7 +111,7 @@ export async function POST(req: Request) {
     // TODO: Integrate with Resend or SendGrid for email delivery
     // Example with Resend:
     // await resend.emails.send({
-    //   from: 'portfolio@nickwiley.dev',
+    //   from: 'portfolio@nickwiley.ai',
     //   to: process.env.CONTACT_EMAIL,
     //   subject: `Portfolio Contact: ${sanitized.subject}`,
     //   text: `From: ${sanitized.name} (${sanitized.email})\n\n${sanitized.message}`,

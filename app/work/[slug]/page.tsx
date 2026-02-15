@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getCaseStudyBySlug, getCaseStudySlugs } from "@/lib/mdx";
@@ -73,6 +74,20 @@ export default async function CaseStudyPage({ params }: Props) {
             ))}
           </div>
         </header>
+
+        {/* Hero image */}
+        {study.image && !study.image.includes("placeholder") && (
+          <div className="relative aspect-[2/1] w-full overflow-hidden rounded-xl border border-border mb-10 bg-muted shadow-sm">
+            <Image
+              src={study.image}
+              alt={`Screenshot of ${study.title}`}
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
+              priority
+            />
+          </div>
+        )}
 
         {/* MDX Content */}
         <article className="prose max-w-none">

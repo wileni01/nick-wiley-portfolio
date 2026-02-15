@@ -230,6 +230,40 @@ with full audit trail and HubSpot sync capabilities.`,
     impact:
       "Eliminated 2,000+ duplicate records, improved email deliverability, and enabled accurate pipeline reporting for the first time.",
   },
+  {
+    slug: "lli-scott-search",
+    title: "Scott Search — Contact Recovery Tool",
+    description:
+      "Gamified decision-support tool for CRM contact recovery with Apollo.io enrichment, GPT-4 lead scoring, and a game-like review UI.",
+    longDescription: `Built a gamified, human-in-the-loop decision-support tool that transforms stale CRM contact recovery
+into an engaging review workflow. The pipeline scores contact staleness, enriches via Apollo.io, applies rule-based
+and GPT-4 lead scoring, then presents contacts in a card-based review UI with XP, streaks, achievements,
+and keyboard shortcuts.
+
+Features a Flask web UI with dark theme, confetti animations, sound effects via Web Audio API,
+full undo support, and HubSpot sync for approved contacts. Deployed on Vercel with Turso/libSQL backend.`,
+    category: ["LLI Client Work", "AI/ML"],
+    technologies: [
+      "Python",
+      "Flask",
+      "OpenAI GPT-4",
+      "HubSpot API",
+      "Apollo.io",
+      "SQLite",
+      "Turso",
+      "Levenshtein",
+      "Vercel",
+    ],
+    image: "/images/projects/scott-search.png",
+    featured: false,
+    status: "completed",
+    problem:
+      "Hundreds of stale CRM contacts — bounced emails, job changes, unsubscribes — represented lost relationships that nobody had time or motivation to manually review and recover.",
+    solution:
+      "Built a gamified review pipeline: staleness scoring → Apollo.io enrichment → GPT-4 lead scoring → card-based UI with XP, streaks, achievements, and keyboard shortcuts for fast human review.",
+    impact:
+      "Recovered hundreds of stale contacts with updated LinkedIn profiles and emails. Gamification drove sustained engagement — reviewers voluntarily extended sessions to reach the next level.",
+  },
 
   // ── Cybersecurity ────────────────────────────────────
   {
@@ -480,7 +514,7 @@ using Optuna Bayesian optimization, improving clustering quality by 40% through 
       "Pandas",
       "scikit-learn",
     ],
-    image: "/images/projects/placeholder-gov.svg",
+    image: "/images/projects/optuna-classification.png",
     agency: "NSF",
     featured: false,
     status: "completed",
@@ -513,7 +547,7 @@ silhouette analysis, and TF-IDF topic labeling. Built in Streamlit with Altair c
       "SQLAlchemy",
       "Pandas",
     ],
-    image: "/images/projects/placeholder-gov.svg",
+    image: "/images/projects/Panel-wized.png",
     agency: "NSF",
     featured: true,
     status: "completed",
@@ -542,7 +576,7 @@ generated documents to internal systems where no API existed.
       "Template Engine",
       "Data Pipelines",
     ],
-    image: "/images/projects/placeholder-gov.svg",
+    image: "/images/projects/robo-ra.png",
     agency: "NSF",
     featured: false,
     status: "completed",
@@ -566,7 +600,7 @@ repeatable, and produces audit-ready results.
 **Role:** Solutions Architect / Developer (via IBM)`,
     category: ["Government"],
     technologies: ["Python", "SQL", "Data Pipelines", "Compliance Rules Engine"],
-    image: "/images/projects/placeholder-gov.svg",
+    image: "/images/projects/adcc.png",
     agency: "NSF",
     featured: false,
     status: "completed",
@@ -590,7 +624,7 @@ all with privacy-first design that collects behavioral patterns without identify
 **Role:** Analytics Lead (via IBM)`,
     category: ["Government"],
     technologies: ["Python", "Dashboards", "Telemetry", "Analytics"],
-    image: "/images/projects/placeholder-gov.svg",
+    image: "/images/projects/telemetry.png",
     agency: "NSF",
     featured: false,
     status: "completed",
@@ -614,7 +648,7 @@ funding sources for strategic portfolio intelligence.
 **Role:** Analytics Lead (via IBM)`,
     category: ["Government"],
     technologies: ["BigQuery", "Tableau", "SQL", "Python", "Public Data APIs"],
-    image: "/images/projects/placeholder-gov.svg",
+    image: "/images/projects/researchher-lineage.png",
     agency: "NSF",
     featured: false,
     status: "completed",

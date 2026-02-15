@@ -60,8 +60,8 @@ Vercel will show import settings:
 |------|-------|-----------------|
 | `OPENAI_API_KEY` | `sk-proj-...` | https://platform.openai.com/api-keys |
 | `ANTHROPIC_API_KEY` | `sk-ant-...` | https://console.anthropic.com/settings/keys |
-| `CONTACT_EMAIL` | `your-email@example.com` | Your real email |
-| `NEXT_PUBLIC_SITE_URL` | `https://nick-wiley-portfolio.vercel.app` | Leave as Vercel URL for now |
+| `CONTACT_EMAIL` | `wileni01@gmail.com` | Your real email |
+| `NEXT_PUBLIC_SITE_URL` | `https://www.nickwiley.ai` | Your production domain |
 
 > **Don't have API keys yet?** You can deploy without them — the chat page will show a configuration message, but all other pages work fine.
 
@@ -91,15 +91,13 @@ Vercel will give you a URL like: `https://nick-wiley-portfolio-abc123.vercel.app
 
 ## Step 4: Custom Domain (Optional, 15 minutes)
 
-### Buy a Domain
-- **Namecheap:** https://www.namecheap.com — $10-15/year for `.dev`
-- **Cloudflare:** https://www.cloudflare.com/products/registrar — $9-12/year
-- **Recommendations:** `nickwiley.dev`, `nickwiley.com`, `nickwiley.io`
+### Your Domain
+- **Domain:** `nickwiley.ai` (already purchased)
 
 ### Add to Vercel
 1. Vercel Dashboard → Your Project → **Settings** → **Domains**
 2. Click **"Add"**
-3. Enter your domain: `nickwiley.dev`
+3. Enter your domain: `www.nickwiley.ai` and `nickwiley.ai`
 4. Vercel shows DNS records to add:
    ```
    Type: A
@@ -118,7 +116,7 @@ Vercel will give you a URL like: `https://nick-wiley-portfolio-abc123.vercel.app
 ### Update Environment Variable
 After domain is live:
 1. Vercel → Settings → Environment Variables
-2. Edit `NEXT_PUBLIC_SITE_URL` → `https://nickwiley.dev`
+2. Edit `NEXT_PUBLIC_SITE_URL` → `https://www.nickwiley.ai`
 3. Redeploy (or push a new commit)
 
 ---
@@ -134,7 +132,7 @@ Once live, share it:
    Built with Next.js 15, featuring a RAG-powered chatbot trained on my 
    professional experience — ask it anything about my work.
 
-   Check it out: [your-domain.com]
+   Check it out: www.nickwiley.ai
 
    #AI #FullStack #WebDev #OpenAI #NextJS
    ```
