@@ -7,6 +7,7 @@ import { getCaseStudyBySlug, getCaseStudySlugs } from "@/lib/mdx";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CaseStudyDetailClient } from "@/components/work/case-study-detail-client";
+import { PressMentions } from "@/components/work/press-mentions";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -74,6 +75,9 @@ export default async function CaseStudyPage({ params }: Props) {
             ))}
           </div>
         </header>
+
+        {/* Press & Mentions — VisiTime / InSite Gettysburg only */}
+        {slug === "visitime-ar" && <PressMentions />}
 
         {/* Hero image */}
         {study.image && !study.image.includes("placeholder") && (

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,14 +17,27 @@ export default function AboutPage() {
       <div className="mx-auto max-w-3xl">
         <h1 className="text-4xl font-bold tracking-tight mb-8">About</h1>
 
-        <div className="prose max-w-none space-y-6">
-          <p className="text-lg text-muted-foreground leading-relaxed">
+        {/* Profile photo + intro */}
+        <div className="flex items-start gap-6 mb-8">
+          <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-full border-2 border-border shadow-sm">
+            <Image
+              src="/images/professional_headshot.jpg"
+              alt="Nick Wiley"
+              fill
+              sizes="112px"
+              className="object-cover"
+              priority
+            />
+          </div>
+          <p className="text-lg text-muted-foreground leading-relaxed pt-2">
             I&apos;m Nick Wiley — a Managing Consultant at IBM Global Business
             Services, where I build analytics and ML solutions for federal
             civilian agencies. I also lead digital strategy for the Lincoln
             Leadership Institute at Gettysburg. Based in Alexandria, VA.
           </p>
+        </div>
 
+        <div className="prose max-w-none space-y-6">
           <p>
             My work sits at the intersection of applied data science, product
             thinking, and governance. I build tools that help experts make
@@ -71,6 +85,17 @@ export default function AboutPage() {
             and automated the creation of marketing materials.
           </p>
 
+          {/* Gettysburg Battlefield image */}
+          <div className="relative aspect-[2/1] w-full overflow-hidden rounded-xl border border-border bg-muted shadow-sm not-prose">
+            <Image
+              src="/images/gettysburg_battlefield.jpg"
+              alt="Gettysburg Battlefield"
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
+            />
+          </div>
+
           <p>
             Before consulting, I founded{" "}
             <strong>VisiTime</strong>, an augmented reality startup that turned
@@ -95,6 +120,17 @@ export default function AboutPage() {
             mission-critical stakes — shaped my conviction that analytics is
             only as valuable as the decisions it informs.
           </p>
+
+          {/* U.S. Capitol image */}
+          <div className="relative aspect-[2/1] w-full overflow-hidden rounded-xl border border-border bg-muted shadow-sm not-prose">
+            <Image
+              src="/images/capitol.jpeg"
+              alt="U.S. Capitol Building"
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
+            />
+          </div>
 
           <h2>Education</h2>
 

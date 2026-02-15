@@ -44,9 +44,21 @@ export default function HomePage() {
       {/* ── Hero Section ────────────────────────────────── */}
       <section
         id="hero-section"
-        className="relative min-h-[80vh] flex items-center grid-bg"
+        className="relative min-h-[80vh] flex items-center overflow-hidden"
       >
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 w-full py-20 sm:py-28">
+        {/* Hero background image */}
+        <Image
+          src="/images/data_meeting2.jpg"
+          alt="Professional presenting data to colleagues"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+        {/* Overlay for text readability */}
+        <div className="absolute inset-0 bg-background/85 dark:bg-background/90" />
+
+        <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 w-full py-20 sm:py-28">
           <div className="max-w-3xl space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] leading-[1.15]">
