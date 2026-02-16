@@ -28,7 +28,7 @@ builderSummary: "Full pipeline: HubSpot staleness scoring, Apollo.io enrichment,
 
 ## The problem
 
-The Lincoln Leadership Institute's HubSpot CRM had accumulated years of contacts — from event registrations, email campaigns, manual entry, and partner imports. Over time, a significant portion had gone stale: bounced emails, unsubscribed contacts, people who changed jobs or companies. These weren't bad leads. They were lost leads. Many had attended flagship programs, held senior titles, and represented exactly the kind of relationship worth recovering.
+The Lincoln Leadership Institute's HubSpot CRM had accumulated years of contacts, from event registrations, email campaigns, manual entry, and partner imports. Over time, a significant portion had gone stale: bounced emails, unsubscribed contacts, people who changed jobs or companies. These weren't bad leads. They were lost leads. Many had attended flagship programs, held senior titles, and represented exactly the kind of relationship worth recovering.
 
 But recovering stale contacts is tedious. Someone has to look at each one, compare old data against current information, decide whether the enriched data looks right, and approve the update. Without a tool that makes this process fast and even enjoyable, it doesn't get done.
 
@@ -42,7 +42,7 @@ The pipeline starts by calculating a staleness score for every contact in HubSpo
 
 ### Apollo.io enrichment
 
-Each stale contact is matched against Apollo.io's People Match API. Match confidence comes from multiple signals: name similarity via Levenshtein distance (40 points), company match (25), LinkedIn URL found (15), email domain match (10), and new email found (5). A minimum 50% confidence threshold filters out unreliable matches. What comes back is current LinkedIn profiles, updated email addresses, new job titles, and company changes — the data needed to reconnect with a lost contact.
+Each stale contact is matched against Apollo.io's People Match API. Match confidence comes from multiple signals: name similarity via Levenshtein distance (40 points), company match (25), LinkedIn URL found (15), email domain match (10), and new email found (5). A minimum 50% confidence threshold filters out unreliable matches. What comes back is current LinkedIn profiles, updated email addresses, new job titles, and company changes, the data needed to reconnect with a lost contact.
 
 ### Lead scoring
 
@@ -58,7 +58,7 @@ What makes it work is speed and feedback. Keyboard shortcuts (A = Approve, R = R
 
 The pipeline flows from HubSpot contact data through staleness scoring, Apollo.io enrichment, lead scoring (rule-based + optional GPT-4), into a review queue (SQLite or Turso), through the Scott Search web UI for human review, and back to HubSpot for approved contacts only.
 
-I chose **Flask** for the web UI — lightweight enough for a focused tool, with Jinja2 templates for server-rendered pages. **SQLite** handles local development and **Turso/libSQL** handles cloud deployment, both serverless-compatible with no native dependencies. The frontend is **vanilla JavaScript** — no framework overhead for what's essentially a single-screen review tool, with Web Audio API for sounds and Canvas API for confetti. Deployed on **Vercel** via a serverless adapter.
+I chose **Flask** for the web UI, lightweight enough for a focused tool, with Jinja2 templates for server-rendered pages. **SQLite** handles local development and **Turso/libSQL** handles cloud deployment, both serverless-compatible with no native dependencies. The frontend is **vanilla JavaScript**, with no framework overhead for what's essentially a single-screen review tool, and uses Web Audio API for sounds and Canvas API for confetti. Deployed on **Vercel** via a serverless adapter.
 
 Approved contacts sync back to HubSpot with custom properties tracking approval timestamps, LinkedIn invite status, and old email addresses preserved before updating.
 
@@ -70,6 +70,6 @@ The dark-themed UI reduces eye strain during long sessions. Keyboard shortcuts m
 
 ## What happened
 
-Recovered hundreds of stale contacts with updated LinkedIn profiles and email addresses. The gamification worked — reviewers voluntarily extended sessions to hit the next level or maintain their streak, which is exactly the behavior the tool was designed to produce.
+Recovered hundreds of stale contacts with updated LinkedIn profiles and email addresses. The gamification worked. Reviewers voluntarily extended sessions to hit the next level or maintain their streak, which is exactly the behavior the tool was designed to produce.
 
 Every CRM update was intentionally approved by a human, which prevented the data quality problems you get from bulk automation. And the tool created a repeatable process for periodic contact hygiene, not just a one-time cleanup.

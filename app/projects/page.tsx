@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Side projects and prototypes — RAG pipelines, embedding notebooks, governance toolkits, and grad school ML experiments.",
+    "Side projects and prototypes: RAG pipelines, embedding notebooks, governance toolkits, and grad school ML experiments.",
 };
 
 const projects = [
@@ -26,14 +26,14 @@ const projects = [
   {
     title: "Tableau governance checklist",
     description:
-      "A starter kit for teams adopting Tableau in regulated settings — naming conventions, data source management, accessibility standards, refresh monitoring, publishing workflows. I put this together after seeing the same governance gaps on multiple engagements.",
+      "A starter kit for teams adopting Tableau in regulated settings: naming conventions, data source management, accessibility standards, refresh monitoring, publishing workflows. I put this together after seeing the same governance gaps on multiple engagements.",
     stack: ["Tableau", "Documentation", "Governance"],
     availability: "Available on request",
   },
   {
     title: "Stack Overflow code language classifier",
     description:
-      "Grad school project. I scraped Stack Overflow posts, extracted code snippets, and trained a Keras deep learning model to identify the programming language. Mostly an exercise in NLP applied to source code — the preprocessing ended up being harder than the model.",
+      "Grad school project. I scraped Stack Overflow posts, extracted code snippets, and trained a Keras deep learning model to identify the programming language. Mostly an exercise in NLP applied to source code. The preprocessing ended up being harder than the model.",
     stack: ["Python", "Keras", "SQL", "NLP", "Deep Learning"],
     availability: "Academic project (2017)",
   },

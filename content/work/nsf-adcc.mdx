@@ -16,17 +16,17 @@ tags:
   - Governance
 featured: false
 image: "/images/projects/adcc.png"
-executiveSummary: "Replaced manual compliance auditing with a tool that runs 28 automated checks against live data — repeatable, documented, and accessible to staff without writing SQL."
+executiveSummary: "Replaced manual compliance auditing with a tool that runs 28 automated checks against live data: repeatable, documented, and accessible to staff without writing SQL."
 builderSummary: "Modular rules engine with live data connections. 28 checks covering completeness, timeliness, consistency, and business rules. Staff-facing UI with drill-down and export."
 ---
 
 ## The situation
 
-Operational data across the program had to meet specific compliance requirements, but the checking process was manual and ad-hoc. Staff would run queries, compare results to standards, and report findings — inconsistently, slowly, and rarely comprehensively. With no systematic approach, compliance gaps went undetected until they surfaced in audits or operational failures.
+Operational data across the program had to meet specific compliance requirements, but the checking process was manual and ad-hoc. Staff would run queries, compare results to standards, and report findings inconsistently, slowly, and rarely comprehensively. With no systematic approach, compliance gaps went undetected until they surfaced in audits or operational failures.
 
 ## What I built
 
-**ADCC** (Automated Data Compliance Checker) connects to live data and runs **28 distinct compliance checks** on the status of operational data. Each check is clearly defined — what it tests, what constitutes a pass or fail, and what the remediation path looks like. Checks run against live data with no manual query writing, produce consistent results every time, and log results for the audit trail. The checks span completeness, timeliness, consistency, referential integrity, and business rule adherence.
+**ADCC** (Automated Data Compliance Checker) connects to live data and runs **28 distinct compliance checks** on the status of operational data. Each check is clearly defined: what it tests, what constitutes a pass or fail, and what the remediation path looks like. Checks run against live data with no manual query writing, produce consistent results every time, and log results for the audit trail. The checks span completeness, timeliness, consistency, referential integrity, and business rule adherence.
 
 Rather than building a monolithic compliance report, I designed ADCC as a **modular rules engine**. Each check is independently defined and can be run individually or as a full suite, configured with different thresholds for different data domains, and extended with new checks as requirements evolve. Staff can select which checks to run, see clear pass/fail results, drill into the specific records that triggered failures, and export findings for remediation tracking.
 

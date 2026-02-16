@@ -35,7 +35,7 @@ export function PersonalizedHero() {
             <span className="font-medium text-foreground">
               {persona.name}
             </span>{" "}
-            — {persona.role}
+            , {persona.role}
           </p>
         </div>
       </div>

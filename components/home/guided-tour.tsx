@@ -15,7 +15,7 @@ const tourSteps: TourStep[] = [
     targetId: "hero-section",
     title: "The short version",
     description:
-      "I build AI and analytics tools for federal agencies — designed so the people accountable for outcomes stay in control.",
+      "I build AI and analytics tools for federal agencies, designed so the people accountable for outcomes stay in control.",
   },
   {
     targetId: "what-i-do",

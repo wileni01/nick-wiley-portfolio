@@ -31,13 +31,13 @@ builderSummary: "Sentence transformer embeddings + K-Means in a Streamlit UI. Dr
 
 ## Context
 
-Federal research agencies review thousands of proposals each cycle. Grouping those proposals into review panels is labor-intensive and high-stakes — wrong groupings mean reviewers without the right expertise, slower decisions, and fairness concerns.
+Federal research agencies review thousands of proposals each cycle. Grouping those proposals into review panels is labor-intensive and high-stakes. Wrong groupings mean reviewers without the right expertise, slower decisions, and fairness concerns.
 
 Staff had been doing this manually across **8 different screens and systems**, relying on institutional knowledge and spreadsheets. As volumes grew, the process didn't scale. New staff couldn't replicate the reasoning of experienced colleagues.
 
 ## Constraints
 
-The work came with real constraints. Proposal abstracts and metadata are pre-decisional and must be handled under strict access controls. Any automated grouping must be explainable and auditable — staff, not models, own the final decisions. The solution needed to work alongside existing systems without deep infrastructure changes. And this had to be a human-in-the-loop tool that surfaces suggestions, never makes assignments autonomously.
+The work came with real constraints. Proposal abstracts and metadata are pre-decisional and must be handled under strict access controls. Any automated grouping must be explainable and auditable. Staff, not models, own the final decisions. The solution needed to work alongside existing systems without deep infrastructure changes. And this had to be a human-in-the-loop tool that surfaces suggestions, never makes assignments autonomously.
 
 ## How the ML works
 
@@ -47,7 +47,7 @@ The core clustering uses **K-Means** to group proposals into review panels based
 
 ## Consolidating 8 screens into 1
 
-Before this tool, staff navigated across 8 different screens to track proposal ratings, compare rankings, and manage assignments. The Panel Wizard **reduced that to a single screen** that pulls data from multiple systems and updates them simultaneously. That alone — independent of the ML — was a meaningful improvement.
+Before this tool, staff navigated across 8 different screens to track proposal ratings, compare rankings, and manage assignments. The Panel Wizard **reduced that to a single screen** that pulls data from multiple systems and updates them simultaneously. That alone, independent of the ML, was a meaningful improvement.
 
 ## The review interface
 
@@ -57,18 +57,18 @@ The full Python stack behind the tool includes sentence-transformers for embeddi
 
 ## Monitoring
 
-Telemetry dashboards tracked adoption patterns, override rates, and cluster quality metrics. That data informed iterative improvements and helped leadership understand how staff were actually using the tool — not just whether they were opening it.
+Telemetry dashboards tracked adoption patterns, override rates, and cluster quality metrics. That data informed iterative improvements and helped leadership understand how staff were actually using the tool, not just whether they were opening it.
 
 ## What shipped
 
-A working application that lets program staff review ML-generated panel groupings, understand the rationale, and override as needed — all from a single unified screen. Dashboards providing operational visibility into clustering quality and staff interaction patterns. Documentation and training materials for onboarding new team members. And a reduction in panel formation time **from weeks to hours** while improving topic coherence and reviewer-proposal matching.
+A working application that lets program staff review ML-generated panel groupings, understand the rationale, and override as needed, all from a single unified screen. Dashboards providing operational visibility into clustering quality and staff interaction patterns. Documentation and training materials for onboarding new team members. And a reduction in panel formation time **from weeks to hours** while improving topic coherence and reviewer-proposal matching.
 
-*What I can share is limited by the sensitivity of the work. The above describes the approach and design — specific data, metrics, and internal details are not included.*
+*What I can share is limited by the sensitivity of the work. The above describes the approach and design. Specific data, metrics, and internal details are not included.*
 
 ## What I learned
 
 The most important design work was understanding how program officers actually think about panel composition. The ML was a means to that end, not the other way around.
 
-High override rates early on weren't failure — they helped me calibrate the clustering. The goal was never zero overrides. It was informed overrides. There's no single accuracy metric for "good panels." Quality is contextual, and that requires ongoing conversation with the people who use the tool.
+High override rates early on weren't failure. They helped me calibrate the clustering. The goal was never zero overrides. It was informed overrides. There's no single accuracy metric for "good panels." Quality is contextual, and that requires ongoing conversation with the people who use the tool.
 
 If I were starting fresh, I'd invest earlier in A/B-style evaluation comparing manual vs. assisted groupings on downstream review outcomes.

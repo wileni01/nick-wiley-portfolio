@@ -35,15 +35,15 @@ I needed to build a system that could discover the natural thematic structure in
 
 ## How I approached it
 
-The classification system uses **BERTopic**, a modular topic modeling framework that chains together three techniques. Transformer-based embeddings (Sentence Transformers) convert proposal abstracts into dense 768-dimensional vectors that capture semantic meaning far beyond keyword matching. UMAP reduces those high-dimensional embeddings into a space where clustering is computationally tractable while preserving local and global structure. And HDBSCAN discovers natural groupings without requiring you to pre-specify the number of topics — which matters when the thematic landscape of a proposal corpus isn't known in advance.
+The classification system uses **BERTopic**, a modular topic modeling framework that chains together three techniques. Transformer-based embeddings (Sentence Transformers) convert proposal abstracts into dense 768-dimensional vectors that capture semantic meaning far beyond keyword matching. UMAP reduces those high-dimensional embeddings into a space where clustering is computationally tractable while preserving local and global structure. And HDBSCAN discovers natural groupings without requiring you to pre-specify the number of topics, which matters when the thematic landscape of a proposal corpus isn't known in advance.
 
 The result is interpretable topic clusters with associated keywords, representative documents, and confidence scores.
 
 ## Tuning with Bayesian optimization
 
-Topic modeling involves dozens of interconnected parameters — UMAP neighbors, minimum distances, HDBSCAN cluster sizes, embedding model selection — and the interactions between them are non-obvious. Manual tuning would have taken weeks.
+Topic modeling involves dozens of interconnected parameters (UMAP neighbors, minimum distances, HDBSCAN cluster sizes, embedding model selection) and the interactions between them are non-obvious. Manual tuning would have taken weeks.
 
-I used **Optuna** to run Bayesian optimization across **100+ trials**, optimizing for topic coherence (are the themes internally consistent?), coverage (what percentage of proposals get meaningful assignments?), and granularity (are topics specific enough for panel formation?). That automated search **improved clustering quality by 40%** over baseline parameters — a gain I'm confident I wouldn't have found through manual iteration.
+I used **Optuna** to run Bayesian optimization across **100+ trials**, optimizing for topic coherence (are the themes internally consistent?), coverage (what percentage of proposals get meaningful assignments?), and granularity (are topics specific enough for panel formation?). That automated search **improved clustering quality by 40%** over baseline parameters, a gain I'm confident I wouldn't have found through manual iteration.
 
 ## What the model found
 

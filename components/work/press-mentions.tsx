@@ -126,7 +126,7 @@ export function PressMentions() {
                         >
                           {mention.description || mention.name}
                           <span className="text-muted-foreground/50 ml-1.5 no-underline">
-                            — {mention.name}
+                            · {mention.name}
                           </span>
                         </a>
                       </li>

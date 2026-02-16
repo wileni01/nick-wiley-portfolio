@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   ),
   title: {
     default:
-      "Nick Wiley — Analytics, ML, and Decision-Support Tools for Federal Agencies",
+      "Nick Wiley | Analytics, ML, and Decision-Support Tools for Federal Agencies",
     template: "%s | Nick Wiley",
   },
   description:
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "Nick Wiley",
     title:
-      "Nick Wiley — Analytics, ML, and Decision-Support Tools for Federal Agencies",
+      "Nick Wiley | Analytics, ML, and Decision-Support Tools for Federal Agencies",
     description:
       "I build analytics, ML, and decision-support tools for federal civilian agencies. 12+ years of hands-on delivery at NSF, USDA, USPS, and Census.",
     images: [
@@ -68,13 +68,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Nick Wiley — analytics and ML for federal agencies",
+        alt: "Nick Wiley, analytics and ML for federal agencies",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nick Wiley — Analytics, ML, and Decision-Support Tools",
+    title: "Nick Wiley | Analytics, ML, and Decision-Support Tools",
     description:
       "I build analytics, ML, and decision-support tools for federal civilian agencies.",
     images: ["/og-image.png"],

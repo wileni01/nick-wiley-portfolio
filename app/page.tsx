@@ -71,7 +71,7 @@ export default function HomePage() {
 
               <p className="max-w-2xl text-lg text-muted-foreground leading-relaxed sm:text-xl">
                 Decision-support apps, analytics platforms, and ML
-                workflows for federal agencies — designed so the people
+                workflows for federal agencies, designed so the people
                 accountable for outcomes{" "}
                 <strong className="text-foreground font-medium">
                   can see, override, and explain every recommendation
@@ -218,7 +218,7 @@ export default function HomePage() {
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
               I start with the decision someone needs to make and work
-              backwards from there — what data do they need, what does the
+              backwards from there. What data do they need? What does the
               workflow look like, and who is accountable for the outcome.
             </p>
             <p>
@@ -241,11 +241,11 @@ export default function HomePage() {
         <div className="mx-auto max-w-3xl text-center space-y-6">
           <Quote className="h-8 w-8 text-primary mx-auto" />
           <blockquote className="text-xl font-medium leading-relaxed italic">
-            &ldquo;Professional and collaborative — uniquely suited for DAO
+            &ldquo;Professional and collaborative, uniquely suited for DAO
             work.&rdquo;
           </blockquote>
           <cite className="block text-sm text-muted-foreground not-italic">
-            — Data Analytics Officer, NSF Engineering Directorate
+            Data Analytics Officer, NSF Engineering Directorate
           </cite>
         </div>
       </section>

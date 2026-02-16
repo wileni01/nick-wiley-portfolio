@@ -99,7 +99,7 @@ export function AdaptiveSelector() {
                     >
                       <span className="font-medium">{p.name}</span>
                       <span className="text-muted-foreground ml-1">
-                        — {p.role}
+                        , {p.role}
                       </span>
                     </button>
                   ))}

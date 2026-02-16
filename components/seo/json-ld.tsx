@@ -7,7 +7,7 @@ export function PersonJsonLd() {
     name: "Nicholas A. Wiley",
     alternateName: "Nick Wiley",
     url: baseUrl,
-    jobTitle: "Managing Consultant — Analytics and ML",
+    jobTitle: "Managing Consultant, Analytics and ML",
     description:
       "Managing Consultant and applied data scientist with 12+ years building analytics, ML, and decision-support tools for federal civilian agencies. Founded an AR startup. Holds two U.S. utility patents.",
     address: {

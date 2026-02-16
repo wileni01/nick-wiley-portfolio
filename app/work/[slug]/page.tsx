@@ -76,7 +76,7 @@ export default async function CaseStudyPage({ params }: Props) {
           </div>
         </header>
 
-        {/* Press & Mentions — VisiTime / InSite Gettysburg only */}
+        {/* Press & Mentions, VisiTime / InSite Gettysburg only */}
         {slug === "visitime-ar" && <PressMentions />}
 
         {/* Hero image */}

@@ -46,7 +46,7 @@ export function RelevanceBanner() {
           <span className="font-medium text-foreground">
             {adaptive.company?.name}
           </span>
-          {" — "}
+          {" · "}
           {topCount} most relevant projects highlighted
         </span>
       </div>

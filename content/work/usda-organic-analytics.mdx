@@ -30,7 +30,7 @@ builderSummary: "AWS-hosted warehouse integrating Salesforce, CBP customs, and i
 
 ## Context
 
-The USDA's organic program oversees more than **50,000 certified operations** across the country. Leadership needed reliable reporting for operational decisions, congressional inquiries, and public transparency — but existing reporting was fragmented across multiple systems and manual processes.
+The USDA's organic program oversees more than **50,000 certified operations** across the country. Leadership needed reliable reporting for operational decisions, congressional inquiries, and public transparency, but existing reporting was fragmented across multiple systems and manual processes.
 
 The audience ranged from analysts running daily reports to senior leaders preparing briefings. The platform needed to serve both without requiring either to write their own queries.
 
@@ -38,13 +38,13 @@ The audience ranged from analysts running daily reports to senior leaders prepar
 
 The analytics platform is a **global data warehouse on AWS** that consolidates data from multiple previously siloed systems into a single governed source of truth. The warehouse holds **5+ billion records**, with ETL pipelines processing **millions of records daily**.
 
-What made it unique was the breadth of systems it brought together. **Salesforce** provided operational CRM data — certifier interactions, compliance workflows, program communications. The **integrity database** held the program's core investigative and enforcement records. **CBP customs import records** allowed cross-referencing organic import claims with U.S. Customs and Border Protection data, identifying discrepancies between what was claimed as organic and what actually crossed the border. And **investigative software** connected enforcement case data with operational records for end-to-end compliance visibility.
+What made it unique was the breadth of systems it brought together. **Salesforce** provided operational CRM data: certifier interactions, compliance workflows, program communications. The **integrity database** held the program's core investigative and enforcement records. **CBP customs import records** allowed cross-referencing organic import claims with U.S. Customs and Border Protection data, identifying discrepancies between what was claimed as organic and what actually crossed the border. And **investigative software** connected enforcement case data with operational records for end-to-end compliance visibility.
 
 Key design decisions included incremental ETL to keep processing times manageable at scale, slowly changing dimensions to preserve historical context for trend analysis, clear data lineage so analysts could trace any number back to its source system, and cross-system entity resolution to match records across Salesforce, CBP, and internal databases.
 
 ## NLP for import taxonomy
 
-I built a **natural language processing classifier using scikit-learn** to automatically categorize organic import records into the program's taxonomy. Import descriptions arrive in inconsistent free-text formats — different languages, abbreviations, trade terminology. The NLP pipeline standardized this unstructured text into official product categories, making it possible to report accurately on import volumes by product type and origin country.
+I built a **natural language processing classifier using scikit-learn** to automatically categorize organic import records into the program's taxonomy. Import descriptions arrive in inconsistent free-text formats: different languages, abbreviations, trade terminology. The NLP pipeline standardized this unstructured text into official product categories, making it possible to report accurately on import volumes by product type and origin country.
 
 Not flashy work, but essential for making the warehouse's import data analytically useful at scale.
 
@@ -60,7 +60,7 @@ On the governance side, I defined data dictionaries and metric definitions so st
 
 ## Getting people to use it
 
-Building reports is the straightforward part. Getting people to actually use them — and trust them — is harder.
+Building reports is the straightforward part. Getting people to actually use them, and trust them, is harder.
 
 I ran training sessions for different skill levels, held office hours for analysts hitting edge cases, and sent clear communications so people understood what changed and why. We gradually retired legacy reports to reduce confusion. None of this is glamorous work, but it's where adoption lives or dies.
 

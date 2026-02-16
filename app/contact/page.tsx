@@ -81,7 +81,7 @@ export default function ContactPage() {
           <p className="text-lg text-muted-foreground">
             If you have a project in mind, a question about something
             I&apos;ve built, or just want to compare notes on analytics
-            and AI — I&apos;d welcome the conversation.
+            and AI, I&apos;d welcome the conversation.
           </p>
         </div>
 
@@ -242,7 +242,7 @@ export default function ContactPage() {
                   <div>
                     <div className="text-sm font-medium">Email</div>
                     <div className="text-xs text-muted-foreground">
-                      Use the form — I&apos;ll reply directly
+                      Use the form. I&apos;ll reply directly
                     </div>
                   </div>
                 </div>

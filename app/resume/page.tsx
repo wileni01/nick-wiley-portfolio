@@ -7,7 +7,7 @@ import { SkillsHighlight } from "@/components/adaptive/skills-highlight";
 export const metadata: Metadata = {
   title: "Resume",
   description:
-    "Nicholas A. Wiley — Managing Consultant at IBM. 12+ years building analytics, ML, and decision-support tools for federal civilian agencies.",
+    "Nicholas A. Wiley, Managing Consultant at IBM. 12+ years building analytics, ML, and decision-support tools for federal civilian agencies.",
 };
 
 export default function ResumePage() {
@@ -121,7 +121,7 @@ export default function ResumePage() {
               <div>
                 <div className="flex items-baseline justify-between gap-4">
                   <h4 className="font-semibold text-sm print:text-xs">
-                    IBM — Global Business Services (AI &amp; Analytics)
+                    IBM, Global Business Services (AI &amp; Analytics)
                   </h4>
                   <span className="text-xs text-muted-foreground shrink-0">
                     2019–Present
@@ -271,7 +271,7 @@ export default function ResumePage() {
               <div>
                 <div className="flex items-baseline justify-between gap-4">
                   <h4 className="font-semibold text-sm print:text-xs">
-                    U.S. Government — Recovery Accountability and Transparency
+                    U.S. Government, Recovery Accountability and Transparency
                     Board
                   </h4>
                   <span className="text-xs text-muted-foreground shrink-0">
@@ -305,7 +305,7 @@ export default function ResumePage() {
                   <strong className="font-medium">
                     University of Maryland
                   </strong>{" "}
-                  — MBA (Consulting &amp; Management), MS (Information Systems)
+                  , MBA (Consulting &amp; Management), MS (Information Systems)
                 </div>
                 <span className="text-xs text-muted-foreground shrink-0">
                   2019
@@ -314,7 +314,7 @@ export default function ResumePage() {
               <div className="flex items-baseline justify-between gap-4">
                 <div>
                   <strong className="font-medium">Gettysburg College</strong>{" "}
-                  — BA Environmental Studies
+                  , BA Environmental Studies
                 </div>
                 <span className="text-xs text-muted-foreground shrink-0">
                   2010
@@ -322,7 +322,7 @@ export default function ResumePage() {
               </div>
               <div className="flex items-baseline justify-between gap-4">
                 <div>
-                  <strong className="font-medium">Penn State</strong> —
+                  <strong className="font-medium">Penn State</strong>,{" "}
                   Project Management Certificate; GIS Certificate
                 </div>
                 <span className="text-xs text-muted-foreground shrink-0">
@@ -341,7 +341,7 @@ export default function ResumePage() {
               <li>SAFe Scrum Master (2022)</li>
               <li>Tableau Certified Associate (2022)</li>
               <li>
-                MIT Professional Education — Applied Data Science: Leveraging
+                MIT Professional Education, Applied Data Science: Leveraging
                 AI for Effective Decision-Making (2024)
               </li>
             </ul>

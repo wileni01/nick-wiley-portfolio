@@ -8,7 +8,7 @@ import { SkillsHighlight } from "@/components/adaptive/skills-highlight";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Nick Wiley — managing consultant and applied data scientist based in Alexandria, VA. 12+ years building analytics and ML solutions for federal agencies, with a startup and two patents along the way.",
+    "Nick Wiley, managing consultant and applied data scientist based in Alexandria, VA. 12+ years building analytics and ML solutions for federal agencies, with a startup and two patents along the way.",
 };
 
 export default function AboutPage() {
@@ -30,7 +30,7 @@ export default function AboutPage() {
             />
           </div>
           <p className="text-lg text-muted-foreground leading-relaxed pt-2">
-            I&apos;m Nick — a Managing Consultant at IBM, where I build
+            I&apos;m Nick, a Managing Consultant at IBM, where I build
             analytics and ML tools for federal civilian agencies like NSF,
             USDA, and USPS. I also run digital strategy for the Lincoln
             Leadership Institute at Gettysburg. Based in Alexandria, VA.
@@ -41,7 +41,7 @@ export default function AboutPage() {
           <p>
             Most of my work comes down to one question: what decision is
             someone trying to make, and what do they need to make it well?
-            I build tools that answer that — NLP-powered clustering workflows,
+            I build tools that answer that: NLP-powered clustering workflows,
             AI-assisted decision-support apps, global data warehouses, and
             the training and governance work that makes those tools stick.
           </p>
@@ -54,9 +54,9 @@ export default function AboutPage() {
             BERTopic-powered proposal classification system (7,000+ proposals,
             70+ themes) to a global data warehouse integrating Salesforce,
             CBP customs records, and investigative databases. At NSF, I built
-            the Panel Wizard — a decision-support tool that consolidated 8
+            the Panel Wizard, a decision-support tool that consolidated 8
             separate screens into 1 and cut panel formation time from weeks
-            to hours — and researcher lineage dashboards that connect public
+            to hours, and researcher lineage dashboards that connect public
             and internal funding data.
           </p>
 
@@ -64,7 +64,7 @@ export default function AboutPage() {
             On the side, I run digital strategy for the{" "}
             <strong>Lincoln Leadership Institute at Gettysburg</strong>. I
             converted their flagship in-person leadership program to a digital
-            format — finding and vetting producers, adapting content, training
+            format, finding and vetting producers, adapting content, training
             presenters, and managing enrollment. I rebuilt their website (
             <a
               href="https://www.gettysburgleadership.com"
@@ -76,7 +76,7 @@ export default function AboutPage() {
             </a>
             ) with Next.js, Stripe, and HubSpot integrations. I also
             conceptualized the &ldquo;America at 250&rdquo; program using
-            AI-powered market research — it has generated significant revenue
+            AI-powered market research. It has generated significant revenue
             since launch. I designed email campaigns that produced direct
             program registrations, mentored an intern into a full-time hire,
             and automated the creation of marketing materials.
@@ -100,7 +100,7 @@ export default function AboutPage() {
             shipped a six-hour interactive iPad tour, and personally geocoded
             every piece of historical content for location-based delivery.
             I hold two U.S. utility patents from that work. I spent a lot of
-            time presenting to Civil War historical societies — earning trust
+            time presenting to Civil War historical societies, earning trust
             for technology in a market that was not naturally interested in it.
             Running a startup taught me things consulting never could: how to
             prioritize under real constraints, when to walk away from a
@@ -140,7 +140,7 @@ export default function AboutPage() {
             State. I completed MIT&apos;s Applied Data Science program in
             2024. In grad school I built a Keras-based code language
             classifier trained on Stack Overflow data and an ML model that
-            scored Washington, DC intersections by accident risk — both
+            scored Washington, DC intersections by accident risk, both
             good exercises in moving from messy data to something actionable.
           </p>
 
@@ -150,14 +150,14 @@ export default function AboutPage() {
             I start with the decision someone needs to make and work backwards.
             What data do they need? What does the workflow look like? Who is
             accountable? Then I build a system that makes the decision faster,
-            more consistent, and auditable — with governance and usability as
+            more consistent, and auditable, with governance and usability as
             engineering requirements, not afterthoughts.
           </p>
 
           <p>
             The strongest AI systems I&apos;ve worked on don&apos;t replace
             experts. They make expert judgment easier to apply consistently.
-            Human-in-the-loop isn&apos;t a concession — it&apos;s the whole
+            Human-in-the-loop isn&apos;t a concession. It&apos;s the whole
             point.
           </p>
 
