@@ -1,5 +1,5 @@
 ---
-title: "USDA Organic Analytics: Global Data Warehouse + Tableau suite for 50,000+ operations"
+title: "USDA Organic Analytics: Global data warehouse and Tableau reporting for 50,000+ operations"
 slug: "usda-organic-analytics"
 client: "USDA (organic program)"
 timeframe: "Recent (sanitized)"
@@ -24,81 +24,48 @@ tags:
   - AWS
 featured: true
 image: "/images/farmland.jpg"
-executiveSummary: "Built a global data warehouse on AWS integrating Salesforce, an integrity database, and CBP customs records — with NLP-powered import taxonomy and dozens of Tableau reports."
-builderSummary: "AWS-hosted warehouse integrating Salesforce, CBP customs, and investigative data; built NLP taxonomy classifier with scikit-learn; created dozens of Tableau dashboards."
+executiveSummary: "Built a global data warehouse on AWS that brought together Salesforce, an integrity database, and CBP customs records. Added an NLP classifier for organic import taxonomy and dozens of Tableau reports serving 50,000+ certified operations."
+builderSummary: "AWS-hosted warehouse integrating Salesforce, CBP customs, and investigative data. scikit-learn NLP taxonomy classifier. Dozens of Tableau dashboards with Section 508 compliance."
 ---
 
-## Scope and stakeholders
+## Context
 
-The USDA's organic program oversees more than **50,000 certified organic operations** across the United States. Program leadership needed reliable, timely reporting to support operational decisions, congressional inquiries, and public transparency — but existing reporting was fragmented across multiple systems and manual processes.
+The USDA's organic program oversees more than **50,000 certified operations** across the country. Leadership needed reliable reporting for operational decisions, congressional inquiries, and public transparency — but existing reporting was fragmented across multiple systems and manual processes.
 
-Stakeholders ranged from program analysts running daily reports to senior leadership preparing briefings. The platform needed to serve both audiences without requiring each to build their own queries.
+The audience ranged from analysts running daily reports to senior leaders preparing briefings. The platform needed to serve both without requiring either to write their own queries.
 
-## Global data warehouse architecture
+## The warehouse
 
-### AWS-hosted data warehouse
+The analytics platform is a **global data warehouse on AWS** that consolidates data from multiple previously siloed systems into a single governed source of truth. The warehouse holds **5+ billion records**, with ETL pipelines processing **millions of records daily**.
 
-The analytics platform was built as a **global data warehouse on AWS**, consolidating data from multiple previously siloed systems into a single governed source of truth. The warehouse contained data described as **5+ billion records**, with ETL pipelines processing **millions of records daily**.
+What made it unique was the breadth of systems it brought together. **Salesforce** provided operational CRM data — certifier interactions, compliance workflows, program communications. The **integrity database** held the program's core investigative and enforcement records. **CBP customs import records** allowed cross-referencing organic import claims with U.S. Customs and Border Protection data, identifying discrepancies between what was claimed as organic and what actually crossed the border. And **investigative software** connected enforcement case data with operational records for end-to-end compliance visibility.
 
-What made this warehouse unique was the breadth of systems it integrated:
+Key design decisions included incremental ETL to keep processing times manageable at scale, slowly changing dimensions to preserve historical context for trend analysis, clear data lineage so analysts could trace any number back to its source system, and cross-system entity resolution to match records across Salesforce, CBP, and internal databases.
 
-- **Salesforce**: operational CRM data tracking certifier interactions, compliance workflows, and program communications
-- **Integrity Database**: the program's core investigative and enforcement records
-- **CBP customs import records**: cross-referencing organic import claims with U.S. Customs and Border Protection data to identify discrepancies between what was claimed as organic and what actually crossed the border
-- **Investigative software**: connecting enforcement case data with operational records for end-to-end compliance visibility
+## NLP for import taxonomy
 
-Key design decisions:
-- **Incremental ETL** to keep processing times manageable at scale
-- **Slowly changing dimensions** to preserve historical context for trend analysis
-- **Clear data lineage** so analysts could trace any number back to its source system
-- **Cross-system entity resolution** to match records across Salesforce, CBP, and internal databases
+I built a **natural language processing classifier using scikit-learn** to automatically categorize organic import records into the program's taxonomy. Import descriptions arrive in inconsistent free-text formats — different languages, abbreviations, trade terminology. The NLP pipeline standardized this unstructured text into official product categories, making it possible to report accurately on import volumes by product type and origin country.
 
-### NLP for organic import taxonomy
+Not flashy work, but essential for making the warehouse's import data analytically useful at scale.
 
-I built a **natural language processing classifier using scikit-learn** to automatically categorize organic import records into the program's taxonomy. Import descriptions arrive in inconsistent, free-text formats — different languages, abbreviations, and trade terminology. The NLP pipeline standardized this unstructured text into the program's official product categories, enabling accurate reporting on import volumes by product type and origin country.
+## Tableau reporting
 
-This was a practical ML application: not flashy, but essential for making the warehouse's import data analytically useful at scale.
-
-### Tableau reporting suite
-
-The reporting layer comprised **dozens of Tableau reports**, organized by program area and audience:
-- Operational dashboards for day-to-day monitoring
-- Executive summaries for leadership briefings
-- Ad-hoc exploration views for analysts
-- Public-facing reports supporting transparency requirements
-- Import analysis views connecting CBP data with certification records
+The reporting layer comprised **dozens of Tableau reports** organized by program area and audience: operational dashboards for day-to-day monitoring, executive summaries for leadership briefings, ad-hoc exploration views for analysts, public-facing reports for transparency requirements, and import analysis views connecting CBP data with certification records.
 
 ## Governance and accessibility
 
-### Section 508 compliance
+All reports were built with **Section 508 / WCAG accessibility** as a first-class requirement. That meant meaningful alt text and data table alternatives, color palettes tested for contrast compliance, keyboard-navigable interfaces, and screen-reader-compatible layouts where Tableau's platform allowed.
 
-All reports were built with **Section 508 / WCAG accessibility** as a first-class requirement — not an afterthought. This included:
-- Meaningful alt text and data table alternatives
-- Color palettes tested for contrast compliance
-- Keyboard-navigable interfaces
-- Screen-reader-compatible layouts where Tableau's platform allowed
+On the governance side, I defined data dictionaries and metric definitions so stakeholders shared a common vocabulary, established review and approval workflows for new reports, and documented known data quality issues transparently rather than hiding them.
 
-### Data governance
+## Getting people to use it
 
-- Defined data dictionaries and metric definitions so stakeholders shared a common vocabulary
-- Established review and approval workflows for new reports
-- Documented known data quality issues transparently rather than hiding them
+Building reports is the straightforward part. Getting people to actually use them — and trust them — is harder.
 
-## Operational adoption
+I ran training sessions for different skill levels, held office hours for analysts hitting edge cases, and sent clear communications so people understood what changed and why. We gradually retired legacy reports to reduce confusion. None of this is glamorous work, but it's where adoption lives or dies.
 
-Building reports is straightforward. Getting people to use them — and trust them — is harder. Adoption work included:
-- **Training sessions** tailored to different skill levels
-- **Office hours** for analysts encountering edge cases
-- **Change communications** so stakeholders understood what was new and why
-- Gradual retirement of legacy reports to reduce confusion
+## What it changed
 
-## Outcomes
-
-- **Improved visibility**: leadership gained consistent, timely access to program performance data across all integrated systems.
-- **Cross-system intelligence**: connecting Salesforce, CBP customs records, and investigative data enabled compliance insights that no single system could provide alone.
-- **Automated classification**: NLP-powered taxonomy reduced manual categorization effort for organic import records.
-- **Streamlined reporting**: consolidated dozens of ad-hoc processes into a governed, repeatable reporting suite.
-- **Auditable**: every number could be traced back to source systems and transformation logic.
-- **Reduced analyst burden**: self-service dashboards allowed analysts to answer routine questions without custom queries.
+Leadership gained consistent, timely access to program data across all integrated systems. Connecting Salesforce, CBP customs records, and investigative data produced compliance insights that no single system could have provided alone. The NLP taxonomy reduced manual categorization effort for import records. Dozens of ad-hoc reporting processes consolidated into a governed, repeatable suite. Every number traces back to source systems and transformation logic. And self-service dashboards let analysts answer routine questions without writing custom queries.
 
 *Specific performance metrics and internal details are not shared due to the sensitivity of the work.*

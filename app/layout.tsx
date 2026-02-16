@@ -28,11 +28,11 @@ export const metadata: Metadata = {
   ),
   title: {
     default:
-      "Nick Wiley | AI Solutions Architect — Human-in-the-Loop Decision Support",
+      "Nick Wiley — Analytics, ML, and Decision-Support Tools for Federal Agencies",
     template: "%s | Nick Wiley",
   },
   description:
-    "AI Solutions Architect / Applied AI & Analytics — Human-in-the-loop decision support for high-stakes public sector work.",
+    "I build analytics, ML, and decision-support tools for federal civilian agencies. 12+ years of hands-on delivery at NSF, USDA, USPS, and Census.",
   keywords: [
     "Nick Wiley",
     "AI Solutions Architect",
@@ -58,25 +58,25 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "/",
-    siteName: "Nick Wiley Portfolio",
+    siteName: "Nick Wiley",
     title:
-      "Nick Wiley | AI Solutions Architect — Human-in-the-Loop Decision Support",
+      "Nick Wiley — Analytics, ML, and Decision-Support Tools for Federal Agencies",
     description:
-      "AI Solutions Architect — human-in-the-loop decision support for high-stakes public sector work.",
+      "I build analytics, ML, and decision-support tools for federal civilian agencies. 12+ years of hands-on delivery at NSF, USDA, USPS, and Census.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Nick Wiley — AI Solutions Architect",
+        alt: "Nick Wiley — analytics and ML for federal agencies",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nick Wiley | AI Solutions Architect",
+    title: "Nick Wiley — Analytics, ML, and Decision-Support Tools",
     description:
-      "Human-in-the-loop decision support for high-stakes public sector work.",
+      "I build analytics, ML, and decision-support tools for federal civilian agencies.",
     images: ["/og-image.png"],
   },
   robots: {

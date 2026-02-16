@@ -5,7 +5,7 @@ import { WorkIndexClient } from "@/components/work/work-index-client";
 export const metadata: Metadata = {
   title: "Work",
   description:
-    "Case studies from federal analytics, ML decision-support tools, data platforms, and startup product delivery.",
+    "Case studies from analytics, ML, and decision-support work at NSF, USDA, USPS, and a startup. Each covers the problem, what I built, and what changed.",
 };
 
 export default function WorkPage() {
@@ -16,11 +16,11 @@ export default function WorkPage() {
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="space-y-4 mb-12">
-          <h1 className="text-4xl font-bold tracking-tight">Case Studies</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Work</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
-            Selected work from federal analytics, ML decision-support tooling,
-            data platforms, and startup product delivery. Toggle between
-            Executive and Builder views to see different angles.
+            Each case study covers the problem, what I built, and what
+            changed. You can toggle between Executive and Builder views
+            depending on whether you care more about impact or implementation.
           </p>
         </div>
 

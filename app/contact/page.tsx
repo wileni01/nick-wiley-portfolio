@@ -79,8 +79,9 @@ export default function ContactPage() {
         <div className="space-y-4 mb-12">
           <h1 className="text-4xl font-bold tracking-tight">Contact</h1>
           <p className="text-lg text-muted-foreground">
-            Interested in working together or have a question? I&apos;d like to
-            hear from you.
+            If you have a project in mind, a question about something
+            I&apos;ve built, or just want to compare notes on analytics
+            and AI — I&apos;d welcome the conversation.
           </p>
         </div>
 
@@ -92,7 +93,7 @@ export default function ContactPage() {
                 <CheckCircle2 className="mx-auto h-12 w-12 text-green-500" />
                 <h3 className="text-xl font-semibold">Message sent.</h3>
                 <p className="text-muted-foreground">
-                  Thank you for reaching out. I&apos;ll get back to you soon.
+                  Got it. I&apos;ll reply within a day or two.
                 </p>
                 <Button
                   variant="outline"
@@ -165,7 +166,7 @@ export default function ContactPage() {
                   <Textarea
                     id="message"
                     name="message"
-                    placeholder="Tell me about the opportunity, project, or question..."
+                    placeholder="What are you working on?"
                     rows={6}
                     required
                     maxLength={5000}
@@ -251,8 +252,8 @@ export default function ContactPage() {
             <div className="rounded-xl border border-border bg-card p-6 space-y-2">
               <p className="text-sm font-medium">Based in Alexandria, VA</p>
               <p className="text-xs text-muted-foreground">
-                Open to conversations about decision-support systems, analytics
-                platforms, and applied AI in regulated environments.
+                Open to conversations about analytics, decision-support
+                tools, or applied AI in regulated environments.
               </p>
             </div>
           </div>

@@ -7,9 +7,9 @@ export function PersonJsonLd() {
     name: "Nicholas A. Wiley",
     alternateName: "Nick Wiley",
     url: baseUrl,
-    jobTitle: "AI Solutions Architect / Managing Consultant",
+    jobTitle: "Managing Consultant — Analytics and ML",
     description:
-      "Managing Consultant and applied data scientist with 12+ years delivering analytics and ML solutions across federal civilian agencies, startups, and SaaS environments.",
+      "Managing Consultant and applied data scientist with 12+ years building analytics, ML, and decision-support tools for federal civilian agencies. Founded an AR startup. Holds two U.S. utility patents.",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Alexandria",
@@ -60,10 +60,10 @@ export function WebsiteJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Nick Wiley — Human-in-the-Loop AI Portfolio",
+    name: "Nick Wiley",
     url: baseUrl,
     description:
-      "AI Solutions Architect — human-in-the-loop decision support for high-stakes public sector work.",
+      "Analytics, ML, and decision-support tools for federal agencies. Tools people can trust and actually use.",
     author: {
       "@type": "Person",
       name: "Nicholas A. Wiley",

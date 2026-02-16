@@ -13,27 +13,27 @@ interface TourStep {
 const tourSteps: TourStep[] = [
   {
     targetId: "hero-section",
-    title: "Welcome",
+    title: "The short version",
     description:
-      "I build decision-support tools that help experts move faster without giving up accountability.",
+      "I build AI and analytics tools for federal agencies — designed so the people accountable for outcomes stay in control.",
   },
   {
     targetId: "what-i-do",
-    title: "What I do",
+    title: "What I build",
     description:
-      "Decision support apps, data platforms, and adoption work — always with governance as a first-class concern.",
+      "Decision-support apps, data platforms, and the adoption and governance work that makes those tools stick.",
   },
   {
     targetId: "selected-work",
     title: "Selected work",
     description:
-      "Case studies from federal clients and a startup — toggle between Executive and Builder views to see different angles.",
+      "Case studies from NSF, USDA, and a startup I founded. You can toggle between Executive and Builder views.",
   },
   {
     targetId: "testimonial-section",
     title: "What others say",
     description:
-      "Feedback from stakeholders I've worked with directly.",
+      "A word from someone I've worked with.",
   },
 ];
 

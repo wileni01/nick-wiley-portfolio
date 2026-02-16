@@ -13,23 +13,23 @@ interface SearchItem {
 
 const staticSearchItems: SearchItem[] = [
   // Pages
-  { title: "Home", url: "/", type: "page", summary: "Human-in-the-loop AI for high-stakes decisions" },
-  { title: "Resume", url: "/resume", type: "page", summary: "Experience, education, certifications, and patents" },
-  { title: "About", url: "/about", type: "page", summary: "Background and approach" },
+  { title: "Home", url: "/", type: "page", summary: "AI and analytics tools that keep experts in control" },
+  { title: "Resume", url: "/resume", type: "page", summary: "12+ years, federal consulting, two patents" },
+  { title: "About", url: "/about", type: "page", summary: "Background, approach, what drives the work" },
   { title: "Contact", url: "/contact", type: "page", summary: "Get in touch" },
-  { title: "Projects", url: "/projects", type: "page", summary: "Smaller projects and demos" },
+  { title: "Projects", url: "/projects", type: "page", summary: "Side projects and prototypes" },
   // Case Studies
-  { title: "Panel Wizard: Human-in-the-loop ML for proposal panel formation", url: "/work/panel-wizard", type: "work", summary: "SciBERT embeddings + clustering for auditable grouping suggestions at NSF" },
-  { title: "USDA Organic Analytics Platform", url: "/work/usda-organic-analytics", type: "work", summary: "Warehouse + Tableau suite supporting 50,000+ operations" },
-  { title: "Researcher Lineage Dashboard", url: "/work/researcher-lineage-dashboard", type: "work", summary: "Making funding histories visible for portfolio review" },
-  { title: "Building adoption: Study halls", url: "/work/enablement-study-halls", type: "work", summary: "Enablement programs that made analytics usable" },
-  { title: "VisiTime AR Tour System", url: "/work/visitime-ar", type: "work", summary: "Geospatial storytelling and AR visitor experience" },
-  { title: "Recovery oversight with GIS (RATB)", url: "/work/ratb-gis-oversight", type: "work", summary: "Geospatial analysis for Recovery Act oversight" },
-  { title: "Scott Search: Gamified decision support for contact recovery", url: "/work/lli-scott-search", type: "work", summary: "Gamified CRM contact recovery with Apollo.io enrichment and GPT-4 lead scoring" },
+  { title: "Panel Wizard: ML-assisted proposal panel formation", url: "/work/panel-wizard", type: "work", summary: "SciBERT embeddings + clustering to cut panel formation from weeks to hours at NSF" },
+  { title: "USDA Organic Analytics Platform", url: "/work/usda-organic-analytics", type: "work", summary: "Global warehouse + Tableau reports serving 50,000+ certified operations" },
+  { title: "Researcher Lineage Dashboard", url: "/work/researcher-lineage-dashboard", type: "work", summary: "Connecting public and internal funding data for portfolio review" },
+  { title: "Building adoption through study halls", url: "/work/enablement-study-halls", type: "work", summary: "Training and enablement that moved analysts from waiting to building" },
+  { title: "VisiTime AR Tour System", url: "/work/visitime-ar", type: "work", summary: "AR tours at Gettysburg — the startup I founded" },
+  { title: "Recovery oversight with GIS (RATB)", url: "/work/ratb-gis-oversight", type: "work", summary: "Geospatial and network analysis for Recovery Act oversight" },
+  { title: "Scott Search: Gamified contact recovery", url: "/work/lli-scott-search", type: "work", summary: "CRM contact recovery with Apollo.io enrichment and GPT-4 lead scoring" },
   // Writing
-  { title: "Human-in-the-loop isn't a compromise. It's the point.", url: "/writing/human-in-the-loop", type: "writing", summary: "Why keeping humans in control is the goal, not a concession" },
-  { title: "From dashboards to decisions", url: "/writing/from-dashboards-to-decisions", type: "writing", summary: "What analytics is actually for" },
-  { title: "What consulting taught me about building AI responsibly", url: "/writing/consulting-and-responsible-ai", type: "writing", summary: "Governance and adoption as engineering requirements" },
+  { title: "Human-in-the-loop isn't a compromise. It's the point.", url: "/writing/human-in-the-loop", type: "writing", summary: "Why keeping humans in control is the goal, not a stepping stone" },
+  { title: "From dashboards to decisions", url: "/writing/from-dashboards-to-decisions", type: "writing", summary: "Analytics is only useful if it changes a decision" },
+  { title: "What consulting taught me about building AI responsibly", url: "/writing/consulting-and-responsible-ai", type: "writing", summary: "Governance and adoption are engineering requirements" },
 ];
 
 function getIcon(type: SearchItem["type"]) {

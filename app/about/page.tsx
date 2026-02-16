@@ -8,7 +8,7 @@ import { SkillsHighlight } from "@/components/adaptive/skills-highlight";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Nick Wiley — AI Solutions Architect based in Alexandria, VA. Background in federal consulting, startups, GIS, and human-in-the-loop AI.",
+    "Nick Wiley — managing consultant and applied data scientist based in Alexandria, VA. 12+ years building analytics and ML solutions for federal agencies, with a startup and two patents along the way.",
 };
 
 export default function AboutPage() {
@@ -30,44 +30,42 @@ export default function AboutPage() {
             />
           </div>
           <p className="text-lg text-muted-foreground leading-relaxed pt-2">
-            I&apos;m Nick Wiley — a Managing Consultant at IBM Global Business
-            Services, where I build analytics and ML solutions for federal
-            civilian agencies. I also lead digital strategy for the Lincoln
+            I&apos;m Nick — a Managing Consultant at IBM, where I build
+            analytics and ML tools for federal civilian agencies like NSF,
+            USDA, and USPS. I also run digital strategy for the Lincoln
             Leadership Institute at Gettysburg. Based in Alexandria, VA.
           </p>
         </div>
 
         <div className="prose max-w-none space-y-6">
           <p>
-            My work sits at the intersection of applied data science, product
-            thinking, and governance. I build tools that help experts make
-            better decisions without losing accountability — from NLP-powered
-            clustering workflows and AI-assisted decision-support tools to
-            global data warehouses and digital transformation programs that
-            drive real revenue.
+            Most of my work comes down to one question: what decision is
+            someone trying to make, and what do they need to make it well?
+            I build tools that answer that — NLP-powered clustering workflows,
+            AI-assisted decision-support apps, global data warehouses, and
+            the training and governance work that makes those tools stick.
           </p>
 
           <h2>Background</h2>
 
           <p>
-            At <strong>IBM</strong>, I&apos;ve delivered analytics and ML
-            solutions for the National Science Foundation, USDA, USPS, and
-            Census Bureau — building everything from BERTopic-powered proposal
-            classification systems to global data warehouses integrating
-            Salesforce, CBP customs records, and investigative databases. My
-            NSF work includes the Panel Wizard (a decision-support tool that
-            consolidated 8 screens into 1) and researcher lineage dashboards
-            that integrate public and internal funding data.
+            At <strong>IBM</strong>, I build analytics and ML solutions for
+            NSF, USDA, USPS, and Census. The work ranges from a
+            BERTopic-powered proposal classification system (7,000+ proposals,
+            70+ themes) to a global data warehouse integrating Salesforce,
+            CBP customs records, and investigative databases. At NSF, I built
+            the Panel Wizard — a decision-support tool that consolidated 8
+            separate screens into 1 and cut panel formation time from weeks
+            to hours — and researcher lineage dashboards that connect public
+            and internal funding data.
           </p>
 
           <p>
-            Alongside consulting, I lead digital strategy for the{" "}
-            <strong>Lincoln Leadership Institute at Gettysburg</strong>, where
-            I&apos;ve driven a comprehensive digital transformation. I
-            converted their flagship in-person leadership development program
-            to a digital format — conceptualizing the approach, identifying and
-            vetting producers, adapting content, training presenters, and
-            managing enrollment. I rebuilt their website (
+            On the side, I run digital strategy for the{" "}
+            <strong>Lincoln Leadership Institute at Gettysburg</strong>. I
+            converted their flagship in-person leadership program to a digital
+            format — finding and vetting producers, adapting content, training
+            presenters, and managing enrollment. I rebuilt their website (
             <a
               href="https://www.gettysburgleadership.com"
               target="_blank"
@@ -76,12 +74,11 @@ export default function AboutPage() {
             >
               gettysburgleadership.com
             </a>
-            ) using modern web technologies with Stripe, HubSpot, and
-            analytics integrations. I conceptualized the &ldquo;America at
-            250&rdquo; program using AI-powered market research — a program
-            that has generated significant revenue since launch. I also
-            designed email marketing campaigns that drove direct program
-            signups, mentored an intern through conversion to a full-time hire,
+            ) with Next.js, Stripe, and HubSpot integrations. I also
+            conceptualized the &ldquo;America at 250&rdquo; program using
+            AI-powered market research — it has generated significant revenue
+            since launch. I designed email campaigns that produced direct
+            program registrations, mentored an intern into a full-time hire,
             and automated the creation of marketing materials.
           </p>
 
@@ -97,28 +94,29 @@ export default function AboutPage() {
           </div>
 
           <p>
-            Before consulting, I founded{" "}
-            <strong>VisiTime</strong>, an augmented reality startup that turned
-            geospatial data into interactive visitor experiences. I built the AR
-            experience on Unity, raised $200K+, shipped a six-hour interactive
-            iPad tour system, and personally geocoded historical content for
-            location-based delivery. I hold two U.S. utility patents from that
-            work. I gave presentations to Civil War historical societies —
-            building trust for technology adoption in a traditionally resistant
-            market. Running a startup taught me things consulting never could —
-            about focus, tradeoffs, sales reality, and knowing when to move on.
+            Before consulting, I founded <strong>VisiTime</strong>, an AR
+            startup that turned geospatial data into interactive visitor
+            experiences. I built the AR system on Unity, raised $200K+,
+            shipped a six-hour interactive iPad tour, and personally geocoded
+            every piece of historical content for location-based delivery.
+            I hold two U.S. utility patents from that work. I spent a lot of
+            time presenting to Civil War historical societies — earning trust
+            for technology in a market that was not naturally interested in it.
+            Running a startup taught me things consulting never could: how to
+            prioritize under real constraints, when to walk away from a
+            feature, and how hard it is to sell something that doesn&apos;t
+            exist yet.
           </p>
 
           <p>
-            I started my career as a data analyst at the{" "}
+            I started as a data analyst at the{" "}
             <strong>Recovery Accountability and Transparency Board</strong>,
             where I led GIS integration of government data and used Palantir
             for network and lead analysis. I conceived an investigation that
-            identified 90 contract misrepresentations and assisted in the
-            creation of a data ontology for cross-system investigative
-            analysis. That experience — working with sensitive data at
-            mission-critical stakes — shaped my conviction that analytics is
-            only as valuable as the decisions it informs.
+            identified 90 contract misrepresentations and helped create a
+            data ontology for cross-system investigative analysis. Working
+            with sensitive data at those stakes is where I first learned that
+            analytics is only useful if it actually changes a decision.
           </p>
 
           {/* U.S. Capitol image */}
@@ -135,32 +133,32 @@ export default function AboutPage() {
           <h2>Education</h2>
 
           <p>
-            I hold an <strong>MBA</strong> and an{" "}
-            <strong>MS in Information Systems</strong> from the University of
-            Maryland, a <strong>BA in Environmental Studies</strong> from
-            Gettysburg College, and certificates in Project Management and GIS
-            from Penn State. I completed MIT Professional Education&apos;s
-            Applied Data Science program in 2024. During graduate school, I
-            built machine learning projects including a Keras-based code
-            language classifier trained on Stack Overflow data and a Python ML
-            model assigning risk scores to Washington, DC intersections based
-            on car accident data.
+            I hold an <strong>MBA</strong> and{" "}
+            <strong>MS in Information Systems</strong> from Maryland, a{" "}
+            <strong>BA in Environmental Studies</strong> from Gettysburg
+            College, and certificates in Project Management and GIS from Penn
+            State. I completed MIT&apos;s Applied Data Science program in
+            2024. In grad school I built a Keras-based code language
+            classifier trained on Stack Overflow data and an ML model that
+            scored Washington, DC intersections by accident risk — both
+            good exercises in moving from messy data to something actionable.
           </p>
 
-          <h2>How I think about work</h2>
+          <h2>How I think about the work</h2>
 
           <p>
-            I start by clarifying the decision someone is trying to make. Then
-            I design a system that makes the decision easier, safer, and
-            repeatable — with governance and usability treated as first-class
-            engineering requirements.
+            I start with the decision someone needs to make and work backwards.
+            What data do they need? What does the workflow look like? Who is
+            accountable? Then I build a system that makes the decision faster,
+            more consistent, and auditable — with governance and usability as
+            engineering requirements, not afterthoughts.
           </p>
 
           <p>
-            I believe that human-in-the-loop isn&apos;t a compromise —
-            it&apos;s the point. The strongest AI systems I&apos;ve worked on
-            don&apos;t replace experts. They make expert judgment easier to
-            apply consistently.
+            The strongest AI systems I&apos;ve worked on don&apos;t replace
+            experts. They make expert judgment easier to apply consistently.
+            Human-in-the-loop isn&apos;t a concession — it&apos;s the whole
+            point.
           </p>
 
           <h2>Currently</h2>
@@ -168,8 +166,8 @@ export default function AboutPage() {
           <div className="flex items-center gap-2 text-muted-foreground not-prose">
             <MapPin className="h-4 w-4" />
             <span className="text-sm">
-              Building decision-support tools at NSF. Driving digital strategy
-              at LLI. Based in Alexandria, VA.
+              Building decision-support tools at NSF. Running digital strategy
+              at LLI. Alexandria, VA.
             </span>
           </div>
         </div>

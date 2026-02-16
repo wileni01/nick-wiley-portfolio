@@ -27,11 +27,11 @@ export function PressMentions() {
       {/* Section header */}
       <div className="space-y-2 mb-8">
         <h2 className="text-xl font-bold tracking-tight sm:text-2xl">
-          Trusted Coverage & Industry Recognition
+          Press and recognition
         </h2>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-          InSite Gettysburg was featured by travel writers, academic
-          researchers, and official tourism organizations.
+          InSite Gettysburg was covered by travel writers, cited in academic
+          research, and listed by official tourism organizations.
         </p>
       </div>
 

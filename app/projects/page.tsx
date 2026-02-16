@@ -5,49 +5,49 @@ import { Badge } from "@/components/ui/badge";
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Smaller projects and prototypes — RAG pipelines, embedding notebooks, governance toolkits, and more.",
+    "Side projects and prototypes — RAG pipelines, embedding notebooks, governance toolkits, and grad school ML experiments.",
 };
 
 const projects = [
   {
-    title: "RAG Pipeline Prototype",
+    title: "RAG pipeline prototype",
     description:
-      "A retrieval-augmented generation pipeline using embedding-based search over a local document corpus. Built to explore how RAG can support curated Q&A experiences without exposing sensitive data.",
+      "Embedding-based search over a local document corpus. I built this to test whether RAG could support curated Q&A without exposing sensitive data in a federal context. Short answer: it can, with caveats around chunk size and overlap that matter more than I expected.",
     stack: ["Python", "LangChain (conceptual)", "FAISS", "Embeddings"],
     availability: "Code available on request",
   },
   {
-    title: "Embedding + Clustering Notebook Template",
+    title: "Embedding + clustering notebook",
     description:
-      "A reusable Jupyter notebook workflow for encoding text with transformer embeddings and exploring clustering approaches (HDBSCAN, k-means). Designed as a starting point for NLP exploration projects.",
+      "A reusable Jupyter workflow for encoding text with sentence-transformer embeddings and testing clustering approaches (HDBSCAN, K-Means). I use this as a starting point when scoping NLP projects. Saves about a day of setup each time.",
     stack: ["Python", "Jupyter", "scikit-learn", "sentence-transformers"],
     availability: "Code available on request",
   },
   {
-    title: "Tableau Governance Checklist",
+    title: "Tableau governance checklist",
     description:
-      "A starter kit for teams adopting Tableau in regulated environments. Covers naming conventions, data source management, accessibility standards, refresh monitoring, and publishing workflows.",
+      "A starter kit for teams adopting Tableau in regulated settings — naming conventions, data source management, accessibility standards, refresh monitoring, publishing workflows. I put this together after seeing the same governance gaps on multiple engagements.",
     stack: ["Tableau", "Documentation", "Governance"],
     availability: "Available on request",
   },
   {
-    title: "Stack Overflow Code Language Classifier",
+    title: "Stack Overflow code language classifier",
     description:
-      "Graduate school project that scraped Stack Overflow data using SQL and built a deep learning model with Keras to identify the programming language of code snippets from posts. An exploration of NLP applied to source code classification.",
+      "Grad school project. I scraped Stack Overflow posts, extracted code snippets, and trained a Keras deep learning model to identify the programming language. Mostly an exercise in NLP applied to source code — the preprocessing ended up being harder than the model.",
     stack: ["Python", "Keras", "SQL", "NLP", "Deep Learning"],
     availability: "Academic project (2017)",
   },
   {
-    title: "DC Intersection Risk Scoring Model",
+    title: "DC intersection risk scoring",
     description:
-      "Machine learning project using Washington, DC car accident data to assign risk scores to intersections. Built predictive models identifying the highest-risk locations for traffic incidents based on historical patterns and environmental features.",
+      "ML model that scored Washington, DC intersections by accident risk using historical crash data and environmental features. The real lesson was how much feature engineering matters when your raw data is messy government records.",
     stack: ["Python", "scikit-learn", "Pandas", "Machine Learning"],
     availability: "Academic project (2017)",
   },
   {
-    title: "Portfolio Site (this site)",
+    title: "This portfolio site",
     description:
-      "A production-grade portfolio built with Next.js, TypeScript, and Tailwind CSS. Features MDX-driven content, global search, adaptive briefing, dark mode, print-ready resume, and accessibility-first design.",
+      "Next.js, TypeScript, Tailwind CSS. MDX-driven content, global search, adaptive briefing, dark mode, print-ready resume, accessibility-first design. I built it partly as a portfolio and partly to stay current on frontend tooling.",
     stack: ["Next.js", "TypeScript", "Tailwind CSS", "MDX"],
     availability: "Source available",
   },
@@ -61,9 +61,10 @@ export default function ProjectsPage() {
         <div className="space-y-4 mb-12">
           <h1 className="text-4xl font-bold tracking-tight">Projects</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
-            Smaller projects, prototypes, and toolkits. These complement the
-            larger case studies and reflect how I explore ideas outside of
-            client delivery.
+            Side projects, prototypes, and toolkits I&apos;ve built outside
+            of client work. Some are reusable starting points for new
+            engagements; others are grad school experiments that taught me
+            something I still use.
           </p>
         </div>
 

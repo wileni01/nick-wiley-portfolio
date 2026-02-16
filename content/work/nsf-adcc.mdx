@@ -16,43 +16,22 @@ tags:
   - Governance
 featured: false
 image: "/images/projects/adcc.png"
-executiveSummary: "A compliance checking tool that connects to operational data and runs 28 automated checks — replacing manual auditing with systematic, repeatable validation."
-builderSummary: "Built a rules-based compliance engine with live data connections that executes 28 checks on data status, surfacing issues before they become problems."
+executiveSummary: "Replaced manual compliance auditing with a tool that runs 28 automated checks against live data — repeatable, documented, and accessible to staff without writing SQL."
+builderSummary: "Modular rules engine with live data connections. 28 checks covering completeness, timeliness, consistency, and business rules. Staff-facing UI with drill-down and export."
 ---
 
-## The problem
+## The situation
 
-Operational data across the program needed to meet specific compliance requirements — but checking compliance was a manual, ad-hoc process. Staff would run queries, compare results to standards, and report findings — a process that was inconsistent, time-consuming, and rarely comprehensive. With no systematic approach, compliance gaps could go undetected until they surfaced in audits or operational failures.
+Operational data across the program had to meet specific compliance requirements, but the checking process was manual and ad-hoc. Staff would run queries, compare results to standards, and report findings — inconsistently, slowly, and rarely comprehensively. With no systematic approach, compliance gaps went undetected until they surfaced in audits or operational failures.
 
 ## What I built
 
-**ADCC** (Automated Data Compliance Checker) is a tool with live data connections that allows users to perform **28 distinct compliance checks** on the status of operational data. Each check is:
+**ADCC** (Automated Data Compliance Checker) connects to live data and runs **28 distinct compliance checks** on the status of operational data. Each check is clearly defined — what it tests, what constitutes a pass or fail, and what the remediation path looks like. Checks run against live data with no manual query writing, produce consistent results every time, and log results for the audit trail. The checks span completeness, timeliness, consistency, referential integrity, and business rule adherence.
 
-- **Clearly defined**: what it checks, what constitutes a pass or fail, and what the remediation path looks like
-- **Automated**: runs against live data with no manual query writing required
-- **Repeatable**: can be executed on a schedule or on-demand, producing consistent results every time
-- **Documented**: results are logged for audit trail purposes
+Rather than building a monolithic compliance report, I designed ADCC as a **modular rules engine**. Each check is independently defined and can be run individually or as a full suite, configured with different thresholds for different data domains, and extended with new checks as requirements evolve. Staff can select which checks to run, see clear pass/fail results, drill into the specific records that triggered failures, and export findings for remediation tracking.
 
-The checks cover a range of data quality and compliance dimensions — completeness, timeliness, consistency, referential integrity, and business rule adherence.
+## What it changed
 
-## Design approach
-
-Rather than building a monolithic compliance report, I designed ADCC as a **modular rules engine** where each check is independently defined and can be:
-- Run individually or as a full suite
-- Configured with different thresholds for different data domains
-- Extended with new checks as compliance requirements evolve
-
-The tool provides a user-facing interface where staff can:
-- Select which checks to run
-- View results with clear pass/fail indicators
-- Drill into specific records that triggered failures
-- Export findings for remediation tracking
-
-## Impact
-
-- **Replaced manual auditing** with systematic, automated compliance validation
-- **28 checks running consistently** — far more comprehensive than any manual spot-check approach could achieve
-- **Early detection**: issues surfaced proactively rather than discovered during formal audits
-- **Staff empowerment**: users can check compliance themselves without writing queries or depending on analysts
+28 checks running consistently is far more comprehensive than manual spot-checking could ever be. Issues now surface proactively instead of during formal audits. And staff can run compliance checks themselves without writing queries or depending on an analyst.
 
 *Details are sanitized to protect agency-specific information.*

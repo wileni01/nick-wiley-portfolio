@@ -18,21 +18,21 @@ import { PersonalizedHero } from "@/components/adaptive/personalized-hero";
 const whatIDo = [
   {
     icon: Brain,
-    title: "Decision Support Apps",
+    title: "Decision support tools",
     description:
-      "Human-centered tools that let experts override models, audit decisions, and stay in control.",
+      "I build apps that surface model outputs alongside confidence scores, let reviewers override recommendations, and log every decision for audit. The goal is faster expert judgment, not less of it.",
   },
   {
     icon: Database,
-    title: "Data Platforms & Analytics",
+    title: "Data platforms and analytics",
     description:
-      "Warehouses, pipelines, and dashboards that turn messy systems into trustworthy reporting.",
+      "Warehouses, ETL pipelines, and Tableau dashboards that turn fragmented agency data into reporting people actually trust. I've built these for USDA, NSF, and USPS.",
   },
   {
     icon: Users,
-    title: "Adoption & Governance",
+    title: "Adoption and governance",
     description:
-      "I run the meetings, write the docs, build the training, and sweat the compliance details.",
+      "I write the documentation, run the training sessions, and sit through the stakeholder reviews. A tool nobody uses is a tool that failed.",
   },
 ];
 
@@ -62,21 +62,21 @@ export default function HomePage() {
           <div className="max-w-3xl space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] leading-[1.15]">
-                Human-in-the-loop AI
+                I build AI tools that keep
                 <br />
                 <span className="text-primary">
-                  for high-stakes decisions.
+                  experts in control.
                 </span>
               </h1>
 
               <p className="max-w-2xl text-lg text-muted-foreground leading-relaxed sm:text-xl">
-                I build decision-support tools that help experts move
-                faster{" "}
+                Decision-support apps, analytics platforms, and ML
+                workflows for federal agencies — designed so the people
+                accountable for outcomes{" "}
                 <strong className="text-foreground font-medium">
-                  without giving up accountability
+                  can see, override, and explain every recommendation
                 </strong>
-                — from federal analytics platforms to ML-assisted workflow
-                apps.
+                .
               </p>
             </div>
 
@@ -112,7 +112,7 @@ export default function HomePage() {
       <section id="what-i-do" className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-2xl font-bold tracking-tight mb-10">
-            What I do
+            What I build
           </h2>
           <div className="grid gap-6 sm:grid-cols-3">
             {whatIDo.map((item) => (
@@ -213,19 +213,21 @@ export default function HomePage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <h2 className="text-2xl font-bold tracking-tight mb-6">
-            How I work
+            How I think about the work
           </h2>
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
-              I start by clarifying the decision someone is trying to make.
+              I start with the decision someone needs to make and work
+              backwards from there — what data do they need, what does the
+              workflow look like, and who is accountable for the outcome.
             </p>
             <p>
-              Then I design a system that makes the decision{" "}
+              Then I build a system that makes that decision{" "}
               <strong className="text-foreground font-medium">
-                easier, safer, and repeatable
+                faster, more consistent, and auditable
               </strong>
-              — with governance and usability treated as first-class
-              engineering requirements.
+              . Governance and usability are engineering requirements, not
+              afterthoughts.
             </p>
           </div>
         </div>
@@ -252,11 +254,11 @@ export default function HomePage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center space-y-6">
           <h2 className="text-2xl font-bold tracking-tight">
-            Interested in working together?
+            Worth a conversation?
           </h2>
           <p className="text-muted-foreground">
-            I&apos;m always open to conversations about decision-support
-            systems, analytics platforms, and responsible AI.
+            If you&apos;re working on analytics, decision-support tooling,
+            or applied AI in a regulated setting, I&apos;d be glad to talk.
           </p>
           <div className="flex justify-center gap-4">
             <Button asChild size="lg">

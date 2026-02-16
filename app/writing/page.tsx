@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 export const metadata: Metadata = {
   title: "Writing",
   description:
-    "Thoughts on human-in-the-loop AI, analytics as decision support, and building responsibly in regulated environments.",
+    "Notes on analytics that changes decisions, AI tools people can trust, and what consulting teaches you about governance and adoption.",
 };
 
 export default function WritingPage() {
@@ -23,8 +23,10 @@ export default function WritingPage() {
         <div className="space-y-4 mb-12">
           <h1 className="text-4xl font-bold tracking-tight">Writing</h1>
           <p className="text-lg text-muted-foreground">
-            Thoughts on human-in-the-loop AI, analytics as decision support,
-            and building responsibly in regulated environments.
+            Notes from building analytics and AI tools in regulated
+            environments. Most of what I write about comes down to two
+            questions: what makes these systems trustworthy, and what
+            makes people actually use them.
           </p>
         </div>
 

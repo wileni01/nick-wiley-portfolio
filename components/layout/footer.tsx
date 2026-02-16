@@ -24,8 +24,8 @@ export function Footer() {
               Nick Wiley
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
-              AI Solutions Architect — human-in-the-loop decision support for
-              high-stakes public sector work.
+              Analytics, ML, and decision-support tools for federal
+              agencies. I build things people can trust and actually use.
             </p>
           </div>
 
