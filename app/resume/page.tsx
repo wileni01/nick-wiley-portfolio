@@ -130,72 +130,43 @@ export default function ResumePage() {
                 <p className="text-xs text-muted-foreground mb-2">
                   Managing Consultant
                 </p>
-                <ul className="space-y-1.5 text-sm print:text-xs">
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Build and deliver analytics and ML tools for federal
-                      clients (NSF, USDA, USPS, Census). Own technical
-                      approach, stakeholder communication, and delivery.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      <strong className="font-medium">NSF:</strong> Built
-                      Panel Wizard — a decision-support tool that consolidated
-                      8 screens into 1, using sentence transformer embeddings
-                      and K-Means clustering. Cut panel formation from weeks
-                      to hours. Built BERTopic proposal classifier (7,000+
-                      proposals, 70+ themes, Optuna-tuned). Created researcher
-                      lineage dashboard connecting public and internal data.
-                      Built RoboRA document automation, ADCC compliance
-                      checking (28 automated checks), and telemetry dashboards.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      <strong className="font-medium">USDA:</strong> Built
-                      global data warehouse on AWS integrating Salesforce,
-                      integrity database, and CBP customs records. Created
-                      NLP taxonomy classifier (scikit-learn) for organic
-                      import categorization. Built dozens of Tableau reports
-                      serving 50,000+ certified operations.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      <strong className="font-medium">USPS:</strong> Ran
-                      data analytics for international mail operations —
-                      identifying leads and operational patterns using SAS.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      <strong className="font-medium">Census Bureau:</strong>{" "}
-                      Data analytics support — ServiceNow administration and
-                      Python-based reporting.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Wrote proposal sections that contributed to a 5-year,
-                      $5M contract win.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Ran study halls and working groups to get people
-                      actually using the tools. Mentored analysts and
-                      supported executive reporting.
-                    </span>
-                  </li>
-                </ul>
+                <div className="space-y-2 text-sm print:text-xs">
+                  <p>
+                    I build and deliver analytics and ML tools for federal
+                    clients (NSF, USDA, USPS, Census), owning the technical
+                    approach, stakeholder communication, and delivery end to
+                    end.
+                  </p>
+                  <p>
+                    At <strong className="font-medium">NSF</strong>, I built
+                    Panel Wizard, a decision-support tool that consolidated 8
+                    screens into 1 using sentence transformer embeddings and
+                    K-Means clustering, cutting panel formation from weeks to
+                    hours. I also built a BERTopic proposal classifier (7,000+
+                    proposals, 70+ themes, Optuna-tuned), a researcher lineage
+                    dashboard connecting public and internal data, RoboRA
+                    document automation, ADCC compliance checking (28 automated
+                    checks), and telemetry dashboards across the tool suite.
+                  </p>
+                  <p>
+                    At <strong className="font-medium">USDA</strong>, I built a
+                    global data warehouse on AWS integrating Salesforce, an
+                    integrity database, and CBP customs records. Created an NLP
+                    taxonomy classifier (scikit-learn) for organic import
+                    categorization and dozens of Tableau reports serving 50,000+
+                    certified operations.
+                    At <strong className="font-medium">USPS</strong>, I ran data
+                    analytics for international mail operations using SAS.
+                    At <strong className="font-medium">Census</strong>,
+                    ServiceNow administration and Python-based reporting.
+                  </p>
+                  <p>
+                    Wrote proposal sections that contributed to a 5-year, $5M
+                    contract win. Ran study halls and working groups to drive
+                    tool adoption. Mentored analysts and supported executive
+                    reporting.
+                  </p>
+                </div>
               </div>
 
               {/* LLI */}
@@ -211,63 +182,37 @@ export default function ResumePage() {
                 <p className="text-xs text-muted-foreground mb-2">
                   Lead Software Engineer &amp; Digital Strategist (Contract)
                 </p>
-                <ul className="space-y-1.5 text-sm print:text-xs">
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Converted a flagship in-person leadership program to
-                      digital: found and vetted producers, adapted content,
-                      trained presenters, and managed advertising and
-                      enrollment.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Rebuilt{" "}
-                      <a
-                        href="https://www.gettysburgleadership.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        gettysburgleadership.com
-                      </a>{" "}
-                      using Next.js with Stripe, HubSpot, and PostHog
-                      analytics integrations. Modernized from legacy WordPress.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Created the &ldquo;America at 250&rdquo; program
-                      concept using AI-powered market research. The program
-                      has generated significant revenue since launch.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Built and ran email marketing campaigns (HubSpot)
-                      that produced direct program registrations, contributing
-                      to hundreds of thousands in revenue.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Automated marketing material creation. Migrated email
-                      platform from Emma to HubSpot.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Mentored an intern through conversion to a full-time
-                      hire managing digital assets and marketing.
-                    </span>
-                  </li>
-                </ul>
+                <div className="space-y-2 text-sm print:text-xs">
+                  <p>
+                    Converted a flagship in-person leadership program to
+                    digital format, finding and vetting producers, adapting
+                    content, training presenters, and managing advertising and
+                    enrollment.
+                  </p>
+                  <p>
+                    Rebuilt{" "}
+                    <a
+                      href="https://www.gettysburgleadership.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      gettysburgleadership.com
+                    </a>{" "}
+                    in Next.js with Stripe, HubSpot, and PostHog integrations,
+                    replacing a legacy WordPress site. Created the &ldquo;America
+                    at 250&rdquo; program concept using AI-powered market
+                    research; the program has generated significant revenue
+                    since launch.
+                  </p>
+                  <p>
+                    Built and ran email campaigns (HubSpot) that produced direct
+                    program registrations, contributing to hundreds of thousands
+                    in revenue. Automated marketing material creation. Migrated
+                    email from Emma to HubSpot. Mentored an intern through
+                    conversion to a full-time hire.
+                  </p>
+                </div>
               </div>
 
               {/* VisiTime */}
@@ -281,46 +226,23 @@ export default function ResumePage() {
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground mb-2">Founder</p>
-                <ul className="space-y-1.5 text-sm print:text-xs">
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Built AR-driven tours using Unity and geospatial
-                      datasets to make historical context accessible at
-                      battlefield sites.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Raised $200K+ to produce a tour book and mobile apps.
-                      Managed iPad rental fleet including imaging and
-                      provisioning.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Personally geocoded historical content for
-                      location-based delivery. Converted archival map data
-                      into machine-readable formats.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Presented to Civil War historical societies — earned
-                      trust for technology in a market not naturally
-                      interested in it.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      U.S. utility patent holder (9,417,668; 9,900,042).
-                    </span>
-                  </li>
-                </ul>
+                <div className="space-y-2 text-sm print:text-xs">
+                  <p>
+                    Built AR-driven tours using Unity and geospatial datasets
+                    to make historical context accessible at battlefield sites.
+                    Raised $200K+ to produce a tour book and mobile apps.
+                    Managed an iPad rental fleet including imaging and
+                    provisioning.
+                  </p>
+                  <p>
+                    Personally geocoded historical content for location-based
+                    delivery and converted archival map data into
+                    machine-readable formats. Presented to Civil War historical
+                    societies, earning trust for technology in a market not
+                    naturally interested in it. U.S. utility patent holder
+                    (9,417,668; 9,900,042).
+                  </p>
+                </div>
               </div>
 
               {/* Transform */}
@@ -336,16 +258,13 @@ export default function ResumePage() {
                 <p className="text-xs text-muted-foreground mb-2">
                   Solution Engineer
                 </p>
-                <ul className="space-y-1.5 text-sm print:text-xs">
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Integrated analytics into client-facing visualization
-                      products. Worked with executives to turn goals into
-                      measurable reporting.
-                    </span>
-                  </li>
-                </ul>
+                <div className="space-y-2 text-sm print:text-xs">
+                  <p>
+                    Integrated analytics into client-facing visualization
+                    products. Worked with executives to translate goals into
+                    measurable reporting.
+                  </p>
+                </div>
               </div>
 
               {/* RATB */}
@@ -362,30 +281,15 @@ export default function ResumePage() {
                 <p className="text-xs text-muted-foreground mb-2">
                   Data Analyst (GIS Lead)
                 </p>
-                <ul className="space-y-1.5 text-sm print:text-xs">
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Ran GIS integration of government data for Recovery Act
-                      oversight using ESRI and Palantir.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Helped create a data ontology for cross-system
-                      investigative analysis.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0">–</span>
-                    <span>
-                      Conceived an investigation that identified 90 contract
-                      misrepresentations using geospatial and network
-                      analysis.
-                    </span>
-                  </li>
-                </ul>
+                <div className="space-y-2 text-sm print:text-xs">
+                  <p>
+                    Led GIS integration of government data for Recovery Act
+                    oversight using ESRI and Palantir. Helped create a data
+                    ontology for cross-system investigative analysis. Conceived
+                    an investigation that identified 90 contract
+                    misrepresentations using geospatial and network analysis.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
