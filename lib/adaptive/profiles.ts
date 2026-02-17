@@ -142,6 +142,29 @@ export const companyProfiles: CompanyProfile[] = [
         ],
         assetTypeWeights: { work: 1.5, project: 1.2, writing: 0.9, resume: 1.0 },
       },
+      {
+        id: "kungfu-head-of-people",
+        name: "Meg Marsh",
+        role: "Head of People",
+        recommendationGoal:
+          "Highlight adoption leadership, cross-functional enablement, and evidence of strengthening team culture through operational and change-management practices.",
+        focusPresets: [
+          "Emphasize how Nick drives adoption and enablement across diverse teams.",
+          "Focus on stakeholder alignment, communication, and organizational change management.",
+          "Show consulting-environment collaboration and leadership that reduces operational friction.",
+        ],
+        focusTags: [
+          "change-management",
+          "adoption",
+          "enablement",
+          "stakeholder-alignment",
+          "leadership",
+          "operations",
+          "governance",
+          "delivery",
+        ],
+        assetTypeWeights: { resume: 1.5, work: 1.3, writing: 1.2, project: 0.8 },
+      },
     ],
     sources: [
       "https://www.kungfu.ai/our-team",
