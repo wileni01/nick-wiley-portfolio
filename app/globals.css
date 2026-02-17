@@ -213,6 +213,33 @@ body {
   margin: 2em 0;
 }
 
+/* Guided tour spotlight overlay */
+.tour-spotlight-overlay {
+  background: rgba(0, 0, 0, 0.6);
+  transition: clip-path 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tour-spotlight-ring {
+  box-shadow:
+    0 0 0 2px var(--color-primary),
+    0 0 20px 4px rgba(30, 64, 175, 0.15);
+  transition:
+    top 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    left 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .tour-spotlight-overlay {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.dark .tour-spotlight-ring {
+  box-shadow:
+    0 0 0 2px var(--color-primary),
+    0 0 24px 6px rgba(59, 130, 246, 0.2);
+}
+
 /* Focus visible for keyboard navigation */
 :focus-visible {
   outline: 2px solid var(--color-primary);
