@@ -27,11 +27,11 @@ export function PressMentions() {
       {/* Section header */}
       <div className="space-y-2 mb-8">
         <h2 className="text-xl font-bold tracking-tight sm:text-2xl">
-          Press and recognition
+          Trusted Coverage &amp; Industry Recognition
         </h2>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-          InSite Gettysburg was covered by travel writers, cited in academic
-          research, and listed by official tourism organizations.
+          InSite Gettysburg was featured by travel writers, academic
+          researchers, and official tourism organizations.
         </p>
       </div>
 
@@ -44,7 +44,7 @@ export function PressMentions() {
       </p>
 
       {/* Logo grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 items-center">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6 items-center">
         {logoMentions.map((mention) => (
           <a
             key={mention.url}

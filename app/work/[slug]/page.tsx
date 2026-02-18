@@ -65,19 +65,19 @@ export default async function CaseStudyPage({ params }: Props) {
             executiveSummary={study.executiveSummary}
             builderSummary={study.builderSummary}
           />
-
-          {/* Stack */}
-          <div className="flex flex-wrap gap-1.5 pt-2">
-            {study.stack.map((tech) => (
-              <Badge key={tech} variant="outline" className="text-xs">
-                {tech}
-              </Badge>
-            ))}
-          </div>
         </header>
 
         {/* Press & Mentions, VisiTime / InSite Gettysburg only */}
         {slug === "visitime-ar" && <PressMentions />}
+
+        {/* Stack */}
+        <div className="flex flex-wrap gap-1.5 pt-2 mb-10">
+          {study.stack.map((tech) => (
+            <Badge key={tech} variant="outline" className="text-xs">
+              {tech}
+            </Badge>
+          ))}
+        </div>
 
         {/* Hero image */}
         {study.image && !study.image.includes("placeholder") && (

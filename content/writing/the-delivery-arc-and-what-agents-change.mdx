@@ -1,0 +1,46 @@
+---
+title: "The Delivery Arc and What Agents Change"
+slug: "the-delivery-arc-and-what-agents-change"
+date: "2025-11-15"
+description: "Agentic engineering compresses the time between decision and change. That can be a gift or a threat, depending on whether your feedback loops are strong."
+tags:
+  - Delivery
+  - Agentic engineering
+  - DevOps
+---
+
+I have been trying to place agentic engineering into the delivery story we already know, because I think it is less of a reset than people assume. It feels more like the next layer on top of practices that were already moving in the same direction.
+
+There is a common narrative that goes something like waterfall to agile to continuous delivery to trunk based development, and now agents. Real organizations do not move in a straight line, and not every domain should optimize for the same speed. Still, I think there is a useful thread underneath the mess.
+
+The thread is feedback.
+
+The Agile Manifesto emphasized working software, customer collaboration, and responding to change. I do not treat that as scripture. I treat it as a reminder that short cycles expose reality early.
+
+Continuous delivery, in the way people like Jez Humble describe it, is another expression of that same idea. Reduce batch size. Automate the path to production. Make releases routine. Small changes tend to be safer than rare huge changes because you can isolate what changed and recover quickly.
+
+Trunk based development fits the same pattern. Keep integration continuous. Avoid long lived branches that drift away from main. Keep the system close to releasable so delivery is always an option, not a special event.
+
+DORA research helped put metrics behind these ideas. Lead time, deployment frequency, change failure rate, time to restore service. The point is not to chase numbers for their own sake. The point is that teams with strong delivery capabilities often move faster and stay more stable at the same time.
+
+Then agentic engineering shows up and shifts the economics of code production.
+
+Agents make it easier to draft code quickly. That is obvious. The less obvious part is what that does to delivery discipline.
+
+If a team already values feedback, agents can help make changes smaller and tighter. They can accelerate writing tests, refactoring with coverage, automating internal tooling, and reducing the cost of iteration.
+
+If a team does not value feedback, agents can also accelerate the wrong thing. You can generate a lot of surface area that looks coherent while nobody fully understands it. You can add dependencies casually and discover supply chain risk later. You can ship changes that pass casual review and still fail at the edges.
+
+So I do not see agents as replacing the delivery arc. I see them as compressing time.
+
+The time between decision and change gets smaller. That can be a gift if the system for verification is strong. It can be stressful if the system for verification is weak.
+
+This is why I think some older practices become more important, not less.
+
+Code review matters, especially review that checks behavior and security rather than style. Tests matter, especially tests that are trusted and fast enough to run often. Observability matters, because recovery speed becomes part of quality. Clear ownership matters, because someone has to hold the architecture together as changes accelerate.
+
+I am cautious about pretending there is one right process. A consumer app and a regulated system do not share the same risk tolerance. Sometimes slower delivery is rational. Sometimes the cost of a defect is too high.
+
+What I do believe is that agentic engineering increases the reward for teams that invest in feedback. It also increases the cost of teams that do not.
+
+If you think this delivery arc looks different where you work, I would like to hear it. I am not attached to a neat narrative. I am attached to learning what holds up in real systems.

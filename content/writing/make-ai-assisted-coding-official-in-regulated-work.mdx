@@ -1,0 +1,46 @@
+---
+title: "Make AI Assisted Coding Official in Regulated Work"
+slug: "make-ai-assisted-coding-official-in-regulated-work"
+date: "2025-12-15"
+description: "The risk is not that people use AI assistance. The risk is that usage stays informal and inconsistent, with no shared training and no systematic feedback loop."
+tags:
+  - AI
+  - Governance
+  - Security
+---
+
+I want to share a perspective on AI assisted coding in regulated environments, especially government work, because I think the safest path forward is to talk about it openly and design guardrails that match reality.
+
+I want to be careful about what I claim.
+
+I am not speaking for any agency, client, employer, contract, or program. I am not asserting anything about specific systems or specific teams. I am speaking as a builder observing a broad pattern in how tools spread.
+
+In large organizations, tooling adoption often leads policy. When a tool saves time, people try it. Often the earliest uses feel low risk. Drafting boilerplate. Generating unit test scaffolding. Summarizing an error message. Brainstorming a refactor. That kind of usage can happen even when official guidance is still forming.
+
+Because of that, I would be surprised if usage across the broader ecosystem were truly zero. That is not an accusation. It is a basic expectation about incentives.
+
+The risk I worry about is not that people use assistance. The risk is that usage stays informal and inconsistent, with no shared training, no agreed boundaries, and no systematic feedback loop.
+
+If the work happens quietly, it becomes harder to measure outcomes, standardize safe practices, and correct mistakes early. It also becomes harder to have an honest security conversation.
+
+The security community is already starting to frame this space. OWASP has published guidance on risks that show up when large language models are part of an application or workflow. The OpenSSF has been pushing best practices around supply chain security and secure development, and those concerns still apply when code is drafted by an assistant.
+
+The practical failure modes are not exotic. Generated code can introduce vulnerabilities. It can use outdated patterns. It can choose weak defaults. It can pull in dependencies casually. It can work on the happy path and behave badly at the edges. Simon Willison has been clear that AI generated code still needs review, and often needs more careful review because it can look clean while being subtly wrong.
+
+So what do I think a responsible posture looks like.
+
+It starts with making the practice legitimate.
+
+Organizations can define what is allowed, what is forbidden, and what must be escalated. They can standardize data handling rules, including what can be pasted into tools and what cannot. They can approve specific environments and vendors. They can require logging and auditability. They can treat tests, scanning, and code review as non negotiable gates.
+
+Most importantly, they can assign ownership.
+
+This is where I think new credentials and job shapes are likely to emerge, especially in government delivery where auditability and compliance are part of the operating reality.
+
+I can imagine roles like an AI code quality reviewer who specializes in verification, testing strategy, and catching subtle logic errors that often show up in generated code. I can imagine an AI code security analyst who is current on model specific risks and traditional application security, and who enforces policies with a clear escalation path. I can imagine an agent workflow operator who knows how to structure agent tasks, run evaluations, and keep systems from drifting.
+
+The names will evolve. The need feels durable.
+
+If we talk about this openly, we can build guardrails that actually work. If we avoid the topic, we risk forcing it into a gray zone where learning is slower and risk is harder to manage.
+
+If you work in regulated delivery and you have seen approaches that are working, I would like to learn from them. I am especially interested in what is practical, auditable, and resilient under real constraints.

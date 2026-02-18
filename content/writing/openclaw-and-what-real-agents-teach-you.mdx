@@ -1,0 +1,42 @@
+---
+title: "OpenClaw and What Real Agents Teach You"
+slug: "openclaw-and-what-real-agents-teach-you"
+date: "2026-01-15"
+description: "The builder question is simpler than the intelligence debate. Can the system do a job reliably under constraints, and can we audit and improve it over time."
+tags:
+  - AI
+  - Agentic engineering
+  - Software engineering
+---
+
+I read the Lex Fridman transcript about OpenClaw and it left me thinking about what makes an agent story feel real to a builder.
+
+It was not the grand claims. It was the constraints.
+
+A specialized agent in a constrained environment, with clear tool access and measurable outcomes, forces you to stop talking in abstractions. It pushes you toward engineering questions. What does the agent see. What can it do. What is the feedback loop. How do you know when it is wrong.
+
+A lot of the broader discourse about agents gets stuck in vague debates about intelligence. Is the model really reasoning. Is it general. Is it conscious. Those debates can be interesting, but they do not help me ship systems.
+
+The builder question is simpler. Can the system do a job reliably under constraints, and can we audit and improve it over time.
+
+Specialization helps because it makes evaluation possible.
+
+When an agent has a clear domain and a clear interface, you can define success and failure. You can build test cases that reflect reality. You can instrument the workflow and see where it breaks. You can iterate based on evidence, not vibes.
+
+The other thing that stood out to me is that agents are not a single moment of brilliance. They are workflow.
+
+The useful pattern is a loop. Plan, act, observe, adjust. Tool use. Logging. Constraint enforcement. Retry logic. Escalation when confidence is low. Over time, the workflow becomes the product as much as the model becomes the product.
+
+This is also where I keep coming back to the phrase agentic engineering. The engineering is the point.
+
+If you have ever built a system that touches the real world, you know that failure is normal. Inputs are messy. Tools fail. Latency exists. Dependencies break. Users do unexpected things. A useful agent system has to be designed for that reality.
+
+So when I think about building with agents, I look for a few concrete requirements.
+
+I want clean interfaces and clear tool permissions. I want logs that let me reconstruct what happened. I want a way to reproduce failures. I want versioning for prompts, policies, and evaluation harnesses. I want a way to measure drift. I want a clear fallback path when the agent cannot be trusted in the moment.
+
+Those requirements are not exciting, but they are what separates a demo from a system.
+
+OpenClaw was a helpful reminder for me that the most important work is usually not the flashy part. The important work is making the loop reliable, observable, and safe.
+
+If you are building agents, I would like to hear what surprised you the most. What broke. What you changed after you saw real failures. That is where the best learning seems to live.
