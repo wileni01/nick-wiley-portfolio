@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Side projects and prototypes: RAG pipelines, embedding notebooks, governance toolkits, and grad school ML experiments.",
+    "Side projects and prototypes: embedding pipelines, governance toolkits, and reusable starting points for AI architecture work.",
 };
 
 const projects = [
@@ -61,10 +61,10 @@ export default function ProjectsPage() {
         <div className="space-y-4 mb-12">
           <h1 className="text-4xl font-bold tracking-tight">Projects</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
-            Side projects, prototypes, and toolkits I&apos;ve built outside
-            of client work. Some are reusable starting points for new
-            engagements; others are grad school experiments that taught me
-            something I still use.
+            Prototypes, toolkits, and reusable components I&apos;ve built
+            outside of client work. Some are starting points for new
+            architecture engagements; others are experiments that shaped
+            how I approach production systems.
           </p>
         </div>
 

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 export const metadata: Metadata = {
   title: "Writing",
   description:
-    "Notes on analytics that changes decisions, AI tools people can trust, and what consulting teaches you about governance and adoption.",
+    "Notes on AI solution architecture, governance in regulated environments, delivery leadership, and what building real systems teaches you.",
 };
 
 export default function WritingPage() {
@@ -23,10 +23,11 @@ export default function WritingPage() {
         <div className="space-y-4 mb-12">
           <h1 className="text-4xl font-bold tracking-tight">Writing</h1>
           <p className="text-lg text-muted-foreground">
-            Notes from building analytics and AI tools in regulated
-            environments. Most of what I write about comes down to two
-            questions: what makes these systems trustworthy, and what
-            makes people actually use them.
+            Notes from architecting and delivering AI systems in regulated
+            environments. Most of what I write about comes down to
+            governance, adoption, and what it takes to make these systems
+            trustworthy enough that the people accountable for outcomes
+            actually use them.
           </p>
         </div>
 

@@ -28,22 +28,23 @@ export const metadata: Metadata = {
   ),
   title: {
     default:
-      "Nick Wiley | Analytics, ML, and Decision-Support Tools for Federal Agencies",
+      "Nick Wiley | AI Solution Architecture & Delivery Leadership for Regulated Environments",
     template: "%s | Nick Wiley",
   },
   description:
-    "I build analytics, ML, and decision-support tools for federal civilian agencies. 12+ years of hands-on delivery at NSF, USDA, USPS, and Census.",
+    "AI solution architect and delivery leader. 12+ years designing analytics platforms, ML workflows, and governance frameworks for federal agencies including NSF, USDA, USPS, and Census.",
   keywords: [
     "Nick Wiley",
-    "AI Solutions Architect",
-    "Human-in-the-loop",
-    "Decision support",
+    "AI Solution Architect",
+    "AI Platforms",
+    "Delivery leadership",
+    "Governance",
+    "Responsible AI",
     "Federal analytics",
-    "Python",
     "NLP",
-    "Tableau",
-    "Data engineering",
-    "Applied AI",
+    "Python",
+    "Decision support",
+    "Regulated environments",
   ],
   authors: [{ name: "Nicholas A. Wiley" }],
   creator: "Nicholas A. Wiley",
@@ -60,23 +61,23 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "Nick Wiley",
     title:
-      "Nick Wiley | Analytics, ML, and Decision-Support Tools for Federal Agencies",
+      "Nick Wiley | AI Solution Architecture & Delivery Leadership for Regulated Environments",
     description:
-      "I build analytics, ML, and decision-support tools for federal civilian agencies. 12+ years of hands-on delivery at NSF, USDA, USPS, and Census.",
+      "AI solution architect and delivery leader. 12+ years designing analytics platforms, ML workflows, and governance frameworks for federal agencies.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Nick Wiley, analytics and ML for federal agencies",
+        alt: "Nick Wiley — AI solution architecture and delivery leadership",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nick Wiley | Analytics, ML, and Decision-Support Tools",
+    title: "Nick Wiley | AI Solution Architecture & Delivery Leadership",
     description:
-      "I build analytics, ML, and decision-support tools for federal civilian agencies.",
+      "AI solution architect and delivery leader. 12+ years in regulated federal environments.",
     images: ["/og-image.png"],
   },
   robots: {

@@ -5,7 +5,7 @@ import { WorkIndexClient } from "@/components/work/work-index-client";
 export const metadata: Metadata = {
   title: "Work",
   description:
-    "Case studies from analytics, ML, and decision-support work at NSF, USDA, USPS, and a startup. Each covers the problem, what I built, and what changed.",
+    "Case studies in AI solution architecture and delivery: NLP pipelines, data platforms, governance frameworks, and decision-support systems for federal agencies.",
 };
 
 export default function WorkPage() {

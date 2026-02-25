@@ -5,7 +5,8 @@ import {
   Download,
   Brain,
   Database,
-  Users,
+  ShieldCheck,
+  Linkedin,
   Quote,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,24 +16,57 @@ import { getFeaturedCaseStudies } from "@/lib/mdx";
 import { HomeClient } from "@/components/home/home-client";
 import { PersonalizedHero } from "@/components/adaptive/personalized-hero";
 
-const whatIDo = [
+const proofPoints = [
   {
     icon: Brain,
-    title: "Decision support tools",
+    title: "NLP pipeline for research proposal triage",
     description:
-      "I build apps that surface model outputs alongside confidence scores, let reviewers override recommendations, and log every decision for audit. The goal is faster expert judgment, not less of it.",
+      "Designed a SciBERT embedding and clustering workflow (HDBSCAN, k-means, Bayesian optimization) that classified 7,000+ research proposals into 70+ themes — with ambiguous proposals flagged for human review, not forced into poor-fit clusters.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Governance, auditability, responsible AI",
+    description:
+      "Partnered with governance and security stakeholders to define responsible AI guardrails: data quality checks, monitoring expectations, review workflows, and documentation standards for reproducible, auditable pipelines.",
   },
   {
     icon: Database,
-    title: "Data platforms and analytics",
+    title: "Data platform supporting 50,000+ operations",
     description:
-      "Warehouses, ETL pipelines, and Tableau dashboards that turn fragmented agency data into reporting people actually trust. I've built these for USDA, NSF, and USPS.",
+      "Architected a global data warehouse and Tableau reporting suite for USDA's organic program — integrating Salesforce, CBP customs records, and investigative databases into a governed source of truth.",
+  },
+];
+
+const howIWork = [
+  {
+    step: "01",
+    title: "Align",
+    description:
+      "Identify the decision, the stakeholders, and the constraints. Define success criteria before writing code.",
   },
   {
-    icon: Users,
-    title: "Adoption and governance",
+    step: "02",
+    title: "Architect",
     description:
-      "I write the documentation, run the training sessions, and sit through the stakeholder reviews. A tool nobody uses is a tool that failed.",
+      "Design the system end-to-end: data pipelines, model workflows, integration points, governance controls, and audit trails.",
+  },
+  {
+    step: "03",
+    title: "Prototype",
+    description:
+      "Build working software quickly. Validate assumptions with real users and real data before committing to scale.",
+  },
+  {
+    step: "04",
+    title: "Operationalize",
+    description:
+      "Harden pipelines, document everything, establish monitoring. Make it reproducible and maintainable.",
+  },
+  {
+    step: "05",
+    title: "Drive adoption",
+    description:
+      "Train users, run stakeholder reviews, retire legacy processes. A tool nobody uses is a tool that failed.",
   },
 ];
 
@@ -62,19 +96,20 @@ export default function HomePage() {
           <div className="max-w-3xl space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] leading-[1.15]">
-                I build AI tools that keep
+                I architect AI systems that
                 <br />
                 <span className="text-primary">
-                  experts in control.
+                  earn trust in regulated environments.
                 </span>
               </h1>
 
               <p className="max-w-2xl text-lg text-muted-foreground leading-relaxed sm:text-xl">
-                Decision-support apps, analytics platforms, and ML
-                workflows for federal agencies, designed so the people
-                accountable for outcomes{" "}
+                End-to-end AI solution architecture, delivery leadership,
+                and governance for federal agencies.{" "}
                 <strong className="text-foreground font-medium">
-                  can see, override, and explain every recommendation
+                  12+ years designing systems where the people accountable
+                  for outcomes can see, override, and explain every
+                  recommendation
                 </strong>
                 .
               </p>
@@ -95,6 +130,16 @@ export default function HomePage() {
                 </a>
               </Button>
               <Button asChild variant="ghost" size="lg">
+                <a
+                  href="https://linkedin.com/in/nicholas-a-wiley-975b3136"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Linkedin className="h-4 w-4" />
+                  LinkedIn
+                </a>
+              </Button>
+              <Button asChild variant="ghost" size="lg">
                 <Link href="/contact">Contact</Link>
               </Button>
             </div>
@@ -108,14 +153,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── What I Do ───────────────────────────────────── */}
-      <section id="what-i-do" className="py-20 px-4 sm:px-6 lg:px-8">
+      {/* ── What I Deliver ────────────────────────────────── */}
+      <section id="what-i-deliver" className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-2xl font-bold tracking-tight mb-10">
-            What I build
+            What I deliver
           </h2>
           <div className="grid gap-6 sm:grid-cols-3">
-            {whatIDo.map((item) => (
+            {proofPoints.map((item) => (
               <Card key={item.title} className="hover:border-primary/20 transition-colors">
                 <CardContent className="pt-6 space-y-3">
                   <item.icon className="h-8 w-8 text-primary" />
@@ -212,23 +257,23 @@ export default function HomePage() {
       {/* ── How I Work ──────────────────────────────────── */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
-          <h2 className="text-2xl font-bold tracking-tight mb-6">
-            How I think about the work
+          <h2 className="text-2xl font-bold tracking-tight mb-10">
+            How I work
           </h2>
-          <div className="space-y-4 text-muted-foreground leading-relaxed">
-            <p>
-              I start with the decision someone needs to make and work
-              backwards from there. What data do they need? What does the
-              workflow look like, and who is accountable for the outcome.
-            </p>
-            <p>
-              Then I build a system that makes that decision{" "}
-              <strong className="text-foreground font-medium">
-                faster, more consistent, and auditable
-              </strong>
-              . Governance and usability are engineering requirements, not
-              afterthoughts.
-            </p>
+          <div className="space-y-6">
+            {howIWork.map((item) => (
+              <div key={item.step} className="flex gap-5">
+                <span className="text-2xl font-bold text-primary/30 tabular-nums shrink-0 w-8 text-right">
+                  {item.step}
+                </span>
+                <div className="space-y-1 pb-6 border-b border-border last:border-0">
+                  <h3 className="text-base font-semibold">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -257,8 +302,9 @@ export default function HomePage() {
             Worth a conversation?
           </h2>
           <p className="text-muted-foreground">
-            If you&apos;re working on analytics, decision-support tooling,
-            or applied AI in a regulated setting, I&apos;d be glad to talk.
+            If you need AI solution architecture, delivery leadership,
+            or governance expertise for a regulated environment, I&apos;d
+            be glad to talk.
           </p>
           <div className="flex justify-center gap-4">
             <Button asChild size="lg">

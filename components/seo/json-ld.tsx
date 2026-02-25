@@ -7,9 +7,9 @@ export function PersonJsonLd() {
     name: "Nicholas A. Wiley",
     alternateName: "Nick Wiley",
     url: baseUrl,
-    jobTitle: "Managing Consultant, Analytics and ML",
+    jobTitle: "Managing Consultant — AI Solution Architecture & Delivery",
     description:
-      "Managing Consultant and applied data scientist with 12+ years building analytics, ML, and decision-support tools for federal civilian agencies. Founded an AR startup. Holds two U.S. utility patents.",
+      "AI solution architect and delivery leader with 12+ years designing analytics platforms, ML workflows, and governance frameworks for federal civilian agencies. U.S. patent holder.",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Alexandria",
@@ -17,19 +17,19 @@ export function PersonJsonLd() {
       addressCountry: "US",
     },
     knowsAbout: [
-      "Human-in-the-loop AI",
-      "Decision support systems",
+      "AI solution architecture",
+      "Delivery leadership",
+      "Responsible AI governance",
+      "NLP embeddings (SciBERT)",
+      "Clustering (HDBSCAN, k-means)",
       "Python",
       "SQL",
-      "NLP embeddings",
-      "SciBERT",
-      "Clustering (HDBSCAN, k-means)",
       "Tableau",
-      "Google BigQuery",
+      "AWS (SageMaker, Bedrock)",
       "Data pipelines",
       "Federal analytics",
-      "Agile delivery",
-      "Section 508 accessibility",
+      "Agile / SAFe delivery",
+      "Human-in-the-loop AI",
     ],
     alumniOf: [
       {
@@ -63,7 +63,7 @@ export function WebsiteJsonLd() {
     name: "Nick Wiley",
     url: baseUrl,
     description:
-      "Analytics, ML, and decision-support tools for federal agencies. Tools people can trust and actually use.",
+      "AI solution architecture and delivery leadership for regulated environments. Analytics platforms, ML workflows, and governance frameworks for federal agencies.",
     author: {
       "@type": "Person",
       name: "Nicholas A. Wiley",

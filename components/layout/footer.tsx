@@ -24,8 +24,9 @@ export function Footer() {
               Nick Wiley
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Analytics, ML, and decision-support tools for federal
-              agencies. I build things people can trust and actually use.
+              AI solution architecture and delivery leadership for
+              regulated environments. Systems people can trust and
+              actually use.
             </p>
           </div>
 
