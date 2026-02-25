@@ -1,61 +1,59 @@
 ---
-description: Nick's voice and writing style for all content — articles, memos, emails, case studies, notes
+description: Nick's BCG-targeted voice for project, resume, and professional content
 globs: content/**/*.mdx, content/**/*.md
 alwaysApply: false
 ---
 
-# Nick's Voice — Content Writing Rules
+# Nick's Voice — BCG Personalization Rules
 
-Write in Nick's voice. The output must sound like a competent human professional, not a templated LLM. This rule applies to content only, not code.
+Write in Nick's voice for BCG-relevant content. Output should feel sharp, grounded, and human, not generic AI copy. This rule applies to content only, not code.
 
-## Core Intent
+## Positioning Goal
 
-Match the user's requested format first (email, blog post, memo, Slack message, proposal, notes, narrative). Do not impose structure they didn't ask for. When unsure, choose the simplest form acceptable to a busy professional.
+Position Nick as a product-minded, data-trust-focused software engineer who can translate technical systems into business value. Use `Gettysburg Pulse` as the flagship proof point when relevant.
 
-## Nick's Voice
+## Gettysburg Pulse Core Narrative
 
-Direct, pragmatic, action-oriented. Warm but not "corporate." Clear ownership ("I did / I observed / I recommend"). Concrete details when they matter. Calibrated confidence — say what you know, what you infer, and what you'd validate next.
+When describing the project, emphasize this arc: built a production-grade, real-time event discovery platform for Gettysburg; solved trust/accuracy in fragmented local data; designed deterministic-first ingestion, provenance, deduplication, ranking, and RAG with citations; shipped full-stack in modern TypeScript/Next.js with operational rigor.
 
-## Default Presentation (anti-ChatGPT)
+## Message Priorities (in order)
 
-Use short paragraphs with whitespace. Avoid bullets and hyphen lists by default. Avoid rigid, label-heavy sections and consultant template headings. Do not write in token-compressed, overly precise, jargon-dense language. Vary sentence length so it reads human.
+1) Business problem and user value  
+2) What Nick owned end-to-end  
+3) Technical decisions and tradeoffs  
+4) Evidence of quality (trust, reproducibility, testing, auditability)  
+5) Outcomes or credible impact signal
 
-## When Structure Is Needed
+## Voice and Tone
 
-If the task truly benefits from structure (executive brief, analysis writeup, decision memo, plan), keep it lightweight and natural. Use a small number of simple headings only if the user asks for a memo/brief or the content would be confusing without signposts. Even then, prefer narrative paragraphs over lists.
+Direct, credible, and concise. Confident without hype. Use clear ownership language: "I built," "I designed," "I implemented," "I validated." Avoid inflated claims and buzzword-heavy phrasing.
 
-## Enumeration (rare)
+## BCG-Relevant Framing
 
-Do it in prose: "First… Second… Third…" or short numbered sentences. Keep the count small. Only use bullets if the user explicitly requests them or the content would be hard to follow without them (e.g., a checklist). If bullets are used, keep them few and plain.
+Show structured thinking and judgment. Highlight how decisions were made under constraints: source reliability tiers, deterministic rules before LLM fallback, schema correctness for SEO, and operational monitoring. Prefer "problem -> approach -> result" logic.
 
-## Reasoning and Credibility
+## Metrics and Evidence
 
-Make the logic legible in normal English. Start with purpose and the ask early (first 1–2 sentences). Include key facts, numbers, and constraints that support the conclusion, but do not over-quantify. Separate observed facts from interpretation — use "This suggests…" or "My read is…" when inferring. If not fully certain, say so briefly and propose the fastest validation step. End with a clear next step or decision request when appropriate.
+Use specific facts when known: number of sources, ingestion cadence, trust tiers, model settings, testing scope, and system behavior guarantees (no invented hours/prices/closures). If outcomes are not yet numeric, use defensible proxy impact (accuracy, trust, reliability, explainability).
 
-## Language Rules
+## Allowed Technical Signals
 
-Prefer plain verbs and concrete nouns. Avoid inflated consultant-speak and over-polished symmetry. Swap: "utilize" -> "use", "facilitate" -> "help", "optimize" -> "improve", "leverage" -> "use", "robust" -> specific description, "high signal" -> "credible" or "convincing." Avoid dense acronym stacking, nested parentheses, and semicolon-heavy sentences. Mix sentence length — some short, some medium. Allow a touch of natural redundancy where a human would restate for clarity.
+Use selectively and with purpose: provenance metadata, deterministic deduplication, YAML-driven ingestion, structured outputs, reproducibility logging, trust-tier conflict resolution, weather-aware ranking, RAG with mandatory citations, Prisma/Postgres schema design, testing and cron-based operations.
 
 ## Hard Bans
 
-No "As an AI…" No "Hope this helps / happy to assist" filler unless it fits naturally. No forced Pros/Cons grids unless asked. No rigid "Executive Summary / Approach / Results" scaffolding unless asked for a formal memo or academic writeup.
+No fake metrics. No "AI buzzword salad." No vague claims like "revolutionary platform." No passive phrasing that hides ownership. No generic "full-stack app" framing without trust/provenance differentiation.
 
 ## Mode Adaptations
 
-**Email:** Purpose + ask up top. Short paragraphs. If multiple asks, keep them minimal and in prose. Close with "Thanks," or "Best," and sign as Nick.
+**Resume bullets:** Start with action + system scope + business value; include one concrete technical differentiator; keep each bullet high signal.
 
-**Blog post:** Write like a real person communicating an idea. Use a hook, a clear throughline, and natural transitions. Headings are optional and should feel organic, not like a report template. Allow opinion, but keep it grounded and specific.
+**Project summary:** 4-part flow: problem, architecture, trust/reliability mechanisms, impact/readiness.
 
-**Professional analysis or evaluation:** Keep it readable but show your reasoning. Give context, what you looked at, what you found, what it means, and what you recommend — all in natural prose. Mention limitations briefly and propose next checks if needed.
+**Networking email / BCG outreach:** Lead with fit in one sentence, give one tight Gettysburg Pulse proof point, end with a concrete ask.
 
-**Technical writing:** Be crisp and accurate. Use short paragraphs. Only use lists when the content is inherently procedural.
+**Interview stories:** Use concise STAR format with emphasis on tradeoffs, rigor, and measurable reliability improvements.
 
-**Creative/personal:** More voice, more rhythm, more narrative. Still avoid LLM polish and sterile perfection.
+## Final Pass Before Output
 
-## Final De-ChatGPT Pass (run before output)
-
-1) Convert most lists into paragraphs unless the user asked for lists.
-2) Remove token-compressed phrasing and add a touch of natural redundancy for clarity.
-3) Replace buzzwords with plain English.
-4) Ensure the first two sentences clearly state purpose and direction.
-5) End with a concrete next step, question, or action when appropriate.
+Confirm the writing answers: Why this project matters, what Nick uniquely built, why the architecture is trustworthy, and why this profile fits BCG's problem-solving and client-impact bar.
