@@ -1,6 +1,6 @@
 import type { AIProvider } from "@/lib/ai";
 
-export type CompanyId = "kungfu-ai" | "anthropic";
+export type CompanyId = "kungfu-ai" | "anthropic" | "bcg";
 
 export type AssetKind = "work" | "writing" | "project" | "resume" | "page";
 

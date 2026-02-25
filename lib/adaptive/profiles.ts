@@ -238,6 +238,76 @@ export const companyProfiles: CompanyProfile[] = [
       "https://privacy.anthropic.com/en/",
     ],
   },
+  {
+    id: "bcg",
+    name: "Boston Consulting Group",
+    website: "https://www.bcg.com",
+    summary:
+      "Global management consulting firm advising on strategy, technology transformation, GenAI adoption, and data-driven operating models.",
+    priorityTags: [
+      "strategy",
+      "enterprise-delivery",
+      "governance",
+      "ai-engineering",
+      "data-platform",
+      "operations",
+      "leadership",
+      "consulting",
+    ],
+    theme: {
+      light: {
+        primary: "#147B58",
+        accent: "#0D6E4F",
+        ring: "#147B58",
+        background: "#F8FAF9",
+        foreground: "#0F1F18",
+        muted: "#EEF3F0",
+        border: "#D1DDD6",
+      },
+      dark: {
+        primary: "#2EA87A",
+        accent: "#5CC4A0",
+        ring: "#2EA87A",
+        background: "#0A1210",
+        foreground: "#E8F2EC",
+        muted: "#16261F",
+        border: "#1E3A2E",
+      },
+    },
+    personas: [
+      {
+        id: "bcg-harsh",
+        name: "Harsh Vardhan Singh",
+        role: "Partner — GenAI, Data & Agents",
+        recommendationGoal:
+          "Demonstrate production AI delivery, data platform architecture, and strategic transformation outcomes that translate to enterprise-scale GenAI impact.",
+        focusPresets: [
+          "Emphasize AI/ML delivery at scale with measurable business outcomes.",
+          "Highlight data platform architecture and analytics that drive strategic decisions.",
+          "Focus on governance, adoption, and change management in complex organizations.",
+        ],
+        focusTags: [
+          "ai-engineering",
+          "ai-ml",
+          "strategy",
+          "enterprise-delivery",
+          "data-platform",
+          "analytics",
+          "adoption",
+          "decision-support",
+          "governance",
+          "automation",
+          "leadership",
+          "operations",
+        ],
+        assetTypeWeights: { work: 1.5, writing: 1.2, resume: 1.3, project: 0.9 },
+      },
+    ],
+    sources: [
+      "https://www.bcg.com/capabilities/artificial-intelligence",
+      "https://www.bcg.com/capabilities/digital-technology-data",
+    ],
+  },
 ];
 
 export function getCompanyProfiles(): CompanyProfile[] {
