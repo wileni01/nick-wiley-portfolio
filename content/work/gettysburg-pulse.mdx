@@ -1,0 +1,68 @@
+---
+title: "Gettysburg Pulse: Real-time event discovery with trust, provenance, and deterministic AI workflows"
+slug: "gettysburg-pulse"
+client: "Product build (Gettysburg tourism ecosystem)"
+timeframe: "2025–present"
+role: "Founder / full-stack product engineer"
+stack:
+  - Next.js 16
+  - React 19
+  - TypeScript
+  - Prisma
+  - PostgreSQL
+  - Tailwind CSS
+  - OpenAI GPT-4o-mini
+  - Cheerio
+  - NWS API
+  - Vercel Cron
+tags:
+  - Product
+  - Full-stack
+  - Data engineering
+  - AI/ML
+  - RAG
+  - SEO
+  - Provenance
+featured: true
+image: "/images/projects/placeholder-gov.svg"
+executiveSummary: "Built Gettysburg Pulse, a production-grade event discovery platform that aggregates 9+ sources into a feed-first experience with provenance metadata, trust tiers, and deterministic deduplication so visitors can rely on what they see."
+builderSummary: "Implemented a YAML-driven multi-source ingestion pipeline, deterministic-first dedupe engine, provenance-first data model, weather-aware ranking, and citation-required RAG chatbot on a Next.js + Prisma + Postgres stack."
+---
+
+## Context
+
+Gettysburg has many event and attraction sources, but they are fragmented across websites with inconsistent freshness and formatting. Visitors, especially first-time tourists, struggle to answer simple questions like what is happening this weekend and which listings are current.
+
+The core product goal was to make Gettysburg Pulse the most trusted machine-readable feed for things to do in Gettysburg while never inventing critical facts such as hours, prices, or closures.
+
+## What I built
+
+I built a full-stack platform with a feed-first homepage and filterable time horizons (today, weekend, and rolling windows), plus category and indoor/outdoor filtering. Every card shows a source badge, last-verified timestamp, and direct source link so users can validate the data themselves.
+
+The ingestion system pulls from 9+ configured sources with source-specific cadence (hourly, daily, weekly) and normalizes records into a common schema. Sources are declared in YAML with trust tier, access method, format, and cadence so new sources can be added without changing core orchestration logic.
+
+## Technical depth
+
+**Deterministic-first deduplication.** I implemented multi-pass dedupe rules: hard merges for identical source IDs/URLs, strong merges for title-time-venue overlap, and LLM-assisted tiebreaking only for ambiguous edge cases. Merge decisions are logged for traceability.
+
+**Provenance and trust model.** Each event and alert carries source ID, source URL, fetch timestamp, last-seen and last-verified timestamps, trust tier, extraction confidence, and raw-content fingerprint. This enables both UI-level trust signals and backend auditability.
+
+**AI extraction with reproducibility controls.** For unstructured sources, I used GPT-4o-mini Structured Outputs to extract event objects under strict schema constraints, deterministic settings, and full call logging (model, temperature, seed, prompt hash, input hash, fingerprint).
+
+**Weather-aware ranking.** I integrated NWS weather data into ranking so outdoor events are down-weighted during poor conditions, while preserving strong source-trust and freshness weighting.
+
+**RAG chatbot with citation guarantees.** I implemented a retrieval-first assistant that answers questions from local indexed records, cites source URLs and verification timestamps, and explicitly declines to guess when evidence is missing.
+
+## SEO and product quality
+
+I treated SEO as a product requirement, not an afterthought. Event pages emit JSON-LD Event schema aligned with visible content, venue pages use appropriate Place/Museum/TouristAttraction schema types, and list pages use WebPage + ItemList. Sitemap generation and internal linking support crawlability and discoverability.
+
+I also implemented test coverage for ranking and dedupe behavior and designed operations around scheduled ingestion and health visibility in an admin surface.
+
+## Outcome
+
+Gettysburg Pulse demonstrates an end-to-end system where trust is an architecture decision, not just a UX claim. The product combines data engineering discipline, full-stack delivery, and practical AI usage to provide a verifiable real-time local intelligence feed for visitors.
+
+## What I learned
+
+In local discovery products, trust and freshness are more important than feature count. Users accept incomplete coverage if what they see is current, sourced, and clearly explained. Deterministic rules plus transparent provenance consistently outperform opaque "smart" ranking in user confidence.

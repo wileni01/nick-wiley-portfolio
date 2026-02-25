@@ -17,6 +17,39 @@ export interface Project {
 }
 
 export const projects: Project[] = [
+  // ── Product Builds ────────────────────────────────────
+  {
+    slug: "gettysburg-pulse",
+    title: "Gettysburg Pulse — Real-Time Event Discovery Platform",
+    description:
+      "Feed-first event discovery platform aggregating trusted Gettysburg sources with provenance metadata, deterministic deduplication, and citation-based AI assistance.",
+    longDescription: `Built Gettysburg Pulse as a production-grade full-stack platform for visitors looking for reliable, up-to-date things to do in Gettysburg. The product aggregates events, attractions, and alerts from multiple sources into a feed-first experience with transparent source badges and verification timestamps.
+
+Designed a YAML-driven ingestion pipeline across 9+ sources, deterministic-first deduplication rules with logged conflict resolution, provenance-rich data modeling, weather-aware ranking, and a retrieval-first chatbot that requires citations for factual responses. Implemented on Next.js + TypeScript + Prisma/PostgreSQL with scheduled ingestion and operational monitoring.`,
+    category: ["Product", "Full-Stack", "AI/ML"],
+    technologies: [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "Prisma",
+      "PostgreSQL",
+      "Tailwind CSS",
+      "OpenAI GPT-4o-mini",
+      "Cheerio",
+      "NWS API",
+      "Vercel Cron",
+    ],
+    image: "/images/projects/placeholder-gov.svg",
+    featured: true,
+    status: "completed",
+    problem:
+      "Tourism event data in Gettysburg is fragmented across many sites with inconsistent freshness, making it hard for visitors to trust what is open, current, and worth doing right now.",
+    solution:
+      "Built a feed-first platform with multi-source ingestion, trust-tier provenance metadata, deterministic deduplication, weather-aware ranking, and a citation-required RAG chatbot to avoid hallucinated facts.",
+    impact:
+      "Created a verifiable local intelligence layer where users can see source, freshness, and confidence for each listing — improving trust, explainability, and practical decision-making for first-time visitors.",
+  },
+
   // ── LLI Client Work ──────────────────────────────────
   {
     slug: "gettysburg-leadership",
