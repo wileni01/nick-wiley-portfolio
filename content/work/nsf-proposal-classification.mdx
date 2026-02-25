@@ -25,7 +25,7 @@ tags:
   - Governance
 featured: true
 image: "/images/projects/optuna-classification.png"
-executiveSummary: "Architected a SciBERT embedding and clustering pipeline (HDBSCAN, k-means, Bayesian optimization) that classified 7,000+ research proposals into 70+ themes for reviewer decision support. Ambiguous proposals flagged for human review rather than forced into poor-fit clusters."
+executiveSummary: "Designed a SciBERT embedding and clustering pipeline (HDBSCAN, k-means, Bayesian optimization) that classified 7,000+ research proposals into 70+ themes for reviewer decision support. Ambiguous proposals flagged for human review rather than forced into poor-fit clusters."
 builderSummary: "SciBERT + UMAP + HDBSCAN/k-means pipeline with Optuna Bayesian optimization across 100+ trials. Plotly dashboards for topic exploration and organizational alignment. Designed for reproducibility and auditability."
 ---
 
@@ -37,7 +37,7 @@ I needed to build a system that could discover the natural thematic structure in
 
 ## Architecture approach
 
-I designed a modular NLP pipeline built around **SciBERT** embeddings — a domain-specific transformer trained on scientific literature, chosen because general-purpose models underperform on technical abstracts. SciBERT converts proposal abstracts into dense 768-dimensional vectors that capture semantic meaning far beyond keyword matching. UMAP reduces those high-dimensional embeddings into a space where clustering is computationally tractable while preserving local and global structure. Both **HDBSCAN** and **k-means** were evaluated as clustering methods — HDBSCAN for discovering natural groupings without pre-specifying topic counts, k-means for cases where organizational alignment required a fixed number of categories.
+I designed a modular NLP pipeline built around **SciBERT** embeddings, a domain-specific transformer trained on scientific literature. General-purpose models underperform on technical abstracts, so the domain specificity mattered. SciBERT converts proposal abstracts into dense 768-dimensional vectors that capture semantic meaning far beyond keyword matching. UMAP reduces those high-dimensional embeddings into a space where clustering is computationally tractable while preserving local and global structure. Both **HDBSCAN** and **k-means** were evaluated as clustering methods: HDBSCAN for discovering natural groupings without pre-specifying topic counts, k-means for cases where organizational alignment required a fixed number of categories.
 
 The result is interpretable topic clusters with associated keywords, representative documents, and confidence scores. The pipeline was designed for reproducibility: versioned parameters, documented preprocessing steps, and auditable outputs at each stage.
 
@@ -67,6 +67,6 @@ Proposal clustering went from a weeks-long manual effort to an hours-long guided
 
 ## What I learned
 
-Domain-specific embeddings (SciBERT vs. general-purpose models) made a measurable difference in cluster quality for technical text. And the decision to flag ambiguous proposals for human review rather than force-classifying them was the right call — it built trust with the subject-matter experts who had to act on the results. Responsible AI in practice often means knowing when the model should step back.
+Domain-specific embeddings (SciBERT vs. general-purpose models) made a measurable difference in cluster quality for technical text. And the decision to flag ambiguous proposals for human review rather than force-classifying them was the right call. It built trust with the subject-matter experts who had to act on the results. Responsible AI in practice often means knowing when the model should step back.
 
 *Details are sanitized to protect agency-specific information.*

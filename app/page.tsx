@@ -21,7 +21,7 @@ const proofPoints = [
     icon: Brain,
     title: "NLP pipeline for research proposal triage",
     description:
-      "Designed a SciBERT embedding and clustering workflow (HDBSCAN, k-means, Bayesian optimization) that classified 7,000+ research proposals into 70+ themes — with ambiguous proposals flagged for human review, not forced into poor-fit clusters.",
+      "Designed a SciBERT embedding and clustering workflow (HDBSCAN, k-means, Bayesian optimization) that classified 7,000+ research proposals into 70+ themes. Ambiguous proposals flagged for human review, not forced into poor-fit clusters.",
   },
   {
     icon: ShieldCheck,
@@ -33,7 +33,7 @@ const proofPoints = [
     icon: Database,
     title: "Data platform supporting 50,000+ operations",
     description:
-      "Architected a global data warehouse and Tableau reporting suite for USDA's organic program — integrating Salesforce, CBP customs records, and investigative databases into a governed source of truth.",
+      "Built a global data warehouse and Tableau reporting suite for USDA's organic program, integrating Salesforce, CBP customs records, and investigative databases into a governed source of truth.",
   },
 ];
 

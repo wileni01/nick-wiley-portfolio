@@ -8,7 +8,7 @@ import { SkillsHighlight } from "@/components/adaptive/skills-highlight";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Nick Wiley — AI solution architect and delivery leader. 12+ years designing analytics platforms, ML workflows, and governance frameworks for federal agencies. Managing Consultant at IBM. U.S. patent holder.",
+    "Nick Wiley, AI solution architect and delivery leader. 12+ years designing analytics platforms, ML workflows, and governance frameworks for federal agencies. Managing Consultant at IBM. U.S. patent holder.",
 };
 
 export default function AboutPage() {
@@ -30,7 +30,7 @@ export default function AboutPage() {
             />
           </div>
           <p className="text-lg text-muted-foreground leading-relaxed pt-2">
-            I&apos;m Nick — a Managing Consultant at IBM Global Business
+            I&apos;m Nick, a Managing Consultant at IBM Global Business
             Services (AI &amp; Analytics), where I architect and deliver
             analytics platforms, ML workflows, and decision-support systems
             for federal civilian agencies. Based in Alexandria, VA.
@@ -43,7 +43,7 @@ export default function AboutPage() {
             I&apos;ve developed a consistent approach: start with the decision
             someone needs to make, then design the system that makes it
             faster, more consistent, and auditable. I own delivery
-            end-to-end — from technical architecture through stakeholder
+            end-to-end, from technical architecture through stakeholder
             alignment, documentation, governance, and adoption.
           </p>
 
@@ -55,10 +55,10 @@ export default function AboutPage() {
             global data warehouse supporting 50,000+ USDA organic operations,
             integrating Salesforce, CBP customs records, and investigative
             databases. I&apos;ve partnered with governance and security
-            stakeholders to define responsible AI guardrails — data quality
-            checks, monitoring expectations, and review workflows — and
-            I&apos;ve mentored junior analysts while contributing to
-            proposals, delivery plans, and risk assessments.
+            stakeholders to define responsible AI guardrails, including
+            data quality checks, monitoring expectations, and review
+            workflows. I&apos;ve mentored junior analysts and contributed
+            to proposals, delivery plans, and risk assessments.
           </p>
 
           <p>
@@ -96,12 +96,12 @@ export default function AboutPage() {
 
           <p>
             I&apos;m pursuing Principal-level AI solution architecture
-            work — the kind of engagement where you own the technical vision
+            work: the kind of engagement where you own the technical vision
             for an AI platform, lead cross-functional delivery teams, and
             ensure governance and auditability are built in from day one.
             I do my best work in regulated environments where the stakes are
             real, the systems need to earn trust, and someone has to stay
-            through adoption and operationalization — not just the design
+            through adoption and operationalization, not just the design
             phase.
           </p>
 
