@@ -39,7 +39,7 @@ Designed a YAML-driven ingestion pipeline across 9+ sources, deterministic-first
       "NWS API",
       "Vercel Cron",
     ],
-    image: "/images/projects/placeholder-gov.svg",
+    image: "/images/projects/gettysburg-pulse.png",
     featured: true,
     status: "completed",
     problem:

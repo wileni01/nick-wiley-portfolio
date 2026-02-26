@@ -18,7 +18,7 @@ const tourSteps: TourStep[] = [
       "I build AI and analytics tools for federal agencies, designed so the people accountable for outcomes stay in control.",
   },
   {
-    targetId: "what-i-do",
+    targetId: "what-i-deliver",
     title: "What I build",
     description:
       "Decision-support apps, data platforms, and the adoption and governance work that makes those tools stick.",
