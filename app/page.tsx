@@ -28,14 +28,14 @@ import {
 type SearchParams = Record<string, string | string[] | undefined>;
 
 type HomePageProps = {
-  searchParams?: SearchParams | Promise<SearchParams>;
+  searchParams?: Promise<SearchParams>;
 };
 
 async function unwrapSearchParams(
-  searchParams?: SearchParams | Promise<SearchParams>
+  searchParams?: Promise<SearchParams>
 ): Promise<SearchParams> {
   if (!searchParams) return {};
-  return Promise.resolve(searchParams);
+  return await searchParams;
 }
 
 const proofPoints = [

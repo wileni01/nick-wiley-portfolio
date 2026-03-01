@@ -116,7 +116,7 @@ export function AdaptiveProvider({ children }: { children: ReactNode }) {
       const resolved = resolveState(shortMode.companyId, shortMode.personaId);
       if (resolved.isActive) {
         setState(resolved);
-        if (resolved.personaId) {
+        if (resolved.companyId && resolved.personaId) {
           persistAdaptiveCookie(resolved.companyId, resolved.personaId);
         }
         try {
@@ -141,7 +141,7 @@ export function AdaptiveProvider({ children }: { children: ReactNode }) {
       const resolved = resolveState(urlCompany, urlPersona);
       if (resolved.isActive) {
         setState(resolved);
-          if (resolved.personaId) {
+          if (resolved.companyId && resolved.personaId) {
             persistAdaptiveCookie(resolved.companyId, resolved.personaId);
           }
         try {
@@ -167,7 +167,7 @@ export function AdaptiveProvider({ children }: { children: ReactNode }) {
         const resolved = resolveState(companyId, personaId);
         if (resolved.isActive) {
           setState(resolved);
-          if (resolved.personaId) {
+          if (resolved.companyId && resolved.personaId) {
             persistAdaptiveCookie(resolved.companyId, resolved.personaId);
           }
           return;
@@ -183,7 +183,7 @@ export function AdaptiveProvider({ children }: { children: ReactNode }) {
       const resolved = resolveState(companyId, personaId ?? null);
       setState(resolved);
       if (resolved.isActive) {
-        if (resolved.personaId) {
+        if (resolved.companyId && resolved.personaId) {
           persistAdaptiveCookie(resolved.companyId, resolved.personaId);
         }
         try {
