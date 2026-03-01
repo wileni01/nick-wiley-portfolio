@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
@@ -128,6 +129,7 @@ export default function RootLayout({
             </AdaptiveProvider>
           </Suspense>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
