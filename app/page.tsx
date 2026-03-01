@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import {
   ArrowRight,
   Download,
@@ -15,6 +17,26 @@ import { Badge } from "@/components/ui/badge";
 import { getFeaturedCaseStudies } from "@/lib/mdx";
 import { HomeClient } from "@/components/home/home-client";
 import { PersonalizedHero } from "@/components/adaptive/personalized-hero";
+import { PlatinionHomeContent } from "@/components/home/platinion-home-content";
+import {
+  ADAPTIVE_MODE_COOKIE,
+  getAdaptiveModeFromSearchParams,
+  isPlatinionView,
+  parseAdaptiveModeCookie,
+} from "@/lib/adaptive/platinion";
+
+type SearchParams = Record<string, string | string[] | undefined>;
+
+type HomePageProps = {
+  searchParams?: SearchParams | Promise<SearchParams>;
+};
+
+async function unwrapSearchParams(
+  searchParams?: SearchParams | Promise<SearchParams>
+): Promise<SearchParams> {
+  if (!searchParams) return {};
+  return Promise.resolve(searchParams);
+}
 
 const proofPoints = [
   {
@@ -70,8 +92,41 @@ const howIWork = [
   },
 ];
 
-export default function HomePage() {
+export async function generateMetadata({
+  searchParams,
+}: HomePageProps): Promise<Metadata> {
+  const resolvedSearchParams = await unwrapSearchParams(searchParams);
+  const platinionVariantFromQuery = isPlatinionView(resolvedSearchParams);
+
+  return {
+    alternates: {
+      canonical: "/",
+    },
+    robots: platinionVariantFromQuery
+      ? {
+          index: false,
+          follow: false,
+          googleBot: {
+            index: false,
+            follow: false,
+          },
+        }
+      : undefined,
+  };
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const resolvedSearchParams = await unwrapSearchParams(searchParams);
+  const modeFromQuery = getAdaptiveModeFromSearchParams(resolvedSearchParams);
+  const modeFromCookie = parseAdaptiveModeCookie(
+    (await cookies()).get(ADAPTIVE_MODE_COOKIE)?.value
+  );
+  const platinionVariant = Boolean(modeFromQuery || modeFromCookie);
   const featured = getFeaturedCaseStudies();
+  const primaryCtaHref = platinionVariant ? "#impact-examples" : "/work";
+  const primaryCtaLabel = platinionVariant
+    ? "View impact examples"
+    : "View Case Studies";
 
   return (
     <div className="relative">
@@ -95,31 +150,60 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 w-full py-20 sm:py-28">
           <div className="max-w-3xl space-y-8">
             <div className="space-y-4">
+              {platinionVariant && (
+                <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  BCG Platinion-focused view: AI platform architecture + delivery proof
+                </div>
+              )}
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] leading-[1.15]">
-                I architect AI systems that
-                <br />
-                <span className="text-primary">
-                  earn trust in regulated environments.
-                </span>
+                {platinionVariant ? (
+                  <>
+                    AI platform architecture and delivery leadership
+                    <br />
+                    <span className="text-primary">
+                      for measurable outcomes and governed scale.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    I architect AI systems that
+                    <br />
+                    <span className="text-primary">
+                      earn trust in regulated environments.
+                    </span>
+                  </>
+                )}
               </h1>
 
               <p className="max-w-2xl text-lg text-muted-foreground leading-relaxed sm:text-xl">
-                End-to-end AI solution architecture, delivery leadership,
-                and governance for federal agencies.{" "}
-                <strong className="text-foreground font-medium">
-                  12+ years designing systems where the people accountable
-                  for outcomes can see, override, and explain every
-                  recommendation
-                </strong>
-                .
+                {platinionVariant ? (
+                  <>
+                    I lead AI-enabled delivery from discovery through
+                    operationalization in constrained environments. My approach
+                    emphasizes repeatable patterns, explicit tradeoffs, and
+                    operating models where teams can review, override, and
+                    explain outcomes.
+                  </>
+                ) : (
+                  <>
+                    End-to-end AI solution architecture, delivery leadership,
+                    and governance for federal agencies.{" "}
+                    <strong className="text-foreground font-medium">
+                      12+ years designing systems where the people accountable
+                      for outcomes can see, override, and explain every
+                      recommendation
+                    </strong>
+                    .
+                  </>
+                )}
               </p>
             </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4">
               <Button asChild size="lg" className="group">
-                <Link href="/work">
-                  View Case Studies
+                <Link href={primaryCtaHref}>
+                  {primaryCtaLabel}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
@@ -144,8 +228,29 @@ export default function HomePage() {
               </Button>
             </div>
 
+            {platinionVariant && (
+              <ul className="grid gap-3 text-sm text-muted-foreground">
+                <li>
+                  Built a proposal triage pipeline for <strong className="text-foreground">7,000+ proposals</strong> and{" "}
+                  <strong className="text-foreground">70+ themes</strong>, with
+                  ambiguous cases routed to human review.
+                </li>
+                <li>
+                  Delivered a governed AWS data platform across Salesforce,
+                  CBP, and investigative systems for{" "}
+                  <strong className="text-foreground">50,000+ operations</strong>{" "}
+                  with <strong className="text-foreground">5+ billion records</strong>.
+                </li>
+                <li>
+                  Delivered HITL panel formation that reduced a manual process{" "}
+                  <strong className="text-foreground">from weeks to hours</strong>{" "}
+                  while preserving reviewer control.
+                </li>
+              </ul>
+            )}
+
             {/* Adaptive personalization */}
-            <PersonalizedHero />
+            {!platinionVariant && <PersonalizedHero />}
 
             {/* Tour + trust signals */}
             <HomeClient />
@@ -153,6 +258,10 @@ export default function HomePage() {
         </div>
       </section>
 
+      {platinionVariant ? (
+        <PlatinionHomeContent />
+      ) : (
+        <>
       {/* ── What I Deliver ────────────────────────────────── */}
       <section id="what-i-deliver" className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
@@ -316,6 +425,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+        </>
+      )}
     </div>
   );
 }

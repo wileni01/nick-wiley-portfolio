@@ -15,9 +15,25 @@ import {
   getDefaultPersonaForCompany,
   getPersonaById,
 } from "@/lib/adaptive/profiles";
+import {
+  ADAPTIVE_MODE_COOKIE,
+  getAdaptiveModeFromUrlSearchParams,
+  serializeAdaptiveMode,
+} from "@/lib/adaptive/platinion";
 import type { CompanyProfile, PersonaProfile } from "@/lib/adaptive/types";
 
 const STORAGE_KEY = "nw-adaptive-mode";
+
+function persistAdaptiveCookie(companyId: CompanyId, personaId: string) {
+  document.cookie = `${ADAPTIVE_MODE_COOKIE}=${serializeAdaptiveMode({
+    companyId,
+    personaId,
+  })}; path=/; SameSite=Lax`;
+}
+
+function clearAdaptiveCookie() {
+  document.cookie = `${ADAPTIVE_MODE_COOKIE}=; path=/; Max-Age=0; SameSite=Lax`;
+}
 
 interface AdaptiveState {
   companyId: CompanyId | null;
@@ -95,6 +111,29 @@ export function AdaptiveProvider({ children }: { children: ReactNode }) {
 
   // Initialize from URL params or sessionStorage
   useEffect(() => {
+    const shortMode = getAdaptiveModeFromUrlSearchParams(searchParams);
+    if (shortMode) {
+      const resolved = resolveState(shortMode.companyId, shortMode.personaId);
+      if (resolved.isActive) {
+        setState(resolved);
+        if (resolved.personaId) {
+          persistAdaptiveCookie(resolved.companyId, resolved.personaId);
+        }
+        try {
+          sessionStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({
+              companyId: resolved.companyId,
+              personaId: resolved.personaId,
+            })
+          );
+        } catch {
+          // sessionStorage unavailable
+        }
+        return;
+      }
+    }
+
     const urlCompany = searchParams.get("for") as CompanyId | null;
     const urlPersona = searchParams.get("persona");
 
@@ -102,6 +141,9 @@ export function AdaptiveProvider({ children }: { children: ReactNode }) {
       const resolved = resolveState(urlCompany, urlPersona);
       if (resolved.isActive) {
         setState(resolved);
+          if (resolved.personaId) {
+            persistAdaptiveCookie(resolved.companyId, resolved.personaId);
+          }
         try {
           sessionStorage.setItem(
             STORAGE_KEY,
@@ -125,6 +167,9 @@ export function AdaptiveProvider({ children }: { children: ReactNode }) {
         const resolved = resolveState(companyId, personaId);
         if (resolved.isActive) {
           setState(resolved);
+          if (resolved.personaId) {
+            persistAdaptiveCookie(resolved.companyId, resolved.personaId);
+          }
           return;
         }
       }
@@ -138,6 +183,9 @@ export function AdaptiveProvider({ children }: { children: ReactNode }) {
       const resolved = resolveState(companyId, personaId ?? null);
       setState(resolved);
       if (resolved.isActive) {
+        if (resolved.personaId) {
+          persistAdaptiveCookie(resolved.companyId, resolved.personaId);
+        }
         try {
           sessionStorage.setItem(
             STORAGE_KEY,
@@ -162,6 +210,7 @@ export function AdaptiveProvider({ children }: { children: ReactNode }) {
       persona: null,
       isActive: false,
     });
+    clearAdaptiveCookie();
     try {
       sessionStorage.removeItem(STORAGE_KEY);
     } catch {

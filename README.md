@@ -121,6 +121,13 @@ lib/
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.
 
+## Personalization Views
+
+- **Platinion / Harsh view (shareable):** `/?p=platinion` (or `/?p=harsh`)
+- **Compatibility URL:** `/?for=bcg&persona=bcg-harsh`
+- The personalized mode persists for the browsing session via existing adaptive storage.
+- Default homepage content stays unchanged unless one of the URLs above is used.
+
 ## Tech Stack
 
 - **Next.js 15** (App Router) + **TypeScript**
