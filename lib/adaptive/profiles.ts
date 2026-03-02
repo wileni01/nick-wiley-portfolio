@@ -277,8 +277,8 @@ export const companyProfiles: CompanyProfile[] = [
     personas: [
       {
         id: "bcg-harsh",
-        name: "Harsh Vardhan Singh",
-        role: "Partner — GenAI, Data & Agents",
+        name: "Harsh Singh",
+        role: "BCG Platinion Director",
         recommendationGoal:
           "Demonstrate production AI delivery, data platform architecture, and strategic transformation outcomes that translate to enterprise-scale GenAI impact.",
         focusPresets: [
