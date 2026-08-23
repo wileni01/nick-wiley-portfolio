@@ -7,6 +7,8 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { PersonJsonLd, WebsiteJsonLd } from "@/components/seo/json-ld";
 import { SearchDialog } from "@/components/search/search-dialog";
+import { getSearchIndex } from "@/lib/search-index";
+import { siteConfig } from "@/lib/site";
 import { AdaptiveProvider } from "@/components/adaptive/adaptive-provider";
 import { AdaptiveTheme } from "@/components/adaptive/adaptive-theme";
 import "./globals.css";
@@ -24,9 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-  ),
+  metadataBase: new URL(siteConfig.url),
   title: {
     default:
       "Nick Wiley | AI Solution Architecture & Delivery Leadership for Regulated Environments",
@@ -99,6 +99,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const searchIndex = getSearchIndex();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -125,7 +127,7 @@ export default function RootLayout({
                 </main>
                 <Footer />
               </div>
-              <SearchDialog />
+              <SearchDialog items={searchIndex} />
             </AdaptiveProvider>
           </Suspense>
         </ThemeProvider>

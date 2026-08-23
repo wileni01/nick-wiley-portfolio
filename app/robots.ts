@@ -1,7 +1,8 @@
+import { siteConfig } from "@/lib/site";
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.nickwiley.ai";
+  const baseUrl = siteConfig.url;
 
   return {
     rules: {

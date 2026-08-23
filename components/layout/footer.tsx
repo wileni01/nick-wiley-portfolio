@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import { LinkedinIcon } from "@/components/icons/linkedin-icon";
+import { siteConfig, mailtoUrl } from "@/lib/site";
 
 const footerLinks = [
   { href: "/work", label: "Work" },
@@ -57,7 +58,7 @@ export function Footer() {
             </h3>
             <div className="flex gap-3">
               <a
-                href="https://linkedin.com/in/nicholas-a-wiley-975b3136"
+                href={siteConfig.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
@@ -66,15 +67,15 @@ export function Footer() {
                 <LinkedinIcon className="h-5 w-5" />
               </a>
               <a
-                href="/contact"
-                aria-label="Contact"
+                href={mailtoUrl()}
+                aria-label="Email"
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-all hover:border-primary hover:text-primary hover:shadow-md"
               >
                 <Mail className="h-5 w-5" />
               </a>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-              Alexandria, VA
+              {siteConfig.location}
             </p>
           </div>
         </div>

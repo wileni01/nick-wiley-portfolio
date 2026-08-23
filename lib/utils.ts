@@ -21,11 +21,11 @@ export function slugify(text: string): string {
     .trim();
 }
 
-export function sanitizeInput(input: string): string {
+export function sanitizeInput(input: string, maxLength = 2000): string {
   return input
     .replace(/[<>]/g, "")
     .replace(/javascript:/gi, "")
     .replace(/on\w+=/gi, "")
     .trim()
-    .slice(0, 2000);
+    .slice(0, maxLength);
 }

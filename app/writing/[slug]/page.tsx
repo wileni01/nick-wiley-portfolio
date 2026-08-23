@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { getWritingPostBySlug, getWritingPostSlugs } from "@/lib/mdx";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { MdxContent } from "@/components/mdx/mdx-content";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -22,6 +23,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.title,
     description: post.description,
+    alternates: { canonical: `/writing/${post.slug}` },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.description,
+      url: `/writing/${post.slug}`,
+      publishedTime: new Date(post.date).toISOString(),
+      authors: ["Nicholas A. Wiley"],
+      tags: post.tags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+    },
   };
 }
 
@@ -30,9 +46,6 @@ export default async function WritingPostPage({ params }: Props) {
   const post = getWritingPostBySlug(slug);
 
   if (!post) notFound();
-
-  // Convert markdown content to HTML
-  const html = markdownToHtml(post.content);
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
@@ -69,67 +82,10 @@ export default async function WritingPostPage({ params }: Props) {
         </header>
 
         {/* Content */}
-        <article
-          className="prose max-w-none"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+        <article className="prose max-w-none">
+          <MdxContent source={post.content} />
+        </article>
       </div>
     </div>
   );
-}
-
-function markdownToHtml(md: string): string {
-  let html = md;
-
-  // Headings
-  html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
-  html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
-  html = html.replace(/^# (.+)$/gm, "<h1>$1</h1>");
-
-  // Bold
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-
-  // Italic (single *)
-  html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, "<em>$1</em>");
-
-  // Inline code
-  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-
-  // Horizontal rules
-  html = html.replace(/^---$/gm, "<hr />");
-
-  // Unordered lists
-  html = html.replace(
-    /(?:^- .+$\n?)+/gm,
-    (match) => {
-      const items = match
-        .trim()
-        .split("\n")
-        .map((line) => `<li>${line.replace(/^- /, "")}</li>`)
-        .join("\n");
-      return `<ul>${items}</ul>`;
-    }
-  );
-
-  // Paragraphs
-  html = html
-    .split("\n\n")
-    .map((block) => {
-      const trimmed = block.trim();
-      if (!trimmed) return "";
-      if (
-        trimmed.startsWith("<h") ||
-        trimmed.startsWith("<ul") ||
-        trimmed.startsWith("<ol") ||
-        trimmed.startsWith("<hr") ||
-        trimmed.startsWith("<blockquote") ||
-        trimmed.startsWith("<")
-      ) {
-        return trimmed;
-      }
-      return `<p>${trimmed.replace(/\n/g, " ")}</p>`;
-    })
-    .join("\n");
-
-  return html;
 }

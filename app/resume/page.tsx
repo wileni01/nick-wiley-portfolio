@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/lib/site";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResumeActions } from "@/components/resume/resume-actions";
@@ -20,7 +21,7 @@ export default function ResumePage() {
           <div className="flex items-center gap-2">
             <ResumeActions />
             <Button asChild variant="default" size="sm">
-              <a href="/resume/nick-wiley-resume.pdf" download>
+              <a href={siteConfig.resumePdf} download>
                 <Download className="h-4 w-4" />
                 Download PDF
               </a>
@@ -50,7 +51,7 @@ export default function ResumePage() {
               </a>{" "}
               &bull;{" "}
               <a
-                href="https://linkedin.com/in/nicholas-a-wiley-975b3136"
+                href={siteConfig.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline"

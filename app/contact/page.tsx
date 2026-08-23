@@ -7,20 +7,30 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
+  ExternalLink,
 } from "lucide-react";
 import { LinkedinIcon } from "@/components/icons/linkedin-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
+import { siteConfig, mailtoUrl } from "@/lib/site";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
+interface Draft {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 export default function ContactPage() {
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [fallbackHref, setFallbackHref] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<TurnstileInstance>(null);
 
@@ -28,8 +38,8 @@ export default function ContactPage() {
     e.preventDefault();
     setFormState("submitting");
     setErrorMessage("");
+    setFallbackHref(null);
 
-    // If Turnstile is enabled, require a token
     if (TURNSTILE_SITE_KEY && !turnstileToken) {
       setFormState("error");
       setErrorMessage("Please complete the verification challenge.");
@@ -37,25 +47,37 @@ export default function ContactPage() {
     }
 
     const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      subject: formData.get("subject") as string,
-      message: formData.get("message") as string,
-      honeypot: formData.get("website") as string,
-      turnstileToken: turnstileToken,
+    const draft: Draft = {
+      name: (formData.get("name") as string) ?? "",
+      email: (formData.get("email") as string) ?? "",
+      subject: (formData.get("subject") as string) ?? "",
+      message: (formData.get("message") as string) ?? "",
     };
 
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...draft,
+          honeypot: formData.get("website") as string,
+          turnstileToken,
+        }),
       });
 
-      const result = await res.json();
+      const result = await res.json().catch(() => ({}));
 
       if (!res.ok) {
+        // Delivery is unavailable: hand the visitor a prefilled email so
+        // nothing they typed is lost.
+        if (result.undelivered) {
+          setFallbackHref(
+            mailtoUrl({
+              subject: draft.subject || `Portfolio contact from ${draft.name}`,
+              body: `${draft.message}\n\n— ${draft.name} (${draft.email})`,
+            })
+          );
+        }
         throw new Error(result.error || "Something went wrong.");
       }
 
@@ -66,7 +88,6 @@ export default function ContactPage() {
       setErrorMessage(
         err instanceof Error ? err.message : "Something went wrong."
       );
-      // Reset Turnstile on error so user can retry
       turnstileRef.current?.reset();
       setTurnstileToken(null);
     }
@@ -127,6 +148,7 @@ export default function ContactPage() {
                       placeholder="Your name"
                       required
                       maxLength={100}
+                      autoComplete="name"
                       disabled={formState === "submitting"}
                     />
                   </div>
@@ -141,6 +163,7 @@ export default function ContactPage() {
                       placeholder="you@example.com"
                       required
                       maxLength={254}
+                      autoComplete="email"
                       disabled={formState === "submitting"}
                     />
                   </div>
@@ -190,9 +213,23 @@ export default function ContactPage() {
                 )}
 
                 {formState === "error" && (
-                  <div className="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/5 p-3 text-sm text-destructive">
-                    <AlertCircle className="h-4 w-4 shrink-0" />
-                    {errorMessage}
+                  <div
+                    role="alert"
+                    className="space-y-2 rounded-lg border border-destructive/50 bg-destructive/5 p-3 text-sm text-destructive"
+                  >
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 shrink-0" />
+                      {errorMessage}
+                    </div>
+                    {fallbackHref && (
+                      <a
+                        href={fallbackHref}
+                        className="ml-6 inline-flex items-center gap-1.5 font-medium underline underline-offset-2 hover:text-foreground"
+                      >
+                        Open this message in your email app
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    )}
                   </div>
                 )}
 
@@ -224,7 +261,19 @@ export default function ContactPage() {
               <h3 className="text-lg font-semibold">Connect directly</h3>
               <div className="space-y-3">
                 <a
-                  href="https://linkedin.com/in/nicholas-a-wiley-975b3136"
+                  href={mailtoUrl()}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/50 hover:shadow-md"
+                >
+                  <Mail className="h-5 w-5 text-primary" />
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium">Email</div>
+                    <div className="truncate text-xs text-muted-foreground">
+                      {siteConfig.email}
+                    </div>
+                  </div>
+                </a>
+                <a
+                  href={siteConfig.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/50 hover:shadow-md"
@@ -237,20 +286,11 @@ export default function ContactPage() {
                     </div>
                   </div>
                 </a>
-                <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
-                  <Mail className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="text-sm font-medium">Email</div>
-                    <div className="text-xs text-muted-foreground">
-                      Use the form. I&apos;ll reply directly
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
             <div className="rounded-xl border border-border bg-card p-6 space-y-2">
-              <p className="text-sm font-medium">Based in Alexandria, VA</p>
+              <p className="text-sm font-medium">Based in {siteConfig.location}</p>
               <p className="text-xs text-muted-foreground">
                 Open to conversations about analytics, decision-support
                 tools, or applied AI in regulated environments.

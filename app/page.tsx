@@ -25,6 +25,7 @@ import {
   isPlatinionView,
   parseAdaptiveModeCookie,
 } from "@/lib/adaptive/platinion";
+import { siteConfig } from "@/lib/site";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -210,14 +211,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <a href="/resume/nick-wiley-resume.pdf" download>
+                <a href={siteConfig.resumePdf} download>
                   <Download className="h-4 w-4" />
                   Download Resume
                 </a>
               </Button>
               <Button asChild variant="ghost" size="lg">
                 <a
-                  href="https://linkedin.com/in/nicholas-a-wiley-975b3136"
+                  href={siteConfig.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

@@ -1,36 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X, FileText, Briefcase, PenLine, ArrowRight } from "lucide-react";
-
-interface SearchItem {
-  title: string;
-  url: string;
-  type: "work" | "writing" | "page";
-  summary: string;
-}
-
-const staticSearchItems: SearchItem[] = [
-  // Pages
-  { title: "Home", url: "/", type: "page", summary: "AI and analytics tools that keep experts in control" },
-  { title: "Resume", url: "/resume", type: "page", summary: "12+ years, federal consulting, two patents" },
-  { title: "About", url: "/about", type: "page", summary: "Background, approach, what drives the work" },
-  { title: "Contact", url: "/contact", type: "page", summary: "Get in touch" },
-  { title: "Projects", url: "/projects", type: "page", summary: "Side projects and prototypes" },
-  // Case Studies
-  { title: "Panel Wizard: ML-assisted proposal panel formation", url: "/work/panel-wizard", type: "work", summary: "SciBERT embeddings + clustering to cut panel formation from weeks to hours at NSF" },
-  { title: "USDA Organic Analytics Platform", url: "/work/usda-organic-analytics", type: "work", summary: "Global warehouse + Tableau reports serving 50,000+ certified operations" },
-  { title: "Researcher Lineage Dashboard", url: "/work/researcher-lineage-dashboard", type: "work", summary: "Connecting public and internal funding data for portfolio review" },
-  { title: "Building adoption through study halls", url: "/work/enablement-study-halls", type: "work", summary: "Training and enablement that moved analysts from waiting to building" },
-  { title: "VisiTime AR Tour System", url: "/work/visitime-ar", type: "work", summary: "AR tours at Gettysburg, the startup I founded" },
-  { title: "Recovery oversight with GIS (RATB)", url: "/work/ratb-gis-oversight", type: "work", summary: "Geospatial and network analysis for Recovery Act oversight" },
-  { title: "Scott Search: Gamified contact recovery", url: "/work/lli-scott-search", type: "work", summary: "CRM contact recovery with Apollo.io enrichment and GPT-4 lead scoring" },
-  // Writing
-  { title: "Human-in-the-loop isn't a compromise. It's the point.", url: "/writing/human-in-the-loop", type: "writing", summary: "Why keeping humans in control is the goal, not a stepping stone" },
-  { title: "From dashboards to decisions", url: "/writing/from-dashboards-to-decisions", type: "writing", summary: "Analytics is only useful if it changes a decision" },
-  { title: "What consulting taught me about building AI responsibly", url: "/writing/consulting-and-responsible-ai", type: "writing", summary: "Governance and adoption are engineering requirements" },
-];
+import type { SearchItem } from "@/lib/search-index";
 
 function getIcon(type: SearchItem["type"]) {
   switch (type) {
@@ -54,23 +27,29 @@ function getTypeLabel(type: SearchItem["type"]) {
   }
 }
 
-export function SearchDialog() {
+function matches(item: SearchItem, terms: string[]) {
+  const haystack =
+    `${item.title} ${item.summary} ${item.keywords}`.toLowerCase();
+  return terms.every((term) => haystack.includes(term));
+}
+
+export function SearchDialog({ items }: { items: SearchItem[] }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const router = useRouter();
 
-  const results = query.trim()
-    ? staticSearchItems.filter(
-        (item) =>
-          item.title.toLowerCase().includes(query.toLowerCase()) ||
-          item.summary.toLowerCase().includes(query.toLowerCase())
-      )
-    : staticSearchItems;
+  const results = useMemo(() => {
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+    return terms.length ? items.filter((item) => matches(item, terms)) : items;
+  }, [items, query]);
 
   const handleOpen = useCallback(() => {
     setOpen(true);
     setQuery("");
+    setActiveIndex(0);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -86,18 +65,26 @@ export function SearchDialog() {
     [router, handleClose]
   );
 
-  // Keyboard shortcuts: Cmd+K or /
+  // Global shortcuts: Cmd/Ctrl+K or "/" to open, Escape to close.
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         handleOpen();
+        return;
       }
       if (e.key === "/" && !open) {
         const target = e.target as HTMLElement;
-        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) return;
+        if (
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable
+        ) {
+          return;
+        }
         e.preventDefault();
         handleOpen();
+        return;
       }
       if (e.key === "Escape" && open) {
         handleClose();
@@ -107,14 +94,40 @@ export function SearchDialog() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open, handleOpen, handleClose]);
 
-  // Focus input when opened
+  // Focus the input when the dialog opens.
   useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
+    if (!open) return;
+    const id = window.setTimeout(() => inputRef.current?.focus(), 50);
+    return () => window.clearTimeout(id);
   }, [open]);
 
+  // Keep the highlighted result visible while arrowing through the list.
+  useEffect(() => {
+    const el = listRef.current?.children[activeIndex] as
+      | HTMLElement
+      | undefined;
+    el?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
+
+  function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => (results.length ? (i + 1) % results.length : 0));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) =>
+        results.length ? (i - 1 + results.length) % results.length : 0
+      );
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const item = results[activeIndex];
+      if (item) handleSelect(item.url);
+    }
+  }
+
   if (!open) return null;
+
+  const safeActive = Math.min(activeIndex, Math.max(results.length - 1, 0));
 
   return (
     <div
@@ -138,10 +151,21 @@ export function SearchDialog() {
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setActiveIndex(0);
+            }}
+            onKeyDown={onInputKeyDown}
             placeholder="Search case studies, writing, pages..."
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             aria-label="Search query"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="site-search-results"
+            aria-activedescendant={
+              results[safeActive] ? `search-option-${safeActive}` : undefined
+            }
+            autoComplete="off"
           />
           <button
             onClick={handleClose}
@@ -159,31 +183,47 @@ export function SearchDialog() {
               No results found for &ldquo;{query}&rdquo;
             </div>
           ) : (
-            <ul role="listbox">
-              {results.map((item) => (
-                <li key={item.url} role="option" aria-selected={false}>
-                  <button
-                    onClick={() => handleSelect(item.url)}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted group"
+            <ul id="site-search-results" role="listbox" ref={listRef}>
+              {results.map((item, index) => {
+                const active = index === safeActive;
+                return (
+                  <li
+                    key={item.url}
+                    id={`search-option-${index}`}
+                    role="option"
+                    aria-selected={active}
                   >
-                    {getIcon(item.type)}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium truncate">
-                          {item.title}
-                        </span>
-                        <span className="shrink-0 rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                          {getTypeLabel(item.type)}
-                        </span>
+                    <button
+                      type="button"
+                      onClick={() => handleSelect(item.url)}
+                      onMouseEnter={() => setActiveIndex(index)}
+                      className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors group ${
+                        active ? "bg-muted" : "hover:bg-muted"
+                      }`}
+                    >
+                      {getIcon(item.type)}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium truncate">
+                            {item.title}
+                          </span>
+                          <span className="shrink-0 rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                            {getTypeLabel(item.type)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          {item.summary}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">
-                        {item.summary}
-                      </p>
-                    </div>
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                  </button>
-                </li>
-              ))}
+                      <ArrowRight
+                        className={`h-3.5 w-3.5 text-muted-foreground transition-opacity shrink-0 ${
+                          active ? "opacity-100" : "opacity-0"
+                        }`}
+                      />
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
@@ -191,6 +231,10 @@ export function SearchDialog() {
         {/* Footer */}
         <div className="border-t border-border px-4 py-2 flex items-center justify-between text-[11px] text-muted-foreground">
           <span>
+            <kbd className="rounded border border-border bg-muted px-1 py-0.5 font-mono text-[10px]">
+              ↑↓
+            </kbd>{" "}
+            to navigate{" "}
             <kbd className="rounded border border-border bg-muted px-1 py-0.5 font-mono text-[10px]">
               ↵
             </kbd>{" "}

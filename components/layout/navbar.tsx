@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
+import { siteConfig } from "@/lib/site";
 
 const navLinks = [
   { href: "/work", label: "Work", icon: Briefcase },
@@ -101,7 +102,7 @@ export function Navbar() {
 
             {/* Download Resume */}
             <Button asChild variant="ghost" size="sm" className="ml-1">
-              <a href="/resume/nick-wiley-resume.pdf" download>
+              <a href={siteConfig.resumePdf} download>
                 <Download className="h-4 w-4" />
                 <span className="hidden lg:inline">Resume</span>
               </a>
@@ -163,7 +164,7 @@ export function Navbar() {
                 );
               })}
               <a
-                href="/resume/nick-wiley-resume.pdf"
+                href={siteConfig.resumePdf}
                 download
                 className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >

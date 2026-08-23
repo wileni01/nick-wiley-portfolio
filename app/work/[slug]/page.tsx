@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CaseStudyDetailClient } from "@/components/work/case-study-detail-client";
 import { PressMentions } from "@/components/work/press-mentions";
+import { MdxContent } from "@/components/mdx/mdx-content";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -22,9 +23,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const study = getCaseStudyBySlug(slug);
   if (!study) return {};
 
+  const image =
+    study.image && !study.image.includes("placeholder")
+      ? study.image
+      : "/og-image.png";
+
   return {
     title: study.title,
     description: study.executiveSummary,
+    alternates: { canonical: `/work/${study.slug}` },
+    openGraph: {
+      type: "article",
+      title: study.title,
+      description: study.executiveSummary,
+      url: `/work/${study.slug}`,
+      images: [{ url: image, alt: study.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: study.title,
+      description: study.executiveSummary,
+      images: [image],
+    },
   };
 }
 
@@ -95,75 +115,9 @@ export default async function CaseStudyPage({ params }: Props) {
 
         {/* MDX Content */}
         <article className="prose max-w-none">
-          <MdxContent content={study.content} />
+          <MdxContent source={study.content} />
         </article>
       </div>
     </div>
   );
-}
-
-// Simple MDX-to-HTML renderer using basic markdown parsing
-// We parse the MDX content on the server without needing next-mdx-remote for simple markdown
-function MdxContent({ content }: { content: string }) {
-  // Convert markdown to HTML (basic conversion for common patterns)
-  const html = markdownToHtml(content);
-
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
-}
-
-function markdownToHtml(md: string): string {
-  let html = md;
-
-  // Headings
-  html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
-  html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
-  html = html.replace(/^# (.+)$/gm, "<h1>$1</h1>");
-
-  // Bold
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-
-  // Italic
-  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-
-  // Inline code
-  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-
-  // Horizontal rules
-  html = html.replace(/^---$/gm, "<hr />");
-
-  // Unordered lists
-  html = html.replace(
-    /(?:^- .+$\n?)+/gm,
-    (match) => {
-      const items = match
-        .trim()
-        .split("\n")
-        .map((line) => `<li>${line.replace(/^- /, "")}</li>`)
-        .join("\n");
-      return `<ul>${items}</ul>`;
-    }
-  );
-
-  // Paragraphs - wrap remaining text blocks
-  html = html
-    .split("\n\n")
-    .map((block) => {
-      const trimmed = block.trim();
-      if (!trimmed) return "";
-      if (
-        trimmed.startsWith("<h") ||
-        trimmed.startsWith("<ul") ||
-        trimmed.startsWith("<ol") ||
-        trimmed.startsWith("<hr") ||
-        trimmed.startsWith("<blockquote")
-      ) {
-        return trimmed;
-      }
-      // Don't wrap if it's already HTML
-      if (trimmed.startsWith("<")) return trimmed;
-      return `<p>${trimmed.replace(/\n/g, " ")}</p>`;
-    })
-    .join("\n");
-
-  return html;
 }

@@ -1,7 +1,37 @@
+import { Resend } from "resend";
 import { rateLimit } from "@/lib/rate-limit";
 import { sanitizeInput } from "@/lib/utils";
+import { siteConfig } from "@/lib/site";
+
+/**
+ * Contact form delivery.
+ *
+ * Email is sent through Resend when RESEND_API_KEY is configured. Until it
+ * is, the route answers 503 so the visitor is told to email directly instead
+ * of being shown a success message for a message nobody will receive.
+ *
+ * Env:
+ *   RESEND_API_KEY  – required for delivery
+ *   CONTACT_EMAIL   – inbox that receives submissions (defaults to siteConfig.email)
+ *   RESEND_FROM     – sender; must be on a domain verified in Resend. Without
+ *                     a verified domain, Resend's onboarding sender only
+ *                     delivers to the account owner's address.
+ */
 
 const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL || siteConfig.email;
+const RESEND_FROM =
+  process.env.RESEND_FROM || "Portfolio Contact <onboarding@resend.dev>";
+
+const FALLBACK_MESSAGE = `The contact form isn't connected to email delivery right now. Please email ${CONTACT_EMAIL} directly.`;
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
 
 async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   try {
@@ -26,9 +56,8 @@ async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
 
 export async function POST(req: Request) {
   try {
-    // Rate limiting
     const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0] ||
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||
       "anonymous";
 
@@ -36,99 +65,114 @@ export async function POST(req: Request) {
       maxRequests: 5,
       windowMs: 3600000, // 5 per hour
     });
-
     if (!rateLimitResult.success) {
-      return new Response(
-        JSON.stringify({
-          error: "Too many submissions. Please try again later.",
-        }),
-        { status: 429, headers: { "Content-Type": "application/json" } }
+      return json(
+        { error: "Too many submissions. Please try again later." },
+        429
       );
     }
 
-    const body = await req.json();
-    const { name, email, subject, message, honeypot, turnstileToken } = body;
-
-    // Honeypot check — if filled, it's a bot
-    if (honeypot) {
-      // Return success to not tip off bots
-      return new Response(
-        JSON.stringify({ success: true }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      );
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: "Invalid request body." }, 400);
     }
 
-    // Cloudflare Turnstile verification (when secret key is configured)
-    if (TURNSTILE_SECRET_KEY) {
-      if (!turnstileToken) {
-        return new Response(
-          JSON.stringify({ error: "CAPTCHA verification is required." }),
-          { status: 400, headers: { "Content-Type": "application/json" } }
-        );
-      }
-
-      const turnstileValid = await verifyTurnstile(turnstileToken, ip);
-      if (!turnstileValid) {
-        return new Response(
-          JSON.stringify({ error: "CAPTCHA verification failed. Please try again." }),
-          { status: 403, headers: { "Content-Type": "application/json" } }
-        );
-      }
-    }
-
-    // Validation
-    if (!name || !email || !message) {
-      return new Response(
-        JSON.stringify({ error: "Name, email, and message are required." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return new Response(
-        JSON.stringify({ error: "Please enter a valid email address." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Sanitize inputs
-    const sanitized = {
-      name: sanitizeInput(name).slice(0, 100),
-      email: email.trim().slice(0, 254),
-      subject: sanitizeInput(subject || "").slice(0, 200),
-      message: sanitizeInput(message).slice(0, 5000),
+    const { name, email, subject, message, honeypot, turnstileToken } = body as {
+      name?: string;
+      email?: string;
+      subject?: string;
+      message?: string;
+      honeypot?: string;
+      turnstileToken?: string;
     };
 
-    // Log the submission (in production, send email via Resend, SendGrid, etc.)
-    console.log("=== NEW CONTACT FORM SUBMISSION ===");
-    console.log(`From: ${sanitized.name} <${sanitized.email}>`);
-    console.log(`Subject: ${sanitized.subject || "(none)"}`);
-    console.log(`Message: ${sanitized.message}`);
-    console.log("===================================");
+    // Honeypot: a filled hidden field means a bot. Pretend it worked.
+    if (honeypot) {
+      return json({ success: true });
+    }
 
-    // TODO: Integrate with Resend or SendGrid for email delivery
-    // Example with Resend:
-    // await resend.emails.send({
-    //   from: 'portfolio@nickwiley.ai',
-    //   to: process.env.CONTACT_EMAIL,
-    //   subject: `Portfolio Contact: ${sanitized.subject}`,
-    //   text: `From: ${sanitized.name} (${sanitized.email})\n\n${sanitized.message}`,
-    // });
+    if (TURNSTILE_SECRET_KEY) {
+      if (!turnstileToken) {
+        return json({ error: "CAPTCHA verification is required." }, 400);
+      }
+      const valid = await verifyTurnstile(turnstileToken, ip);
+      if (!valid) {
+        return json(
+          { error: "CAPTCHA verification failed. Please try again." },
+          403
+        );
+      }
+    }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: "Thank you! Your message has been received.",
-      }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    if (!name || !email || !message) {
+      return json({ error: "Name, email, and message are required." }, 400);
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return json({ error: "Please enter a valid email address." }, 400);
+    }
+
+    const sanitized = {
+      name: sanitizeInput(name, 100),
+      email: email.trim().slice(0, 254),
+      subject: sanitizeInput(subject || "", 200),
+      message: sanitizeInput(message, 5000),
+    };
+
+    if (!RESEND_API_KEY) {
+      console.warn(
+        "[contact] RESEND_API_KEY is not set; submission was NOT delivered.",
+        { from: sanitized.email, name: sanitized.name }
+      );
+      return json(
+        { error: FALLBACK_MESSAGE, fallbackEmail: CONTACT_EMAIL, undelivered: true },
+        503
+      );
+    }
+
+    const resend = new Resend(RESEND_API_KEY);
+    const { error } = await resend.emails.send({
+      from: RESEND_FROM,
+      to: [CONTACT_EMAIL],
+      replyTo: sanitized.email,
+      subject: `Portfolio contact: ${sanitized.subject || sanitized.name}`,
+      text: [
+        `From: ${sanitized.name} <${sanitized.email}>`,
+        `Subject: ${sanitized.subject || "(none)"}`,
+        `IP: ${ip}`,
+        "",
+        sanitized.message,
+      ].join("\n"),
+    });
+
+    if (error) {
+      console.error("[contact] Resend error:", error);
+      return json(
+        {
+          error: `Sending failed. Please email ${CONTACT_EMAIL} directly.`,
+          fallbackEmail: CONTACT_EMAIL,
+          undelivered: true,
+        },
+        502
+      );
+    }
+
+    return json({
+      success: true,
+      message: "Thank you! Your message has been received.",
+    });
   } catch (error) {
-    console.error("Contact form error:", error);
-    return new Response(
-      JSON.stringify({ error: "An error occurred. Please try again." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+    console.error("[contact] Unexpected error:", error);
+    return json(
+      {
+        error: `An error occurred. Please email ${CONTACT_EMAIL} directly.`,
+        fallbackEmail: CONTACT_EMAIL,
+        undelivered: true,
+      },
+      500
     );
   }
 }

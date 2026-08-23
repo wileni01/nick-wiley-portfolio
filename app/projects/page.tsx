@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ExternalLink } from "lucide-react";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -49,7 +51,8 @@ const projects = [
     description:
       "Next.js, TypeScript, Tailwind CSS. MDX-driven content, global search, adaptive briefing, dark mode, print-ready resume, accessibility-first design. I built it partly as a portfolio and partly to stay current on frontend tooling.",
     stack: ["Next.js", "TypeScript", "Tailwind CSS", "MDX"],
-    availability: "Source available",
+    availability: "Source on GitHub",
+    href: siteConfig.sourceRepo,
   },
 ];
 
@@ -93,9 +96,21 @@ export default function ProjectsPage() {
                     </Badge>
                   ))}
                 </div>
-                <p className="text-xs text-muted-foreground italic">
-                  {project.availability}
-                </p>
+                {"href" in project && project.href ? (
+                  <a
+                    href={project.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                  >
+                    {project.availability}
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">
+                    {project.availability}
+                  </p>
+                )}
               </CardContent>
             </Card>
           ))}
