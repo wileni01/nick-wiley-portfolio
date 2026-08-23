@@ -2,38 +2,34 @@
 
 import {
   createContext,
-  useContext,
-  useState,
-  useEffect,
   useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { useSearchParams } from "next/navigation";
-import type { CompanyId } from "@/lib/adaptive/types";
+import { useRouter, useSearchParams } from "next/navigation";
+import type {
+  CompanyId,
+  CompanyProfile,
+  PersonaProfile,
+} from "@/lib/adaptive/types";
 import {
   getCompanyProfileById,
   getDefaultPersonaForCompany,
   getPersonaById,
 } from "@/lib/adaptive/profiles";
 import {
-  ADAPTIVE_MODE_COOKIE,
-  getAdaptiveModeFromUrlSearchParams,
-  serializeAdaptiveMode,
+  getAdaptiveModeFromShortParam,
+  type AdaptiveMode,
 } from "@/lib/adaptive/platinion";
-import type { CompanyProfile, PersonaProfile } from "@/lib/adaptive/types";
-
-const STORAGE_KEY = "nw-adaptive-mode";
-
-function persistAdaptiveCookie(companyId: CompanyId, personaId: string) {
-  document.cookie = `${ADAPTIVE_MODE_COOKIE}=${serializeAdaptiveMode({
-    companyId,
-    personaId,
-  })}; path=/; SameSite=Lax`;
-}
-
-function clearAdaptiveCookie() {
-  document.cookie = `${ADAPTIVE_MODE_COOKIE}=; path=/; Max-Age=0; SameSite=Lax`;
-}
+import {
+  getServerSnapshot,
+  getSnapshot,
+  setMode,
+  subscribe,
+} from "@/lib/adaptive/mode-store";
 
 interface AdaptiveState {
   companyId: CompanyId | null;
@@ -47,6 +43,14 @@ interface AdaptiveContextValue extends AdaptiveState {
   activate: (companyId: CompanyId, personaId?: string) => void;
   deactivate: () => void;
 }
+
+const INACTIVE: AdaptiveState = {
+  companyId: null,
+  personaId: null,
+  company: null,
+  persona: null,
+  isActive: false,
+};
 
 const AdaptiveContext = createContext<AdaptiveContextValue | null>(null);
 
@@ -63,35 +67,16 @@ export function useAdaptiveMaybe(): AdaptiveContextValue | null {
   return useContext(AdaptiveContext);
 }
 
-function resolveState(
-  companyId: CompanyId | null,
-  personaId: string | null
-): AdaptiveState {
-  if (!companyId) {
-    return {
-      companyId: null,
-      personaId: null,
-      company: null,
-      persona: null,
-      isActive: false,
-    };
-  }
-  const company = getCompanyProfileById(companyId) ?? null;
-  if (!company) {
-    return {
-      companyId: null,
-      personaId: null,
-      company: null,
-      persona: null,
-      isActive: false,
-    };
-  }
-  const persona = personaId
-    ? (getPersonaById(companyId, personaId) ?? null)
-    : (getDefaultPersonaForCompany(companyId) ?? null);
-
+function resolveState(mode: AdaptiveMode | null): AdaptiveState {
+  if (!mode) return INACTIVE;
+  const company = getCompanyProfileById(mode.companyId);
+  if (!company) return INACTIVE;
+  const persona =
+    (mode.personaId
+      ? getPersonaById(mode.companyId, mode.personaId)
+      : getDefaultPersonaForCompany(mode.companyId)) ?? null;
   return {
-    companyId,
+    companyId: mode.companyId,
     personaId: persona?.id ?? null,
     company,
     persona,
@@ -99,128 +84,74 @@ function resolveState(
   };
 }
 
+/**
+ * Reads a tailored-view request from the URL. Supports the short form
+ * (`?p=platinion`) and the explicit form (`?for=<company>&persona=<id>`).
+ * Returns null when the URL does not name a valid company.
+ */
+function modeFromUrl(params: URLSearchParams): AdaptiveMode | null {
+  const short = getAdaptiveModeFromShortParam(params.get("p"));
+  if (short) return short;
+
+  const companyId = params.get("for") as CompanyId | null;
+  if (!companyId || !getCompanyProfileById(companyId)) return null;
+
+  const personaId =
+    params.get("persona") ?? getDefaultPersonaForCompany(companyId)?.id;
+  if (!personaId) return null;
+  return { companyId, personaId };
+}
+
 export function AdaptiveProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const [state, setState] = useState<AdaptiveState>({
-    companyId: null,
-    personaId: null,
-    company: null,
-    persona: null,
-    isActive: false,
-  });
 
-  // Initialize from URL params or sessionStorage
+  const stored = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const fromUrl = useMemo(() => modeFromUrl(searchParams), [searchParams]);
+
+  // A tailored link persists its mode for the rest of the browsing session.
   useEffect(() => {
-    const shortMode = getAdaptiveModeFromUrlSearchParams(searchParams);
-    if (shortMode) {
-      const resolved = resolveState(shortMode.companyId, shortMode.personaId);
-      if (resolved.isActive) {
-        setState(resolved);
-        if (resolved.companyId && resolved.personaId) {
-          persistAdaptiveCookie(resolved.companyId, resolved.personaId);
-        }
-        try {
-          sessionStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify({
-              companyId: resolved.companyId,
-              personaId: resolved.personaId,
-            })
-          );
-        } catch {
-          // sessionStorage unavailable
-        }
-        return;
-      }
-    }
+    if (fromUrl) setMode(fromUrl);
+  }, [fromUrl]);
 
-    const urlCompany = searchParams.get("for") as CompanyId | null;
-    const urlPersona = searchParams.get("persona");
-
-    if (urlCompany) {
-      const resolved = resolveState(urlCompany, urlPersona);
-      if (resolved.isActive) {
-        setState(resolved);
-          if (resolved.companyId && resolved.personaId) {
-            persistAdaptiveCookie(resolved.companyId, resolved.personaId);
-          }
-        try {
-          sessionStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify({
-              companyId: resolved.companyId,
-              personaId: resolved.personaId,
-            })
-          );
-        } catch {
-          // sessionStorage unavailable
-        }
-        return;
-      }
-    }
-
-    // Fall back to sessionStorage
-    try {
-      const stored = sessionStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const { companyId, personaId } = JSON.parse(stored);
-        const resolved = resolveState(companyId, personaId);
-        if (resolved.isActive) {
-          setState(resolved);
-          if (resolved.companyId && resolved.personaId) {
-            persistAdaptiveCookie(resolved.companyId, resolved.personaId);
-          }
-          return;
-        }
-      }
-    } catch {
-      // sessionStorage unavailable or parse error
-    }
-  }, [searchParams]);
-
-  const activate = useCallback(
-    (companyId: CompanyId, personaId?: string) => {
-      const resolved = resolveState(companyId, personaId ?? null);
-      setState(resolved);
-      if (resolved.isActive) {
-        if (resolved.companyId && resolved.personaId) {
-          persistAdaptiveCookie(resolved.companyId, resolved.personaId);
-        }
-        try {
-          sessionStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify({
-              companyId: resolved.companyId,
-              personaId: resolved.personaId,
-            })
-          );
-        } catch {
-          // sessionStorage unavailable
-        }
-      }
-    },
-    []
+  const state = useMemo(
+    () => resolveState(fromUrl ?? stored),
+    [fromUrl, stored]
   );
 
-  const deactivate = useCallback(() => {
-    setState({
-      companyId: null,
-      personaId: null,
-      company: null,
-      persona: null,
-      isActive: false,
-    });
-    clearAdaptiveCookie();
-    try {
-      sessionStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // sessionStorage unavailable
+  const activate = useCallback((companyId: CompanyId, personaId?: string) => {
+    const resolved = resolveState({ companyId, personaId: personaId ?? "" });
+    if (resolved.isActive && resolved.companyId && resolved.personaId) {
+      setMode({ companyId: resolved.companyId, personaId: resolved.personaId });
     }
   }, []);
 
+  const deactivate = useCallback(() => {
+    setMode(null);
+    // The home page also renders a server-side variant from the cookie, so
+    // drop any tailored-view query params and re-render from the server.
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      const hadParams = ["p", "for", "persona"].some((key) =>
+        url.searchParams.has(key)
+      );
+      if (hadParams) {
+        url.searchParams.delete("p");
+        url.searchParams.delete("for");
+        url.searchParams.delete("persona");
+        router.replace(url.pathname + (url.search || "") + url.hash);
+        return;
+      }
+    }
+    router.refresh();
+  }, [router]);
+
+  const value = useMemo(
+    () => ({ ...state, activate, deactivate }),
+    [state, activate, deactivate]
+  );
+
   return (
-    <AdaptiveContext.Provider value={{ ...state, activate, deactivate }}>
-      {children}
-    </AdaptiveContext.Provider>
+    <AdaptiveContext.Provider value={value}>{children}</AdaptiveContext.Provider>
   );
 }

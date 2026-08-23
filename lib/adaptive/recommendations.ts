@@ -1,9 +1,5 @@
 import { getPortfolioAssets } from "./portfolio-index";
-import {
-  companyProfiles,
-  getCompanyProfileById,
-  getPersonaById,
-} from "./profiles";
+import { getCompanyProfileById, getPersonaById } from "./profiles";
 import type {
   CompanyId,
   RecommendationBundle,
@@ -166,22 +162,3 @@ export function getRecommendationBundle(
     }),
   };
 }
-
-export function buildVisitorNarrative(
-  companyId: CompanyId,
-  personaId: string
-): string {
-  const bundle = getRecommendationBundle(companyId, personaId);
-  if (!bundle) {
-    return "Select a company and perspective to see a tailored view of this portfolio.";
-  }
-
-  const topTitles = bundle.topRecommendations
-    .slice(0, 3)
-    .map((recommendation) => recommendation.asset.title)
-    .join(", ");
-
-  return `Tailored for ${bundle.company.name}: ${bundle.persona.recommendationGoal} Start with: ${topTitles}.`;
-}
-
-export const supportedCompanyIds = companyProfiles.map((company) => company.id);

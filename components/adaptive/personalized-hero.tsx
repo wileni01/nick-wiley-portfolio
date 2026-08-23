@@ -1,12 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 import { useAdaptive } from "./adaptive-provider";
 import { getRecommendationBundle } from "@/lib/adaptive/recommendations";
 
 export function PersonalizedHero() {
-  const { isActive, companyId, personaId, company, persona } = useAdaptive();
+  const { isActive, companyId, personaId, company, persona, deactivate } =
+    useAdaptive();
 
   if (!isActive || !companyId || !personaId || !company || !persona) {
     return null;
@@ -26,18 +27,25 @@ export function PersonalizedHero() {
         <div className="rounded-lg bg-primary/10 p-2 shrink-0">
           <Sparkles className="h-4 w-4 text-primary" />
         </div>
-        <div className="space-y-1.5 min-w-0">
+        <div className="space-y-1.5 min-w-0 flex-1">
           <p className="text-sm font-semibold text-foreground">
             Tailored for {company.name}
           </p>
           <p className="text-xs text-muted-foreground">
             Viewing as{" "}
-            <span className="font-medium text-foreground">
-              {persona.name}
-            </span>{" "}
+            <span className="font-medium text-foreground">{persona.name}</span>
             , {persona.role}
           </p>
         </div>
+        <button
+          type="button"
+          onClick={deactivate}
+          className="shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
+          aria-label="Exit tailored view"
+          title="Exit tailored view"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
       {bundle.highlights.length > 0 && (

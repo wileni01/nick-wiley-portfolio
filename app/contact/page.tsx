@@ -3,12 +3,12 @@
 import { useState, useRef } from "react";
 import {
   Mail,
-  Linkedin,
   Send,
   Loader2,
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
+import { LinkedinIcon } from "@/components/icons/linkedin-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -229,7 +229,7 @@ export default function ContactPage() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/50 hover:shadow-md"
                 >
-                  <Linkedin className="h-5 w-5 text-primary" />
+                  <LinkedinIcon className="h-5 w-5 text-primary" />
                   <div>
                     <div className="text-sm font-medium">LinkedIn</div>
                     <div className="text-xs text-muted-foreground">

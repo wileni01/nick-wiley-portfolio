@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Linkedin, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
+import { LinkedinIcon } from "@/components/icons/linkedin-icon";
 
 const footerLinks = [
   { href: "/work", label: "Work" },
@@ -62,7 +63,7 @@ export function Footer() {
                 aria-label="LinkedIn"
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-all hover:border-primary hover:text-primary hover:shadow-md"
               >
-                <Linkedin className="h-5 w-5" />
+                <LinkedinIcon className="h-5 w-5" />
               </a>
               <a
                 href="/contact"

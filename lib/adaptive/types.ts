@@ -1,5 +1,3 @@
-import type { AIProvider } from "@/lib/ai";
-
 export type CompanyId = "kungfu-ai" | "anthropic" | "bcg";
 
 export type AssetKind = "work" | "writing" | "project" | "resume" | "page";
@@ -61,38 +59,5 @@ export interface RecommendationBundle {
   persona: PersonaProfile;
   topRecommendations: RankedRecommendation[];
   supportingRecommendations: RankedRecommendation[];
-  highlights: string[];
-}
-
-export interface AdaptiveRequest {
-  companyId: CompanyId;
-  personaId: string;
-  provider?: AIProvider;
-  contextNote?: string;
-}
-
-export interface AdaptiveResponse {
-  mode: {
-    companyId: CompanyId;
-    personaId: string;
-  };
-  companyName: string;
-  personaName: string;
-  personaRole: string;
-  deterministicNarrative: string;
-  aiNarrative?: string;
-  narrativeSource: "deterministic" | "ai";
-  recommendations: Array<{
-    title: string;
-    url: string;
-    kind: AssetKind;
-    reason: string;
-  }>;
-  supportingRecommendations: Array<{
-    title: string;
-    url: string;
-    kind: AssetKind;
-    reason: string;
-  }>;
   highlights: string[];
 }

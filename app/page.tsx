@@ -8,9 +8,9 @@ import {
   Brain,
   Database,
   ShieldCheck,
-  Linkedin,
   Quote,
 } from "lucide-react";
+import { LinkedinIcon } from "@/components/icons/linkedin-icon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import { getFeaturedCaseStudies } from "@/lib/mdx";
 import { HomeClient } from "@/components/home/home-client";
 import { PersonalizedHero } from "@/components/adaptive/personalized-hero";
 import { PlatinionHomeContent } from "@/components/home/platinion-home-content";
+import { ExitTailoredView } from "@/components/adaptive/exit-tailored-view";
 import {
   ADAPTIVE_MODE_COOKIE,
   getAdaptiveModeFromSearchParams,
@@ -151,8 +152,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <div className="max-w-3xl space-y-8">
             <div className="space-y-4">
               {platinionVariant && (
-                <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 py-1 pl-3 pr-1.5 text-xs font-medium text-primary">
                   BCG Platinion-focused view: AI platform architecture + delivery proof
+                  <ExitTailoredView />
                 </div>
               )}
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] leading-[1.15]">
@@ -219,7 +221,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Linkedin className="h-4 w-4" />
+                  <LinkedinIcon className="h-4 w-4" />
                   LinkedIn
                 </a>
               </Button>
