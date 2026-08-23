@@ -1,36 +1,36 @@
 # Nick Wiley — Human-in-the-Loop AI Portfolio
 
-Production-grade portfolio website for Nicholas A. Wiley, built with Next.js 15, TypeScript, and Tailwind CSS.
+Portfolio website for Nicholas A. Wiley, built with Next.js 16, TypeScript, and Tailwind CSS 4. Live at https://www.nickwiley.ai.
 
 ## Local Development
 
+Requires Node 24 (see `.node-version`).
+
 ```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# Lint
-npm run lint
+npm ci             # install from package-lock.json
+npm run dev        # http://localhost:3000
+npm run build      # production build (also type-checks)
+npm run lint       # eslint
+npm run typecheck  # tsc --noEmit
+npm run images:optimize -- --write   # shrink oversized images in public/images
 ```
-
-The dev server runs at [http://localhost:3000](http://localhost:3000).
 
 ## Deployment
 
-This project is **Vercel-ready**. Push to your repository and connect it to Vercel — the build will work out of the box.
+Hosted on Vercel. Pushing to `main` deploys to production; every other branch
+gets a preview URL. The build works with no environment variables, but the
+contact form only delivers email once Resend is configured.
 
-Environment variables (optional):
-- `NEXT_PUBLIC_SITE_URL` — Your production URL (defaults to `https://www.nickwiley.ai`)
-- `OPENAI_API_KEY` — Enables the AI chat API route
-- `ANTHROPIC_API_KEY` — Alternative AI provider for the chat route
+| Variable | Purpose |
+| --- | --- |
+| `RESEND_API_KEY` | Enables contact form delivery via [Resend](https://resend.com). Without it the form tells visitors to email directly. |
+| `CONTACT_EMAIL` | Inbox that receives submissions (defaults to the address in `lib/site.ts`). |
+| `RESEND_FROM` | Sender. Resend's onboarding sender works without DNS setup but only delivers to the Resend account owner; verify `nickwiley.ai` to send from the domain. |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | Address shown on the site. |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | Optional Cloudflare Turnstile CAPTCHA on the form. |
+| `NEXT_PUBLIC_SITE_URL` | Canonical origin, `https://www.nickwiley.ai`, no trailing slash or whitespace. |
+
+See `.env.example`.
 
 ## Where to Edit Content
 
@@ -89,15 +89,16 @@ app/
   resume/page.tsx       # Resume (HTML + print styles)
   about/page.tsx        # About
   contact/page.tsx      # Contact form
-  api/chat/route.ts     # AI chat API
-  api/contact/route.ts  # Contact form API
+  api/contact/route.ts  # Contact form API (Resend)
 
 components/
   layout/               # Navbar, footer, theme
   ui/                   # Button, card, badge, input, textarea
   work/                 # Case study cards, mode toggle
   home/                 # Guided tour, home client wrapper
-  search/               # Global search dialog
+  search/               # Global search dialog (index built from content/)
+  mdx/                  # MDX renderer for case studies and posts
+  adaptive/             # Tailored views for shared links
   resume/               # Print action button
   seo/                  # JSON-LD structured data
 
@@ -107,6 +108,8 @@ content/
 
 lib/
   mdx.ts                # MDX content loader with zod validation
+  search-index.ts       # Builds the global search index at build time
+  site.ts               # Canonical URLs, contact email, social links
   types.ts              # TypeScript types and zod schemas
   utils.ts              # Shared utilities
 ```
@@ -114,23 +117,27 @@ lib/
 ## Key Features
 
 - **Executive / Builder toggle** — Each case study has two summary modes: one focused on outcomes and governance, the other on architecture and stack.
-- **Global search** — Press `/` or `Cmd+K` to search across case studies, writing, and pages.
+- **Global search** — Press `/` or `Cmd+K` to search across case studies, writing, and pages. The index is generated from `content/` at build time.
 - **Guided tour** — A 60-second tour on the home page highlighting key sections.
 - **Dark mode** — System preference + manual toggle.
 - **Skip links** — Keyboard-accessible skip-to-content link.
 - **Print-ready resume** — The resume page has print styles for PDF export.
 - **Accessibility** — Semantic HTML, focus states, ARIA labels, reduced motion support.
 
-## Personalization Views
+## Tailored Views (shareable links)
 
-- **Platinion / Harsh view (shareable):** `/?p=platinion` (or `/?p=harsh`)
-- **Compatibility URL:** `/?for=bcg&persona=bcg-harsh`
-- The personalized mode persists for the browsing session via existing adaptive storage.
-- Default homepage content stays unchanged unless one of the URLs above is used.
+The default site is the same for everyone. A link can activate a tailored
+view for the rest of the browsing session:
+
+- **BCG Platinion view:** `/?p=platinion` (alias `/?p=harsh`, or `/?for=bcg&persona=bcg-harsh`)
+- **Other profiles:** `/?for=<companyId>&persona=<personaId>` using ids from `lib/adaptive/profiles.ts`
+
+Recipients can exit the view with the × on the banner. The profiles file names
+real people, so no selector for it is exposed in the navigation.
 
 ## Tech Stack
 
-- **Next.js 15** (App Router) + **TypeScript**
+- **Next.js 16** (App Router) + **TypeScript**
 - **Tailwind CSS 4**
 - **MDX** content with **zod** frontmatter validation
 - **Framer Motion** for subtle animations
@@ -155,8 +162,6 @@ The following notes document where content uses sanitized, approximated, or plac
 - "12+ years" experience is calculated from the 2011 start date at RATB.
 
 ### Placeholders requiring Nick to fill
-- `public/resume/nick-wiley-resume.pdf` — Place an actual PDF resume here for the download button.
-- `public/og-image.png` — Open Graph image for social sharing (1200x630 recommended).
 - Projects page items marked "Code available on request" or "Available on request" — Add links if/when repos are shared.
 - The testimonial quote on the home page uses a short excerpt. Nick should verify this is the preferred quote from the recommendation letter.
-- The chat API route (`/api/chat`) requires `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` environment variables to function.
+- The contact form needs `RESEND_API_KEY` in Vercel before it delivers email; until then visitors are pointed to the direct address.
