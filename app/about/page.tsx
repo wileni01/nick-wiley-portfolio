@@ -73,7 +73,7 @@ export default function AboutPage() {
           {/* U.S. Capitol image */}
           <div className="relative aspect-[2/1] w-full overflow-hidden rounded-xl border border-border bg-muted shadow-sm not-prose">
             <Image
-              src="/images/capitol.jpeg"
+              src="/images/capitol.jpg"
               alt="U.S. Capitol Building"
               fill
               sizes="(max-width: 768px) 100vw, 768px"
