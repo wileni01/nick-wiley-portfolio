@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Study halls — representative recreation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1600px; height: 1000px; overflow: hidden; }
+  body { font-family: "Segoe UI", -apple-system, Helvetica, Arial, sans-serif; font-size: 13px; color: #242424; background: #f0f0f0; }
+  .top { height: 48px; background: #0f6cbd; color: #fff; display: flex; align-items: center; padding: 0 18px; gap: 18px; font-size: 13.5px; }
+  .top b { font-weight: 600; }
+  .top .s { margin-left: auto; background: rgba(255,255,255,.2); border-radius: 4px; padding: 5px 12px; width: 300px; font-size: 12.5px; }
+  .crumb { height: 36px; background: #fff; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; padding: 0 18px; gap: 6px; color: #616161; font-size: 12.5px; }
+  .wrap { display: grid; grid-template-columns: 1fr 380px; gap: 20px; padding: 20px 24px; height: 916px; }
+  .page { background: #fff; border: 1px solid #e0e0e0; padding: 26px 34px; }
+  h1 { font-size: 26px; margin: 0 0 4px; font-weight: 600; }
+  .meta { color: #616161; font-size: 12.5px; margin-bottom: 18px; }
+  h2 { font-size: 17px; margin: 18px 0 8px; font-weight: 600; }
+  p { margin: 0 0 8px; line-height: 1.55; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; background: #f5f5f5; padding: 7px 10px; border-bottom: 1px solid #e0e0e0; font-weight: 600; color: #424242; }
+  td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+  .tag { display: inline-block; border-radius: 3px; padding: 1px 7px; font-size: 11px; font-weight: 600; }
+  .t1 { background: #e6f2fb; color: #0f548c; } .t2 { background: #e7f5e9; color: #2a6b33; } .t3 { background: #fff4e5; color: #8a4b00; }
+  .card { background: #fff; border: 1px solid #e0e0e0; margin-bottom: 18px; }
+  .card .hd { padding: 10px 14px; border-bottom: 1px solid #e0e0e0; font-weight: 600; font-size: 13px; display: flex; justify-content: space-between; }
+  .card .hd span { color: #616161; font-weight: 400; font-size: 12px; }
+  .card .bd { padding: 12px 14px; }
+  .sess { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 12.5px; }
+  .sess .d { width: 52px; text-align: center; background: #f5f5f5; border-radius: 4px; padding: 4px 0; font-size: 11px; color: #424242; line-height: 1.2; }
+  .sess .d b { display: block; font-size: 15px; }
+  .redact { display: inline-block; background: #d6d6d6; border-radius: 3px; height: 9px; vertical-align: middle; }
+  .note { position: absolute; left: 24px; bottom: 6px; font-size: 11px; color: #9e9e9e; }
+  .callout { border-left: 4px solid #0f6cbd; background: #f3f8fd; padding: 10px 14px; margin: 10px 0 14px; font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div class="top"><b>ENG Analytics</b><span>Home</span><span>Tableau Study Hall</span><span>BigQuery Study Hall</span><span>Data Working Group</span><span>Dashboards</span><span>Data dictionary</span><div class="s">Search this site</div></div>
+<div class="crumb">Home › Enablement › <b style="color:#242424">Study halls and the ENG Data Working Group</b></div>
+<div class="wrap">
+  <div class="page">
+    <h1>Study halls and the ENG Data Working Group</h1>
+    <div class="meta">Maintained by the analytics team · updated this week · open to everyone in the directorate</div>
+    <div class="callout">Bring your own dashboard or query. No prerequisites, no grades. The best sessions are the ones where an analyst solves another analyst's problem.</div>
+    <h2>What runs, and when</h2>
+    <table>
+      <tr><th>Program</th><th>Cadence</th><th>Who</th><th>Recent topics</th></tr>
+      <tr><td><span class="tag t1">Tableau Study Hall</span></td><td>Weekly, Thursdays 1:00–2:00</td><td>Anyone who works with data: first-time users to experienced analysts</td><td>Connecting to data · calculations · LOD expressions · accessible formatting · performance · publishing</td></tr>
+      <tr><td><span class="tag t2">BigQuery Study Hall</span></td><td>Biweekly, Tuesdays 11:00–12:00</td><td>Analysts building SQL fluency on production datasets</td><td>Access controls · how BigQuery differs from traditional databases · reusable query templates · cost awareness</td></tr>
+      <tr><td><span class="tag t3">ENG Data Working Group</span></td><td>Monthly</td><td>Analysts, program officers, leadership</td><td>Metric definitions · data standards · what to build next · data quality issues for collective resolution</td></tr>
+    </table>
+    <h2>Ground rules</h2>
+    <p>Work on real dashboards and real datasets, not toy examples. Questions are the agenda. Anything learned gets written down here so it outlives the session.</p>
+    <h2>Reusable templates (BigQuery)</h2>
+    <table>
+      <tr><th>Template</th><th>Use it for</th><th>Owner</th><th>Last updated</th></tr>
+      <tr><td>awards_by_program_fy.sql</td><td>Program-level award counts and dollars by fiscal year</td><td><span class="redact" style="width:70px"></span></td><td>2 weeks ago</td></tr>
+      <tr><td>reviewer_load.sql</td><td>Reviewer assignments and load per panel</td><td><span class="redact" style="width:56px"></span></td><td>1 month ago</td></tr>
+      <tr><td>proposal_status_snapshot.sql</td><td>Point-in-time status counts with SCD handling</td><td>analytics team</td><td>3 days ago</td></tr>
+      <tr><td>data_quality_checks.sql</td><td>Null rates, orphans, and date sanity for any table</td><td>analytics team</td><td>1 week ago</td></tr>
+    </table>
+    <h2>Shared definitions (from the working group)</h2>
+    <table>
+      <tr><th>Metric</th><th>Definition agreed</th><th>Status</th></tr>
+      <tr><td>Active award</td><td>Award with an end date in the future and obligations &gt; 0</td><td>Adopted</td></tr>
+      <tr><td>Proposal cycle time</td><td>Submission to decision, business days, excluding returned-without-review</td><td>Adopted</td></tr>
+      <tr><td>Reviewer load</td><td>Assigned proposals per reviewer per panel, counted at panel lock</td><td>In review</td></tr>
+    </table>
+  </div>
+  <div>
+    <div class="card"><div class="hd">Upcoming sessions <span>add to calendar</span></div><div class="bd">
+      <div class="sess"><div class="d">Thu<b>12</b></div><div><b>Tableau Study Hall</b><br><span style="color:#616161">Bring a dashboard that is slow. We will profile it together.</span></div></div>
+      <div class="sess"><div class="d">Tue<b>17</b></div><div><b>BigQuery Study Hall</b><br><span style="color:#616161">Window functions and the proposal_status_snapshot template.</span></div></div>
+      <div class="sess"><div class="d">Thu<b>19</b></div><div><b>Tableau Study Hall</b><br><span style="color:#616161">Accessible color and table alternatives (508).</span></div></div>
+      <div class="sess" style="border-bottom:none"><div class="d">Wed<b>25</b></div><div><b>ENG Data Working Group</b><br><span style="color:#616161">Decide: reviewer load definition; review open data quality issues (4).</span></div></div>
+    </div></div>
+    <div class="card"><div class="hd">Participation <span>last 12 months</span></div><div class="bd"><svg id="att" width="350" height="150"></svg><div style="font-size:12px;color:#616161;margin-top:4px">Analysts publishing their own dashboards: <b style="color:#242424">4 → 19</b>. Custom report requests to the consulting team: <b style="color:#242424">down 60%</b>.</div></div></div>
+    <div class="card"><div class="hd">Open data quality issues <span>working group</span></div><div class="bd" style="font-size:12.5px;line-height:1.7">
+      <div>DQ-14 · Duplicate institution names across two systems · <b>in progress</b></div>
+      <div>DQ-15 · Panel lock timestamp missing for FY19 · <b>owner assigned</b></div>
+      <div>DQ-17 · Program code backfill (see ADCC check C-03) · <b>71% cleared</b></div>
+      <div>DQ-18 · Reviewer conflict flags not synced nightly · <b>new</b></div>
+    </div></div>
+  </div>
+</div>
+<div class="note">Representative recreation of the internal enablement page with illustrative details. Actual agency pages are not shown.</div>
+<script>
+  const A=document.getElementById("att"); const v=[6,8,9,11,12,14,13,16,18,19,21,23]; let s=""; const x0=30,y0=120,w=300,h=100;
+  for(let i=0;i<=2;i++){ const y=y0-i*h/2; s+=`<line x1="${x0}" y1="${y}" x2="${x0+w}" y2="${y}" stroke="#eee"/><text x="${x0-6}" y="${y+4}" font-size="10" text-anchor="end" fill="#888">${i*15}</text>`; }
+  v.forEach((n,i)=>{ const bw=18, x=x0+10+i*24, bh=n*h/30; s+=`<rect x="${x}" y="${y0-bh}" width="${bw}" height="${bh}" fill="#0f6cbd" opacity="0.85"/>`; });
+  s+=`<text x="${x0+w/2}" y="142" font-size="10.5" text-anchor="middle" fill="#888">average attendees per Tableau Study Hall, by month</text>`;
+  A.innerHTML=s;
+</script>
+</body>
+</html>

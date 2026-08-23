@@ -23,7 +23,7 @@ import { siteConfig } from "@/lib/site";
 
 const navLinks = [
   { href: "/work", label: "Work", icon: Briefcase },
-  { href: "/projects", label: "Projects", icon: FolderKanban },
+  { href: "/projects", label: "Products", icon: FolderKanban },
   { href: "/writing", label: "Writing", icon: PenLine },
   { href: "/resume", label: "Resume", icon: FileText },
   { href: "/about", label: "About", icon: User },

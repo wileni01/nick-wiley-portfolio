@@ -8,7 +8,7 @@ import { SkillsHighlight } from "@/components/adaptive/skills-highlight";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Nick Wiley, AI solution architect and delivery leader. 12+ years designing analytics platforms, ML workflows, and governance frameworks for federal agencies. Managing Consultant at IBM. U.S. patent holder.",
+    "Nick Wiley, product and delivery leader for AI in federal agencies. 12+ years building analytics platforms, ML workflows, and governance inside NSF, USDA, USPS, and Census. Managing Consultant at IBM. Startup founder and U.S. patent holder.",
 };
 
 export default function AboutPage() {
@@ -95,14 +95,14 @@ export default function AboutPage() {
           <h2>What I&apos;m looking for</h2>
 
           <p>
-            I&apos;m pursuing Principal-level AI solution architecture
-            work: the kind of engagement where you own the technical vision
-            for an AI platform, lead cross-functional delivery teams, and
-            ensure governance and auditability are built in from day one.
-            I do my best work in regulated environments where the stakes are
-            real, the systems need to earn trust, and someone has to stay
-            through adoption and operationalization, not just the design
-            phase.
+            Product work at the intersection of frontier AI and government:
+            sitting inside agency workflows, finding where a model genuinely
+            belongs in the production path of the work, and owning the
+            decisions that get it deployed, adopted, and trusted. I have
+            spent 12+ years doing the discovery, delivery, and governance
+            parts of that job inside federal agencies, usually through teams
+            I did not manage. The part I want next is shaping the product
+            itself, and carrying what agencies need back into the roadmap.
           </p>
 
           <div className="flex items-center gap-2 text-muted-foreground not-prose">

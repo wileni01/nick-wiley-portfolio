@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Proposal triage notebook — representative recreation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1600px; height: 1000px; overflow: hidden; }
+  body { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13px; color: #212121; background: #fff; }
+  .menubar { height: 28px; background: #fff; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; padding: 0 12px; gap: 16px; font-size: 13px; color: #333; }
+  .menubar .logo { font-weight: 700; color: #f37726; margin-right: 8px; }
+  .tabs { height: 34px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; display: flex; align-items: flex-end; padding-left: 220px; }
+  .tab { background: #fff; border: 1px solid #e0e0e0; border-bottom: none; padding: 7px 14px; font-size: 12px; display: flex; gap: 8px; align-items: center; }
+  .tab.inactive { background: #f5f5f5; color: #666; }
+  .toolbar { height: 34px; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; gap: 10px; padding-left: 232px; font-size: 12px; color: #555; }
+  .toolbar span { padding: 2px 6px; }
+  .toolbar .kernel { margin-left: auto; margin-right: 18px; display: flex; align-items: center; gap: 8px; }
+  .toolbar .kernel i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #555; display: inline-block; }
+  .wrap { display: flex; height: 904px; }
+  .files { width: 220px; border-right: 1px solid #e0e0e0; background: #fff; font-size: 12px; padding: 10px 0; }
+  .files .h { padding: 4px 12px; color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+  .files div.f { padding: 4px 12px 4px 22px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .files div.f.sel { background: #e3f2fd; }
+  .nb { flex: 1; overflow: hidden; padding: 8px 40px 0 14px; }
+  .cell { display: flex; margin-bottom: 10px; }
+  .prompt { width: 70px; text-align: right; padding-right: 10px; color: #303f9f; font-family: Menlo, Consolas, monospace; font-size: 12px; padding-top: 6px; flex: none; }
+  .prompt.out { color: #d84315; }
+  .src { flex: 1; border: 1px solid #cfd8dc; background: #f7f7f7; padding: 6px 10px; font-family: Menlo, Consolas, monospace; font-size: 12px; line-height: 1.5; white-space: pre; color: #222; }
+  .src.active { border-left: 4px solid #1976d2; }
+  .md { flex: 1; padding: 2px 10px; line-height: 1.5; }
+  .md h2 { font-size: 20px; margin: 4px 0 4px; }
+  .md p { margin: 0; color: #333; }
+  .out { flex: 1; padding: 4px 10px; font-family: Menlo, Consolas, monospace; font-size: 12px; line-height: 1.5; white-space: pre; color: #222; }
+  .kw { color: #008000; font-weight: 600; } .st { color: #ba2121; } .fn { color: #0000ff; } .cm { color: #408080; font-style: italic; } .nm { color: #666; }
+  .figs { display: flex; gap: 16px; }
+  .fig { border: 1px solid #e0e0e0; background: #fff; }
+  .fig .t { font-size: 13px; font-weight: 600; padding: 8px 12px 0; }
+  .plotly-bar { height: 26px; display: flex; justify-content: flex-end; gap: 6px; padding: 4px 8px; }
+  .plotly-bar i { width: 14px; height: 14px; background: #e0e0e0; border-radius: 2px; display: inline-block; }
+  .foot { position: absolute; right: 40px; bottom: 8px; font-size: 11px; color: #9e9e9e; }
+</style>
+</head>
+<body>
+<div class="menubar"><span class="logo">⬤ JupyterLab</span><span>File</span><span>Edit</span><span>View</span><span>Run</span><span>Kernel</span><span>Tabs</span><span>Settings</span><span>Help</span></div>
+<div class="tabs"><div class="tab">▣ 03_cluster_optimize.ipynb <span style="color:#999">●</span></div><div class="tab inactive">▣ 02_embed_scibert.ipynb</div><div class="tab inactive">▤ optuna_trials.csv</div></div>
+<div class="toolbar"><span>💾</span><span>＋</span><span>✂</span><span>⧉</span><span>▶</span><span>■</span><span>↻</span><span>▶▶</span><span style="border:1px solid #ccc;border-radius:3px">Code ▾</span><div class="kernel"><span>Python 3 (proposal-triage)</span><i></i></div></div>
+<div class="wrap">
+  <div class="files">
+    <div class="h">proposal-triage</div>
+    <div class="f">📁 data/</div>
+    <div class="f" style="padding-left:34px">abstracts_fy.parquet</div>
+    <div class="f" style="padding-left:34px">embeddings_scibert.npy</div>
+    <div class="f">📁 notebooks/</div>
+    <div class="f" style="padding-left:34px">01_preprocess.ipynb</div>
+    <div class="f" style="padding-left:34px">02_embed_scibert.ipynb</div>
+    <div class="f sel" style="padding-left:34px">03_cluster_optimize.ipynb</div>
+    <div class="f" style="padding-left:34px">04_dashboards.ipynb</div>
+    <div class="f">📁 runs/</div>
+    <div class="f" style="padding-left:34px">optuna_study.db</div>
+    <div class="f" style="padding-left:34px">params_v7.json</div>
+    <div class="f">📄 README.md</div>
+    <div class="f">📄 pipeline.py</div>
+  </div>
+  <div class="nb">
+    <div class="cell"><div class="prompt"></div><div class="md"><h2>SciBERT → UMAP → HDBSCAN, tuned with Optuna</h2><p>7,214 abstracts embedded with <code>allenai/scibert_scivocab_uncased</code> (768-d). Objective balances topic coherence, coverage, and granularity. Versioned params in <code>runs/params_v7.json</code>.</p></div></div>
+    <div class="cell"><div class="prompt">[12]:</div><div class="src active"><span class="kw">def</span> <span class="fn">objective</span>(trial):
+    params = {
+        <span class="st">"n_neighbors"</span>:      trial.suggest_int(<span class="st">"n_neighbors"</span>, <span class="nm">5</span>, <span class="nm">60</span>),
+        <span class="st">"min_dist"</span>:         trial.suggest_float(<span class="st">"min_dist"</span>, <span class="nm">0.0</span>, <span class="nm">0.5</span>),
+        <span class="st">"min_cluster_size"</span>: trial.suggest_int(<span class="st">"min_cluster_size"</span>, <span class="nm">15</span>, <span class="nm">80</span>),
+        <span class="st">"min_samples"</span>:      trial.suggest_int(<span class="st">"min_samples"</span>, <span class="nm">5</span>, <span class="nm">30</span>),
+    }
+    labels = run_pipeline(emb, **params, random_state=<span class="nm">42</span>)
+    <span class="kw">return</span> <span class="nm">0.5</span>*coherence(labels) + <span class="nm">0.3</span>*coverage(labels) + <span class="nm">0.2</span>*granularity(labels)
+
+study = optuna.create_study(direction=<span class="st">"maximize"</span>, storage=<span class="st">"sqlite:///runs/optuna_study.db"</span>, load_if_exists=<span class="kw">True</span>)
+study.optimize(objective, n_trials=<span class="nm">120</span>, show_progress_bar=<span class="kw">True</span>)</div></div>
+    <div class="cell"><div class="prompt out"></div><div class="out">Best is trial 97 with value: 0.712. ████████████████████████████████████ 120/120 [1:42:18&lt;00:00, 51.2s/it]
+best params: {'n_neighbors': 23, 'min_dist': 0.08, 'min_cluster_size': 34, 'min_samples': 11}
+clusters: 73   assigned: 5,063 (70.2%)   flagged for review (noise): 2,151 (29.8%)
+quality vs. baseline params (v1): +40.3%</div></div>
+    <div class="cell"><div class="prompt">[13]:</div><div class="src">fig_map = px.scatter(df, x=<span class="st">"umap_x"</span>, y=<span class="st">"umap_y"</span>, color=<span class="st">"topic"</span>, hover_data=[<span class="st">"proposal_id"</span>, <span class="st">"top_terms"</span>])
+fig_opt = optuna.visualization.plot_optimization_history(study)
+show_side_by_side(fig_map, fig_opt)</div></div>
+    <div class="cell"><div class="prompt out"></div><div class="figs">
+      <div class="fig"><div class="plotly-bar"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="t">Topic map · 73 themes · gray = flagged for human review</div><svg id="umap" width="720" height="392"></svg></div>
+      <div class="fig"><div class="plotly-bar"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="t">Optimization history · 120 trials · best 0.712</div><svg id="hist" width="520" height="392"></svg></div>
+    </div></div>
+  </div>
+</div>
+<div class="foot">Representative recreation with illustrative data. Agency proposal data is not shown.</div>
+<script>
+  let seed = 11; const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const pal = ["#636efa","#ef553b","#00cc96","#ab63fa","#ffa15a","#19d3f3","#ff6692","#b6e880","#ff97ff","#fecb52","#1f77b4","#2ca02c","#d62728","#9467bd","#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf","#aec7e8"];
+  const u = document.getElementById("umap");
+  let s = `<rect x="0" y="0" width="720" height="392" fill="#fff"/>`;
+  // axes grid
+  for (let i=1;i<6;i++){ s += `<line x1="${i*120}" y1="10" x2="${i*120}" y2="370" stroke="#eee"/>`; }
+  for (let i=1;i<4;i++){ s += `<line x1="30" y1="${i*95}" x2="700" y2="${i*95}" stroke="#eee"/>`; }
+  // noise points first
+  for (let k=0;k<520;k++){ s += `<circle cx="${(40+rnd()*650).toFixed(1)}" cy="${(20+rnd()*340).toFixed(1)}" r="2" fill="#c7c7c7" opacity="0.7"/>`; }
+  const centers = [];
+  for (let i=0;i<73;i++){ centers.push({x: 60+rnd()*600, y: 35+rnd()*315, c: pal[i%pal.length], n: 10+Math.floor(rnd()*30), r: 10+rnd()*16}); }
+  centers.forEach(c=>{ for(let k=0;k<c.n;k++){ const a=rnd()*6.283, d=Math.sqrt(rnd())*c.r; s += `<circle cx="${(c.x+Math.cos(a)*d).toFixed(1)}" cy="${(c.y+Math.sin(a)*d*0.8).toFixed(1)}" r="2.4" fill="${c.c}" opacity="0.85"/>`; } });
+  s += `<text x="360" y="386" font-size="11" text-anchor="middle" fill="#666">umap_x</text><text x="12" y="200" font-size="11" fill="#666" transform="rotate(-90 12 200)">umap_y</text>`;
+  u.innerHTML = s;
+  const h = document.getElementById("hist");
+  let g = `<rect width="520" height="392" fill="#fff"/>`;
+  const x0=50, y0=350, w=440, ht=300;
+  for (let i=0;i<=5;i++){ const y = y0 - i*ht/5; g += `<line x1="${x0}" y1="${y}" x2="${x0+w}" y2="${y}" stroke="#eee"/><text x="${x0-6}" y="${y+4}" font-size="10" text-anchor="end" fill="#666">${(0.3+i*0.1).toFixed(1)}</text>`; }
+  let best = 0.31; let path = "";
+  for (let t=0;t<120;t++){ const base = 0.34 + 0.3*(1-Math.exp(-t/28)); const v = Math.max(0.3, Math.min(0.72, base + (rnd()-0.5)*0.22)); const vv = t===97 ? 0.712 : v; if (vv>best) best=vv; const x = x0 + t*(w/119), y = y0 - (vv-0.3)*ht/0.5; g += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="#1f77b4" opacity="0.75"/>`; const by = y0 - (best-0.3)*ht/0.5; path += (t===0?`M${x.toFixed(1)},${by.toFixed(1)}`:`L${x.toFixed(1)},${by.toFixed(1)}`); }
+  g += `<path d="${path}" fill="none" stroke="#d62728" stroke-width="2"/>`;
+  g += `<text x="${x0+w/2}" y="380" font-size="11" text-anchor="middle" fill="#666">trial</text><text x="16" y="200" font-size="11" fill="#666" transform="rotate(-90 16 200)">objective value</text>`;
+  g += `<rect x="${x0+250}" y="30" width="180" height="40" fill="#fff" stroke="#ddd"/><circle cx="${x0+262}" cy="44" r="3" fill="#1f77b4"/><text x="${x0+272}" y="48" font-size="11" fill="#333">objective value</text><line x1="${x0+256}" y1="60" x2="${x0+268}" y2="60" stroke="#d62728" stroke-width="2"/><text x="${x0+272}" y="64" font-size="11" fill="#333">best value</text>`;
+  h.innerHTML = g;
+</script>
+</body>
+</html>

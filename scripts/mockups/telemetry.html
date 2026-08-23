@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Tool adoption telemetry — representative recreation</title>
+<link rel="stylesheet" href="_tableau.css" />
+</head>
+<body>
+<div class="tb-top"><div class="brand"><i></i>Tableau Server</div><div class="crumb">Analytics Tools › Adoption › <b>Tool Adoption (weekly)</b></div><div class="right"><span>Data updated today 06:10</span><span>Subscribe</span><span>Share</span><span>Download</span></div></div>
+<div class="tb-bar"><span class="on">View</span><span>Edit</span><span>Comments (4)</span><span>Metrics</span><span style="margin-left:auto">Anonymous usage data · no user identifiers collected</span></div>
+<div class="dash">
+  <div class="title">Tool Adoption: Decision-support suite</div>
+  <div class="subtitle">Weekly active sessions, feature engagement, and workflow drop-off across four tools. Aggregated and anonymous by design.</div>
+  <div class="filters"><div class="filter">Last 26 weeks <span>▼</span></div><div class="filter">All tools (4) <span>▼</span></div><div class="filter">All divisions <span>▼</span></div></div>
+
+  <div class="kpi" style="left:18px;top:70px;width:180px"><div class="l">Weekly active sessions</div><div class="v">1,284</div><div class="d">▲ 18% vs. 8 wks ago</div></div>
+  <div class="kpi" style="left:210px;top:70px;width:180px"><div class="l">Tools with growing use</div><div class="v">3 of 4</div><div class="d n">Lineage dashboard flat</div></div>
+  <div class="kpi" style="left:402px;top:70px;width:180px"><div class="l">Median session</div><div class="v">11.4 min</div><div class="d">▲ 1.6 min</div></div>
+  <div class="kpi" style="left:594px;top:70px;width:180px"><div class="l">Workflow completion</div><div class="v">78%</div><div class="d">▲ from 61% (wk 1)</div></div>
+  <div class="kpi" style="left:786px;top:70px;width:180px"><div class="l">Override rate (Panel Wizard)</div><div class="v">14%</div><div class="d">▼ from 39%</div></div>
+
+  <div class="sheet" style="left:18px;top:150px;width:948px;height:330px"><div class="st">Weekly active sessions by tool</div><div class="ss">26 weeks · sessions are anonymous; one row per session, no account id</div><svg id="lines" width="930" height="280"></svg></div>
+
+  <div class="sheet" style="left:984px;top:70px;width:570px;height:410px"><div class="st">Feature engagement, last 4 weeks</div><div class="ss">Share of sessions that used each feature at least once</div><svg id="bars" width="550" height="360"></svg></div>
+
+  <div class="sheet" style="left:18px;top:498px;width:560px;height:380px"><div class="st">Workflow funnel: Panel Wizard</div><div class="ss">Where sessions stall in the 5-step assignment flow</div><svg id="funnel" width="540" height="320"></svg></div>
+
+  <div class="sheet" style="left:596px;top:498px;width:370px;height:380px"><div class="st">Adoption trend, small multiples</div><div class="ss">Indexed to week 1 = 100</div><svg id="smalls" width="350" height="320"></svg></div>
+
+  <div class="sheet" style="left:984px;top:498px;width:570px;height:380px"><div class="st">What changed after telemetry</div><div class="ss">Decisions informed by this dashboard</div>
+    <table class="tt">
+      <tr><th>Week</th><th>Signal</th><th>Action</th><th>Result</th></tr>
+      <tr><td>6</td><td>Export step abandoned 41% of the time</td><td>Moved export to single button; default format</td><td>Abandon ↓ 9%</td></tr>
+      <tr><td>9</td><td>Lineage drill-down rarely opened</td><td>Training session + surfaced in summary view</td><td>Use ↑ 3×</td></tr>
+      <tr><td>12</td><td>Compliance checker used only Mondays</td><td>Added scheduled run + email digest</td><td>Daily use</td></tr>
+      <tr><td>17</td><td>Override rate settling at ~14%</td><td>Kept; informed overrides are the goal</td><td>Stable</td></tr>
+      <tr><td>21</td><td>Two features never used</td><td>Retired them; simplified UI</td><td>Session ↓ 2 min</td></tr>
+    </table>
+  </div>
+  <div class="note">Representative recreation with illustrative data. Built in Tableau; actual agency dashboards are not shown.</div>
+</div>
+<script>
+  let seed = 23; const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const pal = ["#4e79a7","#f28e2b","#59a14f","#e15759"];
+  const tools = ["Panel Wizard","Compliance checker (ADCC)","Researcher lineage","Document automation (RoboRA)"];
+  // lines
+  const L = document.getElementById("lines"); const x0=46,y0=240,w=860,h=210; let s="";
+  for (let i=0;i<=4;i++){ const y=y0-i*h/4; s+=`<line x1="${x0}" y1="${y}" x2="${x0+w}" y2="${y}" stroke="#eee"/><text x="${x0-6}" y="${y+4}" font-size="10" text-anchor="end" fill="#777">${i*150}</text>`; }
+  const series = [[120,0.95,8],[60,1.2,6],[90,0.25,5],[40,1.1,7]];
+  series.forEach((sp,i)=>{ let p=""; for(let t=0;t<26;t++){ const v = sp[0] + sp[2]*t*sp[1]*(1+0.15*Math.sin(t/2)) + (rnd()-0.5)*18; const x=x0+t*(w/25), y=y0-Math.min(600,Math.max(0,v))*h/600; p+=(t?"L":"M")+x.toFixed(1)+","+y.toFixed(1);} s+=`<path d="${p}" fill="none" stroke="${pal[i]}" stroke-width="2.2"/>`; });
+  for (let t=0;t<26;t+=5){ s+=`<text x="${x0+t*(w/25)}" y="${y0+16}" font-size="10" text-anchor="middle" fill="#777">Wk ${t+1}</text>`; }
+  tools.forEach((t,i)=>{ s+=`<rect x="${x0+10+i*215}" y="${y0+26}" width="10" height="10" fill="${pal[i]}"/><text x="${x0+25+i*215}" y="${y0+35}" font-size="10.5" fill="#555">${t}</text>`; });
+  L.innerHTML = s;
+  // bars
+  const B = document.getElementById("bars"); const feats=[["Cluster suggestions",0.91],["Fit score / why signals",0.84],["Drag-and-drop override",0.63],["Run full check suite",0.77],["Drill into failing records",0.58],["Export findings",0.52],["Lineage summary view",0.71],["Researcher drill-down",0.34],["Batch document run",0.88],["Legacy posting",0.81],["Silhouette chart",0.22],["Keyword labels",0.47]]; let b="";
+  feats.forEach((f,i)=>{ const y=12+i*28; b+=`<text x="186" y="${y+12}" font-size="11" text-anchor="end" fill="#444">${f[0]}</text><rect x="196" y="${y}" width="${(f[1]*320).toFixed(0)}" height="17" fill="${f[1]<0.4?'#e15759':'#4e79a7'}"/><text x="${200+f[1]*320}" y="${y+12}" font-size="10.5" fill="#333">${Math.round(f[1]*100)}%</text>`; });
+  B.innerHTML = b;
+  // funnel
+  const F = document.getElementById("funnel"); const steps=[["Open tool",100],["Load proposals",96],["Review suggestions",89],["Apply overrides",80],["Export assignments",78]]; let f="";
+  steps.forEach((st,i)=>{ const y=10+i*58; const wd=st[1]*4.2; f+=`<rect x="${270-wd/2}" y="${y}" width="${wd}" height="40" fill="#4e79a7" opacity="${0.95-i*0.12}"/><text x="270" y="${y+25}" font-size="11.5" fill="#fff" text-anchor="middle">${st[0]} · ${st[1]}%</text>`; if(i){ const d=steps[i-1][1]-st[1]; f+=`<text x="500" y="${y+25}" font-size="10.5" fill="${d>5?'#e15759':'#777'}" text-anchor="end">−${d}%</text>`; } });
+  F.innerHTML = f;
+  // small multiples
+  const S = document.getElementById("smalls"); let m="";
+  tools.forEach((t,i)=>{ const ox=(i%2)*175, oy=Math.floor(i/2)*160; let p=""; for(let k=0;k<26;k++){ const base = i===2 ? 100+Math.sin(k/3)*6 : 100+k*(i===0?6:i===1?4.5:5.5)+(rnd()-0.5)*10; const x=ox+12+k*5.6, y=oy+120-(base-60)*0.45; p+=(k?"L":"M")+x.toFixed(1)+","+y.toFixed(1);} m+=`<text x="${ox+12}" y="${oy+18}" font-size="10.5" fill="#444">${t}</text><path d="${p}" fill="none" stroke="${pal[i]}" stroke-width="1.8"/><line x1="${ox+12}" y1="${oy+120-40*0.45}" x2="${ox+160}" y2="${oy+120-40*0.45}" stroke="#ddd" stroke-dasharray="2 2"/>`; });
+  S.innerHTML = m;
+</script>
+</body>
+</html>

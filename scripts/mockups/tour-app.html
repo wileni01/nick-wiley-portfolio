@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Gettysburg Battlefield Tour App — design recreation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1600px; height: 1000px; overflow: hidden; }
+  body { font-family: -apple-system, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif; background: #e8e4dc; color: #111; }
+  .stage { position: absolute; inset: 0; background: radial-gradient(circle at 50% 40%, #f3efe7 0%, #e3ded4 70%); }
+  .phone { position: absolute; left: 560px; top: 50px; width: 420px; height: 900px; background: #000; border-radius: 54px; padding: 14px; box-shadow: 0 30px 70px rgba(0,0,0,.35); }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 42px; overflow: hidden; background: #e9efe6; }
+  .island { position: absolute; left: 50%; top: 12px; width: 120px; height: 34px; background: #000; border-radius: 20px; transform: translateX(-50%); z-index: 5; }
+  .status { position: absolute; top: 16px; left: 26px; right: 26px; display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; z-index: 4; }
+  .map { position: absolute; inset: 0; }
+  .topbar { position: absolute; top: 60px; left: 16px; right: 16px; display: flex; gap: 8px; z-index: 4; }
+  .pill { background: rgba(255,255,255,.92); border-radius: 14px; padding: 8px 12px; font-size: 13px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 24px 24px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,.15); padding: 10px 18px 26px; z-index: 6; }
+  .grab { width: 40px; height: 5px; background: #d1d1d6; border-radius: 3px; margin: 0 auto 12px; }
+  .stopn { font-size: 12px; color: #8e8e93; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+  .stopt { font-size: 21px; font-weight: 700; margin: 2px 0 2px; letter-spacing: -0.3px; }
+  .stops { font-size: 13px; color: #3a3a3c; line-height: 1.4; }
+  .player { margin-top: 12px; background: #f2f2f7; border-radius: 16px; padding: 12px 14px; }
+  .player .row { display: flex; align-items: center; gap: 12px; }
+  .play { width: 44px; height: 44px; border-radius: 50%; background: #1c4f8a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .prog { flex: 1; }
+  .prog .t { display: flex; justify-content: space-between; font-size: 11px; color: #8e8e93; margin-top: 6px; }
+  .prog .bar { height: 4px; background: #d1d1d6; border-radius: 2px; }
+  .prog .bar i { display: block; height: 100%; width: 38%; background: #1c4f8a; border-radius: 2px; }
+  .cap { font-size: 12px; color: #3a3a3c; margin-top: 8px; line-height: 1.4; }
+  .next { margin-top: 12px; display: flex; justify-content: space-between; font-size: 13px; }
+  .next b { color: #1c4f8a; }
+  .car { position: absolute; left: 1010px; top: 250px; width: 540px; height: 330px; background: #0b0b0d; border-radius: 18px; padding: 14px; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
+  .carscreen { position: relative; width: 100%; height: 100%; background: #141518; border-radius: 10px; overflow: hidden; color: #fff; }
+  .carnav { position: absolute; left: 0; top: 0; bottom: 0; width: 62px; background: #1c1d21; display: flex; flex-direction: column; align-items: center; gap: 18px; padding-top: 14px; }
+  .carnav i { width: 30px; height: 30px; border-radius: 8px; background: #2c2d32; display: block; }
+  .carnav i.on { background: #1c4f8a; }
+  .carmain { position: absolute; left: 62px; right: 0; top: 0; bottom: 0; }
+  .carmain .big { position: absolute; left: 22px; top: 18px; font-size: 13px; color: #9a9ba3; text-transform: uppercase; letter-spacing: .6px; }
+  .carmain .title { position: absolute; left: 22px; top: 40px; font-size: 24px; font-weight: 700; max-width: 250px; }
+  .carmain .dist { position: absolute; left: 22px; top: 110px; font-size: 14px; color: #c9cad1; max-width: 250px; line-height: 1.4; }
+  .carbtns { position: absolute; left: 22px; bottom: 20px; display: flex; gap: 12px; }
+  .carbtns span { background: #2c2d32; border-radius: 10px; padding: 12px 18px; font-size: 15px; }
+  .carbtns span.p { background: #1c4f8a; }
+  .carmap { position: absolute; right: 18px; top: 18px; width: 170px; height: 130px; border-radius: 10px; overflow: hidden; background: #1f2a1f; }
+  .label { position: absolute; font-size: 12px; color: #5b5b5f; letter-spacing: .3px; }
+  .label b { display: block; color: #222; font-size: 15px; margin-bottom: 2px; }
+  .note { position: absolute; left: 24px; bottom: 8px; font-size: 11px; color: #7a7a7e; }
+  .arch { position: absolute; left: 60px; top: 250px; width: 440px; font-size: 13px; color: #333; line-height: 1.6; }
+  .arch h3 { margin: 0 0 6px; font-size: 15px; }
+  .arch code { font-family: Menlo, monospace; font-size: 11.5px; background: #f5f2ea; border: 1px solid #e0dbcf; border-radius: 4px; padding: 1px 5px; }
+  .arch li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="label" style="left:60px;top:110px"><b>Gettysburg Battlefield Tour</b>iOS (SwiftUI + Mapbox + CarPlay) · Android (Compose + Android Auto) · Fastify backend</div>
+  <div class="arch">
+    <h3>How it works</h3>
+    <ul style="padding-left:18px;margin:0">
+      <li>Driving and walking tour with turn-by-turn navigation to each stop</li>
+      <li>Proximity-triggered narration: audio starts when you arrive, not when you tap</li>
+      <li>Interactive overlays: troop positions, lines of advance, period maps</li>
+      <li>Driver-safe surfaces: CarPlay and Android Auto show only large controls</li>
+      <li>Shared data model in <code>shared/</code> (TypeScript interfaces + JSON schemas) used by all three clients</li>
+      <li>Offline-first tour packages; the backend serves tour versions and updates</li>
+    </ul>
+    <p style="margin-top:10px;color:#6b6b70">Status: in development, August 2026.</p>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="island"></div>
+    <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+    <svg class="map" viewBox="0 0 392 872" width="392" height="872">
+      <defs><pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#dfe6da" stroke-width="1"/></pattern></defs>
+      <rect width="392" height="872" fill="#e9efe6"/>
+      <rect width="392" height="872" fill="url(#grid)"/>
+      <!-- fields and woods -->
+      <ellipse cx="290" cy="300" rx="90" ry="60" fill="#d3e2c6"/><ellipse cx="110" cy="520" rx="80" ry="50" fill="#d3e2c6"/><ellipse cx="300" cy="640" rx="70" ry="46" fill="#c5d9b6"/>
+      <!-- creek -->
+      <path d="M60 120 C 90 220, 40 320, 90 420 S 60 600, 100 700" fill="none" stroke="#9fc5e8" stroke-width="5"/>
+      <!-- roads -->
+      <path d="M190 0 V 872" stroke="#fff" stroke-width="10"/><path d="M190 0 V 872" stroke="#cfcfcf" stroke-width="1" stroke-dasharray="6 6"/>
+      <path d="M0 380 H 392" stroke="#fff" stroke-width="8"/>
+      <path d="M120 90 C 160 180, 260 200, 330 260 S 360 420, 250 470 S 200 600, 310 700" fill="none" stroke="#fff" stroke-width="8"/>
+      <!-- route -->
+      <path d="M120 90 C 160 180, 260 200, 330 260 S 360 420, 250 470 S 200 600, 310 700" fill="none" stroke="#1c4f8a" stroke-width="4" stroke-dasharray="10 6" opacity="0.9"/>
+      <!-- stops -->
+      <g font-family="-apple-system, Helvetica, Arial" font-size="11" font-weight="700">
+        <circle cx="120" cy="90" r="10" fill="#1c4f8a"/><text x="120" y="94" text-anchor="middle" fill="#fff">1</text>
+        <circle cx="240" cy="190" r="10" fill="#1c4f8a"/><text x="240" y="194" text-anchor="middle" fill="#fff">2</text>
+        <circle cx="330" cy="260" r="10" fill="#1c4f8a"/><text x="330" y="264" text-anchor="middle" fill="#fff">3</text>
+        <circle cx="318" cy="380" r="13" fill="#d1342f" stroke="#fff" stroke-width="3"/><text x="318" y="384" text-anchor="middle" fill="#fff">4</text>
+        <circle cx="250" cy="470" r="10" fill="#8e8e93"/><text x="250" y="474" text-anchor="middle" fill="#fff">5</text>
+        <circle cx="225" cy="580" r="10" fill="#8e8e93"/><text x="225" y="584" text-anchor="middle" fill="#fff">6</text>
+      </g>
+      <!-- overlay: lines -->
+      <path d="M70 330 L 170 350 L 260 330" stroke="#b23a3a" stroke-width="3" fill="none" opacity="0.8"/><path d="M90 300 L 180 318 L 270 298" stroke="#3a5fb2" stroke-width="3" fill="none" opacity="0.8"/>
+      <text x="72" y="322" font-size="10" fill="#b23a3a" font-family="-apple-system, Helvetica" font-weight="600">Confederate line, July 2</text><text x="92" y="292" font-size="10" fill="#3a5fb2" font-family="-apple-system, Helvetica" font-weight="600">Union line, July 2</text>
+      <!-- user location -->
+      <circle cx="300" cy="392" r="16" fill="#1c4f8a" opacity="0.18"/><circle cx="300" cy="392" r="7" fill="#1c4f8a" stroke="#fff" stroke-width="2.5"/>
+    </svg>
+    <div class="topbar"><span class="pill">🧭 Auto tour · 16 stops</span><span class="pill" style="margin-left:auto">Overlays: July 2 ▾</span></div>
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="stopn">Stop 4 of 16 · arrived</div>
+      <div class="stopt">Little Round Top</div>
+      <div class="stops">Narration started automatically when you entered the stop area. Walk to the overlook for the Devil's Den view.</div>
+      <div class="player"><div class="row"><div class="play">❚❚</div><div class="prog"><div class="bar"><i></i></div><div class="t"><span>2:14</span><span>Chamberlain and the 20th Maine</span><span>5:40</span></div></div></div>
+        <div class="cap">"…the left of the line had to hold. Warren saw the hill was empty…"</div></div>
+      <div class="next"><span>Next: <b>Devil's Den</b> · 0.6 mi · 3 min</span><span style="color:#8e8e93">Skip ›</span></div>
+    </div>
+  </div></div>
+
+  <div class="car"><div class="carscreen">
+    <div class="carnav"><i class="on"></i><i></i><i></i><i></i></div>
+    <div class="carmain">
+      <div class="big">Gettysburg Tour · CarPlay</div>
+      <div class="title">Little Round Top</div>
+      <div class="dist">Now playing · 2:14 / 5:40 &nbsp;·&nbsp; Next stop 0.6 mi</div>
+      <div class="carmap"><svg width="170" height="130"><rect width="170" height="130" fill="#1f2a1f"/><path d="M18 118 C 50 70, 100 90, 152 18" stroke="#4d8df0" stroke-width="5" fill="none"/><circle cx="82" cy="80" r="7" fill="#4d8df0" stroke="#fff" stroke-width="2"/><circle cx="152" cy="18" r="8" fill="#d1342f"/></svg></div>
+      <div class="carbtns"><span class="p">❚❚ Pause</span><span>⏭ Next stop</span><span>Replay</span></div>
+    </div>
+  </div></div>
+  <div class="label" style="left:1010px;top:600px"><b>Driver-safe surface</b>Large controls only. No reading, no maps to study while moving.</div>
+  <div class="note">Design recreation of the app in development (August 2026). Map is schematic, not Mapbox imagery.</div>
+</div>
+</body>
+</html>

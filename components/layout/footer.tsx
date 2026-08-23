@@ -5,7 +5,7 @@ import { siteConfig, mailtoUrl } from "@/lib/site";
 
 const footerLinks = [
   { href: "/work", label: "Work" },
-  { href: "/projects", label: "Projects" },
+  { href: "/projects", label: "Products" },
   { href: "/writing", label: "Writing" },
   { href: "/resume", label: "Resume" },
   { href: "/about", label: "About" },
@@ -26,9 +26,8 @@ export function Footer() {
               Nick Wiley
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
-              AI solution architecture and delivery leadership for
-              regulated environments. Systems people can trust and
-              actually use.
+              Product and delivery leadership for AI in government.
+              Systems people can trust and actually use.
             </p>
           </div>
 

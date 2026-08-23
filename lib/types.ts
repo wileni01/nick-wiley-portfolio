@@ -11,6 +11,12 @@ export const caseStudySchema = z.object({
   tags: z.array(z.string()),
   featured: z.boolean().default(false),
   image: z.string().optional(),
+  /** How the image was produced; drives the caption under the hero image. */
+  imageKind: z.enum(["screenshot", "recreation", "photo"]).optional(),
+  /** Optional override for the caption shown under the hero image. */
+  imageCaption: z.string().optional(),
+  /** Public URL of the shipped product, when one exists. */
+  liveUrl: z.string().url().optional(),
   executiveSummary: z.string(),
   builderSummary: z.string(),
 });

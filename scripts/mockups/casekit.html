@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>CaseKit — real validator output in a terminal</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1600px; height: 1000px; overflow: hidden; }
+  body { background: #2c2c2e; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .win { position: absolute; background: #1d1f21; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.5); overflow: hidden; border: 1px solid #111; }
+  .tb { height: 34px; background: #3a3a3c; display: flex; align-items: center; padding: 0 12px; gap: 7px; color: #d0d0d0; font-size: 12.5px; }
+  .tb i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .tb .t { flex: 1; text-align: center; margin-right: 50px; }
+  pre { margin: 0; padding: 14px 18px; font-family: "SF Mono", Menlo, Monaco, Consolas, monospace; font-size: 12.5px; line-height: 1.5; color: #c5c8c6; white-space: pre; }
+  .p { color: #8abeb7; } .g { color: #b5bd68; } .y { color: #f0c674; } .b { color: #81a2be; } .m { color: #b294bb; } .dim { color: #707880; } .w { color: #fff; font-weight: 600; } .r { color: #cc6666; }
+  .left { left: 24px; top: 24px; width: 1000px; height: 952px; }
+  .right { left: 1044px; top: 24px; width: 532px; height: 952px; background: #1d1f21; }
+  .note { position: absolute; right: 30px; bottom: 6px; font-size: 11px; color: #8a8a8e; }
+</style>
+</head>
+<body>
+<div class="win left">
+  <div class="tb"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="t">casekit-workspace — zsh — 120×52</span></div>
+<pre><span class="p">nick@mbp</span> <span class="b">~/Code/casekit-workspace</span> <span class="dim">(main)</span> <span class="w">$</span> ls
+AGENTS.md     README.md      case-architect  case-steward  casekit-dev  slidesmith   wheelhouse
+CLAUDE.md     case-analyst   case-planner    casekit       scripts      slidesmith.zip
+
+<span class="p">nick@mbp</span> <span class="b">~/Code/casekit-workspace</span> <span class="dim">(main)</span> <span class="w">$</span> ./casekit-dev/scripts/validate.sh
+CaseKit compatibility test — workspace /Users/nick/Code/casekit-workspace
+
+<span class="y">[1] Schemas are valid JSON Schema</span>
+  <span class="g">ok</span>    schemas/casepack/v1/artifact-descriptor.schema.json
+  <span class="g">ok</span>    schemas/casepack/v1/casepack.schema.json
+  <span class="g">ok</span>    schemas/casepack/v1/claim.schema.json
+  <span class="g">ok</span>    schemas/casepack/v1/evidence.schema.json
+  <span class="g">ok</span>    schemas/casepack/v1/records.schema.json
+  <span class="g">ok</span>    schemas/casepack/v1/validation-report.schema.json
+  <span class="g">ok</span>    schemas/extension.schema.json
+  <span class="g">ok</span>    profiles.json declares 8 profiles
+
+<span class="y">[2] Example fixtures validate</span>
+  <span class="g">ok</span>    examples/analyst-to-slidesmith/cp-analysis-gp-decline-001.casepack (analysis-result)
+  <span class="g">ok</span>    examples/architect-to-slidesmith/cp-architecture-001.casepack (architecture-story)
+  <span class="g">ok</span>    examples/architect-to-steward/cp-roadmap-001.casepack (engineering-roadmap)
+
+<span class="y">[3] Extension manifests validate</span>
+  <span class="g">ok</span>    slidesmith/extension.yaml
+  <span class="g">ok</span>    case-analyst/extension.yaml
+  <span class="g">ok</span>    case-architect/extension.yaml
+  <span class="g">ok</span>    case-steward/extension.yaml
+  <span class="g">ok</span>    case-planner/extension.yaml
+
+<span class="y">[4] Vendored copies have not drifted</span>
+  <span class="g">ok</span>    slidesmith: vendored schemas match
+  <span class="g">ok</span>    case-analyst: vendored schemas match
+  <span class="g">ok</span>    case-architect: vendored schemas match
+  <span class="g">ok</span>    case-steward: vendored schemas match
+  <span class="g">ok</span>    case-planner: vendored schemas match
+  <span class="g">ok</span>    casepack.py byte-identical across 5 extension(s)
+
+<span class="g w">PASSED</span>
+
+<span class="p">nick@mbp</span> <span class="b">~/Code/casekit-workspace</span> <span class="dim">(main)</span> <span class="w">$</span> claude
+<span class="dim">╭──────────────────────────────────────────────────────────────────────────────╮</span>
+<span class="dim">│</span> <span class="w">Claude Code</span>  <span class="dim">· ~/Code/casekit-workspace · AGENTS.md loaded (routes requests to</span> <span class="dim">│</span>
+<span class="dim">│</span> <span class="dim">case-planner · slidesmith · case-analyst · case-architect · case-steward)</span>     <span class="dim">│</span>
+<span class="dim">╰──────────────────────────────────────────────────────────────────────────────╯</span>
+<span class="m">&gt;</span> build me a workplan from these kickoff notes, then turn the margin finding into slides
+<span class="dim">  → case-planner: plan.json (42 tasks, 6 workstreams) · schedule.xlsx · impact preview</span>
+<span class="dim">  → slidesmith:   margin-decline.pptx (7 slides, editable, evidence-cited) · preview.html</span>
+<span class="g">  ✓</span> done · 2 CasePacks exchanged between extensions · all outputs validated against casepack v1<span class="w">▌</span></pre>
+</div>
+<div class="win right">
+  <div class="tb"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="t">README.md</span></div>
+<pre><span class="w"># CaseKit Workspace</span>
+
+<span class="w">Six independent, local-first consulting
+extensions in one portable directory.</span>
+Copy this folder to any machine, open it
+in a coding agent (Claude Code, Codex,
+Devin) and say <span class="y">"please set up"</span>.
+
+<span class="dim">you:</span> please set up
+     <span class="dim">→ scripts/setup.sh installs each</span>
+<span class="dim">       extension in its own environment and</span>
+<span class="dim">       proves it: compatibility test + every</span>
+<span class="dim">       product's test suite</span>
+
+<span class="dim">you:</span> build me a workplan from these notes
+     <span class="dim">→ case-planner</span>
+<span class="dim">you:</span> turn this finding into slides
+     <span class="dim">→ slidesmith</span>
+<span class="dim">you:</span> what drove the margin decline?
+     <span class="dim">→ case-analyst</span>
+
+<span class="w">## The family</span>
+
+<span class="b">Case Planner</span>    dependency-aware workplans,
+                deterministic rescheduling,
+                formula-driven Excel views
+<span class="b">SlideSmith</span>      accurate, editable consulting
+                PowerPoint, evidence-cited
+<span class="b">Case Analyst</span>    case-style answers; auditable
+                Excel models and dashboards
+<span class="b">Case Architect</span>  evidence-verified architecture
+                intelligence, pinned-commit
+                citations, ATO support
+<span class="b">Case Steward</span>    provenance-grounded case memory:
+                sources, decisions, actions,
+                risks, validated briefs
+<span class="b">CaseKit</span>         family spec, CasePack v1
+                interchange, schemas, fixtures
+
+Extensions exchange context only through
+explicit files (CasePacks), never imports.
+Offline mode installs entirely from a
+wheelhouse: no network at all.</pre>
+</div>
+<div class="note">Validator output is real (captured 2026-08-23). Agent session illustrative.</div>
+</body>
+</html>

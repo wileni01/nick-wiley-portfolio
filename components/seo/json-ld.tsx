@@ -9,9 +9,9 @@ export function PersonJsonLd() {
     name: "Nicholas A. Wiley",
     alternateName: "Nick Wiley",
     url: baseUrl,
-    jobTitle: "Managing Consultant, AI Solution Architecture and Delivery",
+    jobTitle: "Managing Consultant, AI and Analytics (IBM)",
     description:
-      "AI solution architect and delivery leader with 12+ years designing analytics platforms, ML workflows, and governance frameworks for federal civilian agencies. U.S. patent holder.",
+      "Product and delivery leader for AI in federal agencies, with 12+ years building analytics platforms, ML workflows, and governance inside NSF, USDA, USPS, and Census. Startup founder and U.S. patent holder.",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Alexandria",
@@ -19,6 +19,8 @@ export function PersonJsonLd() {
       addressCountry: "US",
     },
     knowsAbout: [
+      "AI product management",
+      "Public sector AI deployment",
       "AI solution architecture",
       "Delivery leadership",
       "Responsible AI governance",
@@ -65,7 +67,7 @@ export function WebsiteJsonLd() {
     name: "Nick Wiley",
     url: baseUrl,
     description:
-      "AI solution architecture and delivery leadership for regulated environments. Analytics platforms, ML workflows, and governance frameworks for federal agencies.",
+      "Product and delivery leadership for AI in government. Shipped products, case studies from NSF, USDA, USPS, and Census, and writing on trustworthy AI.",
     author: {
       "@type": "Person",
       name: "Nicholas A. Wiley",

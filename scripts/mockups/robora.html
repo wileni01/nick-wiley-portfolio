@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>RoboRA — representative recreation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1600px; height: 1000px; overflow: hidden; }
+  body { font-family: "Segoe UI", -apple-system, Helvetica, Arial, sans-serif; font-size: 13px; color: #222; background: #ececec; }
+  .win { position: absolute; background: #fff; border: 1px solid #bbb; box-shadow: 0 6px 24px rgba(0,0,0,.18); border-radius: 6px; overflow: hidden; }
+  .tb { height: 32px; background: #f3f3f3; border-bottom: 1px solid #ddd; display: flex; align-items: center; padding: 0 10px; gap: 6px; font-size: 12px; color: #555; }
+  .tb i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+  .tb .t { margin-left: 8px; }
+  /* terminal */
+  .term { left: 20px; top: 20px; width: 760px; height: 560px; background: #1e1e1e; border-color: #111; }
+  .term .tb { background: #2d2d2d; border-color: #111; color: #bbb; }
+  .term pre { margin: 0; padding: 12px 14px; font-family: Menlo, "SF Mono", Consolas, monospace; font-size: 12px; line-height: 1.55; color: #d4d4d4; white-space: pre; }
+  .g { color: #6ec66e; } .y { color: #e0c060; } .b { color: #7fb4f0; } .dim { color: #8a8a8a; } .r { color: #f08080; }
+  /* chrome automation */
+  .chrome { left: 20px; top: 600px; width: 760px; height: 380px; }
+  .chrome .tb { background: #dee1e6; }
+  .addr { height: 34px; background: #fff; border-bottom: 1px solid #ddd; display: flex; align-items: center; padding: 0 10px; gap: 10px; }
+  .addr .url { flex: 1; background: #f1f3f4; border-radius: 14px; padding: 5px 12px; font-size: 12px; color: #333; }
+  .infobar { background: #fff8e1; border-bottom: 1px solid #f1e0a6; padding: 5px 12px; font-size: 12px; color: #5d4a00; }
+  .legacy { font-family: Verdana, Arial, sans-serif; font-size: 11px; background: #fff; padding: 10px 14px; color: #000; }
+  .legacy .lh { background: #003366; color: #fff; padding: 6px 10px; font-weight: bold; font-size: 12px; margin: -10px -14px 10px; }
+  .legacy table { border-collapse: collapse; font-size: 11px; }
+  .legacy td { padding: 4px 6px; border: 1px solid #c0c0c0; }
+  .legacy td.l { background: #e8eef7; width: 180px; }
+  .legacy input { font-family: inherit; font-size: 11px; border: 1px solid #7f9db9; padding: 2px 4px; width: 260px; background: #fff; }
+  .legacy input.filled { background: #fffbe6; border-color: #d4a017; }
+  .legacy .btns { margin-top: 8px; }
+  .legacy button { font-size: 11px; padding: 2px 10px; border: 1px solid #7a7a7a; background: linear-gradient(#fff, #e6e6e6); }
+  .cursor { position: absolute; width: 14px; height: 14px; }
+  /* document */
+  .doc { left: 800px; top: 20px; width: 780px; height: 960px; background: #e9e9e9; }
+  .doc .tb { background: #2b579a; color: #fff; border-color: #2b579a; }
+  .ribbon { height: 28px; background: #f3f3f3; border-bottom: 1px solid #ddd; font-size: 12px; color: #444; display: flex; align-items: center; gap: 16px; padding: 0 12px; }
+  .page { background: #fff; width: 640px; margin: 18px auto 0; padding: 44px 56px; box-shadow: 0 1px 6px rgba(0,0,0,.18); font-family: "Times New Roman", Times, serif; font-size: 12.5px; line-height: 1.45; height: 860px; position: relative; }
+  .page h1 { font-size: 15px; text-align: center; margin: 0 0 2px; font-family: Arial, sans-serif; letter-spacing: .5px; }
+  .page .sub { text-align: center; font-size: 11px; color: #333; margin-bottom: 18px; font-family: Arial, sans-serif; }
+  .page h2 { font-size: 12.5px; margin: 14px 0 4px; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid #999; }
+  .page p { margin: 0 0 6px; }
+  .f { background: #fff6bf; padding: 0 2px; }
+  .page table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-top: 6px; }
+  .page td, .page th { border: 1px solid #999; padding: 3px 6px; text-align: left; }
+  .page th { background: #eee; font-family: Arial, sans-serif; font-size: 11px; }
+  .redact { display: inline-block; background: #cfcfcf; height: 9px; vertical-align: middle; border-radius: 2px; }
+  .stamp { position: absolute; right: 40px; top: 40px; border: 2px solid #2e7d32; color: #2e7d32; font-family: Arial, sans-serif; font-size: 10px; padding: 3px 8px; transform: rotate(-6deg); letter-spacing: .5px; }
+  .foot { position: absolute; left: 20px; bottom: 4px; font-size: 11px; color: #777; }
+</style>
+</head>
+<body>
+<div class="win term">
+  <div class="tb"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="t">robora — python run_batch.py --cycle 2024-Q3 --post</span></div>
+<pre><span class="dim">$</span> python run_batch.py --cycle 2024-Q3 --post
+<span class="b">[robora]</span> loading field map            templates/ops_report_v4.yaml (38 fields → 38 template anchors)
+<span class="b">[robora]</span> querying sources              awards_db (1 query), finance_ledger (2 queries), staffing (1 query)
+<span class="g">  ✓</span> awards_db            2,418 rows    1.9s
+<span class="g">  ✓</span> finance_ledger       9,107 rows    4.3s
+<span class="g">  ✓</span> staffing               312 rows    0.4s
+<span class="b">[robora]</span> building documents           20 units in cycle
+<span class="g">  ✓</span> unit 01  populated 38/38 fields      validated      → out/2024-Q3/unit-01.docx
+<span class="g">  ✓</span> unit 02  populated 38/38 fields      validated      → out/2024-Q3/unit-02.docx
+<span class="y">  !</span> unit 03  populated 36/38 fields      2 missing (conditional section omitted)  → out/2024-Q3/unit-03.docx
+<span class="g">  ✓</span> unit 04  populated 38/38 fields      validated      → out/2024-Q3/unit-04.docx
+<span class="dim">  … 15 more</span>
+<span class="g">  ✓</span> unit 20  populated 38/38 fields      validated      → out/2024-Q3/unit-20.docx
+<span class="b">[robora]</span> traceability                 out/2024-Q3/lineage.csv (field → source table.column → query hash)
+<span class="b">[robora]</span> posting to legacy system     Chrome automation (no API available)
+<span class="g">  ✓</span> unit 01  login ▸ navigate ▸ fill 14 form fields ▸ submit ▸ verified confirmation #A7F21C
+<span class="g">  ✓</span> unit 02  login ▸ navigate ▸ fill 14 form fields ▸ submit ▸ verified confirmation #A7F22E
+<span class="dim">  … </span>
+<span class="y">  ▶</span> unit 14  filling form fields (9/14) …
+<span class="dim">  ○</span> units 15–20 queued
+
+<span class="dim">elapsed 06:41 · previous manual process: ~3 hours per cycle of copy/paste from Excel</span></pre>
+</div>
+
+<div class="win chrome">
+  <div class="tb"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="t">Chrome (automated) — Operations Reporting · Document Entry</span></div>
+  <div class="addr"><span>‹ › ↻</span><div class="url">https://intranet.internal/opsreport/entry.aspx?unit=14&amp;cycle=2024Q3</div></div>
+  <div class="infobar">Chrome is being controlled by automated test software.</div>
+  <div class="legacy">
+    <div class="lh">Operations Reporting System v3.2 &nbsp;·&nbsp; Document Entry &nbsp;·&nbsp; Unit 14 &nbsp;·&nbsp; Cycle 2024-Q3</div>
+    <table>
+      <tr><td class="l">Reporting unit</td><td><input class="filled" value="Unit 14"></td><td class="l">Cycle</td><td><input class="filled" value="2024-Q3"></td></tr>
+      <tr><td class="l">Active awards (count)</td><td><input class="filled" value="127"></td><td class="l">Obligated (USD)</td><td><input class="filled" value="18,442,190.00"></td></tr>
+      <tr><td class="l">Closeouts completed</td><td><input class="filled" value="31"></td><td class="l">Closeouts pending</td><td><input class="filled" value="9"></td></tr>
+      <tr><td class="l">Staff FTE</td><td><input class="filled" value="6.5"></td><td class="l">Reviewer hours</td><td><input class="filled" value="1,204"></td></tr>
+      <tr><td class="l">Narrative summary</td><td><input value="" style="border-color:#3b78e7;outline:1px solid #3b78e7"></td><td class="l">Prepared by</td><td><input value=""></td></tr>
+    </table>
+    <div class="btns"><button>Save draft</button> <button>Validate</button> <button>Submit</button></div>
+  </div>
+</div>
+
+<div class="win doc">
+  <div class="tb"><span class="t">unit-14.docx — Word</span><span style="margin-left:auto">AutoSave ● On</span></div>
+  <div class="ribbon"><span>File</span><span>Home</span><span>Insert</span><span>Layout</span><span>References</span><span>Review</span><span>View</span></div>
+  <div class="page">
+    <div class="stamp">GENERATED · TRACEABLE</div>
+    <h1>QUARTERLY OPERATIONS REPORT</h1>
+    <div class="sub">Reporting Unit 14 · Cycle 2024-Q3 · Generated 2024-10-03 07:41 by RoboRA v2.3</div>
+    <h2>1. Summary</h2>
+    <p>During the reporting period, Unit 14 managed <span class="f">127</span> active awards with total obligations of <span class="f">$18,442,190.00</span>. The unit completed <span class="f">31</span> closeouts and carried <span class="f">9</span> into the next cycle, a <span class="f">14%</span> reduction in pending closeouts versus the prior quarter.</p>
+    <h2>2. Award activity</h2>
+    <table>
+      <tr><th>Measure</th><th>2024-Q2</th><th>2024-Q3</th><th>Change</th></tr>
+      <tr><td>Active awards</td><td>119</td><td><span class="f">127</span></td><td>+8</td></tr>
+      <tr><td>New awards issued</td><td>22</td><td><span class="f">26</span></td><td>+4</td></tr>
+      <tr><td>Closeouts completed</td><td>27</td><td><span class="f">31</span></td><td>+4</td></tr>
+      <tr><td>Closeouts pending</td><td>12</td><td><span class="f">9</span></td><td>−3</td></tr>
+    </table>
+    <h2>3. Staffing and workload</h2>
+    <p>Staffing remained at <span class="f">6.5</span> FTE. Reviewer effort totaled <span class="f">1,204</span> hours across <span class="f">3</span> review events. Lead: <span class="redact" style="width:90px"></span>, Program Officer.</p>
+    <h2>4. Exceptions</h2>
+    <p>No exceptions were recorded for this unit. <span style="color:#777;font-style:italic">(Conditional section: omitted automatically when the exceptions query returns no rows.)</span></p>
+    <h2>5. Source lineage</h2>
+    <p style="font-family:Arial,sans-serif;font-size:10.5px;color:#444">awards_db.v_active_awards (hash 4f1c…) · finance_ledger.obligations_q (hash b09e…) · staffing.fte_by_unit (hash 77d2…) · template ops_report_v4 · run 2024-10-03T07:41Z</p>
+  </div>
+</div>
+<div class="foot">Representative recreation with illustrative data. The real reporting system and documents are not shown.</div>
+</body>
+</html>

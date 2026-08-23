@@ -14,7 +14,7 @@ const pages: SearchItem[] = [
     title: "Home",
     url: "/",
     type: "page",
-    summary: "AI solution architecture and delivery leadership for regulated environments",
+    summary: "Product and delivery leadership for AI in government",
     keywords: "home overview",
   },
   {
@@ -25,11 +25,11 @@ const pages: SearchItem[] = [
     keywords: "case studies portfolio",
   },
   {
-    title: "Projects",
+    title: "Products",
     url: "/projects",
     type: "page",
-    summary: "Side projects, prototypes, and reusable starting points",
-    keywords: "prototypes toolkits",
+    summary: "Shipped products, programs, government systems, and prototypes",
+    keywords: "projects products portfolio gettysburg tours leadership casekit assessment scott search",
   },
   {
     title: "Writing",

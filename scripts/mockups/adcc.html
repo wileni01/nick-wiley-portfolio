@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ADCC — representative recreation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1600px; height: 900px; overflow: hidden; }
+  body { font-family: "Segoe UI", -apple-system, Helvetica, Arial, sans-serif; font-size: 13px; color: #212529; background: #f4f6f8; }
+  .nav { height: 48px; background: #1f3a5f; color: #fff; display: flex; align-items: center; padding: 0 20px; gap: 22px; }
+  .nav b { font-size: 15px; letter-spacing: .3px; margin-right: 10px; }
+  .nav span { opacity: .85; font-size: 13px; }
+  .nav span.on { opacity: 1; border-bottom: 2px solid #ffc107; padding-bottom: 2px; }
+  .nav .right { margin-left: auto; font-size: 12px; opacity: .85; }
+  .wrap { padding: 18px 24px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; height: 852px; }
+  .card { background: #fff; border: 1px solid #dee2e6; border-radius: 4px; }
+  .card .hd { padding: 10px 14px; border-bottom: 1px solid #dee2e6; display: flex; align-items: center; gap: 10px; }
+  .card .hd b { font-size: 14px; }
+  .card .hd .meta { color: #6c757d; font-size: 12px; }
+  .card .hd .sp { margin-left: auto; display: flex; gap: 8px; }
+  .btn { border: 1px solid #ced4da; background: #fff; border-radius: 3px; padding: 5px 10px; font-size: 12px; }
+  .btn.p { background: #1f3a5f; color: #fff; border-color: #1f3a5f; }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 14px; }
+  .tile { border: 1px solid #e9ecef; border-radius: 4px; padding: 10px 12px; }
+  .tile .l { font-size: 11px; color: #6c757d; text-transform: uppercase; letter-spacing: .4px; }
+  .tile .v { font-size: 26px; font-weight: 600; margin-top: 2px; }
+  .tile.ok .v { color: #198754; } .tile.fail .v { color: #dc3545; } .tile.warn .v { color: #b26a00; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; background: #f8f9fa; color: #495057; font-weight: 600; padding: 7px 12px; border-bottom: 1px solid #dee2e6; font-size: 11.5px; text-transform: uppercase; letter-spacing: .3px; }
+  td { padding: 6px 12px; border-bottom: 1px solid #f1f3f5; vertical-align: middle; }
+  tr.grp td { background: #f8f9fa; font-weight: 600; color: #343a40; padding: 5px 12px; font-size: 12px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .b-pass { background: #d1e7dd; color: #0f5132; } .b-fail { background: #f8d7da; color: #842029; } .b-warn { background: #fff3cd; color: #664d03; }
+  .chk input { margin-right: 6px; }
+  .mono { font-family: Menlo, Consolas, monospace; font-size: 11.5px; color: #495057; }
+  .drill { padding: 12px 14px; }
+  .drill h4 { margin: 0 0 4px; font-size: 13px; }
+  .drill p { margin: 0 0 10px; color: #6c757d; font-size: 12px; }
+  .kv { display: grid; grid-template-columns: 150px 1fr; gap: 4px 10px; font-size: 12px; margin-bottom: 10px; }
+  .kv div:nth-child(odd) { color: #6c757d; }
+  .redact { display: inline-block; background: #dee2e6; border-radius: 2px; height: 9px; vertical-align: middle; }
+  .log { font-family: Menlo, Consolas, monospace; font-size: 11px; color: #495057; background: #f8f9fa; border-top: 1px solid #dee2e6; padding: 10px 14px; line-height: 1.6; white-space: pre; }
+  .foot { position: absolute; left: 24px; bottom: 8px; font-size: 11px; color: #adb5bd; }
+  .prog { height: 6px; background: #e9ecef; border-radius: 3px; overflow: hidden; width: 100%; }
+  .prog i { display: block; height: 100%; background: #198754; width: 100%; }
+</style>
+</head>
+<body>
+<div class="nav"><b>ADCC</b><span class="on">Run checks</span><span>Check library (28)</span><span>Run history</span><span>Thresholds</span><span>Exports</span><span class="right">Connected: operational DB (read-only) · Last run: today 07:02 · Scheduled daily</span></div>
+<div class="wrap">
+  <div class="card">
+    <div class="hd"><b>Run #1,184 · Full suite</b><span class="meta">28 checks · 4m 12s · against live data as of 07:00</span><div class="sp"><span class="btn">Re-run selected</span><span class="btn">Export findings (CSV)</span><span class="btn p">Run full suite</span></div></div>
+    <div class="tiles">
+      <div class="tile"><div class="l">Checks run</div><div class="v">28</div><div class="prog"><i></i></div></div>
+      <div class="tile ok"><div class="l">Passed</div><div class="v">24</div></div>
+      <div class="tile fail"><div class="l">Failed</div><div class="v">3</div></div>
+      <div class="tile warn"><div class="l">Warnings</div><div class="v">1</div></div>
+    </div>
+    <table>
+      <tr><th style="width:34px"></th><th>Check</th><th>Rule</th><th>Records</th><th>Result</th><th></th></tr>
+      <tr class="grp"><td colspan="6">Completeness (7)</td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>C-01 Required fields populated</td><td class="mono">null_rate(required_cols) = 0</td><td>184,221</td><td><span class="badge b-pass">PASS</span></td><td></td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>C-03 Award records have a program code</td><td class="mono">program_code IS NOT NULL</td><td>184,221</td><td><span class="badge b-fail">FAIL · 412</span></td><td><a href="#" style="color:#1f3a5f">Drill in</a></td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>C-05 Contact email present for active records</td><td class="mono">email IS NOT NULL WHERE status='active'</td><td>61,904</td><td><span class="badge b-pass">PASS</span></td><td></td></tr>
+      <tr class="grp"><td colspan="6">Timeliness (5)</td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>T-01 Nightly load completed</td><td class="mono">max(load_ts) &gt; now() - 24h</td><td>1</td><td><span class="badge b-pass">PASS</span></td><td></td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>T-04 Status updates within SLA (10 business days)</td><td class="mono">age(status_change) &lt;= 10 bd</td><td>9,318</td><td><span class="badge b-warn">WARN · 2.1%</span></td><td><a href="#" style="color:#1f3a5f">Drill in</a></td></tr>
+      <tr class="grp"><td colspan="6">Consistency (6)</td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>K-02 Start date precedes end date</td><td class="mono">start_dt &lt; end_dt</td><td>184,221</td><td><span class="badge b-pass">PASS</span></td><td></td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>K-04 Amount totals reconcile to ledger</td><td class="mono">abs(sum(obligated) - ledger_total) &lt; 0.01</td><td>12 programs</td><td><span class="badge b-fail">FAIL · 2</span></td><td><a href="#" style="color:#1f3a5f">Drill in</a></td></tr>
+      <tr class="grp"><td colspan="6">Referential integrity (5)</td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>R-01 Every award references a valid organization</td><td class="mono">org_id IN organizations</td><td>184,221</td><td><span class="badge b-pass">PASS</span></td><td></td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>R-03 Orphaned reviewer assignments</td><td class="mono">assignment.proposal_id IN proposals</td><td>27,450</td><td><span class="badge b-fail">FAIL · 19</span></td><td><a href="#" style="color:#1f3a5f">Drill in</a></td></tr>
+      <tr class="grp"><td colspan="6">Business rules (5)</td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>B-02 Closed awards have a final report on file</td><td class="mono">status='closed' ⇒ final_report_id IS NOT NULL</td><td>40,112</td><td><span class="badge b-pass">PASS</span></td><td></td></tr>
+      <tr><td class="chk"><input type="checkbox" checked></td><td>B-05 Budget within program ceiling</td><td class="mono">requested &lt;= ceiling(program_code)</td><td>184,221</td><td><span class="badge b-pass">PASS</span></td><td></td></tr>
+    </table>
+  </div>
+  <div>
+    <div class="card" style="margin-bottom:18px">
+      <div class="hd"><b>C-03 · Award records have a program code</b><span class="badge b-fail" style="margin-left:auto">FAIL</span></div>
+      <div class="drill">
+        <h4>What this check tests</h4>
+        <p>Every award row must carry a program code so it can be reported and reconciled. Missing codes usually come from legacy imports.</p>
+        <div class="kv"><div>Failing records</div><div><b>412</b> of 184,221 (0.22%)</div><div>Threshold</div><div>0 allowed</div><div>Trend</div><div>↓ from 1,906 (Jan) · 71% cleared</div><div>Remediation</div><div>Backfill from program roster; owner: data steward</div></div>
+        <table>
+          <tr><th>Record</th><th>Org</th><th>Loaded</th><th>Source</th></tr>
+          <tr><td class="mono">AWD-1190442</td><td><span class="redact" style="width:110px"></span></td><td>2019-03-12</td><td>legacy import</td></tr>
+          <tr><td class="mono">AWD-1190507</td><td><span class="redact" style="width:86px"></span></td><td>2019-03-12</td><td>legacy import</td></tr>
+          <tr><td class="mono">AWD-1203318</td><td><span class="redact" style="width:124px"></span></td><td>2019-04-02</td><td>legacy import</td></tr>
+          <tr><td class="mono">AWD-1215870</td><td><span class="redact" style="width:98px"></span></td><td>2019-05-19</td><td>manual entry</td></tr>
+          <tr><td class="mono">AWD-1216004</td><td><span class="redact" style="width:132px"></span></td><td>2019-05-19</td><td>manual entry</td></tr>
+        </table>
+        <p style="margin:8px 0 0;font-size:11.5px">Showing 5 of 412 · <a href="#" style="color:#1f3a5f">Export failing records</a></p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="hd"><b>Run log</b><span class="meta">audit trail · retained 7 years</span></div>
+      <div class="log">07:02:11  run 1184 started by schedule (daily)
+07:02:12  connected operational DB (read-only replica)
+07:02:14  C-01 completeness ........... PASS   184,221 rows
+07:02:31  C-03 program_code present ... FAIL   412 rows → findings/1184/C-03.csv
+07:03:02  T-04 status SLA ............. WARN   2.1% &gt; 1.0% threshold
+07:04:45  K-04 ledger reconcile ....... FAIL   2 programs (Δ $14.20, $0.35)
+07:05:40  R-03 orphan assignments ..... FAIL   19 rows
+07:06:23  run 1184 complete: 24 pass / 3 fail / 1 warn · results logged</div>
+    </div>
+  </div>
+</div>
+<div class="foot">Representative recreation with illustrative data. Actual agency data and screens are not shown.</div>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Panel Wizard (Streamlit) — representative recreation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1600px; height: 1000px; overflow: hidden; }
+  body { font-family: "Source Sans Pro", "Source Sans 3", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color: #31333f; background: #fff; font-size: 15px; }
+  .top { height: 46px; border-bottom: 1px solid #f0f2f6; display: flex; align-items: center; justify-content: flex-end; padding: 0 18px; gap: 14px; color: #808495; font-size: 13px; }
+  .top .btn { border: 1px solid #d6d6d9; border-radius: 6px; padding: 4px 10px; color: #31333f; }
+  .top .dots { font-size: 18px; letter-spacing: 1px; }
+  .layout { display: flex; height: 954px; }
+  aside { width: 336px; background: #f0f2f6; padding: 28px 24px; }
+  aside h3 { font-size: 14px; margin: 0 0 10px; font-weight: 600; color: #31333f; }
+  .w { margin-bottom: 22px; }
+  .w label { display: block; font-size: 14px; margin-bottom: 6px; }
+  .sel { background: #fff; border: 1px solid #d6d6d9; border-radius: 6px; padding: 8px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .sel span.car { color: #808495; font-size: 12px; }
+  .slider { position: relative; height: 22px; margin-top: 8px; }
+  .slider .track { position: absolute; top: 10px; left: 0; right: 0; height: 3px; background: #d6d6d9; border-radius: 2px; }
+  .slider .fill { position: absolute; top: 10px; left: 0; height: 3px; background: #ff4b4b; border-radius: 2px; }
+  .slider .thumb { position: absolute; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #ff4b4b; }
+  .slider .val { position: absolute; top: -20px; font-size: 12px; color: #ff4b4b; font-weight: 600; }
+  .range { display: flex; justify-content: space-between; font-size: 12px; color: #808495; }
+  .chk { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 8px 0; }
+  .chk i { width: 16px; height: 16px; border-radius: 3px; background: #ff4b4b; display: inline-block; position: relative; }
+  .chk i::after { content: ""; position: absolute; left: 5px; top: 2px; width: 4px; height: 8px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .chk i.off { background: #fff; border: 1px solid #d6d6d9; }
+  .chk i.off::after { display: none; }
+  .pbtn { background: #fff; border: 1px solid #d6d6d9; border-radius: 6px; padding: 8px 14px; font-size: 14px; display: inline-block; margin-top: 6px; }
+  .pbtn.primary { background: #ff4b4b; color: #fff; border-color: #ff4b4b; }
+  main { flex: 1; padding: 28px 48px 0; overflow: hidden; }
+  h1 { font-size: 32px; margin: 0 0 4px; font-weight: 700; letter-spacing: -0.3px; }
+  .cap { color: #808495; font-size: 14px; margin-bottom: 22px; }
+  .metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-bottom: 22px; }
+  .m .l { font-size: 13px; color: #31333f; margin-bottom: 2px; }
+  .m .v { font-size: 30px; font-weight: 400; line-height: 1.1; }
+  .m .d { font-size: 13px; color: #09ab3b; margin-top: 2px; }
+  .m .d.neg { color: #ff2b2b; }
+  .cols { display: grid; grid-template-columns: 1.25fr 1fr; gap: 28px; }
+  h2 { font-size: 18px; margin: 0 0 10px; font-weight: 600; }
+  .panel { border: 1px solid #e6e9ef; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+  .panel .hd { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .panel .hd b { font-size: 15px; }
+  .panel .hd span { font-size: 12px; color: #808495; }
+  .kw { font-size: 12px; color: #808495; margin-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: #808495; font-weight: 500; padding: 4px 6px; border-bottom: 1px solid #e6e9ef; }
+  td { padding: 5px 6px; border-bottom: 1px solid #f0f2f6; white-space: nowrap; }
+  .fit { display: inline-block; width: 90px; height: 8px; background: #f0f2f6; border-radius: 4px; vertical-align: middle; margin-right: 6px; overflow: hidden; }
+  .fit i { display: block; height: 100%; background: #1c83e1; }
+  .why { color: #808495; font-size: 12px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .move { color: #ff4b4b; font-size: 12px; }
+  .drag { color: #b5b8c3; }
+  .chart { border: 1px solid #e6e9ef; border-radius: 8px; padding: 10px 12px 4px; margin-bottom: 14px; }
+  .chart .t { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .foot { position: absolute; left: 384px; bottom: 14px; font-size: 11px; color: #b5b8c3; }
+  .redact { display: inline-block; background: #d9dce3; border-radius: 3px; height: 10px; vertical-align: middle; }
+  .toast { position: absolute; right: 40px; top: 64px; background: #fff; border: 1px solid #e6e9ef; border-left: 4px solid #09ab3b; border-radius: 6px; padding: 8px 12px; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+</style>
+</head>
+<body>
+<div class="top"><span>Running…</span><span class="btn">Deploy</span><span class="dots">⋮</span></div>
+<div class="layout">
+  <aside>
+    <h3>Clustering settings</h3>
+    <div class="w"><label>Embedding model</label><div class="sel">SciBERT (scivocab, uncased) <span class="car">▼</span></div></div>
+    <div class="w"><label>Number of panels (K)</label>
+      <div class="slider"><div class="val" style="left:47%">14</div><div class="track"></div><div class="fill" style="width:47%"></div><div class="thumb" style="left:calc(47% - 7px)"></div></div>
+      <div class="range"><span>4</span><span>30</span></div>
+    </div>
+    <div class="w"><label>Min proposals per panel</label>
+      <div class="slider"><div class="val" style="left:28%">8</div><div class="track"></div><div class="fill" style="width:28%"></div><div class="thumb" style="left:calc(28% - 7px)"></div></div>
+      <div class="range"><span>3</span><span>20</span></div>
+    </div>
+    <div class="w"><label>Random seed</label><div class="sel">42 <span class="car">−&nbsp; +</span></div></div>
+    <div class="w">
+      <div class="chk"><i></i> Show “why” signals</div>
+      <div class="chk"><i></i> Recalculate fit on override</div>
+      <div class="chk"><i class="off"></i> Lock panels with manual edits</div>
+    </div>
+    <div class="w"><label>Data sources</label><div class="sel">Proposal metadata · Ratings · Assignments <span class="car">3 of 3</span></div></div>
+    <span class="pbtn primary">Recompute clusters</span> &nbsp;<span class="pbtn">Export assignments</span>
+  </aside>
+  <main>
+    <h1>Panel Wizard</h1>
+    <div class="cap">FY review cycle · Division 3 · 412 proposals loaded from 3 systems · last recompute 14s ago</div>
+    <div class="metrics">
+      <div class="m"><div class="l">Proposals</div><div class="v">412</div><div class="d">↑ 37 new this week</div></div>
+      <div class="m"><div class="l">Suggested panels</div><div class="v">14</div><div class="d" style="color:#808495">K from silhouette</div></div>
+      <div class="m"><div class="l">Silhouette score</div><div class="v">0.41</div><div class="d">↑ 0.06 vs. last run</div></div>
+      <div class="m"><div class="l">Low-fit proposals</div><div class="v">23</div><div class="d neg">needs review</div></div>
+      <div class="m"><div class="l">Manual overrides</div><div class="v">31</div><div class="d" style="color:#808495">7.5% of assignments</div></div>
+    </div>
+    <div class="cols">
+      <div>
+        <h2>Suggested panels <span style="font-weight:400;color:#808495;font-size:13px">· drag rows between panels to override</span></h2>
+        <div class="panel">
+          <div class="hd"><b>Panel 3 · Microfluidics &amp; biosensing</b><span>29 proposals · mean fit 0.78</span></div>
+          <div class="kw">TF-IDF keywords: microfluidic · biosensor · lab-on-a-chip · droplet · point-of-care</div>
+          <table>
+            <tr><th></th><th>ID</th><th>Fit</th><th>Why (nearest proposals)</th><th></th></tr>
+            <tr><td class="drag">⋮⋮</td><td>P-2041</td><td><span class="fit"><i style="width:92%"></i></span>0.92</td><td class="why">P-2088 (0.89), P-2107 (0.86) · shared: droplet, assay</td><td></td></tr>
+            <tr><td class="drag">⋮⋮</td><td>P-2088</td><td><span class="fit"><i style="width:89%"></i></span>0.89</td><td class="why">P-2041 (0.89), P-2153 (0.81) · shared: microfluidic</td><td></td></tr>
+            <tr><td class="drag">⋮⋮</td><td>P-2153</td><td><span class="fit"><i style="width:81%"></i></span>0.81</td><td class="why">P-2088 (0.81), P-2207 (0.74) · shared: biosensor</td><td></td></tr>
+            <tr><td class="drag">⋮⋮</td><td>P-2311</td><td><span class="fit"><i style="width:54%"></i></span>0.54</td><td class="why">P-2041 (0.58) · closer to Panel 7 (0.61)</td><td class="move">Consider Panel 7</td></tr>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="hd"><b>Panel 7 · Optical imaging &amp; spectroscopy</b><span>31 proposals · mean fit 0.74</span></div>
+          <div class="kw">TF-IDF keywords: optical · spectroscopy · imaging · photonic · Raman</div>
+          <table>
+            <tr><th></th><th>ID</th><th>Fit</th><th>Why (nearest proposals)</th><th></th></tr>
+            <tr><td class="drag">⋮⋮</td><td>P-1987</td><td><span class="fit"><i style="width:88%"></i></span>0.88</td><td class="why">P-2002 (0.85), P-2260 (0.83) · shared: spectroscopy</td><td></td></tr>
+            <tr><td class="drag">⋮⋮</td><td>P-2002</td><td><span class="fit"><i style="width:85%"></i></span>0.85</td><td class="why">P-1987 (0.85), P-2260 (0.80) · shared: imaging</td><td></td></tr>
+            <tr><td class="drag">⋮⋮</td><td>P-2419</td><td><span class="fit"><i style="width:47%"></i></span>0.47</td><td class="why">P-2002 (0.51) · closer to Panel 11 (0.63)</td><td class="move">Consider Panel 11</td></tr>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="hd"><b>Panel 11 · Machine learning for materials</b><span>27 proposals · mean fit 0.71</span></div>
+          <div class="kw">TF-IDF keywords: machine learning · materials · prediction · dataset · neural</div>
+          <table>
+            <tr><th></th><th>ID</th><th>Fit</th><th>Why (nearest proposals)</th><th></th></tr>
+            <tr><td class="drag">⋮⋮</td><td>P-2230</td><td><span class="fit"><i style="width:84%"></i></span>0.84</td><td class="why">P-2275 (0.82), P-2301 (0.79) · shared: neural, dataset</td><td></td></tr>
+            <tr><td class="drag">⋮⋮</td><td>P-2275</td><td><span class="fit"><i style="width:82%"></i></span>0.82</td><td class="why">P-2230 (0.82), P-2419 (0.63) · shared: prediction</td><td></td></tr>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h2>Cluster quality</h2>
+        <div class="chart"><div class="t">Proposal landscape (PCA → t-SNE, 2D)</div><svg id="scatter" width="560" height="300"></svg></div>
+        <div class="chart"><div class="t">Silhouette by K (current K = 14)</div><svg id="sil" width="560" height="170"></svg></div>
+        <div class="chart" style="margin-bottom:0"><div class="t">Adoption this cycle</div>
+          <table style="font-size:12px"><tr><th>Metric</th><th>Week 1</th><th>Week 2</th><th>Week 3</th></tr>
+            <tr><td>Suggestions accepted</td><td>61%</td><td>78%</td><td>86%</td></tr>
+            <tr><td>Override rate</td><td>39%</td><td>22%</td><td>14%</td></tr>
+            <tr><td>Screens used per session</td><td>1</td><td>1</td><td>1</td></tr></table>
+        </div>
+      </div>
+    </div>
+    <div class="toast">✓ Moved P-2311 → Panel 7 · fit recalculated (0.61) · logged for audit</div>
+    <div class="foot">Representative recreation with illustrative data. Built in Streamlit; actual agency data and screens are not shown.</div>
+  </main>
+</div>
+<script>
+  // Deterministic pseudo-random so the render is reproducible.
+  let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const colors = ["#1c83e1","#ff4b4b","#09ab3b","#ffa421","#803df5","#00c0f2","#ff8700","#7d2e2e","#2e7d32","#6c5b7b","#b36b00","#0b7285","#c2185b","#5d4037"];
+  const s = document.getElementById("scatter");
+  const centers = Array.from({length:14}, (_,i)=>({x: 60 + (i%5)*110 + rnd()*40, y: 40 + Math.floor(i/5)*95 + rnd()*30}));
+  let svg = "";
+  centers.forEach((c,i)=>{ for(let k=0;k<28;k++){ const r = rnd()*34 + rnd()*14; const a = rnd()*6.283; svg += `<circle cx="${(c.x + Math.cos(a)*r).toFixed(1)}" cy="${(c.y + Math.sin(a)*r).toFixed(1)}" r="3" fill="${colors[i]}" opacity="0.8"/>`; } });
+  for(let k=0;k<23;k++){ svg += `<circle cx="${(40+rnd()*500).toFixed(1)}" cy="${(20+rnd()*260).toFixed(1)}" r="3.5" fill="none" stroke="#ff4b4b" stroke-width="1.5"/>`; }
+  svg += `<text x="8" y="292" font-size="11" fill="#808495">○ low-fit proposals flagged for staff review (23)</text>`;
+  s.innerHTML = svg;
+  const sil = document.getElementById("sil");
+  const ks = [6,8,10,12,14,16,18,20,22,24]; const vals = [0.22,0.27,0.31,0.36,0.41,0.39,0.37,0.33,0.31,0.28];
+  let g = `<line x1="40" y1="140" x2="550" y2="140" stroke="#e6e9ef"/>`;
+  ks.forEach((k,i)=>{ const x = 60 + i*52; const h = vals[i]*260; g += `<rect x="${x-16}" y="${140-h}" width="32" height="${h}" fill="${k===14?'#ff4b4b':'#1c83e1'}" opacity="0.85"/><text x="${x}" y="156" font-size="11" text-anchor="middle" fill="#808495">${k}</text><text x="${x}" y="${136-h}" font-size="10" text-anchor="middle" fill="#31333f">${vals[i].toFixed(2)}</text>`; });
+  g += `<text x="300" y="168" font-size="11" text-anchor="middle" fill="#808495">K (number of panels)</text>`;
+  sil.innerHTML = g;
+</script>
+</body>
+</html>

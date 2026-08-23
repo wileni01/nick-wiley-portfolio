@@ -8,7 +8,7 @@ import { SkillsHighlight } from "@/components/adaptive/skills-highlight";
 export const metadata: Metadata = {
   title: "Resume",
   description:
-    "Nicholas A. Wiley — AI solution architect and delivery leader. Managing Consultant at IBM. 12+ years in regulated federal environments.",
+    "Nicholas A. Wiley. Product and delivery leader for AI in federal agencies. Managing Consultant at IBM. 12+ years inside NSF, USDA, USPS, and Census.",
 };
 
 export default function ResumePage() {

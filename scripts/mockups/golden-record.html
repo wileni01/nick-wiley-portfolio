@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>LLI Golden Record — merge review (representative)</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1600px; height: 900px; overflow: hidden; }
+  body { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13px; color: #1f2937; background: #f3f4f6; }
+  .nav { height: 52px; background: #111827; color: #fff; display: flex; align-items: center; padding: 0 22px; gap: 24px; }
+  .nav b { font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .nav b i { width: 22px; height: 22px; border-radius: 6px; background: #f59e0b; display: inline-block; }
+  .nav span { color: #9ca3af; font-size: 13px; }
+  .nav span.on { color: #fff; border-bottom: 2px solid #f59e0b; padding-bottom: 3px; }
+  .nav .r { margin-left: auto; color: #9ca3af; font-size: 12px; display: flex; gap: 16px; }
+  .wrap { padding: 20px 24px; display: grid; grid-template-columns: 300px 1fr 340px; gap: 18px; height: 848px; }
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; }
+  .hd { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; font-weight: 600; font-size: 13.5px; display: flex; justify-content: space-between; align-items: center; }
+  .hd span { color: #6b7280; font-weight: 400; font-size: 12px; }
+  .stat { padding: 10px 16px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; }
+  .stat b { font-size: 15px; }
+  .queue div { padding: 9px 16px; border-bottom: 1px solid #f3f4f6; font-size: 12.5px; display: flex; justify-content: space-between; }
+  .queue div.sel { background: #fffbeb; border-left: 3px solid #f59e0b; }
+  .pct { font-variant-numeric: tabular-nums; color: #6b7280; }
+  .pair { display: grid; grid-template-columns: 1fr 90px 1fr; gap: 0; padding: 16px; align-items: start; }
+  .rec { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 14px; }
+  .rec h4 { margin: 0 0 8px; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: .4px; display: flex; justify-content: space-between; }
+  .rec h4 em { font-style: normal; color: #9ca3af; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .f { display: grid; grid-template-columns: 110px 1fr; gap: 6px 10px; font-size: 12.5px; }
+  .f div:nth-child(odd) { color: #6b7280; }
+  .f .m { background: #fef3c7; border-radius: 3px; padding: 0 3px; }
+  .redact { display: inline-block; background: #d1d5db; border-radius: 3px; height: 10px; vertical-align: middle; }
+  .arrow { text-align: center; padding-top: 60px; color: #9ca3af; font-size: 22px; }
+  .golden { margin: 0 16px 12px; border: 1px dashed #f59e0b; background: #fffbeb; border-radius: 8px; padding: 12px 14px; }
+  .golden h4 { margin: 0 0 8px; font-size: 12px; color: #92400e; text-transform: uppercase; letter-spacing: .4px; }
+  .actions { display: flex; gap: 10px; padding: 6px 16px 16px; align-items: center; }
+  .btn { border: 1px solid #d1d5db; background: #fff; border-radius: 6px; padding: 8px 14px; font-size: 13px; font-weight: 500; }
+  .btn.ok { background: #059669; color: #fff; border-color: #059669; }
+  .btn.no { background: #fff; color: #b91c1c; border-color: #fecaca; }
+  kbd { font-family: Menlo, monospace; font-size: 10.5px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 3px; padding: 0 4px; color: #6b7280; margin-left: 6px; }
+  .sim { display: flex; align-items: center; gap: 10px; padding: 0 16px 10px; font-size: 12px; color: #6b7280; }
+  .bar { flex: 1; height: 8px; background: #f3f4f6; border-radius: 4px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 94%; background: #f59e0b; }
+  .score { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; }
+  .score .big { font-size: 28px; font-weight: 700; color: #059669; }
+  .score p { margin: 6px 0 0; font-size: 12px; color: #4b5563; line-height: 1.5; }
+  .audit div { padding: 8px 16px; border-bottom: 1px solid #f3f4f6; font-size: 12px; color: #4b5563; }
+  .audit div b { color: #1f2937; font-weight: 600; }
+  .sync { padding: 12px 16px; font-size: 12px; color: #4b5563; line-height: 1.6; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #059669; margin-right: 6px; }
+  .note { position: absolute; left: 24px; bottom: 6px; font-size: 11px; color: #9ca3af; }
+</style>
+</head>
+<body>
+<div class="nav"><b><i></i>Golden Record</b><span class="on">Merge review</span><span>Recovery (Apollo)</span><span>Lead scores</span><span>HubSpot sync</span><span>Audit log</span><div class="r"><span>Source: HubSpot export 2026-02-18 · 14,212 contacts</span><span>Staff: <span class="redact" style="width:60px;background:#4b5563"></span></span></div></div>
+<div class="wrap">
+  <div class="card">
+    <div class="hd">Review queue <span>Levenshtein ≥ 0.85</span></div>
+    <div class="stat"><span>Suggested merges</span><b>2,318</b></div>
+    <div class="stat"><span>Approved</span><b style="color:#059669">2,074</b></div>
+    <div class="stat"><span>Rejected</span><b style="color:#b91c1c">196</b></div>
+    <div class="stat"><span>Remaining</span><b>48</b></div>
+    <div class="queue">
+      <div class="sel"><span>#2271 · <span class="redact" style="width:80px"></span></span><span class="pct">0.94</span></div>
+      <div><span>#2272 · <span class="redact" style="width:64px"></span></span><span class="pct">0.93</span></div>
+      <div><span>#2273 · <span class="redact" style="width:92px"></span></span><span class="pct">0.91</span></div>
+      <div><span>#2274 · <span class="redact" style="width:70px"></span></span><span class="pct">0.90</span></div>
+      <div><span>#2275 · <span class="redact" style="width:84px"></span></span><span class="pct">0.88</span></div>
+      <div><span>#2276 · <span class="redact" style="width:58px"></span></span><span class="pct">0.87</span></div>
+      <div><span>#2277 · <span class="redact" style="width:76px"></span></span><span class="pct">0.86</span></div>
+      <div><span>#2278 · <span class="redact" style="width:88px"></span></span><span class="pct">0.85</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="hd">Suggested merge #2271 <span>duplicate created by event registration import, 2023-04</span></div>
+    <div class="sim"><span>Similarity</span><div class="bar"><i></i></div><span>0.94 · name 0.96 · email domain match · company 0.91</span></div>
+    <div class="pair">
+      <div class="rec"><h4>Record A <em>HubSpot 10492 · created 2019-11-02</em></h4>
+        <div class="f"><div>Name</div><div><span class="redact" style="width:120px"></span></div><div>Email</div><div><span class="redact" style="width:80px"></span>@<span class="redact" style="width:70px"></span>.com</div><div>Company</div><div><span class="redact" style="width:130px"></span> Inc.</div><div>Title</div><div class="m">VP, Operations</div><div>Phone</div><div>(···) ···-4412</div><div>Programs</div><div>Gettysburg Leadership Experience, 2019</div><div>Last activity</div><div>2021-06-14 (email open)</div><div>Lifecycle</div><div>Customer</div></div>
+      </div>
+      <div class="arrow">⇢</div>
+      <div class="rec"><h4>Record B <em>HubSpot 18831 · created 2023-04-19</em></h4>
+        <div class="f"><div>Name</div><div><span class="redact" style="width:116px"></span> <em style="color:#9ca3af;font-style:normal">(initial differs)</em></div><div>Email</div><div><span class="redact" style="width:64px"></span>@<span class="redact" style="width:70px"></span>.com</div><div>Company</div><div><span class="redact" style="width:130px"></span></div><div>Title</div><div class="m">SVP, Operations</div><div>Phone</div><div>—</div><div>Programs</div><div>Executive Forum, 2023</div><div>Last activity</div><div>2026-01-30 (form submit)</div><div>Lifecycle</div><div>Lead</div></div>
+      </div>
+    </div>
+    <div class="golden"><h4>Proposed golden record</h4>
+      <div class="f"><div>Name</div><div><span class="redact" style="width:120px"></span> <em style="color:#92400e;font-style:normal">from A (full name)</em></div><div>Email</div><div><span class="redact" style="width:80px"></span>@<span class="redact" style="width:70px"></span>.com <em style="color:#92400e;font-style:normal">from A (verified by Apollo)</em></div><div>Title</div><div>SVP, Operations <em style="color:#92400e;font-style:normal">from B (newer)</em></div><div>Programs</div><div>Gettysburg Leadership Experience (2019) · Executive Forum (2023)</div><div>Lifecycle</div><div>Customer <em style="color:#92400e;font-style:normal">highest stage wins</em></div></div>
+    </div>
+    <div class="actions"><span class="btn ok">Approve merge <kbd>A</kbd></span><span class="btn no">Not a duplicate <kbd>R</kbd></span><span class="btn">Skip <kbd>S</kbd></span><span class="btn">Edit fields</span><span style="margin-left:auto;font-size:12px;color:#6b7280">Undo last <kbd>Z</kbd></span></div>
+  </div>
+  <div>
+    <div class="card" style="margin-bottom:18px">
+      <div class="hd">Lead score <span>GPT-4 + rules</span></div>
+      <div class="score"><div class="big">A · 88</div><p>Senior operations leader at a returning customer account. Attended two programs, recent form submission, title advanced since first contact. Rule bonus: customer lifecycle (+15).</p></div>
+      <div class="sync"><span class="dot"></span>Apollo enrichment: email verified, LinkedIn matched, company size 1,000–5,000<br><span class="dot" style="background:#9ca3af"></span>HubSpot sync: queued after approval</div>
+    </div>
+    <div class="card">
+      <div class="hd">Audit trail <span>this record</span></div>
+      <div class="audit">
+        <div><b>2026-02-18 09:41</b> · suggested by dedupe run #31 (Levenshtein 0.94)</div>
+        <div><b>2026-02-18 09:41</b> · Apollo lookup: email verified, title updated</div>
+        <div><b>2026-02-18 09:42</b> · lead score computed (rules 55 + model 33)</div>
+        <div><b>pending</b> · staff decision</div>
+        <div><b>pending</b> · HubSpot merge (18831 → 10492), properties written, source noted</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="note">Representative recreation of the Flask review UI with contact details redacted. Counts illustrative.</div>
+</body>
+</html>

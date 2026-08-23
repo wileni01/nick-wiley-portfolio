@@ -14,6 +14,7 @@ npm run build          # production build; also type-checks
 npm run lint           # eslint (flat config)
 npm run typecheck      # tsc --noEmit
 npm run images:optimize -- --write   # re-encode oversized images in public/images
+npm run images:capture               # re-capture product/case-study images (needs Chrome)
 ```
 
 Node 24 (`.node-version`). Use `npm`, never pnpm/yarn, to keep the lockfile.
@@ -29,8 +30,18 @@ Node 24 (`.node-version`). Use `npm`, never pnpm/yarn, to keep the lockfile.
   profiles in `lib/adaptive/profiles.ts` name real people, so nothing there is
   exposed in the default UI
 - `components/mdx/mdx-content.tsx` — the only MDX renderer; do not reintroduce regex markdown
+- `lib/products.ts` — the /projects gallery (shipped products, LLI programs, government engagements, prototypes)
+- `scripts/capture-screenshots.mjs` + `scripts/mockups/*.html` — every product/case-study image is either a
+  headless-Chrome capture of a live site or a hand-built recreation of an internal tool. Recreations are
+  labeled as such on the site (`imageKind` in frontmatter and in `lib/products.ts`); keep that honest.
 - `resources/` — canonical facts/resume source material for content edits
 - `.cursor/rules/nick-content-writing.mdc` — voice rules for site-facing copy; follow them for any content change
+
+## Positioning (August 2026)
+
+Copy is aligned with Nick's application for Product Manager, Public Sector at Anthropic: discovery inside
+agency workflows, AI product judgment (evaluation, human oversight), shipping through teams he does not
+control, and shipped end-to-end products. Reframe existing facts; never add new claims.
 
 ## Conventions
 

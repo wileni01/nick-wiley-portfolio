@@ -5,8 +5,8 @@ import { cookies } from "next/headers";
 import {
   ArrowRight,
   Download,
-  Brain,
-  Database,
+  Search,
+  Users,
   ShieldCheck,
   Quote,
 } from "lucide-react";
@@ -42,31 +42,31 @@ async function unwrapSearchParams(
 
 const proofPoints = [
   {
-    icon: Brain,
-    title: "NLP pipeline for research proposal triage",
+    icon: Search,
+    title: "Discovery inside the workflow",
     description:
-      "Designed a SciBERT embedding and clustering workflow (HDBSCAN, k-means, Bayesian optimization) that classified 7,000+ research proposals into 70+ themes. Ambiguous proposals flagged for human review, not forced into poor-fit clusters.",
+      "Panel Wizard started by watching program staff work across 8 screens and spreadsheets. The product consolidated them into 1, let sentence embeddings suggest review panels, and kept every decision with the staff. Panel formation went from weeks to hours.",
   },
   {
     icon: ShieldCheck,
-    title: "Governance, auditability, responsible AI",
+    title: "AI product judgment",
     description:
-      "Partnered with governance and security stakeholders to define responsible AI guardrails: data quality checks, monitoring expectations, review workflows, and documentation standards for reproducible, auditable pipelines.",
+      "Ambiguous proposals go to people instead of being forced into clusters. Assistants have to cite their sources. Overrides are logged and measured, not hidden. I design for evaluation and human oversight from the first sprint, because that is what gets an AI product adopted in an agency.",
   },
   {
-    icon: Database,
-    title: "Data platform supporting 50,000+ operations",
+    icon: Users,
+    title: "Shipping through teams I do not control",
     description:
-      "Built a global data warehouse and Tableau reporting suite for USDA's organic program, integrating Salesforce, CBP customs records, and investigative databases into a governed source of truth.",
+      "Consulting means executing through agency staff, security and governance stakeholders, and vendors. I delivered a governed AWS data platform across Salesforce, CBP customs records, and investigative systems for 50,000+ USDA operations, then ran the study halls that made adoption stick.",
   },
 ];
 
 const howIWork = [
   {
     step: "01",
-    title: "Align",
+    title: "Discover",
     description:
-      "Identify the decision, the stakeholders, and the constraints. Define success criteria before writing code.",
+      "Sit with the people doing the work. Find the decision, the constraints, and the step where a model genuinely belongs. Requirements documents come after, not before.",
   },
   {
     step: "02",
@@ -169,10 +169,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   </>
                 ) : (
                   <>
-                    I architect AI systems that
+                    I find where AI belongs in government work,
                     <br />
                     <span className="text-primary">
-                      earn trust in regulated environments.
+                      and ship products people can trust.
                     </span>
                   </>
                 )}
@@ -189,12 +189,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   </>
                 ) : (
                   <>
-                    End-to-end AI solution architecture, delivery leadership,
-                    and governance for federal agencies.{" "}
+                    Product and delivery leadership for AI in federal
+                    agencies. 12+ years building decision-support systems for
+                    NSF, USDA, USPS, and Census, plus a startup I founded.{" "}
                     <strong className="text-foreground font-medium">
-                      12+ years designing systems where the people accountable
-                      for outcomes can see, override, and explain every
-                      recommendation
+                      I do discovery inside the workflow, and I ship systems
+                      where the people accountable for outcomes can see,
+                      override, and explain every recommendation
                     </strong>
                     .
                   </>
@@ -225,9 +226,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   <LinkedinIcon className="h-4 w-4" />
                   LinkedIn
                 </a>
-              </Button>
-              <Button asChild variant="ghost" size="lg">
-                <Link href="/contact">Contact</Link>
               </Button>
             </div>
 
@@ -269,7 +267,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <section id="what-i-deliver" className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-2xl font-bold tracking-tight mb-10">
-            What I deliver
+            What I bring
           </h2>
           <div className="grid gap-6 sm:grid-cols-3">
             {proofPoints.map((item) => (
@@ -414,16 +412,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             Worth a conversation?
           </h2>
           <p className="text-muted-foreground">
-            If you need AI solution architecture, delivery leadership,
-            or governance expertise for a regulated environment, I&apos;d
-            be glad to talk.
+            If you need someone to find where AI belongs in a government
+            workflow and carry it through to adoption, I&apos;d be glad to
+            talk.
           </p>
           <div className="flex justify-center gap-4">
             <Button asChild size="lg">
               <Link href="/contact">Get in Touch</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/work">View My Work</Link>
+              <Link href="/projects">See the products</Link>
             </Button>
           </div>
         </div>

@@ -29,13 +29,16 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
     default:
-      "Nick Wiley | AI Solution Architecture & Delivery Leadership for Regulated Environments",
+      "Nick Wiley | AI Product and Delivery Leadership for Government",
     template: "%s | Nick Wiley",
   },
   description:
-    "AI solution architect and delivery leader. 12+ years designing analytics platforms, ML workflows, and governance frameworks for federal agencies including NSF, USDA, USPS, and Census.",
+    "Product and delivery leader for AI in federal agencies. 12+ years shipping decision-support systems at NSF, USDA, USPS, and Census, plus a startup founder. Discovery inside the workflow, human oversight by design.",
   keywords: [
     "Nick Wiley",
+    "Product manager",
+    "Public sector AI",
+    "Government AI",
     "AI Solution Architect",
     "AI Platforms",
     "Delivery leadership",
@@ -61,24 +64,23 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/",
     siteName: "Nick Wiley",
-    title:
-      "Nick Wiley | AI Solution Architecture & Delivery Leadership for Regulated Environments",
+    title: "Nick Wiley | AI Product and Delivery Leadership for Government",
     description:
-      "AI solution architect and delivery leader. 12+ years designing analytics platforms, ML workflows, and governance frameworks for federal agencies.",
+      "Product and delivery leader for AI in federal agencies. 12+ years shipping decision-support systems at NSF, USDA, USPS, and Census.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Nick Wiley, AI solution architecture and delivery leadership",
+        alt: "Nick Wiley, AI product and delivery leadership for government",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nick Wiley | AI Solution Architecture & Delivery Leadership",
+    title: "Nick Wiley | AI Product and Delivery Leadership for Government",
     description:
-      "AI solution architect and delivery leader. 12+ years in regulated federal environments.",
+      "Product and delivery leader for AI in federal agencies. 12+ years inside NSF, USDA, USPS, and Census.",
     images: ["/og-image.png"],
   },
   robots: {

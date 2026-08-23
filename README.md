@@ -70,8 +70,18 @@ The resume content is in `app/resume/page.tsx` as structured HTML. Edit directly
 
 Place a PDF resume at `public/resume/nick-wiley-resume.pdf` for the download button.
 
-### Projects
-Edit the projects list in `app/projects/page.tsx`.
+### Products
+Edit `lib/products.ts` (shipped products, LLI programs, government engagements, prototypes). The page is `app/projects/page.tsx`.
+
+### Images
+Product and case-study images are generated, not hand-placed:
+
+```bash
+npm run images:capture                      # everything in scripts/capture-screenshots.mjs
+npm run images:capture -- panel-wizard adcc # just these ids
+```
+
+Live products are captured with headless Chrome. Internal government tools cannot be shown, so `scripts/mockups/*.html` are hand-built recreations based on the case studies; they are labeled as recreations on the site via `imageKind` in the MDX frontmatter and in `lib/products.ts`.
 
 ### About Page
 Edit `app/about/page.tsx`.

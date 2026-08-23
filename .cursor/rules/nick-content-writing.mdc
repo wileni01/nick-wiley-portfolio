@@ -1,16 +1,16 @@
 ---
-description: Nick's BCG-targeted voice for project, resume, and professional content
+description: Nick's voice for project, resume, and professional content, positioned for public-sector AI product leadership
 globs: content/**/*.mdx, content/**/*.md
 alwaysApply: false
 ---
 
-# Nick's Voice — BCG Personalization Rules
+# Nick's Voice and Positioning Rules
 
-Write in Nick's voice for BCG-relevant content. Output should feel sharp, grounded, and human, not generic AI copy. This rule applies to content only, not code.
+Write in Nick's voice. Output should feel sharp, grounded, and human, not generic AI copy. This rule applies to content only, not code. No em dashes in site-facing copy.
 
 ## Positioning Goal
 
-Position Nick as a product-minded, data-trust-focused software engineer who can translate technical systems into business value. Use `Gettysburg Pulse` as the flagship proof point when relevant.
+Position Nick for public-sector AI product leadership (target: Product Manager, Public Sector at Anthropic, applied August 2026). The role is about discovery inside government institutions, shaping products around observed workflows rather than requirements documents, owning product decisions, AI product fluency (evaluations, model behavior, human oversight), navigating compliance, and executing through teams outside direct authority. Lead with evidence of those things from the case studies and shipped products. Use `Gettysburg Tours` (shipped as Gettysburg Pulse) and `Panel Wizard` as flagship proof points when relevant.
 
 ## Gettysburg Pulse Core Narrative
 
@@ -28,7 +28,7 @@ When describing the project, emphasize this arc: built a production-grade, real-
 
 Direct, credible, and concise. Confident without hype. Use clear ownership language: "I built," "I designed," "I implemented," "I validated." Avoid inflated claims and buzzword-heavy phrasing.
 
-## BCG-Relevant Framing
+## Framing
 
 Show structured thinking and judgment. Highlight how decisions were made under constraints: source reliability tiers, deterministic rules before LLM fallback, schema correctness for SEO, and operational monitoring. Prefer "problem -> approach -> result" logic.
 
@@ -50,10 +50,10 @@ No fake metrics. No "AI buzzword salad." No vague claims like "revolutionary pla
 
 **Project summary:** 4-part flow: problem, architecture, trust/reliability mechanisms, impact/readiness.
 
-**Networking email / BCG outreach:** Lead with fit in one sentence, give one tight Gettysburg Pulse proof point, end with a concrete ask.
+**Networking email / outreach:** Lead with fit in one sentence, give one tight proof point, end with a concrete ask.
 
 **Interview stories:** Use concise STAR format with emphasis on tradeoffs, rigor, and measurable reliability improvements.
 
 ## Final Pass Before Output
 
-Confirm the writing answers: Why this project matters, what Nick uniquely built, why the architecture is trustworthy, and why this profile fits BCG's problem-solving and client-impact bar.
+Confirm the writing answers: Why this project matters, what Nick uniquely built, why the system is trustworthy, and why this profile fits a public-sector AI product role.

@@ -9,7 +9,7 @@ export function HomeClient() {
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <span>Alexandria, VA</span>
         <span className="text-border">·</span>
-        <span>12+ years, federal consulting</span>
+        <span>12+ years in federal agencies</span>
       </div>
     </div>
   );

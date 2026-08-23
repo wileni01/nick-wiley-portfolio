@@ -74,7 +74,7 @@ export default function ContactPage() {
           setFallbackHref(
             mailtoUrl({
               subject: draft.subject || `Portfolio contact from ${draft.name}`,
-              body: `${draft.message}\n\n— ${draft.name} (${draft.email})`,
+              body: `${draft.message}\n\n${draft.name} (${draft.email})`,
             })
           );
         }
