@@ -18,7 +18,7 @@ export default function AboutPage() {
         <div className="prose">
           <p>I’m Nick Wiley, a {siteConfig.jobTitle} at {siteConfig.employer}, based in {siteConfig.location}. Before BCG, I worked at IBM on analytics and software for federal agencies, including tools for NSF proposal review and reporting for USDA’s organic program.</p>
           <p>I founded VisiTime, which released an interactive iPad tour of Gettysburg. The tour used maps, narration, and historical imagery tied to locations on the battlefield.</p>
-          <p>My recent projects include rebuilding a 1990s PC game for 64-bit Windows and documenting and backing up parts of the infotainment system in my car.</p>
+          <p>My recent projects include rebuilding a 1990s pirate game for 64-bit Windows and installing a new operating system on my car’s infotainment unit.</p>
           <p>I have an MBA and an MS in Information Systems from the University of Maryland.</p>
           <Link href="/resume" className="text-link">View résumé <ArrowUpRight size={15} aria-hidden="true" /></Link>
         </div>

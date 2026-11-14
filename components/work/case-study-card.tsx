@@ -8,7 +8,7 @@ export function CaseStudyCard({ study }: { study: CaseStudy }) {
     <article className="project-card">
       <Link href={`/work/${study.slug}`} className="project-link">
         {study.image && (
-          <div className="project-image">
+          <div className={study.imageKind === "illustrative" ? "project-image project-image-illustration" : "project-image"}>
             <Image
               src={study.image}
               alt=""

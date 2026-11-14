@@ -2,15 +2,13 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, FileText, Briefcase, PenLine, ArrowRight } from "lucide-react";
+import { Search, X, FileText, Briefcase, ArrowRight } from "lucide-react";
 import type { SearchItem } from "@/lib/search-index";
 
 function getIcon(type: SearchItem["type"]) {
   switch (type) {
     case "work":
       return <Briefcase className="h-4 w-4 shrink-0 text-primary" />;
-    case "writing":
-      return <PenLine className="h-4 w-4 shrink-0 text-primary" />;
     default:
       return <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />;
   }
@@ -20,8 +18,6 @@ function getTypeLabel(type: SearchItem["type"]) {
   switch (type) {
     case "work":
       return "Case Study";
-    case "writing":
-      return "Writing";
     default:
       return "Page";
   }
@@ -160,7 +156,7 @@ export function SearchDialog({ items }: { items: SearchItem[] }) {
               setActiveIndex(0);
             }}
             onKeyDown={onInputKeyDown}
-            placeholder="Search case studies, writing, pages..."
+            placeholder="Search projects and pages…"
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             aria-label="Search query"
             role="combobox"

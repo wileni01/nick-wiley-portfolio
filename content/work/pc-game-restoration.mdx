@@ -1,5 +1,5 @@
 ---
-title: "Rebuilding a 1990s PC game"
+title: "Rebuilding a 1990s pirate game"
 slug: "pc-game-restoration"
 client: "Independent project"
 role: "Software restoration and release preparation"
@@ -7,18 +7,18 @@ timeframe: "2026"
 status: "Windows release candidate"
 order: 1
 stack: [C, SDL, CMake, Windows x64]
-tags: [Game preservation, Binary recovery, Remaster]
+tags: [PC games, Pirates, Game preservation, Binary recovery, Remaster]
 featured: true
-image: "/images/projects/pc-game-restoration.webp"
+image: "/images/projects/pirate-game-desk.webp"
 imageKind: "illustrative"
-imageAlt: "A late-1990s desktop PC, CRT monitor, and CD-ROM on a wooden desk"
-imageCaption: "Generated illustration of a period PC."
+imageAlt: "A beige desktop PC with a wired keyboard and mouse. The CRT shows sailing ships in a tropical harbor."
+imageCaption: "Generated illustration of a 1990s PC running a fictional pirate game."
 summary: "Recovered game logic from the original executable, rebuilt it for 64-bit Windows, and packaged a remaster with updated art, audio, and controls."
 ---
 
 ## From the original executable to a 64-bit build
 
-I started with the compiled 32-bit game. I used it as a reference for reconstructing gameplay and checking how the rebuilt game handled things like input, saves, and campaign state. The new build runs as a 64-bit Windows application with SDL handling platform services.
+I started with the original 32-bit executable of a 1990s PC strategy game about pirates. I used it as a reference for reconstructing gameplay and checking how the rebuilt game handled things like input, saves, and campaign state. The new build runs as a 64-bit Windows application with SDL handling platform services.
 
 Keeping existing saves readable meant treating the file format separately from the new program’s in-memory structures. I also used recorded play and focused regression tests to check behaviors that could easily change during the port.
 

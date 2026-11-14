@@ -1,9 +1,9 @@
-import { getAllCaseStudies, getAllWritingPosts } from "./mdx";
+import { getAllCaseStudies } from "./mdx";
 
 export interface SearchItem {
   title: string;
   url: string;
-  type: "work" | "writing" | "page";
+  type: "work" | "page";
   summary: string;
   /** Extra lowercase terms (tags, client, stack) matched by the search box. */
   keywords: string;
@@ -32,13 +32,6 @@ const pages: SearchItem[] = [
     keywords: "projects products portfolio gettysburg tours leadership casekit assessment scott search",
   },
   {
-    title: "Writing",
-    url: "/writing",
-    type: "page",
-    summary: "Notes on building software and using coding assistants",
-    keywords: "blog posts essays",
-  },
-  {
     title: "Résumé",
     url: "/resume",
     type: "page",
@@ -62,9 +55,7 @@ const pages: SearchItem[] = [
 ];
 
 /**
- * Builds the global search index from the real content directories, so a
- * new case study or post is searchable the moment it is added. Runs on the
- * server at build time; the result is passed to the client search dialog.
+ * Builds the client search index from case studies and top-level pages.
  */
 export function getSearchIndex(): SearchItem[] {
   const work: SearchItem[] = getAllCaseStudies().map((study) => ({
@@ -77,15 +68,5 @@ export function getSearchIndex(): SearchItem[] {
       .toLowerCase(),
   }));
 
-  const writing: SearchItem[] = getAllWritingPosts()
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .map((post) => ({
-      title: post.title,
-      url: `/writing/${post.slug}`,
-      type: "writing",
-      summary: post.description,
-      keywords: post.tags.join(" ").toLowerCase(),
-    }));
-
-  return [...pages, ...work, ...writing];
+  return [...pages, ...work];
 }

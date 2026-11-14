@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllWritingPosts, getCaseStudySlugs } from "@/lib/mdx";
+import { getCaseStudySlugs } from "@/lib/mdx";
 import { siteConfig } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -11,7 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: baseUrl, priority: 1.0, changeFrequency: "monthly" },
     { url: `${baseUrl}/work`, priority: 0.9, changeFrequency: "monthly" },
     { url: `${baseUrl}/resume`, priority: 0.9, changeFrequency: "monthly" },
-    { url: `${baseUrl}/writing`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${baseUrl}/projects`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${baseUrl}/about`, priority: 0.6, changeFrequency: "yearly" },
     { url: `${baseUrl}/contact`, priority: 0.6, changeFrequency: "yearly" },
@@ -25,14 +24,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })
   );
 
-  const writingPosts: MetadataRoute.Sitemap = getAllWritingPosts().map(
-    (post) => ({
-      url: `${baseUrl}/writing/${post.slug}`,
-      lastModified: new Date(post.date),
-      priority: 0.7,
-      changeFrequency: "yearly",
-    })
-  );
-
-  return [...staticPages, ...caseStudies, ...writingPosts];
+  return [...staticPages, ...caseStudies];
 }

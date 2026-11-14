@@ -160,3 +160,23 @@ main { flex: 1; }
   .resume-document ul { margin-top: 3pt; }
   .resume-document li + li { margin-top: 1pt; }
 }
+
+.project-image-illustration { aspect-ratio: 3 / 2; }
+
+.startup-display {
+  position: absolute;
+  inset: 1px;
+  pointer-events: none;
+  clip-path: polygon(33% 11.1%, 61.6% 11.5%, 63% 70.3%, 34.7% 72.8%);
+  background: radial-gradient(ellipse 15% 20% at 48% 42%, #7790a0, #233845 45%, #080d14 90%);
+  background-size: 100% 100%;
+  animation: startup-reveal 1.35s ease-out both;
+}
+@keyframes startup-reveal {
+  0%, 14% { opacity: 1; background: #080d14; }
+  55% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .startup-display { animation-duration: .01s; }
+}

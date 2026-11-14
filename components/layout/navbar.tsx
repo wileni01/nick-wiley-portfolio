@@ -6,7 +6,6 @@ import { Search } from "lucide-react";
 
 const links = [
   { href: "/work", label: "Work" },
-  { href: "/writing", label: "Writing" },
   { href: "/about", label: "About" },
   { href: "/resume", label: "Résumé" },
 ];

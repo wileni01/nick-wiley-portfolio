@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getCaseStudyBySlug, getCaseStudySlugs } from "@/lib/mdx";
 import { PressMentions } from "@/components/work/press-mentions";
+import { StartupPreview } from "@/components/work/startup-preview";
 import { MdxContent } from "@/components/mdx/mdx-content";
 
 interface Props {
@@ -37,6 +38,19 @@ export default async function CaseStudyPage({ params }: Props) {
   const study = getCaseStudyBySlug((await params).slug);
   if (!study) notFound();
 
+  const cover = study.image && (
+    <div className={study.imageKind === "illustrative" ? "project-image project-image-illustration" : "project-image"}>
+      <Image
+        src={study.image}
+        alt={study.imageAlt ?? (study.imageKind === "recreation" ? `Illustrative recreation of ${study.title}` : study.title)}
+        fill
+        sizes="(min-width: 880px) 800px, 100vw"
+        className={study.imageKind === "recreation" ? "object-cover object-top" : "object-cover"}
+        preload
+      />
+    </div>
+  );
+
   return (
     <div className="article-shell page-space">
       <Link href="/work" className="text-link"><ArrowLeft size={15} aria-hidden="true" /> All work</Link>
@@ -51,18 +65,9 @@ export default async function CaseStudyPage({ params }: Props) {
             {study.status && <span>{study.status}</span>}
           </div>
         </header>
-        {study.image && (
+        {cover && (
           <figure className="case-figure">
-            <div className="project-image">
-              <Image
-                src={study.image}
-                alt={study.imageAlt ?? (study.imageKind === "recreation" ? `Illustrative recreation of ${study.title}` : study.title)}
-                fill
-                sizes="(min-width: 880px) 800px, 100vw"
-                className={study.imageKind === "recreation" ? "object-cover object-top" : "object-cover"}
-                preload
-              />
-            </div>
+            {study.slug === "car-infotainment" ? <StartupPreview>{cover}</StartupPreview> : cover}
             {(study.imageCaption || study.imageKind === "recreation") && (
               <figcaption>{study.imageCaption ?? "Interface recreation with sample data."}</figcaption>
             )}

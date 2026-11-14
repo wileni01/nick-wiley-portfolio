@@ -28,18 +28,3 @@ export type CaseStudyFrontmatter = z.infer<typeof caseStudySchema>;
 export interface CaseStudy extends CaseStudyFrontmatter {
   content: string;
 }
-
-// ── Writing Post Frontmatter ────────────────────────────────────
-export const writingSchema = z.object({
-  title: z.string(),
-  slug: z.string(),
-  date: z.string(),
-  description: z.string(),
-  tags: z.array(z.string()).default([]),
-});
-
-export type WritingFrontmatter = z.infer<typeof writingSchema>;
-
-export interface WritingPost extends WritingFrontmatter {
-  content: string;
-}
