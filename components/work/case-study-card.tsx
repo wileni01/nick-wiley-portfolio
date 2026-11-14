@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { HarborPreview } from "@/components/work/harbor-preview";
 import { StartupPreview } from "@/components/work/startup-preview";
+import { ProjectStack } from "@/components/work/project-stack";
 import type { CaseStudy } from "@/lib/types";
 
 export function CaseStudyCard({
@@ -38,6 +39,7 @@ export function CaseStudyCard({
           <ArrowUpRight size={21} strokeWidth={1.5} aria-hidden="true" />
         </h3>
         <p className="project-summary">{study.summary}</p>
+        <ProjectStack stack={study.stack} />
       </div>
     </article>
   );

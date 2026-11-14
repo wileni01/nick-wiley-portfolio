@@ -6,14 +6,14 @@ role: "Software installation, backup, and interface prototyping"
 timeframe: "2026"
 status: "Installed in my car"
 order: 2
-stack: [Embedded software, File verification, Interface prototyping]
+stack: [QNX, C, Python, File verification]
 tags: [Infotainment, Operating system, Startup animation, Software preservation, Backups]
 featured: true
 image: "/images/projects/car-startup-chief.webp"
 imageKind: "illustrative"
 imageAlt: "Chief, a golden retriever, on a tall dashboard touchscreen"
 imageCaption: "Recreation of the original factory screen, Chief’s startup sequence, and the new controls."
-summary: "I reverse-engineered the factory infotainment software, verified a partial backup, and installed a new OS in my car. My dog Chief makes an appearance at startup."
+summary: "I reverse-engineered the factory startup, built a read-only backup tool, and verified the files I recovered. I installed a new infotainment OS in my car and customized its startup screen."
 ---
 
 ## Installing the software
@@ -22,4 +22,4 @@ I installed the new operating system on the car’s infotainment unit and gave i
 
 ## Preserving the factory software
 
-I reverse-engineered the original infotainment binary to understand how the factory software starts and which files it relies on. That work informed the new interface and helped me identify what to back up. I copied a set of factory files from the car and verified that the backup copies matched. I also tested a read-only backup package with simulated inputs. A complete backup and a tested restore are still open.
+I reverse-engineered the original infotainment binary to understand how the factory software starts and which files it relies on. That work informed the new interface and helped me identify what to back up. I copied a set of factory files from the car and verified that the backup copies matched. I also tested a read-only backup package with simulated inputs. The verification covered the factory files I copied from the unit.

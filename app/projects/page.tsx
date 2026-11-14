@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ProjectStack } from "@/components/work/project-stack";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
@@ -28,6 +29,7 @@ export default function ProjectsPage() {
                 <p className="eyebrow">{project.label}</p>
                 <h2>{project.url ? <Link className="hover:underline underline-offset-4" href={project.url}>{project.title}</Link> : project.title}</h2>
                 <p>{project.summary}</p>
+                <ProjectStack stack={project.stack} />
               </div>
               {project.url && <ArrowUpRight size={21} strokeWidth={1.5} aria-hidden="true" />}
             </div>

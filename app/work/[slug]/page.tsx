@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getCaseStudyBySlug, getCaseStudySlugs } from "@/lib/mdx";
+import { ProjectStack } from "@/components/work/project-stack";
 import { PressMentions } from "@/components/work/press-mentions";
 import { StartupPreview } from "@/components/work/startup-preview";
 import { MdxContent } from "@/components/mdx/mdx-content";
@@ -64,6 +65,7 @@ export default async function CaseStudyPage({ params }: Props) {
             {study.timeframe && <span>{study.timeframe}</span>}
             {study.status && <span>{study.status}</span>}
           </div>
+          <ProjectStack stack={study.stack} />
         </header>
         {cover && (
           <figure className="case-figure">

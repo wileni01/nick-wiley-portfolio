@@ -97,10 +97,21 @@ main { flex: 1; }
 }
 .project-info h3 svg, .work-list-link > svg { flex: none; color: var(--color-primary); margin-top: .25rem; }
 .project-link:hover, .work-list-link:hover :is(h2, h3) { color: var(--color-primary); }
-.project-summary, .work-list-link p:last-child { color: var(--color-muted-foreground); line-height: 1.62; margin-top: .55rem; max-width: 58ch; }
-.work-list li { border-bottom: 1px solid var(--color-border); }
+.project-summary, .work-list-link p:not(.eyebrow) { color: var(--color-muted-foreground); line-height: 1.62; margin-top: .55rem; max-width: 58ch; }
+.work-list > li { border-bottom: 1px solid var(--color-border); }
 .work-list-link { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 1.15rem; }
 .work-list :is(h2, h3) { font-size: clamp(1.55rem, 2.6vw, 2.08rem); }
+
+.project-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem .8rem;
+  margin-top: .65rem;
+  color: var(--color-primary);
+  font-size: .75rem;
+  font-weight: 700;
+}
+.project-stack li + li::before { content: "·"; margin-right: .8rem; color: var(--color-muted-foreground); }
 
 .page-space { padding-top: clamp(2.7rem, 6vw, 5.5rem); }
 .page-heading { margin-bottom: 2.5rem; }

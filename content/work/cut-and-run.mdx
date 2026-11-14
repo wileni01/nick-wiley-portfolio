@@ -2,26 +2,26 @@
 title: "Cut & Run: A Pirate’s Life at Sea"
 slug: "cut-and-run"
 client: "Independent project"
-role: "Game development at Sushi Sunday Studio"
-timeframe: "2026–present"
-status: "In development"
+role: "Gameplay and build engineering at Sushi Sunday Studio"
+timeframe: "2026"
 order: 2
 featured: true
-summary: "I’m building a Caribbean pirate strategy game. Start with one sloop, build a fleet through trade and raids, and keep your crew loyal when the plunder runs thin."
-stack: [Game development]
+summary: "I extended a native pirate strategy game with new mission text and updated graphics, then built a scripted playtest runner to check campaign flows on Windows."
+stack: [C, SDL, CMake, Python]
 tags: [Pirate strategy, Independent game, Caribbean, Fleet management]
 image: "/images/projects/cut-and-run-at-sea.webp"
 imageKind: "screenshot"
 imageAlt: "A pirate sloop under sail along a rocky Caribbean coast"
-imageCaption: "Work-in-progress preview from the Cut & Run project site."
+imageCaption: "Sailing and fleet interface from the project site."
 liveUrl: "https://cutandrungame.com/"
 liveLabel: "Visit the game site"
 ---
 
-## From one sloop to a fleet
 
-You start with a small crew and a ship. Trade or raid to build up your fleet. Every voyage has a cost, from provisions to the crew’s share of the take. I’m building the campaign around decisions that carry over after you leave port, including how you pay the crew and whose flag you sail under.
+## Connecting content to the game
 
-## Who lets you back into port
+I integrated the Lantern Compact storyline into the mission and dialogue pipeline. I updated ship sprites, port artwork, and interface graphics, and checked how the game loaded and displayed the replacements.
 
-A governor’s commission can make a raid legal under one flag and turn you into a wanted captain under another. I’m developing the Lantern Compact as a network of captains, pilots, and harbor keepers who remember which promises you kept. The project site has work-in-progress images and a signup for the first look.
+## Testing campaign flows
+
+I used C and SDL for the Windows runtime and CMake to build it. I wrote a scripted playtest runner that exercised the game through its own controls and produced repeatable runs for checking menu navigation, campaign actions, and saves. I packaged the Windows build with its assets and checked the archive against the staged files.
