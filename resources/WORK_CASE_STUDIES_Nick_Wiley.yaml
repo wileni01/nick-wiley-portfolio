@@ -53,7 +53,7 @@
   featured: true
   tags: ["Product", "AR", "GIS", "Operations"]
   stack: ["Geospatial data", "Mobile apps (high level)", "Product ops"]
-  executiveSummary: "A data-rich visitor experience built end-to-end—from fundraising to delivery."
+  executiveSummary: "An interactive iPad tour distributed through a rental fleet."
   builderSummary: "Geospatial storytelling translated into an interactive guided tour system."
 
 - slug: "ratb-gis-oversight"

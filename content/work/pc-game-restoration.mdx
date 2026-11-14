@@ -1,19 +1,21 @@
 ---
-title: "Rebuilding a 1990s pirate game"
+title: "A 1999 pirate game on Windows 11"
 slug: "pc-game-restoration"
 client: "Independent project"
-role: "Software restoration and release preparation"
+role: "Reverse engineering and Windows port"
 timeframe: "2026"
-status: "64-bit Windows remaster"
+status: "Free public beta"
 order: 1
 stack: [Ghidra, C, SDL, CMake, Windows x64]
-tags: [PC games, Pirates, Game preservation, Binary recovery, Remaster]
+tags: [PC games, Pirates, Game preservation, Binary recovery, Compatibility patch]
 featured: true
 image: "/images/projects/pirate-game-harbor.webp"
 imageKind: "illustrative"
 imageAlt: "A beige desktop PC with a wired keyboard and mouse. The CRT shows a pirate strategy game with ships, a map, and fleet controls."
 imageCaption: "Generated illustration of a 1990s PC running a fictional pirate game."
-summary: "I used Ghidra to recover game logic from the original executable, rebuilt the game for 64-bit Windows, and remastered its art, audio, and controls."
+summary: "I rebuilt the game’s 32-bit executable for modern Windows and published a free patch that fixes crashes and freezes while preserving the original gameplay, art, and sound."
+liveUrl: "https://cutthroatspatch.com/"
+liveLabel: "Patch notes and free download"
 ---
 
 ## Recovering the original game in Ghidra
@@ -26,6 +28,6 @@ That gave me enough context to reimplement behavior in C and compare it with the
 
 I rebuilt the game as a native 64-bit Windows application, with SDL handling the window, input, and audio. I treated the original save format separately from the new in-memory data structures so existing saves could still be read. Recorded play and regression tests helped me check that campaign state and controls behaved as expected after the port.
 
-## Remaster and release preparation
+## Publishing the patch
 
-I refreshed interface art, backgrounds, and audio, and updated mouse handling and dialog controls. I assembled the executable, media, launchers, and player instructions in a Windows release package and ran build and package checks. The Windows release is planned for Steam and an indie storefront.
+The free beta fixes crashes and freezes, including problems around loading saves and returning from encounters. The installer patches a separate copy of the game. Players need their own copy of the English CD release, since the download contains no original game data. The beta has been played on 64-bit Windows 11. The patch site has the supported version, setup instructions, and known issues.

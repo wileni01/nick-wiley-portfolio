@@ -20,6 +20,7 @@ export const caseStudySchema = z.object({
   imageCaption: z.string().optional(),
   /** Public URL of the shipped product, when one exists. */
   liveUrl: z.string().url().optional(),
+  liveLabel: z.string().optional(),
   summary: z.string(),
 });
 

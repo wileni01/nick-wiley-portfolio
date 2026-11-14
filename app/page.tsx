@@ -9,12 +9,12 @@ export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default function HomePage() {
   const studies = getAllCaseStudies();
-  const personal = studies.filter((study) => study.featured && study.client === "Independent project");
+  const personal = studies.filter((study) => study.featured && ["Independent project", "Independent product"].includes(study.client));
   const previews: Partial<Record<string, "startup" | "harbor">> = {
     "car-infotainment": "startup",
     "pc-game-restoration": "harbor",
   };
-  const professional = studies.filter((study) => study.featured && study.client !== "Independent project");
+  const professional = studies.filter((study) => study.featured && !personal.includes(study));
 
   return (
     <div className="site-shell">

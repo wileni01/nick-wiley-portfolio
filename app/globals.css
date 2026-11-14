@@ -163,4 +163,4 @@ main { flex: 1; }
   .resume-document li + li { margin-top: 1pt; }
 }
 
-.project-image-illustration { aspect-ratio: 3 / 2; }
+.project-image-illustration, #selected-work .project-image { aspect-ratio: 3 / 2; }

@@ -74,7 +74,7 @@ export default async function CaseStudyPage({ params }: Props) {
           </figure>
         )}
         <div className="prose article-body"><MdxContent source={study.content} /></div>
-        {study.liveUrl && <a className="text-link mt-4" href={study.liveUrl}>Visit the site <ArrowUpRight size={15} aria-hidden="true" /></a>}
+        {study.liveUrl && <a className="text-link mt-4" href={study.liveUrl}>{study.liveLabel ?? "Visit the site"} <ArrowUpRight size={15} aria-hidden="true" /></a>}
         {study.slug === "visitime-ar" && <PressMentions />}
       </article>
     </div>

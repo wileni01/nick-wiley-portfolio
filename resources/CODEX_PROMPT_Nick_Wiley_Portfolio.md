@@ -115,7 +115,6 @@ Use the facts below to write copy and build structured data. Do not add new clai
   - Ran/led internal enablement: **Tableau Study Hall**, **Google BigQuery Study Hall**, and a **Data Working Group**.
 - **VisiTime, LLC** — Founder (founded 2012; wound down around ~2020 based on resume versions)
   - Augmented reality / geospatial visitor experiences.
-  - Raised **at least $200K** (some resumes cite higher; do not overclaim—use “$200K+”).
   - Built a **six-hour interactive iPad tour system** for Gettysburg’s 150th anniversary context.
   - Iterated a scalable rental model; one resume cites **400% annual growth** (present as “reported” if used).
   - **U.S. patent holder**: Patent numbers **9,417,668** and **9,900,042**.
@@ -297,7 +296,6 @@ Write:
 **Stack:** Geospatial data, iOS/Android apps (high level), product ops
 
 Use only safe claims:
-- raised $200K+  
 - built AR apps + interactive iPad tour  
 - patent holder (list patent numbers)  
 Avoid hard revenue claims unless stated.
@@ -368,7 +366,6 @@ IBM — Global Business Services (AI & Analytics) | Managing Consultant | 2019�
 
 VisiTime, LLC | Founder | 2012–~2020  
 - Founded AR-driven tours using geospatial datasets to make historical context accessible and engaging.  
-- Raised $200K+ to produce a tour book and multiple mobile applications.  
 - Led distributed delivery to create an interactive iPad tour experience; iterated business model and operations.  
 - U.S. patent holder (9,417,668; 9,900,042).
 
