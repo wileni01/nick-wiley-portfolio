@@ -4,24 +4,28 @@ slug: "pc-game-restoration"
 client: "Independent project"
 role: "Software restoration and release preparation"
 timeframe: "2026"
-status: "Windows release candidate"
+status: "64-bit Windows remaster"
 order: 1
-stack: [C, SDL, CMake, Windows x64]
+stack: [Ghidra, C, SDL, CMake, Windows x64]
 tags: [PC games, Pirates, Game preservation, Binary recovery, Remaster]
 featured: true
 image: "/images/projects/pirate-game-desk.webp"
 imageKind: "illustrative"
-imageAlt: "A beige desktop PC with a wired keyboard and mouse. The CRT shows sailing ships in a tropical harbor."
+imageAlt: "A beige desktop PC with a wired keyboard and mouse. The CRT shows a pirate strategy game with ships, a map, and fleet controls."
 imageCaption: "Generated illustration of a 1990s PC running a fictional pirate game."
-summary: "Recovered game logic from the original executable, rebuilt it for 64-bit Windows, and packaged a remaster with updated art, audio, and controls."
+summary: "I used Ghidra to recover game logic from the original executable, rebuilt the game for 64-bit Windows, and remastered its art, audio, and controls."
 ---
 
-## From the original executable to a 64-bit build
+## Recovering the original game in Ghidra
 
-I started with the original 32-bit executable of a 1990s PC strategy game about pirates. I used it as a reference for reconstructing gameplay and checking how the rebuilt game handled things like input, saves, and campaign state. The new build runs as a 64-bit Windows application with SDL handling platform services.
+I started with the compiled 32-bit executable. In Ghidra, I worked through the disassembly and the decompiler’s C-like output. I followed calls from the map, sailing, and port screens, gave routines names as their roles became clear, and mapped the data they shared for ships, routes, and game state.
 
-Keeping existing saves readable meant treating the file format separately from the new program’s in-memory structures. I also used recorded play and focused regression tests to check behaviors that could easily change during the port.
+That gave me enough context to reimplement behavior in C and compare it with the original. For example, I checked how a ship changed heading and advanced along a route, then used focused tests to catch differences as I rebuilt more of the game.
+
+## Moving to 64-bit Windows
+
+I rebuilt the game as a native 64-bit Windows application, with SDL handling the window, input, and audio. I treated the original save format separately from the new in-memory data structures so existing saves could still be read. Recorded play and regression tests helped me check that campaign state and controls behaved as expected after the port.
 
 ## Remaster and release preparation
 
-I refreshed interface art, backgrounds, and audio, and updated mouse handling and dialog controls. I assembled the executable, media, launchers, and player instructions in a Windows release package and ran build and package checks. The package is staged as a release candidate. Windows playtesting is still in progress, and public distribution is paused.
+I refreshed interface art, backgrounds, and audio, and updated mouse handling and dialog controls. I assembled the executable, media, launchers, and player instructions in a Windows release package and ran build and package checks. The Windows release is planned for Steam and an indie storefront.

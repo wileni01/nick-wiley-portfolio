@@ -1,0 +1,251 @@
+.preview {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  --cycle: 12s;
+  --play-state: running;
+}
+
+.preview[data-playback="paused"] {
+  --play-state: paused;
+}
+
+/* This transparent overlay registers to the four display corners in the cover photo. */
+.screen {
+  position: absolute;
+  inset: 1px;
+  overflow: hidden;
+  pointer-events: none;
+  clip-path: polygon(33% 11.1%, 61.6% 11.5%, 63.2% 70.5%, 34.7% 72.9%);
+  container-type: inline-size;
+  color: #f2f5f9;
+}
+
+.scene {
+  position: absolute;
+  top: 11%;
+  left: 33%;
+  width: 30%;
+  height: 62%;
+  overflow: hidden;
+  transform-origin: top left;
+  transform: skewX(2deg);
+  animation-duration: var(--cycle);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-play-state: var(--play-state);
+}
+
+.boot, .chief {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(ellipse at 47% 45%, #243747, #111a27 55%, #080d15 83%);
+}
+
+.boot {
+  justify-content: center;
+  animation-name: boot;
+}
+
+.bootIcon {
+  display: grid;
+  place-items: center;
+  width: 5.3cqw;
+  height: 5.3cqw;
+  margin-bottom: 1.35cqw;
+  color: #a1eee0;
+  filter: drop-shadow(0 0 .75cqw #70d5c29c);
+  animation: breathe var(--cycle) ease-in-out infinite var(--play-state);
+}
+
+.bootIcon svg {
+  width: 100%;
+  height: 100%;
+  fill: #3fc7a735;
+}
+
+.bootTitle, .chiefTitle {
+  font-size: clamp(8px, 2.12cqw, 17px);
+  font-weight: 700;
+  letter-spacing: -.025em;
+}
+
+.bootDetail {
+  margin-top: .36cqw;
+  color: #b6c7d7;
+  font-size: clamp(6px, 1.18cqw, 10px);
+}
+
+.progress {
+  width: 53%;
+  height: max(2px, .37cqw);
+  margin-top: 1.7cqw;
+  border-radius: 1cqw;
+  background: #c6e7f128;
+}
+
+.progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #538dc9, #8ce9cf);
+  box-shadow: 0 0 .6cqw #80e9cb80;
+  transform-origin: left;
+  animation: load var(--cycle) ease-out infinite var(--play-state);
+}
+
+.chief {
+  animation-name: chief;
+}
+
+.chiefTitle {
+  padding-top: 3.7cqw;
+}
+
+.chiefCutout {
+  position: absolute;
+  width: 82%;
+  height: auto;
+  bottom: 0;
+  left: -9%;
+  filter: drop-shadow(0 0 1.3cqw #91c3dd35);
+  animation: nudge var(--cycle) ease-in-out infinite var(--play-state);
+}
+
+.treat {
+  position: absolute;
+  top: 39%;
+  right: 12%;
+  width: 4.7cqw;
+  height: 4.7cqw;
+  color: #efca80;
+  filter: drop-shadow(0 0 .8cqw #ffbd5b95);
+  animation: treat var(--cycle) ease-out infinite var(--play-state);
+}
+
+.controls {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  gap: .8cqw;
+  padding: 1.3cqw 1.9cqw 1.7cqw 1.75cqw;
+  background: #111723;
+  animation-name: controls;
+}
+
+.dashboardHeader, .climate, .dock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #e6edf5;
+  font-size: clamp(6px, 1.25cqw, 11px);
+  font-weight: 700;
+}
+
+.map {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: .9cqw;
+  background:
+    linear-gradient(149deg, transparent 32%, #9dbeae 33% 38%, transparent 39%),
+    linear-gradient(49deg, transparent 46%, #91a4a9 47% 50%, transparent 51%),
+    linear-gradient(116deg, transparent 61%, #a1b3af 62% 66%, transparent 67%),
+    repeating-linear-gradient(36deg, transparent 0 2.3cqw, #8ca1a4 2.4cqw 2.56cqw, transparent 2.65cqw 4.8cqw),
+    linear-gradient(72deg, #44707c 23%, #4a6863 24% 66%, #658878 66%);
+}
+
+.map span {
+  position: absolute;
+  inset: 47% auto auto 47%;
+  display: grid;
+  place-items: center;
+  width: 3.1cqw;
+  height: 3.1cqw;
+  border: max(1px, .2cqw) solid #e5f2fa;
+  border-radius: 50%;
+  background: #2764df;
+  color: white;
+}
+
+.map span svg { width: 49%; height: 49%; }
+.mapPin { position: absolute; top: 20%; right: 22%; width: 2.3cqw; height: 2.3cqw; color: #f6df9c; }
+
+.nowPlaying, .climate, .dock {
+  min-width: 0;
+  border-radius: .85cqw;
+  background: #253142;
+  padding: .72cqw .9cqw;
+}
+
+.nowPlaying {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: .64cqw;
+  font-size: clamp(6px, 1.22cqw, 10px);
+  line-height: 1.18;
+}
+
+.nowPlaying small {
+  display: block;
+  margin-top: .14cqw;
+  color: #bbc6d4;
+  font-size: .87em;
+}
+
+.musicIcon, .dock svg {
+  border-radius: .6cqw;
+  background: #8a345c;
+  color: #fff;
+}
+
+.musicIcon { display: grid; place-items: center; padding: .55cqw; }
+.musicIcon svg, .trackPlay, .climate svg { width: 1.52cqw; height: 1.52cqw; }
+.climate { background: #1d2939; }
+.dock { justify-content: space-around; background: #1e2936; }
+.dock svg { width: 2.45cqw; height: 2.45cqw; padding: .46cqw; background: #306a96; }
+.dock svg:nth-child(2) { background: #8a345c; }
+.dock svg:nth-child(3) { background: #427764; }
+
+@keyframes boot {
+  0%, 27% { opacity: 1; }
+  31%, 97% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes breathe {
+  0%, 23%, 100% { transform: scale(.88); }
+  11% { transform: scale(1.08); }
+}
+@keyframes load {
+  0% { transform: scaleX(.03); }
+  9% { transform: scaleX(.42); }
+  16% { transform: scaleX(.76); }
+  23%, 100% { transform: scaleX(1); }
+}
+@keyframes chief {
+  0%, 20%, 54%, 100% { opacity: 0; }
+  27%, 45% { opacity: 1; }
+}
+@keyframes nudge {
+  0%, 24% { transform: translate(-30%, 11%) rotate(-8deg); }
+  34% { transform: translate(2%, 0) rotate(-3deg); }
+  39% { transform: translate(8%, -5%) rotate(-2deg); }
+  47%, 100% { transform: translate(-1%, 0) rotate(-3deg); }
+}
+@keyframes treat {
+  0%, 35% { opacity: 1; transform: rotate(-18deg) scale(.9); }
+  40% { opacity: 1; transform: translate(24%, -28%) rotate(28deg) scale(1.28); }
+  48%, 100% { opacity: 0; transform: translate(54%, -62%) rotate(56deg) scale(.8); }
+}
+@keyframes controls {
+  0%, 68% { opacity: 0; }
+  75%, 97% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview:not([data-playback]) .screen { visibility: hidden; }
+  .preview:not([data-playback]) { --play-state: paused; }
+}
