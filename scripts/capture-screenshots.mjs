@@ -33,7 +33,7 @@ const CHROME =
 /** @type {Array<{id: string, url?: string, mockup?: string, width?: number, height?: number, wait?: number, optional?: boolean}>} */
 const TARGETS = [
   // ── Live products ─────────────────────────────────────────────
-  { id: "gettysburg-tours", url: "https://www.gettysburgtours.com", wait: 6000 },
+  { id: "gettysburg-tours-home", url: "https://www.gettysburgtours.com", wait: 6000 },
   { id: "gettysburg-leadership", url: "https://www.gettysburgleadership.com", wait: 8000 },
   { id: "lli-vistage", url: "https://llivistage-vistage-site.vercel.app", wait: 6000, height: 900 },
   { id: "lli-purdue", url: "https://lli-purdue.vercel.app", wait: 6000 },

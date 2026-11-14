@@ -4,33 +4,24 @@ client: "Independent product"
 role: "Developer"
 order: 3
 featured: true
-summary: "I built a visitor guide that compares tours, lists local events, and links prices and closures to their sources."
+summary: "I built an independent guide for comparing Gettysburg tours, finding local events, and checking park notices before a visit."
 slug: "gettysburg-pulse"
 timeframe: "2025–present"
-stack:
-  - Next.js 16
-  - React 19
-  - TypeScript
-  - Prisma
-  - PostgreSQL
-  - Tailwind CSS
-  - OpenAI GPT-4o-mini
-  - Cheerio
-  - NWS API
-  - Vercel Cron
-tags:
-  - Product
-  - Full-stack
-  - Data engineering
-  - AI/ML
-  - RAG
-  - SEO
-  - Provenance
-image: "/images/projects/gettysburg-tours.jpg"
+stack: [Next.js, TypeScript, Prisma, PostgreSQL, Neon, Vercel]
+tags: [Visitor guide, Tour comparison, Search, Events, Data quality]
+image: "/images/projects/gettysburg-tours-home.jpg"
 imageKind: "screenshot"
+imageAlt: "Gettysburg Tours homepage with a tour search and a National Park Service photo of the Mississippi Monument"
+imageCaption: "Live Gettysburg Tours homepage. Battlefield photo by the National Park Service."
 liveUrl: "https://www.gettysburgtours.com"
 ---
 
-Gettysburg visitors have to piece together information from tour operators, local calendars, and National Park Service notices. I built a single site that puts tour options, event listings, and closure notices in one place.
+## Finding a tour or planning a day
 
-I wrote the import jobs that normalize records from different sources and match duplicate listings by source ID, title, time, and venue. The site exposes source links and verification dates so visitors can check when a price or closure was last confirmed. The public site also gives users a direct link to the operator when they’re ready to book.
+I built GettysburgTours.com to bring information from tour operators, local venues, and the National Park Service into one guide. The redesigned homepage leads with tour search and puts upcoming events and park notices within reach. Visitors can narrow the catalog by category, listed price, duration, or family suitability, then follow the link to the operator to book. Listings show their sources and when they were last checked.
+
+## Fixing the event calendar
+
+A change to the Majestic Theater’s website broke the calendar import and left visitors with incorrect showtimes and duplicate listings. I rewrote the import to check each production’s published showtimes before replacing entries. The cleanup restored 51 performances from the theater’s schedules and removed duplicate, sample, and unverified historical entries from the public calendar.
+
+Repeated imports match existing events by source page and showtime. If a schedule can’t be parsed, the last published entries stay up and the job records the failure for follow-up. The public pages also share a cache so routine visits don’t have to query the database each time.
