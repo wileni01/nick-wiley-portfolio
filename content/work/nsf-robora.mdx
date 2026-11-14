@@ -1,9 +1,11 @@
 ---
-title: "RoboRA: Automated document generation with browser automation"
+title: "Automating recurring documents"
+client: "National Science Foundation"
+role: "IBM consulting engagement"
+order: 14
+featured: false
+summary: "I built a Python workflow that populated document templates and submitted them through an existing web interface."
 slug: "nsf-robora"
-client: "National Science Foundation (sanitized)"
-timeframe: "Recent (sanitized)"
-role: "Solutions architect / developer"
 stack:
   - Python
   - Chrome automation
@@ -15,25 +17,10 @@ tags:
   - Document generation
   - Legacy modernization
   - Browser automation
-featured: false
 image: "/images/projects/robora.jpg"
 imageKind: "recreation"
-executiveSummary: "Replaced a fragile Excel-based document workflow with an automated pipeline: data queries, template population, and Chrome browser automation to post into a legacy system with no API."
-builderSummary: "Python pipeline: queries large datasets, populates document templates, then uses Chrome automation to post results into a legacy web interface."
 ---
 
-## The situation
+Staff had been copying data into spreadsheet templates, then entering it again in a separate system. I mapped the source fields to the templates and added handling for missing values and conditional sections.
 
-Program staff relied on a manual, Excel-based process to generate recurring operational documents. Each document required pulling data from multiple sources, manually copying values into spreadsheet templates, and then re-entering everything into an internal system. The process was slow, error-prone, and entirely dependent on institutional knowledge of which cells mapped to which data sources. As document volumes grew, the manual approach became a bottleneck and a risk, since copy-paste errors in operational documents have downstream consequences.
-
-## What I built
-
-**RoboRA** replaced the Excel workflow with an automated pipeline. It queries large datasets programmatically to retrieve the values needed for each document, populates templates using a structured mapping between data fields and template positions, handles edge cases (missing data, format variations, conditional sections) that the manual process handled inconsistently, and produces audit-ready output with clear traceability from source data to final document.
-
-The harder part was the legacy system. The internal application where documents needed to be posted had no API, only a web interface designed for manual data entry. Rather than waiting for a system modernization that might never come, I wrote **Chrome browser automation** that crawls the legacy web interface, navigates to the correct posting locations, enters document data into form fields, and validates successful submission. A pragmatic solution that bridged a modern data pipeline and a legacy system without asking anyone to change their infrastructure.
-
-## What it changed
-
-Document generation that used to take hours of copy-paste work now runs automatically. Programmatic template population eliminated the transcription errors that came with the Excel process. Browser automation provided integration where no API existed. And the system scales: growing document volumes don't require proportional increases in manual effort.
-
-*Details are sanitized to protect agency-specific information.*
+The destination had no API, so I used browser automation to enter the prepared documents and check for submission confirmation.

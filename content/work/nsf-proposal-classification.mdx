@@ -1,9 +1,11 @@
 ---
-title: "Research proposal triage: SciBERT embeddings + clustering pipeline"
+title: "Finding themes in research proposals"
+client: "National Science Foundation"
+role: "IBM consulting engagement"
+order: 10
+featured: false
+summary: "I used scientific text embeddings and clustering to identify more than 70 themes across 7,000 research proposals."
 slug: "nsf-proposal-classification"
-client: "National Science Foundation (sanitized)"
-timeframe: "Recent (sanitized)"
-role: "AI solution architect / delivery lead"
 stack:
   - Python
   - SciBERT
@@ -23,51 +25,10 @@ tags:
   - Optimization
   - AI/ML
   - Governance
-featured: true
 image: "/images/projects/proposal-triage.jpg"
 imageKind: "recreation"
-executiveSummary: "Designed a SciBERT embedding and clustering pipeline (HDBSCAN, k-means, Bayesian optimization) that classified 7,000+ research proposals into 70+ themes for reviewer decision support. Ambiguous proposals flagged for human review rather than forced into poor-fit clusters."
-builderSummary: "SciBERT + UMAP + HDBSCAN/k-means pipeline with Optuna Bayesian optimization across 100+ trials. Plotly dashboards for topic exploration and organizational alignment. Designed for reproducibility and auditability."
 ---
 
-## The problem
+I built a pipeline that turned scientific abstracts into SciBERT embeddings, reduced their dimensions with UMAP, and compared HDBSCAN and k-means clustering. I used Optuna to tune the pipeline and built Plotly views so staff could inspect topic keywords and representative proposals.
 
-Research funding agencies receive thousands of proposals each review cycle. Before any of those can be evaluated, they need to be grouped into thematically coherent clusters and assigned to panels with the right domain expertise. Doing this manually is slow, inconsistent, and heavily dependent on institutional knowledge that walks out the door when experienced staff rotate.
-
-I needed to build a system that could discover the natural thematic structure in a corpus of **7,000+ research proposals** and surface those groupings for human review.
-
-## Architecture approach
-
-I designed a modular NLP pipeline built around **SciBERT** embeddings, a domain-specific transformer trained on scientific literature. General-purpose models underperform on technical abstracts, so the domain specificity mattered. SciBERT converts proposal abstracts into dense 768-dimensional vectors that capture semantic meaning far beyond keyword matching. UMAP reduces those high-dimensional embeddings into a space where clustering is computationally tractable while preserving local and global structure. Both **HDBSCAN** and **k-means** were evaluated as clustering methods: HDBSCAN for discovering natural groupings without pre-specifying topic counts, k-means for cases where organizational alignment required a fixed number of categories.
-
-The result is interpretable topic clusters with associated keywords, representative documents, and confidence scores. The pipeline was designed for reproducibility: versioned parameters, documented preprocessing steps, and auditable outputs at each stage.
-
-## Tuning with Bayesian optimization
-
-Topic modeling involves dozens of interconnected parameters (UMAP neighbors, minimum distances, HDBSCAN cluster sizes, embedding model selection) and the interactions between them are non-obvious. Manual tuning would have taken weeks.
-
-I used **Optuna** to run Bayesian optimization across **100+ trials**, optimizing for topic coherence (are the themes internally consistent?), coverage (what percentage of proposals get meaningful assignments?), and granularity (are topics specific enough for panel formation?). That automated search **improved clustering quality by 40%** over baseline parameters, a gain I'm confident I wouldn't have found through manual iteration.
-
-## What the model found
-
-The optimized model discovered **70+ distinct research themes** across the corpus. About **70% of proposals** mapped cleanly to coherent thematic clusters. The remaining **30%** didn't fit clearly into any single topic and were flagged for manual review rather than forced into poor-fit clusters.
-
-That 30% noise ratio is intentional. Forcing every proposal into a cluster inflates apparent accuracy while degrading actual usefulness. Flagging ambiguous cases for human judgment is the honest approach, and it's more useful to the people building panels.
-
-## Dashboards and analysis
-
-I built interactive visualizations in **Plotly** so stakeholders could explore the results: topic maps showing the semantic landscape of the corpus, organizational alignment views mapping topics to institutional priorities, quality dashboards tracking clustering performance across optimization trials, and drilldowns into representative proposals and keyword distributions within each theme.
-
-## The data engineering underneath
-
-The ML pipeline needed solid data engineering to hold together. That included text preprocessing and abstract extraction, batch embedding generation for large datasets, caching and checkpointing for long-running optimization runs, and export pipelines connecting classification results to downstream panel formation workflows.
-
-## Outcome
-
-Proposal clustering went from a weeks-long manual effort to an hours-long guided review. The Bayesian optimization discovered parameter combinations I wouldn't have found by hand. The thematic groupings directly informed reviewer-proposal matching, and the pipeline scales with submission volume without requiring proportional manual effort.
-
-## What I learned
-
-Domain-specific embeddings (SciBERT vs. general-purpose models) made a measurable difference in cluster quality for technical text. And the decision to flag ambiguous proposals for human review rather than force-classifying them was the right call. It built trust with the subject-matter experts who had to act on the results. Responsible AI in practice often means knowing when the model should step back.
-
-*Details are sanitized to protect agency-specific information.*
+About 30% of the corpus was left for manual review in the selected run. That gave staff a way to look at interdisciplinary or ambiguous proposals before assigning them to a theme.

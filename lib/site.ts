@@ -24,10 +24,13 @@ export const siteConfig = {
   url: resolveSiteUrl(),
   /** Public contact address shown on the site and used for mailto: links. */
   email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "wileni01@gmail.com",
-  linkedin: "https://linkedin.com/in/nicholas-a-wiley-975b3136",
+  linkedin: "https://www.linkedin.com/in/nick-a-wiley-975b3136",
   github: "https://github.com/wileni01",
   sourceRepo: "https://github.com/wileni01/nick-wiley-portfolio",
   location: "Alexandria, VA",
+  jobTitle: "Lead IT Architect",
+  employer: "Boston Consulting Group (BCG)",
+  description: "Nick Wiley’s portfolio of independent software projects, public-sector analytics, and products built in Gettysburg.",
   resumePdf: "/resume/nick-wiley-resume.pdf",
 } as const;
 

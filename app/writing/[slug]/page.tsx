@@ -3,8 +3,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getWritingPostBySlug, getWritingPostSlugs } from "@/lib/mdx";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { MdxContent } from "@/components/mdx/mdx-content";
 
 interface Props {
@@ -48,44 +46,17 @@ export default async function WritingPostPage({ params }: Props) {
   if (!post) notFound();
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl">
-        {/* Back link */}
-        <Button asChild variant="ghost" size="sm" className="mb-8 -ml-3">
-          <Link href="/writing">
-            <ArrowLeft className="h-4 w-4" />
-            All Writing
-          </Link>
-        </Button>
-
-        {/* Header */}
-        <header className="space-y-4 mb-10">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl leading-tight">
-            {post.title}
-          </h1>
-          <div className="flex items-center gap-3">
-            <time className="text-sm text-muted-foreground">
-              {new Date(post.date).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </time>
-            <div className="flex gap-1.5">
-              {post.tags.map((tag) => (
-                <Badge key={tag} variant="muted" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
+    <div className="article-shell page-space">
+      <Link href="/writing" className="text-link"><ArrowLeft size={15} aria-hidden="true" /> All writing</Link>
+      <article>
+        <header className="page-heading case-heading">
+          <time className="eyebrow" dateTime={post.date}>
+            {new Date(post.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" })}
+          </time>
+          <h1>{post.title}</h1>
         </header>
-
-        {/* Content */}
-        <article className="prose max-w-none">
-          <MdxContent source={post.content} />
-        </article>
-      </div>
+        <div className="prose article-body"><MdxContent source={post.content} /></div>
+      </article>
     </div>
   );
 }

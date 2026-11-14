@@ -10,7 +10,7 @@ function getIcon(type: SearchItem["type"]) {
     case "work":
       return <Briefcase className="h-4 w-4 shrink-0 text-primary" />;
     case "writing":
-      return <PenLine className="h-4 w-4 shrink-0 text-accent" />;
+      return <PenLine className="h-4 w-4 shrink-0 text-primary" />;
     default:
       return <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />;
   }
@@ -91,7 +91,11 @@ export function SearchDialog({ items }: { items: SearchItem[] }) {
       }
     }
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    document.addEventListener("open-site-search", handleOpen);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("open-site-search", handleOpen);
+    };
   }, [open, handleOpen, handleClose]);
 
   // Focus the input when the dialog opens.
@@ -143,7 +147,7 @@ export function SearchDialog({ items }: { items: SearchItem[] }) {
       />
 
       {/* Dialog */}
-      <div className="relative w-full max-w-lg mx-4 rounded-xl border border-border bg-card shadow-2xl overflow-hidden animate-scale-in">
+      <div className="relative w-full max-w-lg mx-4 rounded-xl border border-border bg-card shadow-2xl overflow-hidden">
         {/* Search Input */}
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
           <Search className="h-5 w-5 text-muted-foreground shrink-0" />

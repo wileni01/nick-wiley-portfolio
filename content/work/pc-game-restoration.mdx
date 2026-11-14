@@ -1,0 +1,27 @@
+---
+title: "Rebuilding a 1990s PC game"
+slug: "pc-game-restoration"
+client: "Independent project"
+role: "Software restoration and release preparation"
+timeframe: "2026"
+status: "Windows release candidate"
+order: 1
+stack: [C, SDL, CMake, Windows x64]
+tags: [Game preservation, Binary recovery, Remaster]
+featured: true
+image: "/images/projects/pc-game-restoration.webp"
+imageKind: "illustrative"
+imageAlt: "A late-1990s desktop PC, CRT monitor, and CD-ROM on a wooden desk"
+imageCaption: "Generated illustration of a period PC."
+summary: "Recovered game logic from the original executable, rebuilt it for 64-bit Windows, and packaged a remaster with updated art, audio, and controls."
+---
+
+## From the original executable to a 64-bit build
+
+I started with the compiled 32-bit game. I used it as a reference for reconstructing gameplay and checking how the rebuilt game handled things like input, saves, and campaign state. The new build runs as a 64-bit Windows application with SDL handling platform services.
+
+Keeping existing saves readable meant treating the file format separately from the new program’s in-memory structures. I also used recorded play and focused regression tests to check behaviors that could easily change during the port.
+
+## Remaster and release preparation
+
+I refreshed interface art, backgrounds, and audio, and updated mouse handling and dialog controls. I assembled the executable, media, launchers, and player instructions in a Windows release package and ran build and package checks. The package is staged as a release candidate. Windows playtesting is still in progress, and public distribution is paused.

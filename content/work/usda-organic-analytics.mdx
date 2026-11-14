@@ -1,9 +1,11 @@
 ---
-title: "USDA Organic Analytics: Global data warehouse and Tableau reporting for 50,000+ operations"
+title: "Reporting for USDA’s organic program"
+client: "U.S. Department of Agriculture"
+role: "IBM consulting engagement"
+order: 6
+featured: true
+summary: "I helped build an AWS warehouse and Tableau reports for the USDA program overseeing more than 50,000 certified operations."
 slug: "usda-organic-analytics"
-client: "USDA (organic program)"
-timeframe: "Recent (sanitized)"
-role: "Solution architect / analytics lead"
 stack:
   - AWS
   - Python
@@ -22,55 +24,10 @@ tags:
   - "508"
   - NLP
   - AWS
-featured: true
 image: "/images/projects/usda-organic.jpg"
 imageKind: "recreation"
-executiveSummary: "Built a global data warehouse on AWS that brought together Salesforce, an integrity database, and CBP customs records. Added an NLP classifier for organic import taxonomy and dozens of Tableau reports serving 50,000+ certified operations."
-builderSummary: "AWS-hosted warehouse integrating Salesforce, CBP customs, and investigative data. scikit-learn NLP taxonomy classifier. Dozens of Tableau dashboards with Section 508 compliance."
 ---
 
-## Context
+The team brought Salesforce, program records, and U.S. Customs and Border Protection import data into one AWS warehouse. That let analysts compare certification and import records in the same reporting workflow.
 
-The USDA's organic program oversees more than **50,000 certified operations** across the country. Leadership needed reliable reporting for operational decisions, congressional inquiries, and public transparency, but existing reporting was fragmented across multiple systems and manual processes.
-
-The audience ranged from analysts running daily reports to senior leaders preparing briefings. The platform needed to serve both without requiring either to write their own queries.
-
-## The warehouse
-
-The analytics platform is a **global data warehouse on AWS** that consolidates data from multiple previously siloed systems into a single governed source of truth. The warehouse holds **5+ billion records**, with ETL pipelines processing **millions of records daily**.
-
-What made it unique was the breadth of systems it brought together. **Salesforce** provided operational CRM data: certifier interactions, compliance workflows, program communications. The **integrity database** held the program's core investigative and enforcement records. **CBP customs import records** allowed cross-referencing organic import claims with U.S. Customs and Border Protection data, identifying discrepancies between what was claimed as organic and what actually crossed the border. And **investigative software** connected enforcement case data with operational records for end-to-end compliance visibility.
-
-Key design decisions included incremental ETL to keep processing times manageable at scale, slowly changing dimensions to preserve historical context for trend analysis, clear data lineage so analysts could trace any number back to its source system, and cross-system entity resolution to match records across Salesforce, CBP, and internal databases.
-
-## NLP for import taxonomy
-
-I built a **natural language processing classifier using scikit-learn** to automatically categorize organic import records into the program's taxonomy. Import descriptions arrive in inconsistent free-text formats: different languages, abbreviations, trade terminology. The NLP pipeline standardized this unstructured text into official product categories, making it possible to report accurately on import volumes by product type and origin country.
-
-Not flashy work, but essential for making the warehouse's import data analytically useful at scale.
-
-## Tableau reporting
-
-The reporting layer comprised **dozens of Tableau reports** organized by program area and audience: operational dashboards for day-to-day monitoring, executive summaries for leadership briefings, ad-hoc exploration views for analysts, public-facing reports for transparency requirements, and import analysis views connecting CBP data with certification records.
-
-## Governance and accessibility
-
-All reports were built with **Section 508 / WCAG accessibility** as a first-class requirement. That meant meaningful alt text and data table alternatives, color palettes tested for contrast compliance, keyboard-navigable interfaces, and screen-reader-compatible layouts where Tableau's platform allowed.
-
-On the governance side, I defined data dictionaries and metric definitions so stakeholders shared a common vocabulary, established review and approval workflows for new reports, and documented known data quality issues transparently rather than hiding them.
-
-## Getting people to use it
-
-Building reports is the straightforward part. Getting people to actually use them, and trust them, is harder.
-
-I ran training sessions for different skill levels, held office hours for analysts hitting edge cases, and sent clear communications so people understood what changed and why. We gradually retired legacy reports to reduce confusion. None of this is glamorous work, but it's where adoption lives or dies.
-
-## Outcome
-
-Leadership gained consistent, timely access to program data across all integrated systems. Connecting Salesforce, CBP customs records, and investigative data produced compliance insights that no single system could have provided alone. The NLP taxonomy reduced manual categorization effort for import records. Dozens of ad-hoc reporting processes consolidated into a governed, repeatable suite. Every number traces back to source systems and transformation logic. Self-service dashboards let analysts answer routine questions without writing custom queries.
-
-## What I learned
-
-The hardest part of a data platform isn't the technical architecture. It's getting people to trust the numbers. Clear data lineage, transparent documentation of known quality issues, and persistent training and communication drove adoption more than any dashboard feature. Governance and usability are engineering requirements, not afterthoughts.
-
-*Specific performance metrics and internal details are not shared due to the sensitivity of the work.*
+I built a text classifier with scikit-learn to map inconsistent import descriptions to the program’s reporting categories. I also worked on Tableau reports, documented metric definitions and data limitations, and ran training and office hours for analysts using the new reports.

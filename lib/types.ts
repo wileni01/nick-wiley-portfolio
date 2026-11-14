@@ -5,20 +5,22 @@ export const caseStudySchema = z.object({
   title: z.string(),
   slug: z.string(),
   client: z.string(),
-  timeframe: z.string(),
+  timeframe: z.string().optional(),
+  status: z.string().optional(),
+  order: z.number().default(100),
   role: z.string(),
   stack: z.array(z.string()),
   tags: z.array(z.string()),
   featured: z.boolean().default(false),
   image: z.string().optional(),
   /** How the image was produced; drives the caption under the hero image. */
-  imageKind: z.enum(["screenshot", "recreation", "photo"]).optional(),
+  imageKind: z.enum(["screenshot", "recreation", "photo", "illustrative"]).optional(),
+  imageAlt: z.string().optional(),
   /** Optional override for the caption shown under the hero image. */
   imageCaption: z.string().optional(),
   /** Public URL of the shipped product, when one exists. */
   liveUrl: z.string().url().optional(),
-  executiveSummary: z.string(),
-  builderSummary: z.string(),
+  summary: z.string(),
 });
 
 export type CaseStudyFrontmatter = z.infer<typeof caseStudySchema>;
@@ -40,14 +42,4 @@ export type WritingFrontmatter = z.infer<typeof writingSchema>;
 
 export interface WritingPost extends WritingFrontmatter {
   content: string;
-}
-
-// ── Search Index Entry ──────────────────────────────────────────
-export interface SearchEntry {
-  title: string;
-  url: string;
-  type: "work" | "writing" | "page";
-  summary: string;
-  tags: string[];
-  body: string;
 }

@@ -1,9 +1,11 @@
 ---
-title: "Scott Search: Gamified decision support for contact recovery"
-slug: "lli-scott-search"
+title: "Scott Search CRM review tool"
 client: "Lincoln Leadership Institute"
-timeframe: "Recent"
-role: "Full-stack developer / product designer"
+role: "Developer"
+order: 12
+featured: false
+summary: "I built a review queue for checking proposed updates to older HubSpot contact records."
+slug: "lli-scott-search"
 stack:
   - Python
   - Flask
@@ -20,57 +22,10 @@ tags:
   - Gamification
   - CRM
   - AI/ML
-featured: false
 image: "/images/projects/scott-search.png"
 imageKind: "screenshot"
-executiveSummary: "Turned stale CRM contact recovery into something people actually want to do. Apollo.io enrichment, GPT-4 lead scoring, and a gamified review UI with XP, streaks, and keyboard shortcuts."
-builderSummary: "Full pipeline: HubSpot staleness scoring, Apollo.io enrichment, rule-based + GPT-4 lead scoring, Flask review UI with XP/streaks/achievements. SQLite/Turso backend, Vercel deployment."
 ---
 
-## The problem
+The tool prioritized records using signals such as bounced email and time since last engagement. It used Apollo.io to propose updates, then showed reviewers the current and suggested values side by side.
 
-The Lincoln Leadership Institute's HubSpot CRM had accumulated years of contacts, from event registrations, email campaigns, manual entry, and partner imports. Over time, a significant portion had gone stale: bounced emails, unsubscribed contacts, people who changed jobs or companies. These weren't bad leads. They were lost leads. Many had attended flagship programs, held senior titles, and represented exactly the kind of relationship worth recovering.
-
-But recovering stale contacts is tedious. Someone has to look at each one, compare old data against current information, decide whether the enriched data looks right, and approve the update. Without a tool that makes this process fast and even enjoyable, it doesn't get done.
-
-## What I built
-
-Scott Search is a **human-in-the-loop decision-support tool** that transforms contact recovery from a dreaded chore into an engaging, gamified workflow. The system has four layers.
-
-### Staleness scoring
-
-The pipeline starts by calculating a staleness score for every contact in HubSpot. Days since last engagement is weighted 2x as the strongest signal. Email bounce status adds 100 points (hard evidence of a stale address). Unsubscribe status adds 50 and no recent activity adds 30. Contacts scoring 100+ enter the recovery pipeline, which keeps the tool focused on contacts that actually need attention rather than the entire CRM.
-
-### Apollo.io enrichment
-
-Each stale contact is matched against Apollo.io's People Match API. Match confidence comes from multiple signals: name similarity via Levenshtein distance (40 points), company match (25), LinkedIn URL found (15), email domain match (10), and new email found (5). A minimum 50% confidence threshold filters out unreliable matches. What comes back is current LinkedIn profiles, updated email addresses, new job titles, and company changes, the data needed to reconnect with a lost contact.
-
-### Lead scoring
-
-Not all recovered contacts are worth the same effort, so a two-tier scoring system prioritizes the queue. The rule-based tier always runs, scoring on title seniority (C-level gets 30 points, VP gets 25, Director gets 20), company size, previous engagement history, LinkedIn presence, and match confidence. When the rule-based score hits 50+, an optional **GPT-4 enhanced scoring** layer triggers, providing reasoning alongside its score. The final result blends both: 60% rule-based, 40% LLM.
-
-### The review UI
-
-This is the core of Scott Search. Instead of a spreadsheet or a CRM bulk-edit screen, reviewers work through a **card-based interface** with side-by-side comparison of old vs. enriched data.
-
-What makes it work is speed and feedback. Keyboard shortcuts (A = Approve, R = Reject, S = Skip, Ctrl+Z = Undo) mean reviewing a contact takes seconds, not minutes. An XP and leveling system (Approve = 15 XP, Reject = 10, Skip = 5, 100 XP per level) reframes the work from "I have 500 contacts to review" to "I'm 40 XP from the next level." A streak counter builds with consecutive reviews and breaks after 5 minutes of inactivity, encouraging flow state. Achievements ("First Contact," "Centurion" at 100 reviews, "Machine Mode" at a 25 streak) trigger confetti and sound effects. Color-coded confidence indicators make it immediately clear which contacts are high-value vs. marginal. And every action is fully reversible with complete action history.
-
-## Architecture
-
-The pipeline flows from HubSpot contact data through staleness scoring, Apollo.io enrichment, lead scoring (rule-based + optional GPT-4), into a review queue (SQLite or Turso), through the Scott Search web UI for human review, and back to HubSpot for approved contacts only.
-
-I chose **Flask** for the web UI, lightweight enough for a focused tool, with Jinja2 templates for server-rendered pages. **SQLite** handles local development and **Turso/libSQL** handles cloud deployment, both serverless-compatible with no native dependencies. The frontend is **vanilla JavaScript**, with no framework overhead for what's essentially a single-screen review tool, and uses Web Audio API for sounds and Canvas API for confetti. Deployed on **Vercel** via a serverless adapter.
-
-Approved contacts sync back to HubSpot with custom properties tracking approval timestamps, LinkedIn invite status, and old email addresses preserved before updating.
-
-## Why gamification matters here
-
-The gamification isn't decoration. It solves a real adoption problem. Contact data cleanup is genuinely boring work. Most CRM hygiene initiatives die because nobody wants to sit through hundreds of records. By reframing review as a game with progression, streaks, and achievements, the tool creates intrinsic motivation to keep going.
-
-The dark-themed UI reduces eye strain during long sessions. Keyboard shortcuts mean reviewers never reach for the mouse. Toast notifications and XP popups provide constant feedback without breaking flow.
-
-## What happened
-
-Recovered hundreds of stale contacts with updated LinkedIn profiles and email addresses. The gamification worked. Reviewers voluntarily extended sessions to hit the next level or maintain their streak, which is exactly the behavior the tool was designed to produce.
-
-Every CRM update was intentionally approved by a human, which prevented the data quality problems you get from bulk automation. And the tool created a repeatable process for periodic contact hygiene, not just a one-time cleanup.
+I built the review interface in Flask, with keyboard shortcuts, an undo action, and a progress counter. Approved changes synced back to HubSpot, and the tool kept a history of the review decisions.

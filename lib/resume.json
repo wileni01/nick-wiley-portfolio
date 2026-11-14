@@ -1,0 +1,63 @@
+{
+  "summary": "Lead IT Architect at Boston Consulting Group. Previously built analytics, reporting, and decision-support tools for federal agencies at IBM. Founded VisiTime and released an interactive Gettysburg tour.",
+  "experience": [
+    {
+      "organization": "Boston Consulting Group (BCG)",
+      "role": "Lead IT Architect",
+      "dates": "2026–present",
+      "bullets": []
+    },
+    {
+      "organization": "IBM Consulting",
+      "role": "Senior Managing Consultant, AI & Analytics (most recent role)",
+      "dates": "2019–2026",
+      "bullets": [
+        "Built Panel Wizard for NSF, bringing eight screens into one and reducing panel preparation from weeks to hours in the workflow it supported.",
+        "Built a text analysis pipeline that identified over 70 themes across more than 7,000 research proposals and flagged ambiguous cases for staff review.",
+        "Contributed to the USDA organic program’s AWS warehouse and Tableau reporting for more than 50,000 certified operations. Built a classifier for import descriptions.",
+        "Supported USPS international mail analytics and Census Bureau reporting. Led proposal writing for a five-year, $5 million contract win."
+      ]
+    },
+    {
+      "organization": "Lincoln Leadership Institute at Gettysburg",
+      "role": "Digital strategy and software (contract)",
+      "dates": "",
+      "bullets": [
+        "Rebuilt the institute’s website in Next.js and integrated Stripe, HubSpot, and PostHog. Helped adapt its in-person leadership program for virtual delivery."
+      ]
+    },
+    {
+      "organization": "VisiTime, LLC",
+      "role": "Founder",
+      "dates": "2012–2020",
+      "bullets": [
+        "Raised more than $200,000 and released a six-hour interactive iPad tour. Programmed the Unity experience, mapped tour stops, and managed the rental fleet."
+      ]
+    },
+    {
+      "organization": "Transform, Inc.",
+      "role": "Solution Engineer",
+      "dates": "2014–2015",
+      "bullets": ["Integrated analytics into client-facing visualization products."]
+    },
+    {
+      "organization": "Recovery Accountability and Transparency Board",
+      "role": "Data Analyst (GIS Lead)",
+      "dates": "2011–2012",
+      "bullets": ["Led GIS integration for Recovery Act oversight and proposed an investigation that identified 90 contract misrepresentations."]
+    }
+  ],
+  "education": [
+    "University of Maryland · MBA and MS in Information Systems (2019)",
+    "Gettysburg College · BA in Environmental Studies (2010)",
+    "Penn State · Project Management (2017) and GIS (2012) certificates"
+  ],
+  "training": [
+    "MIT Professional Education · Applied Data Science program (2024)",
+    "SAFe Scrum Master and Tableau Certified Associate (earned in 2022)"
+  ],
+  "patents": [
+    { "number": "9,417,668", "url": "https://patents.google.com/patent/US9417668B2/en" },
+    { "number": "9,900,042", "url": "https://patents.google.com/patent/US9900042B2/en" }
+  ]
+}

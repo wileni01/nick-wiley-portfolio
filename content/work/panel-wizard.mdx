@@ -1,9 +1,11 @@
 ---
-title: "Panel Wizard: ML-assisted proposal panel formation"
+title: "Panel Wizard"
+client: "National Science Foundation"
+role: "IBM consulting engagement"
+order: 4
+featured: true
+summary: "I built a tool that brought eight screens into one and helped staff group research proposals for peer review."
 slug: "panel-wizard"
-client: "National Science Foundation (sanitized)"
-timeframe: "Recent (sanitized)"
-role: "Solutions architect / applied data scientist (consulting)"
 stack:
   - Python
   - Streamlit
@@ -23,53 +25,10 @@ tags:
   - Decision support
   - Governance
   - Sentence embeddings
-featured: true
 image: "/images/projects/panel-wizard.jpg"
 imageKind: "recreation"
-executiveSummary: "Consolidated 8 screens into 1. Sentence embeddings and K-Means clustering suggest proposal groupings, with drag-and-drop overrides so program staff keep full control. Cut panel formation from weeks to hours."
-builderSummary: "Sentence transformer embeddings + K-Means in a Streamlit UI. Drag-and-drop overrides, fit scoring, real-time silhouette analysis. Data from multiple systems consolidated into one view."
 ---
 
-## Context
+Program staff used eight screens and spreadsheets to compare proposals, track ratings, and assemble review panels. I built a Streamlit application that brought the relevant records into one screen.
 
-Federal research agencies review thousands of proposals each cycle. Grouping those proposals into review panels is labor-intensive and high-stakes. Wrong groupings mean reviewers without the right expertise, slower decisions, and fairness concerns.
-
-Staff had been doing this manually across **8 different screens and systems**, relying on institutional knowledge and spreadsheets. As volumes grew, the process didn't scale. New staff couldn't replicate the reasoning of experienced colleagues.
-
-## Constraints
-
-The work came with real constraints. Proposal abstracts and metadata are pre-decisional and must be handled under strict access controls. Any automated grouping must be explainable and auditable. Staff, not models, own the final decisions. The solution needed to work alongside existing systems without deep infrastructure changes. And this had to be a human-in-the-loop tool that surfaces suggestions, never makes assignments autonomously.
-
-## How the ML works
-
-The system makes extensive use of **sentence transformer embeddings** to convert proposal text into dense vector representations that capture semantic meaning. I made four embedding models available, each with different accuracy and performance tradeoffs: MiniLM-L6-v2 (384-dimensional, fast, good for rapid iteration), SciBERT (pre-trained on scientific publications for domain-specific accuracy), MiniLM-L12-v2 (768-dimensional, higher quality), and MPNet-base-v2 (768-dimensional, highest accuracy, heaviest computation).
-
-The core clustering uses **K-Means** to group proposals into review panels based on semantic similarity, with reproducible settings. Supporting that are **cosine similarity** for fit scores and reassignment recommendations, **silhouette analysis** for evaluating cluster quality and finding the right number of panels, **TF-IDF** for extracting top keywords per cluster and generating automatic panel labels, and **PCA and t-SNE** for 2D visualization of the proposal landscape.
-
-## Consolidating 8 screens into 1
-
-Before this tool, staff navigated across 8 different screens to track proposal ratings, compare rankings, and manage assignments. The Panel Wizard **reduced that to a single screen** that pulls data from multiple systems and updates them simultaneously. That alone, independent of the ML, was a meaningful improvement.
-
-## The review interface
-
-Built in **Streamlit**, the interface presents clustering suggestions alongside transparency signals so staff can understand and challenge every recommendation. Fit scores show how strongly each proposal matches its assigned cluster. "Why" signals surface the most similar proposals and shared topical themes. Drag-and-drop overrides let staff move proposals between panels, with the system recalculating fit metrics in real time. Silhouette plots and evaluation charts give visual cluster quality assessment. And adoption tracking monitors how staff engage with suggestions over time.
-
-The full Python stack behind the tool includes sentence-transformers for embedding models, scikit-learn for clustering and evaluation, numpy and pandas for data operations, Streamlit for the UI, Altair for charting, SQLAlchemy for database connections, and hashlib plus pickle for caching and session state.
-
-## Monitoring
-
-Telemetry dashboards tracked adoption patterns, override rates, and cluster quality metrics. That data informed iterative improvements and helped leadership understand how staff were actually using the tool, not just whether they were opening it.
-
-## What shipped
-
-A working application that lets program staff review ML-generated panel groupings, understand the rationale, and override as needed, all from a single unified screen. Dashboards providing operational visibility into clustering quality and staff interaction patterns. Documentation and training materials for onboarding new team members. And a reduction in panel formation time **from weeks to hours** while improving topic coherence and reviewer-proposal matching.
-
-*What I can share is limited by the sensitivity of the work. The above describes the approach and design. Specific data, metrics, and internal details are not included.*
-
-## What I learned
-
-The most important design work was understanding how program officers actually think about panel composition. The ML was a means to that end, not the other way around.
-
-High override rates early on weren't failure. They helped me calibrate the clustering. The goal was never zero overrides. It was informed overrides. There's no single accuracy metric for "good panels." Quality is contextual, and that requires ongoing conversation with the people who use the tool.
-
-If I were starting fresh, I'd invest earlier in A/B-style evaluation comparing manual vs. assisted groupings on downstream review outcomes.
+The tool used sentence embeddings and k-means to suggest groups of related proposals. Staff could see match scores, move proposals between groups, and make the final assignments. The combined workflow reduced panel preparation from weeks to hours on the process we supported.

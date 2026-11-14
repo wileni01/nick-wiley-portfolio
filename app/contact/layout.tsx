@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Contact",
+  alternates: { canonical: "/contact" },
   description:
-    "Get in touch with Nick Wiley about AI solution architecture, analytics platforms, or decision-support work in regulated environments.",
+    "Contact Nick Wiley.",
 };
 
 export default function ContactLayout({

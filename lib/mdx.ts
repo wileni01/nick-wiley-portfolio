@@ -31,11 +31,8 @@ export function getAllCaseStudies(): CaseStudy[] {
 
       return { ...parsed.data, content } as CaseStudy;
     })
-    .filter(Boolean) as CaseStudy[];
-}
-
-export function getFeaturedCaseStudies(): CaseStudy[] {
-  return getAllCaseStudies().filter((cs) => cs.featured);
+    .filter((study): study is CaseStudy => study !== null)
+    .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
 }
 
 export function getCaseStudyBySlug(slug: string): CaseStudy | null {

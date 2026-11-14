@@ -40,8 +40,6 @@ const TARGETS = [
   // Protected by Vercel Authentication: pass a share link via LLI_ASSESSMENT_URL
   // (vercel.com → project → Share) when re-capturing.
   { id: "lli-assessment", url: process.env.LLI_ASSESSMENT_URL, wait: 7000, height: 900, optional: true },
-  // The portfolio itself, captured from a local production build (`next start -p 3200`).
-  { id: "portfolio-home", url: "http://localhost:3200/", wait: 6000, optional: true },
 
   // ── Representative recreations of internal tools ─────────────
   { id: "panel-wizard", mockup: "panel-wizard.html" },

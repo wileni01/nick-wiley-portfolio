@@ -94,17 +94,9 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="article-shell page-space">
       <div className="mx-auto max-w-3xl">
-        {/* Header */}
-        <div className="space-y-4 mb-12">
-          <h1 className="text-4xl font-bold tracking-tight">Contact</h1>
-          <p className="text-lg text-muted-foreground">
-            If you have a project in mind, a question about something
-            I&apos;ve built, or just want to compare notes on analytics
-            and AI, I&apos;d welcome the conversation.
-          </p>
-        </div>
+        <header className="page-heading"><h1>Contact</h1></header>
 
         <div className="grid gap-12 lg:grid-cols-5">
           {/* Contact Form */}
@@ -282,7 +274,7 @@ export default function ContactPage() {
                   <div>
                     <div className="text-sm font-medium">LinkedIn</div>
                     <div className="text-xs text-muted-foreground">
-                      nicholas-a-wiley
+                      Nick A. Wiley
                     </div>
                   </div>
                 </a>
@@ -291,10 +283,6 @@ export default function ContactPage() {
 
             <div className="rounded-xl border border-border bg-card p-6 space-y-2">
               <p className="text-sm font-medium">Based in {siteConfig.location}</p>
-              <p className="text-xs text-muted-foreground">
-                Open to conversations about analytics, decision-support
-                tools, or applied AI in regulated environments.
-              </p>
             </div>
           </div>
         </div>
