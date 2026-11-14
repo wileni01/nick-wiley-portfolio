@@ -1,15 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { HarborPreview } from "@/components/work/harbor-preview";
 import { StartupPreview } from "@/components/work/startup-preview";
 import type { CaseStudy } from "@/lib/types";
 
 export function CaseStudyCard({
   study,
-  animateStartup = false,
+  preview,
 }: {
   study: CaseStudy;
-  animateStartup?: boolean;
+  preview?: "startup" | "harbor";
 }) {
   const cover = study.image && (
     <div className={study.imageKind === "illustrative" ? "project-image project-image-illustration" : "project-image"}>
@@ -23,9 +24,13 @@ export function CaseStudyCard({
     </div>
   );
 
+  let media = cover;
+  if (cover && preview === "startup") media = <StartupPreview compact>{cover}</StartupPreview>;
+  if (cover && preview === "harbor") media = <HarborPreview>{cover}</HarborPreview>;
+
   return (
-    <article className="project-card" data-animated={animateStartup || undefined}>
-      {animateStartup && cover ? <StartupPreview compact>{cover}</StartupPreview> : cover}
+    <article className="project-card" data-animated={preview ? "true" : undefined}>
+      {media}
       <div className="project-info">
         <p className="eyebrow">{study.status ?? study.client}</p>
         <h3>

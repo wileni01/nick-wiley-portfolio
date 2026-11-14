@@ -1,0 +1,66 @@
+/* Coordinates are measured on the 1440 × 960 cover. The overlay matches its content box. */
+.harbor {
+  position: absolute;
+  inset: 1px;
+  overflow: hidden;
+  pointer-events: none;
+  clip-path: polygon(31% 22%, 51% 22%, 53.5% 42.7%, 31% 42.7%);
+}
+
+.water {
+  position: absolute;
+  left: 32.2917%;
+  top: 21.6667%;
+  width: 18.1944%;
+  height: 17.5%;
+  background: url("/images/projects/pirate-harbor-water.webp") center / 100% 100% no-repeat;
+}
+
+.blue, .green, .red {
+  position: absolute;
+  inset: 0;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: var(--play-state);
+}
+
+.blue > div, .green > div, .red > div {
+  position: absolute;
+  background: var(--sprite) center / 100% 100% no-repeat;
+}
+
+.blue { animation-name: western-channel; animation-duration: 18s; --sprite: url("/images/projects/pirate-ship-1.webp"); }
+.green { animation-name: port-approach; animation-duration: 20s; --sprite: url("/images/projects/pirate-ship-2.webp"); }
+.red { animation-name: outer-harbor; animation-duration: 16s; --sprite: url("/images/projects/pirate-ship-3.webp"); }
+
+.blue > div { left: 32.8472%; top: 22.1875%; width: 2.9167%; height: 5.2083%; }
+.green > div { left: 36.25%; top: 27.7083%; width: 3.9583%; height: 6.3542%; }
+.red > div { left: 43.2639%; top: 33.125%; width: 2.8472%; height: 5.3125%; }
+
+@keyframes western-channel {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(3.8%, 1.3%); }
+  41% { transform: translate(6.3%, 3.8%); }
+  60% { transform: translate(4.4%, 5.5%); }
+  82% { transform: translate(1.1%, 3.4%); }
+}
+
+@keyframes port-approach {
+  0%, 100% { transform: translate(0, 0); }
+  24% { transform: translate(5.5%, -.4%); }
+  47% { transform: translate(9.3%, 2.1%); }
+  59% { transform: translate(8.8%, 3.1%); }
+  81% { transform: translate(4.3%, 3.2%); }
+}
+
+@keyframes outer-harbor {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(4.1%, 0); }
+  44% { transform: translate(4.8%, 2.3%); }
+  65% { transform: translate(2.1%, 3.6%); }
+  84% { transform: translate(-1.1%, 2.1%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-default-motion] > .harbor { visibility: hidden; }
+}

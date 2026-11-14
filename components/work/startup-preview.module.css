@@ -1,46 +1,5 @@
-.player {
-  position: relative;
-}
-
-.playbackButton {
-  margin-top: .75rem;
-  cursor: pointer;
-}
-
-.player[data-compact] .playbackButton {
-  position: absolute;
-  z-index: 1;
-  right: .55rem;
-  bottom: .55rem;
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  place-items: center;
-  margin: 0;
-  border: 1px solid #fff5;
-  border-radius: 50%;
-  background: #151b23e8;
-  color: white;
-}
-
-.player[data-compact] .playbackButton:hover { background: #293647; }
-.player[data-compact] .playbackButton:focus-visible { outline-color: white; }
-.player[data-compact] .playbackButton span { display: none; }
-
-.preview {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  --cycle: 15s;
-  --play-state: running;
-}
-
-.preview[data-playback="paused"], .preview[data-offscreen] {
-  --play-state: paused;
-}
-
-/* This transparent overlay registers to the four display corners in the cover photo. */
 .screen {
+  --cycle: 15s;
   position: absolute;
   inset: 1px;
   overflow: hidden;
@@ -349,6 +308,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .preview:not([data-playback]) .screen { visibility: hidden; }
-  .preview:not([data-playback]) { --play-state: paused; }
+  [data-default-motion] > .screen { visibility: hidden; }
 }

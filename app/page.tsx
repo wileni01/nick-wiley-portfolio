@@ -10,6 +10,10 @@ export const metadata: Metadata = { alternates: { canonical: "/" } };
 export default function HomePage() {
   const studies = getAllCaseStudies();
   const personal = studies.filter((study) => study.featured && study.client === "Independent project");
+  const previews: Partial<Record<string, "startup" | "harbor">> = {
+    "car-infotainment": "startup",
+    "pc-game-restoration": "harbor",
+  };
   const professional = studies.filter((study) => study.featured && study.client !== "Independent project");
 
   return (
@@ -35,7 +39,7 @@ export default function HomePage() {
         </div>
         <div className="portfolio-grid">
           {personal.map((study) => (
-            <CaseStudyCard key={study.slug} study={study} animateStartup={study.slug === "car-infotainment"} />
+            <CaseStudyCard key={study.slug} study={study} preview={previews[study.slug]} />
           ))}
         </div>
       </section>
