@@ -1,12 +1,41 @@
+.player {
+  position: relative;
+}
+
+.playbackButton {
+  margin-top: .75rem;
+  cursor: pointer;
+}
+
+.player[data-compact] .playbackButton {
+  position: absolute;
+  z-index: 1;
+  right: .55rem;
+  bottom: .55rem;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  margin: 0;
+  border: 1px solid #fff5;
+  border-radius: 50%;
+  background: #151b23e8;
+  color: white;
+}
+
+.player[data-compact] .playbackButton:hover { background: #293647; }
+.player[data-compact] .playbackButton:focus-visible { outline-color: white; }
+.player[data-compact] .playbackButton span { display: none; }
+
 .preview {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  --cycle: 12s;
+  --cycle: 15s;
   --play-state: running;
 }
 
-.preview[data-playback="paused"] {
+.preview[data-playback="paused"], .preview[data-offscreen] {
   --play-state: paused;
 }
 
@@ -35,6 +64,75 @@
   animation-iteration-count: infinite;
   animation-play-state: var(--play-state);
 }
+
+.factory {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  color: #23415d;
+  background: #dbe8f6;
+  font-size: clamp(6px, 1.27cqw, 11px);
+  z-index: 1;
+  animation-name: factory;
+}
+
+.factoryStatus, .factoryNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #2a527d;
+  color: #fff;
+}
+
+.factoryStatus {
+  padding: .8cqw 2.35cqw .8cqw 1.1cqw;
+  border-bottom: 1px solid #244462;
+  font-weight: 700;
+}
+
+.factoryMap {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(112deg, transparent 23%, #f8f3e7 24% 27%, transparent 28% 64%, #f6ebd5 65% 69%, transparent 70%),
+    linear-gradient(17deg, transparent 44%, #f1cf7b 45% 48%, transparent 49%),
+    repeating-linear-gradient(-36deg, transparent 0 2.6cqw, #f2eee4 2.7cqw 2.95cqw, transparent 3cqw 4.8cqw),
+    linear-gradient(58deg, #bed5de 29%, #dfded2 30% 72%, #cbd8bc 73%);
+}
+
+.factoryMap span {
+  position: absolute;
+  inset: auto auto .65cqw .65cqw;
+  padding: .14cqw .42cqw;
+  background: #ebf0f5;
+}
+
+.factoryMap svg {
+  position: absolute;
+  left: 52%;
+  top: 48%;
+  width: 2.15cqw;
+  height: 2.15cqw;
+  color: #b13b33;
+}
+
+.factoryTiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-block: 1px solid #a4b7ca;
+  background: linear-gradient(#eff4fa, #cbdceb);
+}
+
+.factoryTiles div, .factoryNav span {
+  display: grid;
+  justify-items: center;
+  gap: .22cqw;
+  padding: .86cqw .22cqw;
+}
+
+.factoryTiles div + div { border-left: 1px solid #a4b7ca; }
+.factoryTiles svg, .factoryNav svg { width: 1.7cqw; height: 1.7cqw; }
+.factoryNav { justify-content: space-around; padding-right: .7cqw; }
+.factoryNav span { font-size: clamp(5px, 1.04cqw, 8px); }
 
 .boot, .chief {
   display: flex;
@@ -209,39 +307,44 @@
 .dock svg:nth-child(2) { background: #8a345c; }
 .dock svg:nth-child(3) { background: #427764; }
 
-@keyframes boot {
-  0%, 27% { opacity: 1; }
-  31%, 97% { opacity: 0; }
+@keyframes factory {
+  0%, 15% { opacity: 1; }
+  19%, 98% { opacity: 0; }
   100% { opacity: 1; }
 }
+@keyframes boot {
+  0%, 14% { opacity: 0; }
+  18%, 35% { opacity: 1; }
+  39%, 100% { opacity: 0; }
+}
 @keyframes breathe {
-  0%, 23%, 100% { transform: scale(.88); }
-  11% { transform: scale(1.08); }
+  0%, 36%, 100% { transform: scale(.88); }
+  24% { transform: scale(1.08); }
 }
 @keyframes load {
-  0% { transform: scaleX(.03); }
-  9% { transform: scaleX(.42); }
-  16% { transform: scaleX(.76); }
-  23%, 100% { transform: scaleX(1); }
+  0%, 16% { transform: scaleX(.03); }
+  24% { transform: scaleX(.48); }
+  31% { transform: scaleX(.8); }
+  36%, 100% { transform: scaleX(1); }
 }
 @keyframes chief {
-  0%, 20%, 54%, 100% { opacity: 0; }
-  27%, 45% { opacity: 1; }
+  0%, 34%, 60%, 100% { opacity: 0; }
+  38%, 53% { opacity: 1; }
 }
 @keyframes nudge {
-  0%, 24% { transform: translate(-30%, 11%) rotate(-8deg); }
-  34% { transform: translate(2%, 0) rotate(-3deg); }
-  39% { transform: translate(8%, -5%) rotate(-2deg); }
-  47%, 100% { transform: translate(-1%, 0) rotate(-3deg); }
+  0%, 35% { transform: translate(-30%, 11%) rotate(-8deg); }
+  43% { transform: translate(2%, 0) rotate(-3deg); }
+  47% { transform: translate(8%, -5%) rotate(-2deg); }
+  55%, 100% { transform: translate(-1%, 0) rotate(-3deg); }
 }
 @keyframes treat {
-  0%, 35% { opacity: 1; transform: rotate(-18deg) scale(.9); }
-  40% { opacity: 1; transform: translate(24%, -28%) rotate(28deg) scale(1.28); }
-  48%, 100% { opacity: 0; transform: translate(54%, -62%) rotate(56deg) scale(.8); }
+  0%, 43% { opacity: 1; transform: rotate(-18deg) scale(.9); }
+  48% { opacity: 1; transform: translate(24%, -28%) rotate(28deg) scale(1.28); }
+  55%, 100% { opacity: 0; transform: translate(54%, -62%) rotate(56deg) scale(.8); }
 }
 @keyframes controls {
-  0%, 68% { opacity: 0; }
-  75%, 97% { opacity: 1; }
+  0%, 72% { opacity: 0; }
+  79%, 98% { opacity: 1; }
   100% { opacity: 0; }
 }
 

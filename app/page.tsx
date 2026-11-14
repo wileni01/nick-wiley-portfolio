@@ -34,7 +34,9 @@ export default function HomePage() {
           <Link href="/work" className="text-link">All work <ArrowUpRight size={15} aria-hidden="true" /></Link>
         </div>
         <div className="portfolio-grid">
-          {personal.map((study) => <CaseStudyCard key={study.slug} study={study} />)}
+          {personal.map((study) => (
+            <CaseStudyCard key={study.slug} study={study} animateStartup={study.slug === "car-infotainment"} />
+          ))}
         </div>
       </section>
 

@@ -12,14 +12,14 @@ featured: true
 image: "/images/projects/car-startup-chief.webp"
 imageKind: "illustrative"
 imageAlt: "Chief, a golden retriever, on a tall dashboard touchscreen"
-imageCaption: "Illustrated startup preview with sample infotainment controls."
-summary: "I installed a new operating system on the infotainment unit in my car. It plays a short startup animation and ends on a portrait of Chief, my dog."
+imageCaption: "Recreation of the original factory screen, Chief’s startup sequence, and the new controls."
+summary: "I reverse-engineered the factory infotainment software, verified a partial backup, and installed a new OS in my car. My dog Chief makes an appearance at startup."
 ---
 
 ## Installing the software
 
-I installed the new operating system on the car’s infotainment unit and gave its portrait screen a custom start-up sequence. A short animation leads into Chief’s photo.
+I installed the new operating system on the car’s infotainment unit and gave its portrait screen a custom startup sequence. Chief gets a dog bone, then his portrait appears before the driving controls load.
 
 ## Preserving the factory software
 
-I documented the original setup and copied six factory files from the car to my laptop. I read each file twice and checked that the copies matched byte for byte. I also built an offline interface prototype and tested a read-only backup package with simulated inputs. A full backup and tested restore are still open.
+I reverse-engineered the original infotainment binary to understand how the factory software starts and which files it relies on. That work informed the new interface and helped me identify what to back up. I copied a set of factory files from the car and verified that the backup copies matched. I also tested a read-only backup package with simulated inputs. A complete backup and a tested restore are still open.
