@@ -14,14 +14,14 @@ image: "/images/projects/pirate-game-harbor.webp"
 imageKind: "illustrative"
 imageAlt: "A beige desktop PC with a wired keyboard and mouse. The CRT shows a pirate strategy game with ships, a map, and fleet controls."
 imageCaption: "Generated illustration of a 1990s PC running a fictional pirate game."
-summary: "My free patch runs a 1999 pirate game on Windows 11 with its original saves, art, and sound. I rebuilt the executable for 64-bit Windows and fixed crashes and freezes."
+summary: "I started trying to fix this 1999 pirate game when I was 12. I loved it, but bugs kept me from playing it all the way through. My free patch brings it to 64-bit Windows 11 and keeps the original saves, art, and sound."
 liveUrl: "https://cutthroatspatch.com/"
 liveLabel: "Patch notes and free download"
 ---
 
 ## Recovering the original game in Ghidra
 
-I started with the compiled 32-bit executable. In Ghidra, I worked through the disassembly and the decompiler’s C-like output. I followed calls from the map, sailing, and port screens, gave routines names as their roles became clear, and mapped the data they shared for ships, routes, and game state.
+The game had shipped with bugs, and getting it to launch on a modern PC would only get me partway there. I wanted to fix the crashes and freezes that interrupted a campaign. I started with the compiled 32-bit executable and worked through the disassembly and Ghidra’s C-like output. I followed calls from the map, sailing, and port screens, gave routines names as their roles became clear, and mapped the data they shared for ships, routes, and game state.
 
 That gave me enough context to reimplement behavior in C and compare it with the original. For example, I checked how a ship changed heading and advanced along a route, then used focused tests to catch differences as I rebuilt more of the game.
 

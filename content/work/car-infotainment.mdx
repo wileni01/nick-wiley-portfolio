@@ -14,21 +14,19 @@ image: "/images/projects/car-startup-chief.webp"
 imageKind: "illustrative"
 imageAlt: "Chief, a golden retriever, on a tall dashboard touchscreen"
 imageCaption: "Recreation of the original factory screen, Chief’s startup sequence, and the new controls."
-summary: "I wrote and installed custom software for my car’s QNX infotainment system. The portrait display opens with an animation starring my dog Chief, then hands off to the driving controls."
+summary: "Plugging in my phone should have started CarPlay. When it didn’t, I dug into the factory QNX system and ended up writing and installing my own infotainment software. My dog Chief now greets me at startup."
 ---
 
-## From power-on to driving controls
-
-I wrote custom software for the car’s QNX-based infotainment unit and installed it in the vehicle. The portrait screen opens with a short animation and a photo of Chief, then hands off to the driving controls.
-
-## Finding ways to shorten boot time
+## Working out what happens at startup
 
 I used Ghidra to reverse-engineer the factory infotainment binary and trace its startup sequence. I mapped what loads before the controls appear so I could target changes to shorten boot time.
 
-## Preserving the factory software
+Tracing startup also helped me identify which factory files to preserve before installing my changes. I copied those files from the car and verified that the backup matched. I tested the read-only backup package with simulated inputs.
 
-Tracing startup also helped me identify which factory files to preserve. I copied those files from the car and verified that the backup matched. I tested the read-only backup package with simulated inputs.
+## Putting it in the car
+
+I wrote and installed custom software for the QNX unit. Once I was working on the startup sequence, I made it something I’d enjoy seeing every time I got in. The portrait display opens with a short animation and a photo of Chief, then hands off to the driving controls.
 
 ## How I used coding assistants
 
-I used Codex to add automated tests for the backup and file comparison tools. Those tests used simulated inputs. I verified the recovered files separately using copies from the infotainment unit.
+I used Codex to add automated tests for the backup and file comparison tools.
