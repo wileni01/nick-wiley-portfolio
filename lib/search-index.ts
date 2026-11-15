@@ -63,7 +63,7 @@ export function getSearchIndex(): SearchItem[] {
     url: `/work/${study.slug}`,
     type: "work",
     summary: study.summary,
-    keywords: [study.client, ...study.tags, ...study.languages, ...study.stack]
+    keywords: [study.cardTitle ?? study.title, study.client, ...study.tags, ...study.languages, ...study.stack]
       .join(" ")
       .toLowerCase(),
   }));

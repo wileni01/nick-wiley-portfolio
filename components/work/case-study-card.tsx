@@ -39,7 +39,7 @@ export function CaseStudyCard({
       <div className="project-info">
         {!isSideQuest && <p className="eyebrow">{study.status ?? study.client}</p>}
         <Heading>
-          <Link href={`/work/${study.slug}`} className="project-link">{study.title}</Link>
+          <Link href={`/work/${study.slug}`} className="project-link">{study.cardTitle ?? study.title}</Link>
           <ArrowUpRight size={21} strokeWidth={1.5} aria-hidden="true" />
         </Heading>
         <p className="project-summary">{study.summary}</p>

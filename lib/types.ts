@@ -3,6 +3,7 @@ import { z } from "zod";
 // ── Case Study Frontmatter ──────────────────────────────────────
 export const caseStudySchema = z.object({
   title: z.string(),
+  cardTitle: z.string().optional(),
   slug: z.string(),
   client: z.string(),
   timeframe: z.string().optional(),
