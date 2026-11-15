@@ -9,10 +9,14 @@ import type { CaseStudy } from "@/lib/types";
 export function CaseStudyCard({
   study,
   preview,
+  variant = "work",
 }: {
   study: CaseStudy;
   preview?: "startup" | "harbor";
+  variant?: "side-quest" | "work";
 }) {
+  const isSideQuest = variant === "side-quest";
+  const Heading = isSideQuest ? "h2" : "h3";
   const cover = study.image && (
     <div className={study.imageKind === "illustrative" ? "project-image project-image-illustration" : "project-image"}>
       <Image
@@ -33,13 +37,21 @@ export function CaseStudyCard({
     <article className="project-card" data-animated={preview ? "true" : undefined}>
       {media}
       <div className="project-info">
-        <p className="eyebrow">{study.status ?? study.client}</p>
-        <h3>
+        {!isSideQuest && <p className="eyebrow">{study.status ?? study.client}</p>}
+        <Heading>
           <Link href={`/work/${study.slug}`} className="project-link">{study.title}</Link>
           <ArrowUpRight size={21} strokeWidth={1.5} aria-hidden="true" />
-        </h3>
+        </Heading>
         <p className="project-summary">{study.summary}</p>
-        <ProjectStack languages={study.languages} stack={study.stack} />
+        {isSideQuest ? (
+          study.liveUrl && (
+            <a className="text-link project-action" href={study.liveUrl}>
+              {study.liveLabel ?? "Visit the site"} <ArrowUpRight size={15} aria-hidden="true" />
+            </a>
+          )
+        ) : (
+          <ProjectStack languages={study.languages} stack={study.stack} />
+        )}
       </div>
     </article>
   );

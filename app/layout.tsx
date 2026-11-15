@@ -14,7 +14,7 @@ const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", variable: "-
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
-  title: { default: "Nick Wiley | Portfolio", template: "%s | Nick Wiley" },
+  title: { default: "Nick Wiley | Side Quests", template: "%s | Nick Wiley" },
   description: siteConfig.description,
   authors: [{ name: siteConfig.fullName }],
   icons: { icon: [{ url: "/favicon.ico", sizes: "any" }, { url: "/icon.png", type: "image/png" }], apple: "/icon.png" },
@@ -23,13 +23,13 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/",
     siteName: siteConfig.name,
-    title: "Nick Wiley | Portfolio",
+    title: "Nick Wiley | Side Quests",
     description: siteConfig.description,
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Nick Wiley, portfolio" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Nick Wiley" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nick Wiley | Portfolio",
+    title: "Nick Wiley | Side Quests",
     description: siteConfig.description,
     images: ["/og-image.png"],
   },

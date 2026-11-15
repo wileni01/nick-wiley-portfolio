@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
-import { getCaseStudyBySlug, getCaseStudySlugs } from "@/lib/mdx";
+import { getCaseStudyBySlug, getCaseStudySlugs, isSideQuest } from "@/lib/mdx";
 import { ProjectStack } from "@/components/work/project-stack";
 import { PressMentions } from "@/components/work/press-mentions";
 import { StartupPreview } from "@/components/work/startup-preview";
@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CaseStudyPage({ params }: Props) {
   const study = getCaseStudyBySlug((await params).slug);
   if (!study) notFound();
+  const sideQuest = isSideQuest(study);
 
   const cover = study.image && (
     <div className={study.imageKind === "illustrative" ? "project-image project-image-illustration" : "project-image"}>
@@ -54,7 +55,9 @@ export default async function CaseStudyPage({ params }: Props) {
 
   return (
     <div className="article-shell page-space">
-      <Link href="/work" className="text-link"><ArrowLeft size={15} aria-hidden="true" /> All work</Link>
+      <Link href={sideQuest ? "/#selected-work" : "/work"} className="text-link">
+        <ArrowLeft size={15} aria-hidden="true" /> {sideQuest ? "Side Quests" : "Professional Work"}
+      </Link>
       <article>
         <header className="page-heading case-heading">
           <p className="eyebrow">{study.client}</p>

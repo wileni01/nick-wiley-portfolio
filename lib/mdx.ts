@@ -34,6 +34,10 @@ export function getCaseStudyBySlug(slug: string): CaseStudy | null {
   return studies.find((s) => s.slug === slug) ?? null;
 }
 
+export function isSideQuest(study: CaseStudy): boolean {
+  return study.client === "Independent project" || study.client === "Independent product";
+}
+
 export function getCaseStudySlugs(): string[] {
   return getAllCaseStudies().map((s) => s.slug);
 }

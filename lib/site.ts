@@ -30,7 +30,7 @@ export const siteConfig = {
   location: "Alexandria, VA",
   jobTitle: "Lead IT Architect",
   employer: "Boston Consulting Group (BCG)",
-  description: "Nick Wiley’s portfolio of independent software projects, public-sector analytics, and products built in Gettysburg.",
+  description: "Nick Wiley’s side projects, from pirate games and custom car software to a guide to Gettysburg.",
   resumePdf: "/resume/nick-wiley-resume.pdf",
 } as const;
 

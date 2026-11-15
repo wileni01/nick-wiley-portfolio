@@ -2,21 +2,21 @@ import type { Metadata } from "next";
 import { ProjectStack } from "@/components/work/project-stack";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { getAllCaseStudies } from "@/lib/mdx";
+import { getAllCaseStudies, isSideQuest } from "@/lib/mdx";
 import { CaseStudyCard } from "@/components/work/case-study-card";
 
 export const metadata: Metadata = {
-  title: "Work",
-  description: "Independent software projects, public-sector case studies, and products built in Gettysburg.",
+  title: "Professional Work",
+  description: "Nick Wiley’s work in public-sector analytics, client software, and VisiTime.",
   alternates: { canonical: "/work" },
 };
 
 export default function WorkPage() {
-  const studies = getAllCaseStudies();
+  const studies = getAllCaseStudies().filter((study) => !isSideQuest(study));
 
   return (
     <div className="site-shell page-space">
-      <header className="page-heading"><h1>Work</h1></header>
+      <header className="page-heading"><h1>Professional Work</h1></header>
       <section className="portfolio-section" aria-labelledby="featured">
         <div className="section-heading"><h2 id="featured">Selected projects</h2></div>
         <div className="portfolio-grid">
@@ -40,7 +40,7 @@ export default function WorkPage() {
             </li>
           ))}
         </ul>
-        <Link href="/projects" className="text-link mt-8">More independent and client builds <ArrowUpRight size={15} aria-hidden="true" /></Link>
+        <Link href="/projects" className="text-link mt-8">More projects <ArrowUpRight size={15} aria-hidden="true" /></Link>
       </section>
     </div>
   );

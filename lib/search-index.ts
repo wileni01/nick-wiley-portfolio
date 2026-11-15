@@ -11,17 +11,17 @@ export interface SearchItem {
 
 const pages: SearchItem[] = [
   {
-    title: "Home",
+    title: "Side Quests",
     url: "/",
     type: "page",
-    summary: "Independent projects and consulting work",
-    keywords: "home overview",
+    summary: "Pirate games, car software, and projects in Gettysburg",
+    keywords: "home personal independent projects",
   },
   {
-    title: "Work",
+    title: "Professional Work",
     url: "/work",
     type: "page",
-    summary: "Independent projects and client case studies",
+    summary: "Public-sector, client, and VisiTime case studies",
     keywords: "case studies portfolio",
   },
   {

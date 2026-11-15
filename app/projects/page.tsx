@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function ProjectsPage() {
   return (
     <div className="article-shell page-space">
-      <Link href="/work" className="text-link"><ArrowLeft size={15} aria-hidden="true" /> All work</Link>
+      <Link href="/work" className="text-link"><ArrowLeft size={15} aria-hidden="true" /> Professional Work</Link>
       <header className="page-heading case-heading"><h1>More projects</h1></header>
       <ul className="work-list">
         {products.map((project) => (
