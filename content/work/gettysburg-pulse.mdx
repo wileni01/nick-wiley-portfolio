@@ -5,7 +5,7 @@ client: "Independent product"
 role: "Developer"
 order: 3
 featured: true
-summary: "Planning a day in Gettysburg meant checking tour operators, venues, and the park separately. I built a single guide where visitors can compare tours, find events, and check park notices."
+summary: "When you’re planning a day in Gettysburg, the tours, events, and park notices are all on different sites. I built the guide I wanted in the first place, where you can look those things up together."
 slug: "gettysburg-pulse"
 timeframe: "2025–present"
 languages: [TypeScript, SQL]
@@ -21,14 +21,10 @@ liveLabel: "Explore Gettysburg tours"
 
 ## Finding a tour or planning a day
 
-I built GettysburgTours.com to bring information from tour operators, local venues, and the National Park Service into one guide. The redesigned homepage leads with tour search and puts upcoming events and park notices within reach. Visitors can narrow the catalog by category, listed price, duration, or family suitability, then follow the link to the operator to book. Listings show their sources and when they were last checked.
+I wanted to be able to compare tours by things like price and length, see what’s on that weekend, and check for park notices before heading out. I built GettysburgTours.com to bring all of that together. Listings show where the info came from and when it was last checked. If you find a tour you like, you can go straight to the operator to book.
 
 ## Fixing the event calendar
 
-A change to the Majestic Theater’s website broke the calendar import and left visitors with incorrect showtimes and duplicate listings. I rewrote the import to check each production’s published showtimes before replacing entries. The cleanup restored 51 performances from the theater’s schedules and removed duplicate, sample, and unverified historical entries from the public calendar.
+A change to the Majestic Theater’s site broke my calendar import. I ended up with wrong showtimes and duplicate listings. I used Codex to help update the parser and add tests for both problems. I checked the listings against the theater’s published schedule before putting them back up, which brought back 51 performances and cleared out duplicates and unverified entries.
 
-Repeated imports match existing events by source page and showtime. If a schedule can’t be parsed, the last published entries stay up and the job records the failure for follow-up. The public pages also share a cache so routine visits don’t have to query the database each time.
-
-## How I used coding assistants
-
-I used Codex to update the Majestic Theater parser after the venue changed its site and add regression tests for duplicate and incorrect showtimes. I checked the corrected listings against the venue’s published schedule before putting them back online.
+The importer now matches events by source page and showtime. If it can’t read a schedule, it keeps the last published listings and logs what went wrong. I also added a shared cache so the public pages can reuse results between visits.

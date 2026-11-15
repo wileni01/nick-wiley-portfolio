@@ -14,7 +14,7 @@ export default function HomePage() {
     <div className="site-shell">
       <header className="masthead">
         <h1>Side Quests</h1>
-        <p className="masthead-intro">I’m Nick. I build games, tinker with my car’s software, and make things for people visiting Gettysburg.</p>
+        <p className="masthead-intro">I like seeing what I can figure out with AI tools. In about six months, I got a favorite game from 1999 running on Windows 11. I also wrote software that now runs on my car’s dashboard. Both used to feel out of reach.</p>
       </header>
 
       <div id="selected-work" className="portfolio-grid scroll-mt-6">

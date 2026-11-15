@@ -15,25 +15,23 @@ image: "/images/projects/pirate-game-harbor.webp"
 imageKind: "illustrative"
 imageAlt: "A beige desktop PC with a wired keyboard and mouse. The CRT shows a pirate strategy game with ships, a map, and fleet controls."
 imageCaption: "Generated illustration of a 1990s PC running a fictional pirate game."
-summary: "I started trying to fix this 1999 pirate game when I was 12. I loved it, but bugs kept me from playing it all the way through. My free patch brings it to 64-bit Windows 11 and keeps the original saves, art, and sound."
+summary: "I loved this game as a kid, but it kept crashing before I could finish it. I started trying to fix it at 12. I finally got it running on Windows 11 and put out a free patch that keeps the old saves working."
 liveUrl: "https://cutthroatspatch.com/"
 liveLabel: "Patch notes and free download"
 ---
 
 ## Recovering the original game in Ghidra
 
-The game had shipped with bugs, and getting it to launch on a modern PC would only get me partway there. I wanted to fix the crashes and freezes that interrupted a campaign. I started with the compiled 32-bit executable and worked through the disassembly and Ghidra’s C-like output. I followed calls from the map, sailing, and port screens, gave routines names as their roles became clear, and mapped the data they shared for ships, routes, and game state.
+I wanted to get through a campaign without the game freezing or crashing. I opened the original 32-bit executable in Ghidra and followed the code behind the map, sailing, and port screens. As I figured out what each piece did, I named the routines and tracked how they shared data about ships, routes, and game state.
 
-That gave me enough context to reimplement behavior in C and compare it with the original. For example, I checked how a ship changed heading and advanced along a route, then used focused tests to catch differences as I rebuilt more of the game.
+I rebuilt pieces in C and compared them with what the original did. For instance, I watched how a ship turned and followed a route, then wrote tests to catch differences as I went.
 
 ## Moving to 64-bit Windows
 
-I rebuilt the game as a native 64-bit Windows application, with SDL handling the window, input, and audio. I treated the original save format separately from the new in-memory data structures so existing saves could still be read. Recorded play and regression tests helped me check that campaign state and controls behaved as expected after the port.
+I rebuilt the game for 64-bit Windows and used SDL for the window, controls, and sound. I handled the old save format separately so the new build could still open existing saves. I used recordings and repeatable tests to check how the controls and campaign behaved after the port.
 
 ## Publishing the patch
 
-The free beta fixes crashes and freezes, including problems around loading saves and returning from encounters. The installer patches a separate copy of the game. Players need their own copy of the English CD release, since the download contains no original game data. The beta has been played on 64-bit Windows 11. The patch site has the supported version, setup instructions, and known issues.
+I used Codex to help put together the Windows tests for the release. I wanted to check the archive hashes, use a separate game copy, and record any trouble launching or loading a save.
 
-## How I used coding assistants
-
-I set up a Codex-assisted Windows test pass around the patch’s release requirements: check the archive hashes, use a separate game copy, and record any launch or save issues.
+The free beta fixes crashes and freezes, including some that happened when loading a save or returning from an encounter. You’ll need your own copy of the English CD release. The installer patches a separate copy and uses the game’s original art and sound. You can find setup instructions and known issues on the patch site.

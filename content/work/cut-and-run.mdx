@@ -7,7 +7,7 @@ role: "Gameplay and build engineering at Sushi Sunday Studio"
 timeframe: "2026"
 order: 2
 featured: true
-summary: "I wanted to build on the kind of pirate strategy game I loved as a kid. For Cut & Run, I brought the Lantern Compact storyline and updated ship and port art into a playable Windows build."
+summary: "I wanted to make the kind of pirate strategy game I’d have played for hours as a kid. I put together a playable Windows build with a new story and updated art for the ships and ports."
 languages: [C, Python]
 stack: [SDL, CMake, Windows x64]
 tags: [Pirate strategy, Independent game, Caribbean, Fleet management]
@@ -19,14 +19,12 @@ liveUrl: "https://cutandrungame.com/"
 liveLabel: "Visit the game site"
 ---
 
-## Connecting content to the game
+## Getting the story into the game
 
-The new story had to work inside the campaign, where players could pick up a mission, see the right dialogue, and return to it after a save. I integrated the Lantern Compact storyline into the mission and dialogue pipeline. I updated ship sprites, port artwork, and interface graphics, and checked how the game loaded and displayed the replacements.
+I put the Lantern Compact story into the campaign and worked through how missions load their dialogue and pick up after a save. I swapped in new ship sprites, port art, and interface graphics, then checked how they looked in the game.
 
-## Testing campaign flows
+## Playing through the same thing twice
 
-I used C and SDL for the Windows runtime and CMake to build it. I wrote a scripted playtest runner that exercised the game through its own controls and produced repeatable runs for checking menu navigation, campaign actions, and saves. I packaged the Windows build with its assets and checked the archive against the staged files.
+I wanted to be able to run the same playtest twice and see what changed. I had Claude Code help with a test driver that sends input through SDL the same way the player’s controls reach the game. That gave me a way to repeat menu, campaign, and save checks. I used Codex to check that the game loaded the new mission text and that the other mission fields stayed intact.
 
-## How I used coding assistants
-
-I asked Claude Code to add a scripted test driver that used the game’s regular SDL input path. I used Codex to check that the Windows build loaded the updated mission text and that the other mission fields stayed intact.
+I used CMake to build the Windows version and checked the packaged game against the files I’d staged.

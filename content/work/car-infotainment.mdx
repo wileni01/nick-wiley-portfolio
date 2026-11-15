@@ -15,19 +15,15 @@ image: "/images/projects/car-startup-chief.webp"
 imageKind: "illustrative"
 imageAlt: "Chief, a golden retriever, on a tall dashboard touchscreen"
 imageCaption: "Recreation of the original factory screen, Chief’s startup sequence, and the new controls."
-summary: "Plugging in my phone should have started CarPlay. When it didn’t, I dug into the factory software and ended up writing and installing my own. My dog Chief now greets me at startup."
+summary: "I plugged my phone in and CarPlay wouldn’t start. I wanted to know why, so I started digging through the factory software. I ended up writing and installing my own dashboard software. Now my dog Chief shows up when I start the car."
 ---
 
 ## Working out what happens at startup
 
-I used Ghidra to reverse-engineer the factory infotainment binary and trace its startup sequence. I mapped what loads before the controls appear so I could target changes to shorten boot time.
+I used Ghidra to reverse-engineer the factory QNX binary and follow what loads before the controls come up. That gave me a place to look for ways to shorten boot time.
 
-Tracing startup also helped me identify which factory files to preserve before installing my changes. I copied those files from the car and verified that the backup matched. I tested the read-only backup package with simulated inputs.
+Tracing startup also showed me which factory files I wanted to keep. I used Codex to add tests for the read-only backup and file comparison tools using simulated inputs. I checked the files I copied from the car separately and verified that the backup matched.
 
 ## Putting it in the car
 
-I wrote and installed custom software for the QNX unit. Once I was working on the startup sequence, I made it something I’d enjoy seeing every time I got in. The portrait display opens with a short animation and a photo of Chief, then hands off to the driving controls.
-
-## How I used coding assistants
-
-I used Codex to add automated tests for the backup and file comparison tools.
+Once I had my own software running on the QNX unit in the car, I wanted to do something fun with startup. The portrait display plays a short animation, shows a photo of Chief, then brings up the driving controls.
