@@ -7,7 +7,7 @@ timeframe: "2026"
 status: "Installed in my car"
 order: 2
 languages: [C, Python, Shell]
-stack: [QNX, Qt, SHA-256]
+stack: [QNX, Qt, Ghidra, SHA-256]
 tags: [Infotainment, Operating system, Startup animation, Software preservation, Backups]
 featured: true
 image: "/images/projects/car-startup-chief.webp"
@@ -21,9 +21,13 @@ summary: "I wrote and installed custom software for my car’s QNX infotainment 
 
 I wrote custom software for the car’s QNX-based infotainment unit and installed it in the vehicle. The portrait screen opens with a short animation and a photo of Chief, then hands off to the driving controls.
 
+## Finding ways to shorten boot time
+
+I used Ghidra to reverse-engineer the factory infotainment binary and trace its startup sequence. I mapped what loads before the controls appear so I could target changes to shorten boot time.
+
 ## Preserving the factory software
 
-I reverse-engineered the original infotainment binary to understand how the factory software starts and which files it relies on. That work informed the new interface and helped me identify what to back up. I copied a set of factory files from the car and verified that the backup copies matched. I also tested a read-only backup package with simulated inputs. The verification covered the factory files I copied from the unit.
+Tracing startup also helped me identify which factory files to preserve. I copied those files from the car and verified that the backup matched. I tested the read-only backup package with simulated inputs.
 
 ## How I used coding assistants
 
