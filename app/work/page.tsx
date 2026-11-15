@@ -33,7 +33,7 @@ export default function WorkPage() {
                   <p className="eyebrow">{study.client}</p>
                   <h3>{study.title}</h3>
                   <p>{study.summary}</p>
-                  <ProjectStack stack={study.stack} />
+                  <ProjectStack languages={study.languages} stack={study.stack} />
                 </div>
                 <ArrowUpRight size={21} strokeWidth={1.5} aria-hidden="true" />
               </Link>

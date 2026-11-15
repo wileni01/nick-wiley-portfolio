@@ -6,7 +6,8 @@ role: "Reverse engineering and Windows port"
 timeframe: "2026"
 status: "Free Windows patch"
 order: 1
-stack: [Ghidra, C, SDL, CMake]
+languages: [C, Python]
+stack: [Ghidra, SDL, CMake, LLVM-MinGW, Windows x64]
 tags: [PC games, Pirates, Game preservation, Binary recovery, Compatibility patch]
 featured: true
 image: "/images/projects/pirate-game-harbor.webp"
@@ -31,3 +32,7 @@ I rebuilt the game as a native 64-bit Windows application, with SDL handling the
 ## Publishing the patch
 
 The free beta fixes crashes and freezes, including problems around loading saves and returning from encounters. The installer patches a separate copy of the game. Players need their own copy of the English CD release, since the download contains no original game data. The beta has been played on 64-bit Windows 11. The patch site has the supported version, setup instructions, and known issues.
+
+## How I used coding assistants
+
+I set up a Codex-assisted Windows test pass around the patch’s release requirements: check the archive hashes, use a separate game copy, and record any launch or save issues.

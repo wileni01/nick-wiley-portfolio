@@ -6,7 +6,8 @@ role: "Software installation, backup, and interface prototyping"
 timeframe: "2026"
 status: "Installed in my car"
 order: 2
-stack: [QNX, C, Python, File verification]
+languages: [C, Python, Shell]
+stack: [QNX, Qt, SHA-256]
 tags: [Infotainment, Operating system, Startup animation, Software preservation, Backups]
 featured: true
 image: "/images/projects/car-startup-chief.webp"
@@ -23,3 +24,7 @@ I installed the new operating system on the car’s infotainment unit and gave i
 ## Preserving the factory software
 
 I reverse-engineered the original infotainment binary to understand how the factory software starts and which files it relies on. That work informed the new interface and helped me identify what to back up. I copied a set of factory files from the car and verified that the backup copies matched. I also tested a read-only backup package with simulated inputs. The verification covered the factory files I copied from the unit.
+
+## How I used coding assistants
+
+I used Codex to add automated tests for the read-only backup and file comparison tools. I verified the recovered factory files against copies taken from the actual unit. The automated tests covered the tools on a computer with simulated inputs.

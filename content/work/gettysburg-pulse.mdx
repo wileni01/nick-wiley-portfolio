@@ -7,7 +7,8 @@ featured: true
 summary: "I built a Next.js tour catalog and repaired a calendar importer that was publishing duplicate and incorrect showtimes. The fix restored 51 performances from the venue’s published schedules."
 slug: "gettysburg-pulse"
 timeframe: "2025–present"
-stack: [Next.js, TypeScript, Prisma, PostgreSQL]
+languages: [TypeScript, SQL]
+stack: [Next.js, Prisma, PostgreSQL, Jest, Vercel]
 tags: [Visitor guide, Tour comparison, Search, Events, Data quality]
 image: "/images/projects/gettysburg-tours-home.jpg"
 imageKind: "screenshot"
@@ -25,3 +26,7 @@ I built GettysburgTours.com to bring information from tour operators, local venu
 A change to the Majestic Theater’s website broke the calendar import and left visitors with incorrect showtimes and duplicate listings. I rewrote the import to check each production’s published showtimes before replacing entries. The cleanup restored 51 performances from the theater’s schedules and removed duplicate, sample, and unverified historical entries from the public calendar.
 
 Repeated imports match existing events by source page and showtime. If a schedule can’t be parsed, the last published entries stay up and the job records the failure for follow-up. The public pages also share a cache so routine visits don’t have to query the database each time.
+
+## How I used coding assistants
+
+I used Codex to update the Majestic Theater parser after the venue changed its site and add regression tests for duplicate and incorrect showtimes. I checked the corrected listings against the venue’s published schedule before putting them back online.

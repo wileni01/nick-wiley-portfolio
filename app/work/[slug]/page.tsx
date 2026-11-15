@@ -65,7 +65,7 @@ export default async function CaseStudyPage({ params }: Props) {
             {study.timeframe && <span>{study.timeframe}</span>}
             {study.status && <span>{study.status}</span>}
           </div>
-          <ProjectStack stack={study.stack} />
+          <ProjectStack languages={study.languages} stack={study.stack} />
         </header>
         {cover && (
           <figure className="case-figure">

@@ -29,7 +29,8 @@ export default function ProjectsPage() {
                 <p className="eyebrow">{project.label}</p>
                 <h2>{project.url ? <Link className="hover:underline underline-offset-4" href={project.url}>{project.title}</Link> : project.title}</h2>
                 <p>{project.summary}</p>
-                <ProjectStack stack={project.stack} />
+                <ProjectStack languages={project.languages} stack={project.stack} />
+                {project.assistantNote && <p className="project-method">{project.assistantNote}</p>}
               </div>
               {project.url && <ArrowUpRight size={21} strokeWidth={1.5} aria-hidden="true" />}
             </div>

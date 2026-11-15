@@ -7,7 +7,8 @@ timeframe: "2026"
 order: 2
 featured: true
 summary: "I extended a native pirate strategy game with new mission text and updated graphics, then built a scripted playtest runner to check campaign flows on Windows."
-stack: [C, SDL, CMake, Python]
+languages: [C, Python]
+stack: [SDL, CMake, Windows x64]
 tags: [Pirate strategy, Independent game, Caribbean, Fleet management]
 image: "/images/projects/cut-and-run-at-sea.webp"
 imageKind: "screenshot"
@@ -25,3 +26,7 @@ I integrated the Lantern Compact storyline into the mission and dialogue pipelin
 ## Testing campaign flows
 
 I used C and SDL for the Windows runtime and CMake to build it. I wrote a scripted playtest runner that exercised the game through its own controls and produced repeatable runs for checking menu navigation, campaign actions, and saves. I packaged the Windows build with its assets and checked the archive against the staged files.
+
+## How I used coding assistants
+
+I asked Claude Code to add a scripted test driver that used the game’s regular SDL input path. I used Codex to check that the Windows build loaded the updated mission text and that the other mission fields stayed intact.

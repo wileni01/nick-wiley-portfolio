@@ -1,9 +1,20 @@
-export function ProjectStack({ stack }: { stack: string[] }) {
-  if (stack.length === 0) return null;
+export function ProjectStack({ languages, stack }: { languages: string[]; stack: string[] }) {
+  if (languages.length === 0 && stack.length === 0) return null;
 
   return (
-    <ul className="project-stack" aria-label="Tools and techniques">
-      {stack.map((tool) => <li key={tool}>{tool}</li>)}
-    </ul>
+    <dl className="project-stack">
+      {languages.length > 0 && (
+        <div>
+          <dt>Languages</dt>
+          <dd>{languages.join(" · ")}</dd>
+        </div>
+      )}
+      {stack.length > 0 && (
+        <div>
+          <dt>Tools</dt>
+          <dd>{stack.join(" · ")}</dd>
+        </div>
+      )}
+    </dl>
   );
 }

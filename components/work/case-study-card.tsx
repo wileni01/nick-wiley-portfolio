@@ -39,7 +39,7 @@ export function CaseStudyCard({
           <ArrowUpRight size={21} strokeWidth={1.5} aria-hidden="true" />
         </h3>
         <p className="project-summary">{study.summary}</p>
-        <ProjectStack stack={study.stack} />
+        <ProjectStack languages={study.languages} stack={study.stack} />
       </div>
     </article>
   );

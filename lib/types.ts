@@ -9,6 +9,7 @@ export const caseStudySchema = z.object({
   status: z.string().optional(),
   order: z.number().default(100),
   role: z.string(),
+  languages: z.array(z.string()).default([]),
   stack: z.array(z.string()),
   tags: z.array(z.string()),
   featured: z.boolean().default(false),
